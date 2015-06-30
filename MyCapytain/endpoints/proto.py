@@ -1,6 +1,9 @@
+"""
+    Prototypes used for implementation of API abstraction
+"""
 class API(object):
     """ API Prototype object """
-    def init(self, endpoint):
+    def __init__(self, endpoint):
         """ Instantiate an API class
         :param self: Object
         :type self: API

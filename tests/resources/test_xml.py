@@ -1,5 +1,5 @@
 import unittest
-from codecs import open
+from io import open
 from MyCapytain.resources.xml import *
 
 class TestXMLImplementation(unittest.TestCase):

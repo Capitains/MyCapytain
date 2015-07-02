@@ -8,4 +8,5 @@
 /*.egg-info
 
 /venv/
+/venv2.7/
 __pycache__

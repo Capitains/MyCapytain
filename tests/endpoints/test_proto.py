@@ -97,7 +97,5 @@ class TestEndpointsProto(unittest.TestCase):
             self.cts.getLabel(urn="urn", inventory="inventory")
 
 
-# Ceci lance le test si on exécute le script
-# directement.
 if __name__ == '__main__':
     unittest.main()

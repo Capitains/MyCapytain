@@ -1,5 +1,5 @@
 <CTS:GetCapabilities xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:CTS="http://chs.harvard.edu/xmlns/cts">
-    <CTS:request elapsed-time="112">
+    <CTS:request elapsed-time="111">
         <CTS:requestName>GetCapabilities</CTS:requestName>
         <CTS:requestUrn/>
         <CTS:psg/>

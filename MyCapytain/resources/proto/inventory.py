@@ -34,13 +34,10 @@ class Resource(object):
         """
         raise NotImplementedError()
 
-class Edition(Resource)
-class Translation(Resource)
-
 class Text(Resource):
     """ Represents a CTS Text
     """
-    def __init__(self, resource=None, urn=None, type=Edition):
+    def __init__(self, resource=None, urn=None, type="Edition"):
         """ Initiate a Work resource
 
         :param resource: Resource representing the TextInventory 
@@ -76,7 +73,12 @@ class Text(Resource):
         """
         return self.parents[0]
 
+def Edition(resource=None, urn=None):
+    return Text(resource=resource, urn=urn, type="Edition")
 
+def Translation(resource=None, urn=None):
+    return Text(resource=resource, urn=urn, type="Translation")
+    
 class Work(Resource):
     """ Represents a CTS Work
     """

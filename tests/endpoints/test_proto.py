@@ -81,6 +81,21 @@ class TestEndpointsProto(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.cts.getPassagePlus(urn="urn", inventory="inventory", context=1)
 
+    def test_raise_CTS_getFirstUrn_arguments(self):
+        """ Tests that methods getFirstUrn have consistent arguments"""
+        with self.assertRaises(NotImplementedError):
+            self.cts.getFirstUrn(urn="urn", inventory="inventory")
+
+    def test_raise_CTS_getPrevNextUrn_arguments(self):
+        """ Tests that methods getPrevNextUrn have consistent arguments"""
+        with self.assertRaises(NotImplementedError):
+            self.cts.getPrevNextUrn(urn="urn", inventory="inventory")
+
+    def test_raise_CTS_getLabel_arguments(self):
+        """ Tests that methods getLabel have consistent arguments"""
+        with self.assertRaises(NotImplementedError):
+            self.cts.getLabel(urn="urn", inventory="inventory")
+
 
 # Ceci lance le test si on exécute le script
 # directement.

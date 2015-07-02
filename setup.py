@@ -12,4 +12,7 @@ setup(name='MyCapytain',
         "requests==2.7.0",
         "lxml==3.4.4"
       ],
+      tests_require=[
+        "mock==1.0.1"
+      ],
       zip_safe=False)

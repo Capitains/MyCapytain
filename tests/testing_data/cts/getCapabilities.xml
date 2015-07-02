@@ -1,0 +1,268 @@
+<CTS:GetCapabilities xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:CTS="http://chs.harvard.edu/xmlns/cts">
+    <CTS:request elapsed-time="112">
+        <CTS:requestName>GetCapabilities</CTS:requestName>
+        <CTS:requestUrn/>
+        <CTS:psg/>
+        <CTS:workurn>:.</CTS:workurn>
+    </CTS:request>
+    <CTS:reply>
+        <ti:TextInventory xmlns:ti="http://chs.harvard.edu/xmlns/cts" tiid="thibault3">
+            <ti:textgroup urn="urn:cts:greekLit:tlg0003">
+                <ti:groupname xml:lang="en">Thucydides</ti:groupname>
+                <ti:groupname xml:lang="eng">Thucydides</ti:groupname>
+                <ti:groupname>Thucydides</ti:groupname>
+                <ti:work urn="urn:cts:greekLit:tlg0003.tlg001" xml:lang="grc">
+                    <ti:title xml:lang="en">The Peloponnesian War</ti:title>
+                    <ti:title xml:lang="eng">The Peloponnesian War</ti:title>
+                    <ti:edition workUrn="urn:cts:greekLit:tlg0003.tlg001" urn="urn:cts:greekLit:tlg0003.tlg001.perseus-grc2">
+                        <ti:label xml:lang="eng">The Peloponnesian War (Oxford 1942 Epidoc)</ti:label>
+                        <ti:description xml:lang="eng">Thucydides. Historiae in two volumes. Oxford, Oxford
+            University Press. 1942.</ti:description>
+                        <ti:online docname="/db/apps/canonical-greekLit/data/tlg0003/tlg001/tlg0003.tlg001.perseus-grc2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
+                                    <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+                                        <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
+                                    </ti:citation>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+            </ti:textgroup>
+            <ti:textgroup urn="urn:cts:latinLit:phi0959">
+                <ti:groupname xml:lang="eng">Ovid</ti:groupname>
+                <ti:groupname>Ovid</ti:groupname>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi001" xml:lang="lat">
+                    <ti:title xml:lang="eng">Amores</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi001" urn="urn:cts:latinLit:phi0959.phi001.perseus-lat2">
+                        <ti:label xml:lang="eng">Amores</ti:label>
+                        <ti:description xml:lang="eng">
+                    Amores, Epistulae, Medicamina faciei femineae, Ars amatoria, Remedia
+                            amoris, R. Ehwald, edidit ex Rudolphi Merkelii recognitione, Leipzig, B. G. Teubner, 1907
+                </ti:description>
+                        <ti:memberof collection="Perseus:collection:Greco-Roman"/>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi001/phi0959.phi001.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']">
+                                    <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']">
+                                        <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']/tei:div[@n='?']"/>
+                                    </ti:citation>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi002" xml:lang="lat">
+                    <ti:title xml:lang="eng">Epistulae</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi002" urn="urn:cts:latinLit:phi0959.phi002.perseus-lat2">
+                        <ti:label xml:lang="eng">Epistulae</ti:label>
+                        <ti:online docname="">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping/>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi003" xml:lang="lat">
+                    <ti:title xml:lang="eng">Art of Beauty</ti:title>
+                    <ti:title xml:lang="fre">Les Fards ou Soins du visage</ti:title>
+                    <ti:title xml:lang="lat">Medicamina faciei femineae</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi003" urn="urn:cts:latinLit:phi0959.phi003.perseus-lat2">
+                        <ti:label xml:lang="eng">Art of Beauty</ti:label>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi003/phi0959.phi003.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']">
+                                    <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']"/>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi004" xml:lang="lat">
+                    <ti:title xml:lang="eng">Art of Love</ti:title>
+                    <ti:title xml:lang="fre">L'Art d'Aimer</ti:title>
+                    <ti:title xml:lang="lat">Ars Amatoria</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi004" urn="urn:cts:latinLit:phi0959.phi004.perseus-lat2">
+                        <ti:label xml:lang="eng">Art of Love</ti:label>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi004/phi0959.phi004.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']">
+                                    <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']"/>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi005" xml:lang="lat">
+                    <ti:title xml:lang="eng">Remedy of Love</ti:title>
+                    <ti:title xml:lang="fre">Remède à l'amoru</ti:title>
+                    <ti:title xml:lang="lat">Remedia amoris</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi005" urn="urn:cts:latinLit:phi0959.phi005.perseus-lat2">
+                        <ti:label xml:lang="eng">Remedy of Love</ti:label>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi005/phi0959.phi005.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']"/>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi006" xml:lang="lat">
+                    <ti:title xml:lang="eng">Metamorphoses</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi006" urn="urn:cts:latinLit:phi0959.phi006.perseus-lat2">
+                        <ti:label xml:lang="eng">Metamorphoses</ti:label>
+                        <ti:description xml:lang="eng">Perseus:bib:oclc,32116154, Ovid. Metamorphoses. Hugo
+                     Magnus. Gotha (Germany). Friedr. Andr. Perthes. 1892.</ti:description>
+                        <ti:memberof collection="Perseus:collection:Greco-Roman"/>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi006/phi0959.phi006.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body">
+                                    <ti:citation label="unknown" xpath="/tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@n='?']"/>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi006" urn="urn:cts:latinLit:phi0959.phi006.perseus-lat1">
+                        <ti:label xml:lang="eng">Metamorphoses</ti:label>
+                        <ti:description xml:lang="eng">Perseus:bib:oclc,32116154, Ovid. Metamorphoses. Hugo Magnus.
+          Gotha (Germany). Friedr. Andr. Perthes. 1892.</ti:description>
+                        <ti:memberof collection="Perseus:collection:Greco-Roman"/>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi006/phi0959.phi006.perseus-lat1.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping/>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi007" xml:lang="lat">
+                    <ti:title xml:lang="eng">Book of Days</ti:title>
+                    <ti:title xml:lang="fre">Fastes</ti:title>
+                    <ti:title xml:lang="lat">Fasti</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi007" urn="urn:cts:latinLit:phi0959.phi007.perseus-lat2">
+                        <ti:label xml:lang="eng">Book of Days</ti:label>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi007/phi0959.phi007.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']">
+                                    <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']"/>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi008" xml:lang="lat">
+                    <ti:title xml:lang="eng">Sorrows</ti:title>
+                    <ti:title xml:lang="fre">Tristes</ti:title>
+                    <ti:title xml:lang="lat">Tristia</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi008" urn="urn:cts:latinLit:phi0959.phi008.perseus-lat2">
+                        <ti:label xml:lang="eng">Tristia</ti:label>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi008/phi0959.phi008.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']">
+                                    <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']">
+                                        <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']/tei:div[@n='?']"/>
+                                    </ti:citation>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi009" xml:lang="lat">
+                    <ti:title xml:lang="eng">Letters from the Black Sea</ti:title>
+                    <ti:title xml:lang="fre">Pontiques</ti:title>
+                    <ti:title xml:lang="lat">Ex Ponto</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi009" urn="urn:cts:latinLit:phi0959.phi009.perseus-lat2">
+                        <ti:label xml:lang="eng">Ex Ponto</ti:label>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi009/phi0959.phi009.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']">
+                                    <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']">
+                                        <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='?']/tei:div[@n='?']"/>
+                                    </ti:citation>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+                <ti:work urn="urn:cts:latinLit:phi0959.phi010" xml:lang="lat">
+                    <ti:title xml:lang="eng">Ibis</ti:title>
+                    <ti:title xml:lang="fre">Ibis</ti:title>
+                    <ti:title xml:lang="lat">Ibis</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi0959.phi010" urn="urn:cts:latinLit:phi0959.phi010.perseus-lat2">
+                        <ti:label xml:lang="eng">Ibis</ti:label>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi0959/phi010/phi0959.phi010.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="//tei:l[@n='?']" scope="/tei:TEI.2/tei:text/tei:body/tei:div[@type='edition']"/>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+            </ti:textgroup>
+            <ti:textgroup urn="urn:cts:latinLit:phi1276">
+                <ti:groupname xml:lang="eng">Juvenal</ti:groupname>
+                <ti:work urn="urn:cts:latinLit:phi1276.phi001">
+                    <ti:title xml:lang="eng">Satires</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi1276.phi001" urn="urn:cts:latinLit:phi1276.phi001.perseus-lat2">
+                        <ti:label xml:lang="eng">Satires</ti:label>
+                        <ti:description xml:lang="eng">
+            Juvenal and Persius: With An English Translation, G. G. Ramsay, 1918, William Heinemann; G. P. Putnam's Son, London
+        </ti:description>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi1276/phi001/phi1276.phi001.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
+                                    <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+                                        <ti:citation label="unknown" xpath="/tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
+                                    </ti:citation>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+            </ti:textgroup>
+            <ti:textgroup urn="urn:cts:latinLit:phi1294">
+                <ti:groupname xml:lang="eng">Martial</ti:groupname>
+                <ti:work urn="urn:cts:latinLit:phi1294.phi002">
+                    <ti:title xml:lang="eng">Epigrammata</ti:title>
+                    <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
+                        <ti:label xml:lang="eng">Epigrammata</ti:label>
+                        <ti:description xml:lang="eng">
+            M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus
+        </ti:description>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
+                                    <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+                                        <ti:citation label="unknown" xpath="/tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
+                                    </ti:citation>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:edition>
+                </ti:work>
+            </ti:textgroup>
+        </ti:TextInventory>
+    </CTS:reply>
+</CTS:GetCapabilities>

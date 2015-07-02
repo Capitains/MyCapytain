@@ -1,12 +1,16 @@
 from . import proto
 import requests
 
+
 class Ahab(proto.Ahab):
+
     """ Basic integration of the proto.CTS abstractiojn
     """
     pass
 
+
 class CTS(proto.CTS):
+
     """ Basic integration of the proto.CTS abstraction
     """
 
@@ -17,7 +21,9 @@ class CTS(proto.CTS):
         :rtype: text
         """
         # DEV !
-        parameters = dict((key,parameters[key]) for key in parameters if parameters[key] is not None)
+        parameters = dict(
+            (key, parameters[key]) for key in parameters if parameters[key] is not None
+        )
         request = requests.get(self.endpoint, params=parameters)
         return request.text
 
@@ -28,9 +34,9 @@ class CTS(proto.CTS):
         :rtype: str
         """
         return self.call({
-                "inv" : inventory,
-                "request" : "GetCapabilities"
-            })
+            "inv": inventory,
+            "request": "GetCapabilities"
+        })
 
     def getValidReff(self, urn, inventory, level=1):
         """ Retrieve valid urn-references for a text
@@ -43,11 +49,11 @@ class CTS(proto.CTS):
         :rtype: str
         """
         return self.call({
-                "inv" : inventory,
-                "urn" : urn,
-                "level" : level,
-                "request" : "GetValidReff"
-            })
+            "inv": inventory,
+            "urn": urn,
+            "level": level,
+            "request": "GetValidReff"
+        })
 
     def getFirstUrn(self, urn, inventory):
         """ Retrieve the first passage urn of a text
@@ -58,10 +64,10 @@ class CTS(proto.CTS):
         :rtype: str
         """
         return self.call({
-                "inv" : inventory,
-                "urn" : urn,
-                "request" : "GetFirstUrn"
-            })
+            "inv": inventory,
+            "urn": urn,
+            "request": "GetFirstUrn"
+        })
 
     def getPrevNextUrn(self, urn, inventory):
         """ Retrieve the previous and next passage urn of one passage
@@ -72,10 +78,10 @@ class CTS(proto.CTS):
         :rtype: str
         """
         return self.call({
-                "inv" : inventory,
-                "urn" : urn,
-                "request" : "GetPrevNextUrn"
-            })
+            "inv": inventory,
+            "urn": urn,
+            "request": "GetPrevNextUrn"
+        })
 
     def getLabel(self, urn, inventory):
         """ Retrieve informations about a CTS Urn
@@ -86,10 +92,10 @@ class CTS(proto.CTS):
         :rtype: str
         """
         return self.call({
-                "inv" : inventory,
-                "urn" : urn,
-                "request" : "GetLabel"
-            })
+            "inv": inventory,
+            "urn": urn,
+            "request": "GetLabel"
+        })
 
     def getPassage(self, urn, inventory, context=None):
         """ Retrieve a passage
@@ -102,12 +108,11 @@ class CTS(proto.CTS):
         :rtype: str
         """
         return self.call({
-                "inv" : inventory,
-                "urn" : urn,
-                "context" : context,
-                "request" : "GetPassage"
-            })
-
+            "inv": inventory,
+            "urn": urn,
+            "context": context,
+            "request": "GetPassage"
+        })
 
     def getPassagePlus(self, urn, inventory, context=None):
         """ Retrieve a passage and informations about it
@@ -120,8 +125,8 @@ class CTS(proto.CTS):
         :rtype: str
         """
         return self.call({
-                "inv" : inventory,
-                "urn" : urn,
-                "context" : context,
-                "request" : "GetPassagePlus"
-            })
+            "inv": inventory,
+            "urn": urn,
+            "context": context,
+            "request": "GetPassagePlus"
+        })

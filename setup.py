@@ -9,6 +9,7 @@ setup(name='MyCapytain',
       license='MIT',
       packages=['MyCapytain'],
       install_requires=[
-        "requests==2.7.0"
+        "requests==2.7.0",
+        "lxml==3.4.4"
       ],
       zip_safe=False)

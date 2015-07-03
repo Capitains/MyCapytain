@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from collections import defaultdict
-from future import basestring
+from past.builtins import basestring
+from builtins import range
 import re
 
 __order = [
@@ -57,25 +58,27 @@ class Reference(object):
         :rtype: Tuple
         :returns: An empty tuple to model data
         """
-        return (None, [], None)
+        return [None, [], None]
 
     def __regexp(self, subreference):
-        r = re.compile("(\w*)\[([0-9]*)\]", re.UNICODE)
+        r = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
         return r.findall(subreference)[0]
 
     def __parse(self, reference):
         """ Parse references informations
         """
         ref = reference.split("-")
-        element = (self.__model(), self.__model())
-        for i in xrange(0,len(ref)):
+        element = [self.__model(), self.__model()]
+        for i in range(0,len(ref)):
             r = ref[i]
+            element[i][0] = r
             subreference = r.split("@")
-            if len(ref) == 2:
-                element[i][2] = __regexp(r[1])
-                r = r[0]
+            if len(subreference) == 2:
+                element[i][2] = self.__regexp(subreference[1])
+                r = subreference[0]
             element[i][1] = r.split(".")
-        return element
+            element[i] = tuple(element[i])
+        return tuple(element)
 
 
 

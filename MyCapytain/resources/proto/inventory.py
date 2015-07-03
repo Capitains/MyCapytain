@@ -10,7 +10,7 @@ class Resource(object):
         :param resource: Resource representing the TextInventory 
         :type resource: Any
         """
-        if resource:
+        if resource is not None:
             self.setResource(resource)
 
     def setResource(self, resource):
@@ -37,7 +37,7 @@ class Resource(object):
 class Text(Resource):
     """ Represents a CTS Text
     """
-    def __init__(self, resource=None, urn=None, type="Edition"):
+    def __init__(self, resource=None, urn=None, parents=None, type="Edition"):
         """ Initiate a Work resource
 
         :param resource: Resource representing the TextInventory 
@@ -46,8 +46,11 @@ class Text(Resource):
         :type urn: str
         """
         self.urn = None
-        if resource:
+        if resource is not None:
             self.setResource(resource)
+        self.parents = ()
+        if parents is not None:
+            self.parents = None
 
     def getWork(self):
         """ Find Work parent
@@ -74,15 +77,15 @@ class Text(Resource):
         return self.parents[0]
 
 def Edition(resource=None, urn=None):
-    return Text(resource=resource, urn=urn, type="Edition")
+    return Text(resource=resource, urn=urn, parents=None, type="Edition")
 
 def Translation(resource=None, urn=None):
-    return Text(resource=resource, urn=urn, type="Translation")
+    return Text(resource=resource, urn=urn, parents=None, type="Translation")
     
 class Work(Resource):
     """ Represents a CTS Work
     """
-    def __init__(self, resource=None, urn=None):
+    def __init__(self, resource=None, urn=None, parents=None):
         """ Initiate a Work resource
 
         :param resource: Resource representing the TextInventory 
@@ -93,12 +96,12 @@ class Work(Resource):
         :type parents: Tuple.<TextInventory> 
         """
         self.urn = None
-        self.works = []
-        if resource:
+        self.texts = []
+        if resource is not None:
             self.setResource(resource)
 
         self.parents = ()
-        if parents:
+        if parents is not None:
             self.parents = parents
 
     def getTextGroup(self):
@@ -137,7 +140,7 @@ class TextGroup(Resource):
         if parents:
             self.parents = parents
 
-        if resource:
+        if resource is not None:
             self.setResource(resource)
 
     def getInventory(self):
@@ -161,7 +164,7 @@ class TextInventory(Resource):
         """
         self.textgroups = []
         self.id = id
-        if resource:
+        if resource is not None:
             self.setResource(resource)
 
     def parse(self, resource):

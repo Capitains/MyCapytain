@@ -18,4 +18,5 @@ setup(name='MyCapytain',
       extras_require = {
         "DOC" : ["Sphinx==1.3.1"]
       },
+      test_suite="tests",
       zip_safe=False)

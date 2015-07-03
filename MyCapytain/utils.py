@@ -5,6 +5,10 @@ from builtins import range
 import re
 
 
+"""
+    The ```utils``` modules
+"""
+
 class Reference(object):
 
     """ A reference object giving informations """

@@ -3,12 +3,17 @@ python:
   - "2.7"
   - "3.4"
 # command to install dependencies
+before_install:
+    - pip install coveralls
 install: 
     - pip install -r requirements.txt
-    - pip install coveralls
 # command to run tests
 script: 
     - python -m unittest discover --verbose
-    - coverage run --source=MyCapytain setup.py test
-after_success: 
-    - coveralls
+after_success:
+    - if [[ $ENV == python=3.4* ]]; then
+          coveralls;
+      fi
+branches:
+  only:
+    - master

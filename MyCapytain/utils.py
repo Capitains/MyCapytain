@@ -113,6 +113,17 @@ class URN(object):
         self.urn = urn
         self.parsed = self.__parse(self.urn)
 
+    def __len__(self):
+        """ Warning : Does not take into account the passage ! """
+        items = [key for key in self.parsed if key not in ["passage", "reference", "full"] ]
+        return len(items)
+
+    def __gt__(self, other):
+        return len(self) > len(other)
+
+    def __lt__(self, other):
+        return len(self) < len(other)
+
     def __eq__(self, other):
         """ Equality checker for URN object
         :param other: An object to be checked against
@@ -288,5 +299,5 @@ class URN(object):
                 if len(urn) >= 3:
                     parsed["text"] = urn[2]
         else:
-            raise UserWarning("URN is empty")
+            raise ValueError("URN is empty")
         return parsed

@@ -14,6 +14,7 @@ class TestReferenceImplementation(unittest.TestCase):
 
     def test_str_getitem(self):
         a = Reference("1.1@Achilles[0]-1.10@Atreus[3]")
+        self.assertEqual(a["any"], "1.1@Achilles[0]-1.10@Atreus[3]")
         self.assertEqual(a["start"], "1.1@Achilles[0]")
         self.assertEqual(a["start_list"], ["1", "1"])
         self.assertEqual(a["start_sub"][0], "Achilles")
@@ -173,14 +174,32 @@ class TestURNImplementation(unittest.TestCase):
         self.assertIsNone(a["end"])
 
     def test_missing_text_in_passage_emptiness(self):
-        a = URN("urn:cts:greekLit:textgroup.work:1")
-        self.assertEqual(a["full"], "urn:cts:greekLit:textgroup.work:1")
+        a = URN("urn:cts:greekLit:textgroup.work:1-2")
+        self.assertEqual(a["full"], "urn:cts:greekLit:textgroup.work:1-2")
         self.assertEqual(a["urn_namespace"], "urn:cts")
         self.assertEqual(a["cts_namespace"], "urn:cts:greekLit")
         self.assertEqual(a["textgroup"], "urn:cts:greekLit:textgroup")
         self.assertEqual(a["work"], "urn:cts:greekLit:textgroup.work")
         self.assertIsNone(a["text"])
-        self.assertEqual(a["passage"], "urn:cts:greekLit:textgroup.work:1")
-        self.assertEqual(a["reference"], Reference("1"))
+        self.assertEqual(a["passage"], "urn:cts:greekLit:textgroup.work:1-2")
+        self.assertEqual(a["reference"], Reference("1-2"))
         self.assertEqual(a["start"], "urn:cts:greekLit:textgroup.work:1")
-        self.assertIsNone(a["end"])
+        self.assertEqual(a["end"], "urn:cts:greekLit:textgroup.work:2")
+
+    def test_warning_on_empty(self):
+        with self.assertRaises(ValueError):
+            a = URN("urn:cts")
+
+    def test_len(self):
+        a = URN("urn:cts:greekLit")
+        self.assertEqual(len(a), 2)
+
+    def test_greater(self):
+        a = URN("urn:cts:greekLit")
+        b = URN("urn:cts:greekLit:textgroup")
+        self.assertGreater(b, a)
+
+    def test_lower(self):
+        a = URN("urn:cts:greekLit")
+        b = URN("urn:cts:greekLit:textgroup")
+        self.assertEqual(a < b, True)

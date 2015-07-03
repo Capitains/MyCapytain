@@ -7,7 +7,7 @@ import collections
 
 ns = {
     "tei": "http://www.tei-c.org/ns/1.0",
-    "ahab": "lala",
+    "ahab": "http://localhost.local",
     "ti": "http://chs.harvard.edu/xmlns/cts"
 }
 
@@ -27,40 +27,6 @@ def parse(xml):
     if doclose:
         xml.close()
     return parsed
-
-
-def parseUrn(urn):
-    """ Parse a urn cts string
-    :param urn: Urn identifying a textinventory object
-    :type urn: basestring
-    :rtype: Dict
-    :returns: Decomposed urn
-    """
-    urn = urn.split(":")
-    parsed = {}
-    parsed["prefix"] = ":".join(urn[0:3])
-
-    if len(urn) == 4:
-        urn = urn[3].split(".")
-    if len(urn) >= 1:
-        parsed["textgroup"] = urn[0]
-    if len(urn) >= 2:
-        parsed["work"] = urn[1]
-    if len(urn) >= 3:
-        parsed["text"] = urn[2]
-    return parsed
-
-def joinUrn(level, urn):
-    """ Join a parsed Urn
-    """
-    if level == "textgroup":
-        return ":".join([urn["prefix"], urn["textgroup"]])
-    elif level == "work":
-        return ":".join([urn["prefix"], ".".join([urn["textgroup"], urn["work"]])])
-    elif level == "text":
-        return ":".join([urn["prefix"], ".".join([urn["textgroup"], urn["work"], urn["text"]])])
-    else:
-        return ""
 
 
 def xpathDict(xml, xpath, children, parents, **kwargs):
@@ -89,6 +55,24 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
         ) for child in xml.xpath(xpath, namespaces=ns))
     )
 
+
+class Text(inventory.Text):
+    """ Represents a CTS Text
+    """
+    def __init__(self, **kwargs):
+        super(Text, self).__init__(**kwargs)
+        self.label = {}
+        self.descriptions = {}
+
+    def parse(self, resource):
+        return None
+
+def Edition(resource=None, urn=None, parents=None):
+    return Text(resource=resource, urn=urn, parents=parents, type="Edition")
+
+def Translation(resource=None, urn=None, parents=None):
+    return Text(resource=resource, urn=urn, parents=parents, type="Translation")
+
 class Work(inventory.Work):
 
     """ Represents a CTS Textgroup in XML
@@ -98,8 +82,30 @@ class Work(inventory.Work):
         super(Work, self).__init__(**kwargs)
         self.title = {}
 
+
     def parse(self, resource):
-        return None
+        self.xml = parse(resource)
+
+        self.editions = xpathDict(
+            xml=self.xml,
+            xpath='ti:edition',
+            children=Edition,
+            parents=tuple([self]) + self.parents
+        )
+        self.translations = xpathDict(
+            xml=self.xml,
+            xpath='ti:translation',
+            children=Translation,
+            parents=tuple([self]) + self.parents
+        )
+
+        self.texts = collections.defaultdict(Text)
+        for urn in self.editions:
+            self.texts[urn] = self.editions[urn]
+        for urn in self.translations:
+            self.texts[urn] = self.translations[urn]
+
+        return self.texts
 
 class TextGroup(inventory.TextGroup):
 
@@ -109,28 +115,6 @@ class TextGroup(inventory.TextGroup):
     def __init__(self, **kwargs):
         super(TextGroup, self).__init__(**kwargs)
         self.groupname = {}
-
-    def __getitem__(self, urn):
-        """ Allows Obj[urn] returning an element
-        :param key: A urn
-        :type key: basestring
-        :rtype: inventory.Resource
-        :returns: inventory.Resource Corresponding
-        """
-        if urn == 0:
-            return self
-        elif not isinstance(urn, basestring):
-            raise TypeError("Expected string, got something else")
-
-        raw_urn = urn
-        urn = parseUrn(urn)
-        element = None
-
-        if "work" in urn:
-            element = self.works[joinUrn("work", urn)]
-        if "text" in urn:
-            element = element[raw_urn]
-        return element
 
     def parse(self, resource):
         self.xml = parse(resource)
@@ -151,29 +135,6 @@ class TextInventory(inventory.TextInventory):
 
     def __init__(self, **kwargs):
         super(TextInventory, self).__init__(**kwargs)
-
-    def __getitem__(self, urn):
-        """ Allows Obj[urn] returning an element
-        :param key: A urn
-        :type key: basestring
-        :rtype: TextGroup
-        :returns: Textgroup Corresponding
-        """
-        if urn == 0:
-            return self
-        elif not isinstance(urn, basestring):
-            raise TypeError("Expected string, got something else")
-
-        raw_urn = urn
-        urn = parseUrn(urn)
-        element = None
-        if "textgroup" in urn:
-            element = self.textgroups[joinUrn("textgroup", urn)]
-        if "work" in urn:
-            element = element[raw_urn]
-        if "text" in urn:
-            element = element[raw_urn]
-        return element
 
     def parse(self, resource):
         self.xml = parse(resource)

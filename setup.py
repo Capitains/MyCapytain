@@ -15,4 +15,7 @@ setup(name='MyCapytain',
       tests_require=[
         "mock==1.0.1"
       ],
+      extras_require = {
+        "DOC" : ["Sphinx==1.3.1"]
+      },
       zip_safe=False)

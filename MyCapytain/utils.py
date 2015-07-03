@@ -288,5 +288,5 @@ class URN(object):
                 if len(urn) >= 3:
                     parsed["text"] = urn[2]
         else:
-            raise UserWarning("URN is empty")
+            raise ValueError("URN is empty")
         return parsed

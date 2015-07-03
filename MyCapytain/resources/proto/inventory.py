@@ -1,6 +1,8 @@
 """
     Resources Prototypes
 """
+from ...utils import URN, Reference
+from past.builtins import basestring
 
 class Resource(object):
     """ Resource represents any resource from the inventory """
@@ -12,6 +14,60 @@ class Resource(object):
         """
         if resource is not None:
             self.setResource(resource)
+
+    def __getitem__(self, key):
+        """ Direct key access function for Text objects """
+        if key == 0:
+            return self
+        elif isinstance(key, int) and 1 <= key <= len(self.parents):
+            r = self.parents[key - 1]
+            if isinstance(r, (list, tuple)):
+                return r[0]
+            else:
+                return r
+        elif isinstance(key, basestring):
+            return self.__urnitem__(key)
+        else:
+            None
+
+    def __eq__(self, other):
+        if self is other:
+            return True
+        if not isinstance(other, self.__class__):
+            return False
+        if self.resource is None:
+            # Not totally true
+            return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn)
+        return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn) and self.resource == other.resource
+
+    def __urnitem__(self, key):
+        urn = URN(key)
+
+        if len(urn) <= 2:
+            raise ValueError("Not valid urn")
+        elif hasattr(self, "urn") and self.urn == urn:
+            return self
+        else:
+            if hasattr(self, "urn"):
+                i = len(self.urn)
+            else:
+                i = 2
+
+            if isinstance(self, TextInventory):
+                children = self.textgroups
+            elif isinstance(self, TextGroup):
+                children = self.works
+            elif isinstance(self, Work):
+                children = self.texts
+
+            order = ["", "", "textgroup", "work", "text"]
+
+            while i <= len(urn) - 1:
+                children = children[urn[order[i]]]
+                if not hasattr(children, "urn"):
+                    raise ValueError("Unrecognized urn at level " + order[i])
+                i += 1
+            return children
 
     def setResource(self, resource):
         """ Set the object property resource
@@ -46,11 +102,16 @@ class Text(Resource):
         :type urn: str
         """
         self.urn = None
+        self.parents = ()
+
+        if urn is not None:
+            self.urn = URN(urn)
+
+        if parents is not None:
+            self.parents = parents
+
         if resource is not None:
             self.setResource(resource)
-        self.parents = ()
-        if parents is not None:
-            self.parents = None
 
     def getWork(self):
         """ Find Work parent
@@ -58,7 +119,7 @@ class Text(Resource):
         :rtype: Work
         :returns: The Work
         """
-        return self.parents[2]
+        return self[1]
 
     def getTextGroup(self):
         """ Find TextGroup parent
@@ -66,7 +127,7 @@ class Text(Resource):
         :rtype: TextGroup
         :returns: The TextGroup
         """
-        return self.parents[1]
+        return self[2]
 
     def getInventory(self):
         """ Find Inventory parent
@@ -74,13 +135,13 @@ class Text(Resource):
         :rtype: TextInventory
         :returns: The Inventory
         """
-        return self.parents[0]
+        return self[3]
 
-def Edition(resource=None, urn=None):
-    return Text(resource=resource, urn=urn, parents=None, type="Edition")
+def Edition(resource=None, urn=None, parents=None):
+    return Text(resource=resource, urn=urn, parents=parents, type="Edition")
 
-def Translation(resource=None, urn=None):
-    return Text(resource=resource, urn=urn, parents=None, type="Translation")
+def Translation(resource=None, urn=None, parents=None):
+    return Text(resource=resource, urn=urn, parents=parents, type="Translation")
     
 class Work(Resource):
     """ Represents a CTS Work
@@ -97,12 +158,16 @@ class Work(Resource):
         """
         self.urn = None
         self.texts = []
-        if resource is not None:
-            self.setResource(resource)
-
         self.parents = ()
+
+        if urn is not None:
+            self.urn = URN(urn)
+
         if parents is not None:
             self.parents = parents
+
+        if resource is not None:
+            self.setResource(resource)
 
     def getTextGroup(self):
         """ Find TextGroup parent
@@ -110,7 +175,7 @@ class Work(Resource):
         :rtype: TextGroup
         :returns: The TextGroup
         """
-        return self.parents[1]
+        return self.parents[0]
 
     def getInventory(self):
         """ Find Inventory parent
@@ -118,7 +183,7 @@ class Work(Resource):
         :rtype: TextInventory
         :returns: The Inventory
         """
-        return self.parents[0]
+        return self.parents[1]
 
 class TextGroup(Resource):
     """ Represents a CTS Textgroup
@@ -135,10 +200,13 @@ class TextGroup(Resource):
         """
         self.urn = None
         self.works = []
-
         self.parents = ()
+
+        if urn is not None:
+            self.urn = URN(urn)
+
         if parents:
-            self.parents = parents
+            self.parents = [parents]
 
         if resource is not None:
             self.setResource(resource)
@@ -164,6 +232,7 @@ class TextInventory(Resource):
         """
         self.textgroups = []
         self.id = id
+        self.parents = ()
         if resource is not None:
             self.setResource(resource)
 

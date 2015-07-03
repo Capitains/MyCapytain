@@ -189,3 +189,17 @@ class TestURNImplementation(unittest.TestCase):
     def test_warning_on_empty(self):
         with self.assertRaises(ValueError):
             a = URN("urn:cts")
+
+    def test_len(self):
+        a = URN("urn:cts:greekLit")
+        self.assertEqual(len(a), 2)
+
+    def test_greater(self):
+        a = URN("urn:cts:greekLit")
+        b = URN("urn:cts:greekLit:textgroup")
+        self.assertGreater(b, a)
+
+    def test_lower(self):
+        a = URN("urn:cts:greekLit")
+        b = URN("urn:cts:greekLit:textgroup")
+        self.assertEqual(a < b, True)

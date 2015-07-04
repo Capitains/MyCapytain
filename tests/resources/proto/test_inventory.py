@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import six
 import unittest
+import six
+
 from io import open
 from collections import defaultdict
 from MyCapytain.resources.proto import inventory

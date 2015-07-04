@@ -345,6 +345,13 @@ class Metadatum(object):
             return self.children[key]
 
     def __setitem__(self, key, value):
+        """ Add an iterable access method
+        :param key:
+        :type key:
+        :param value:
+        :type value:
+        :returns: An element of children whose index is key
+        """
         if isinstance(key, tuple):
             if not isinstance(value, (tuple, list)):
                 value = [value]*len(key)
@@ -371,3 +378,63 @@ class Metadatum(object):
         for key in self.children:
             yield (key, self.children[key])
             i+=1
+
+class Metadata(object):
+    def __init__(self, keys=None):
+        self.metadata = defaultdict(Metadatum)
+        self.__keys = []
+        if keys is not None:
+            for key in keys:
+                self[key] = Metadatum(name=key)
+
+    def __getitem__(self, key):
+        """ Add an iterable access method
+        :param key:
+        :type key:
+        :returns: An element of children whose index is key
+        """
+        if isinstance(key, int):
+            if key + 1 > len(self.__keys):
+                raise KeyError()
+            else:
+                key = self.__keys[key]
+        elif isinstance(key, tuple):
+            return tuple([self[k] for k in key])
+
+        if key not in self.metadata:
+            raise KeyError()
+        else:
+            return self.metadata[key]
+
+    def __setitem__(self, key, value):
+        """ Add an iterable access method
+        :param key:
+        :type key:
+        :param value:
+        :type value:
+        :returns: An element of children whose index is key
+        """
+        if isinstance(key, tuple):
+            if len(value) < len(key):
+                raise ValueError("Less values than keys detected")
+            for i in range(0, len(key)):
+                self[key[i]] = value[i]
+        elif not isinstance(key, basestring):
+            raise TypeError("Only basestring or tuple instances are accepted as key")
+        else:
+            if not isinstance(value, Metadatum) and isinstance(value, list):
+                self.metadata[key] = Metadatum(key, value)
+            elif isinstance(value, Metadatum):
+                self.metadata[key] = value
+
+            if key in self.metadata and key not in self.__keys:
+                self.__keys.append(key)
+
+    def __iter__(self):
+        i = 0
+        for key in self.__keys:
+            yield (key, self.metadata[key])
+            i+=1
+
+    def __len__(self):
+        return len([k for k in self.__keys if isinstance(self.metadata[k], Metadatum)])

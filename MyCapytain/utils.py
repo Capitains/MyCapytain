@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 from past.builtins import basestring
-from builtins import range
+from builtins import range, object
 import re
 
 
@@ -316,6 +316,7 @@ class Metadatum(object):
         self.name = name
         self.children = OrderedDict()
         self.default = None
+        self._iter = iter(self.children)
 
         if children is not None and isinstance(children, list):
             for tup in children:
@@ -366,3 +367,9 @@ class Metadatum(object):
         else:
             self.default = key
         return self.default
+
+    def __next__(self):
+        return next(self._iter)
+
+    def __iter__(self):
+        return self

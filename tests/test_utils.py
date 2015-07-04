@@ -273,3 +273,19 @@ class TestMetadatum(unittest.TestCase):
         a.default = None
         with self.assertRaises(KeyError):
             print(a["spa"])
+
+    def test_iter(self):
+        data = [
+                ("eng", "Epigrams"),
+                ("fre", "Epigrammes")
+            ]
+        a = Metadatum("title", [
+                ("eng", "Epigrams"),
+                ("fre", "Epigrammes")
+            ])
+        self.assertEqual(list(a), [
+                "eng",
+                "fre"
+            ])
+        testdata = [(k, v) for k, v in a]
+        self.assertEqual(list(a), testdata)

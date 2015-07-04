@@ -13,7 +13,8 @@ setup(name='MyCapytain',
         "lxml==3.4.4"
       ],
       tests_require=[
-        "mock==1.0.1"
+        "mock==1.0.1",
+        "six==1.9.0"
       ],
       extras_require = {
         "DOC" : ["Sphinx==1.3.1"]

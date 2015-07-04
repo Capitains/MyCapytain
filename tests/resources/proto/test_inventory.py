@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 import unittest
+import six
+
 from io import open
 from collections import defaultdict
 from MyCapytain.resources.proto import inventory
@@ -50,12 +52,12 @@ class TestRepoProto(unittest.TestCase):
 
         b = TIV(resource="hello")
 
-        with self.assertRaisesRegex(ValueError, "Not valid urn"):
+        with six.assertRaisesRegex(self, ValueError, "Not valid urn"):
             a["urn:cts:greekLit"]
 
         self.assertEqual(a["urn:cts:greekLit:tg"], a)
 
-        with self.assertRaisesRegex(ValueError, "Unrecognized urn at level"):
+        with six.assertRaisesRegex(self, ValueError, "Unrecognized urn at level"):
             b["urn:cts:greekLit:tg2"]
         
     def test_edit_trans(self):

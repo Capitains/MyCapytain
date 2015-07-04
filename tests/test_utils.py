@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import unittest
+import six
 from MyCapytain.utils import *
 
 class TestReferenceImplementation(unittest.TestCase):
@@ -203,3 +204,72 @@ class TestURNImplementation(unittest.TestCase):
         a = URN("urn:cts:greekLit")
         b = URN("urn:cts:greekLit:textgroup")
         self.assertEqual(a < b, True)
+
+class TestMetadatum(unittest.TestCase):
+    def test_init(self):
+        a = Metadatum("title")
+        self.assertEqual(a.name, "title")
+
+    def test_set_item(self):
+        a = Metadatum("title")
+        a["eng"] = "Epigrams"
+        self.assertEqual(a["eng"], "Epigrams")
+        # It should set a default too
+        self.assertEqual(a["fre"], "Epigrams")
+        # But not twice
+        a["fre"] = "Epigrammes"
+        self.assertEqual(a["spa"], "Epigrams")
+        self.assertEqual(a["fre"], "Epigrammes")
+        # Set tuples with one value
+        a[("lat", "grc")] = "Epigrammata"
+        self.assertEqual(a["lat"], "Epigrammata")
+        self.assertEqual(a["grc"], "Epigrammata")
+        # Set tuples with tuples
+        a = Metadatum("title")
+        a[("lat", "grc")] = ("Epigrammata", "ἐπιγραμματον")
+        self.assertEqual(a["lat"], "Epigrammata")
+        self.assertEqual(a["grc"], "ἐπιγραμματον")
+        # Set error because key is wrong
+        with six.assertRaisesRegex(self, TypeError, "Only basestring or tuple instances are accepted as key"):
+            a[3.5] = "test"
+        with six.assertRaisesRegex(self, ValueError, "Less values than keys detected"):
+            a[("lat", "grc")] = ["Epigrammata"]
+        
+
+    def test_init_with_children(self):
+        a = Metadatum("title", [
+                ("eng", "Epigrams"),
+                ("fre", "Epigrammes")
+            ])
+        self.assertEqual(a["fre"], "Epigrammes")
+        self.assertEqual(a["eng"], "Epigrams")
+
+    def test_override_default(self):
+        a = Metadatum("title", [
+                ("eng", "Epigrams"),
+                ("fre", "Epigrammes")
+            ])
+        self.assertEqual(a["spa"], "Epigrams")
+        a.setDefault("fre")
+        self.assertEqual(a["spa"], "Epigrammes")
+        # If key is not available, should raise an error
+        with six.assertRaisesRegex(self, ValueError, "Can not set a default to an unknown key"):
+            a.setDefault(None)
+
+    def test_get_item(self):
+        a = Metadatum("title", [
+                ("eng", "Epigrams"),
+                ("fre", "Epigrammes")
+            ])
+        self.assertEqual(a[0], "Epigrams")
+        self.assertEqual(a["eng"], "Epigrams")
+        self.assertEqual(a["spa"], "Epigrams")
+        self.assertEqual(a[1], "Epigrammes")
+        # Access through tuple !
+        self.assertEqual(a[(0,1)], ("Epigrams", "Epigrammes"))
+        with self.assertRaises(KeyError):
+            print(a[2])
+
+        a.default = None
+        with self.assertRaises(KeyError):
+            print(a["spa"])

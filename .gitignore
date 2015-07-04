@@ -11,3 +11,4 @@
 /venv2.7/
 __pycache__
 .coverall
+.coverage

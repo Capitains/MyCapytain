@@ -93,7 +93,7 @@ class Resource(object):
 class Text(Resource):
     """ Represents a CTS Text
     """
-    def __init__(self, resource=None, urn=None, parents=None, type="Edition"):
+    def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
         """ Initiate a Work resource
 
         :param resource: Resource representing the TextInventory 
@@ -103,6 +103,7 @@ class Text(Resource):
         """
         self.urn = None
         self.parents = ()
+        self.subtype = subtype
 
         if urn is not None:
             self.urn = URN(urn)
@@ -138,10 +139,10 @@ class Text(Resource):
         return self[3]
 
 def Edition(resource=None, urn=None, parents=None):
-    return Text(resource=resource, urn=urn, parents=parents, type="Edition")
+    return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
 
 def Translation(resource=None, urn=None, parents=None):
-    return Text(resource=resource, urn=urn, parents=parents, type="Translation")
+    return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
     
 class Work(Resource):
     """ Represents a CTS Work

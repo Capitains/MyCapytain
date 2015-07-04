@@ -3,7 +3,6 @@
 """
 from ...utils import URN, Reference
 from past.builtins import basestring
-from collections import defaultdict
 
 class Resource(object):
     """ Resource represents any resource from the inventory """
@@ -13,7 +12,6 @@ class Resource(object):
         :param resource: Resource representing the TextInventory 
         :type resource: Any
         """
-        self.resource = None
         if resource is not None:
             self.setResource(resource)
 
@@ -66,7 +64,7 @@ class Resource(object):
 
             while i <= len(urn) - 1:
                 children = children[urn[order[i]]]
-                if not hasattr(children, "urn") or str(children.urn) != urn[order[i]]:
+                if not hasattr(children, "urn"):
                     raise ValueError("Unrecognized urn at level " + order[i])
                 i += 1
             return children
@@ -95,7 +93,7 @@ class Resource(object):
 class Text(Resource):
     """ Represents a CTS Text
     """
-    def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
+    def __init__(self, resource=None, urn=None, parents=None, type="Edition"):
         """ Initiate a Work resource
 
         :param resource: Resource representing the TextInventory 
@@ -105,7 +103,6 @@ class Text(Resource):
         """
         self.urn = None
         self.parents = ()
-        self.subtype = subtype
 
         if urn is not None:
             self.urn = URN(urn)
@@ -116,12 +113,35 @@ class Text(Resource):
         if resource is not None:
             self.setResource(resource)
 
+    def getWork(self):
+        """ Find Work parent
+        
+        :rtype: Work
+        :returns: The Work
+        """
+        return self[1]
+
+    def getTextGroup(self):
+        """ Find TextGroup parent
+        
+        :rtype: TextGroup
+        :returns: The TextGroup
+        """
+        return self[2]
+
+    def getInventory(self):
+        """ Find Inventory parent
+        
+        :rtype: TextInventory
+        :returns: The Inventory
+        """
+        return self[3]
 
 def Edition(resource=None, urn=None, parents=None):
-    return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
+    return Text(resource=resource, urn=urn, parents=parents, type="Edition")
 
 def Translation(resource=None, urn=None, parents=None):
-    return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
+    return Text(resource=resource, urn=urn, parents=parents, type="Translation")
     
 class Work(Resource):
     """ Represents a CTS Work
@@ -137,7 +157,7 @@ class Work(Resource):
         :type parents: Tuple.<TextInventory> 
         """
         self.urn = None
-        self.texts = defaultdict(Text)
+        self.texts = []
         self.parents = ()
 
         if urn is not None:
@@ -148,6 +168,22 @@ class Work(Resource):
 
         if resource is not None:
             self.setResource(resource)
+
+    def getTextGroup(self):
+        """ Find TextGroup parent
+        
+        :rtype: TextGroup
+        :returns: The TextGroup
+        """
+        return self.parents[0]
+
+    def getInventory(self):
+        """ Find Inventory parent
+        
+        :rtype: TextInventory
+        :returns: The Inventory
+        """
+        return self.parents[1]
 
 class TextGroup(Resource):
     """ Represents a CTS Textgroup
@@ -163,7 +199,7 @@ class TextGroup(Resource):
         :type parents: Tuple.<TextInventory> 
         """
         self.urn = None
-        self.works = defaultdict(Work)
+        self.works = []
         self.parents = ()
 
         if urn is not None:
@@ -174,6 +210,14 @@ class TextGroup(Resource):
 
         if resource is not None:
             self.setResource(resource)
+
+    def getInventory(self):
+        """ Find Inventory parent
+
+        :rtype: TextInventory
+        :returns: The Inventory
+        """
+        return self.parents[0]
 
 class TextInventory(Resource):
     """ Represents a CTS Inventory file
@@ -186,8 +230,19 @@ class TextInventory(Resource):
         :param id: Identifier of the TextInventory
         :type id: str
         """
-        self.textgroups = defaultdict(TextGroup)
+        self.textgroups = []
         self.id = id
         self.parents = ()
         if resource is not None:
             self.setResource(resource)
+
+    def parse(self, resource):
+        """ Parse the object resource 
+
+        :param resource: Resource representing the TextInventory 
+        :type resource: Any
+        :rtype: List
+        :returns: List of TextGroup objects
+        """
+        self.textgroups = []
+        return self.textgroups

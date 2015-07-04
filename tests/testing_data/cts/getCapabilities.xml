@@ -261,23 +261,6 @@
                             </ti:citationMapping>
                         </ti:online>
                     </ti:edition>
-                    <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2" xml:lang="eng">
-                        <ti:label xml:lang="eng">Epigrammata</ti:label>
-                        <ti:description xml:lang="eng">
-            M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus
-                        </ti:description>
-                        <ti:online docname="/db/apps/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-eng2.xml">
-                            <ti:validate schema="tei-epidoc.rng"/>
-                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
-                            <ti:citationMapping>
-                                <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
-                                    <ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
-                                        <ti:citation label="unknown" xpath="/tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
-                                    </ti:citation>
-                                </ti:citation>
-                            </ti:citationMapping>
-                        </ti:online>
-                    </ti:translation>
                 </ti:work>
             </ti:textgroup>
         </ti:TextInventory>

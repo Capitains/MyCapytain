@@ -68,10 +68,10 @@ class Text(inventory.Text):
         return None
 
 def Edition(resource=None, urn=None, parents=None):
-    return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
+    return Text(resource=resource, urn=urn, parents=parents, type="Edition")
 
 def Translation(resource=None, urn=None, parents=None):
-    return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
+    return Text(resource=resource, urn=urn, parents=parents, type="Translation")
 
 class Work(inventory.Work):
 

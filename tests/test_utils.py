@@ -268,11 +268,11 @@ class TestMetadatum(unittest.TestCase):
         # Access through tuple !
         self.assertEqual(a[(0,1)], ("Epigrams", "Epigrammes"))
         with self.assertRaises(KeyError):
-            print(a[2])
+            z = a[2]
 
         a.default = None
         with self.assertRaises(KeyError):
-            print(a["spa"])
+            z = a["spa"]
 
     def test_iter(self):
         data = [
@@ -283,9 +283,26 @@ class TestMetadatum(unittest.TestCase):
                 ("eng", "Epigrams"),
                 ("fre", "Epigrammes")
             ])
-        self.assertEqual(list(a), [
-                "eng",
-                "fre"
-            ])
+
         testdata = [(k, v) for k, v in a]
         self.assertEqual(list(a), testdata)
+
+        a["lat"] = "Epigrammata"
+        testdata = [(k, v) for k, v in a]
+        self.assertEqual(testdata, data + [("lat", "Epigrammata")])
+
+        i = 0
+        d=[]
+        for k, v in a:
+            d.append(k)
+            break
+        self.assertEqual(d, ["eng"])
+
+        i = 0
+        d=[]
+        for k, v in a:
+            d.append(k)
+            if i == 1:
+                break
+            i += 1
+        self.assertEqual(d, ["eng", "fre"])

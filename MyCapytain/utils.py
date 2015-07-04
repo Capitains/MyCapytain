@@ -316,7 +316,6 @@ class Metadatum(object):
         self.name = name
         self.children = OrderedDict()
         self.default = None
-        self._iter = iter(self.children)
 
         if children is not None and isinstance(children, list):
             for tup in children:
@@ -349,7 +348,6 @@ class Metadatum(object):
         if isinstance(key, tuple):
             if not isinstance(value, (tuple, list)):
                 value = [value]*len(key)
-                print(value)
             if len(value) < len(key):
                 raise ValueError("Less values than keys detected")
             for i in range(0, len(key)):
@@ -368,8 +366,8 @@ class Metadatum(object):
             self.default = key
         return self.default
 
-    def __next__(self):
-        return next(self._iter)
-
     def __iter__(self):
-        return self
+        i = 0
+        for key in self.children:
+            yield (key, self.children[key])
+            i+=1

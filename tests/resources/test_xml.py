@@ -122,3 +122,16 @@ class TestXMLImplementation(unittest.TestCase):
                 id="TestInv",
                 resource=5
             )
+
+
+    def test_Inventory_metadata(self):
+        """ Tests TextInventory parses without errors """
+        TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["eng"], "Martial")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["lat"], "Martialis")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["eng"], "Epigrammata")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["fre"], "Epigrammes")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["label"]["eng"], "Epigrammata Label")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["label"]["fre"], "Epigrammes Label")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["fre"], "G. Heraeus")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["eng"], "W. Heraeus")

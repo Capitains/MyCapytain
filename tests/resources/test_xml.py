@@ -4,6 +4,15 @@ from __future__ import unicode_literals
 import unittest
 from io import open
 from MyCapytain.resources.xml import *
+import lxml.etree as etree
+
+
+def compareSTR(one, other):
+    return (etree.tostring(parse(one), encoding=str).replace("\n", ""), etree.tostring(parse(other), encoding=str).replace("\n", ""))
+
+def compareXML(one, other):
+    return (etree.tostring(parse(one), encoding=str).replace("\n", ""), etree.tostring(parse(other), encoding=str).replace("\n", ""))
+
 
 class TestXMLImplementation(unittest.TestCase):
 
@@ -135,3 +144,41 @@ class TestXMLImplementation(unittest.TestCase):
         self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["label"]["fre"], "Epigrammes Label")
         self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["fre"], "G. Heraeus")
         self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["eng"], "W. Heraeus")
+
+    def test_export(self):
+        ed = """<ti:edition urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:label xml:lang='eng'>Epigrammata Label</ti:label>
+<ti:label xml:lang='fre'>Epigrammes Label</ti:label>
+<ti:description xml:lang='eng'>W. Heraeus</ti:description>
+<ti:description xml:lang='fre'>G. Heraeus</ti:description>
+</ti:edition>""".replace("\n", "")
+
+        tr = """<ti:translation xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:label xml:lang='eng'>Epigrammata</ti:label>
+<ti:description xml:lang='eng'>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ti:description>
+</ti:translation>""".replace("\n", "")
+
+        wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:title xml:lang='eng'>Epigrammata</ti:title>
+<ti:title xml:lang='fre'>Epigrammes</ti:title>""" + tr + ed + """</ti:work>""".replace("\n", "")
+
+        tg = """<ti:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:groupname xml:lang='eng'>Martial</ti:groupname>
+<ti:groupname xml:lang='lat'>Martialis</ti:groupname>""" + wk + """</ti:textgroup>""".replace("\n", "")
+
+        t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
+
+        ti = TextInventory(resource=t, id="annotsrc")
+        self.assertEqual(*compareSTR(str(ti), t))
+
+        # Test individual :
+        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294"]), tg))
+        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002"]), wk))
+        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
+        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"]), ed))
+
+        # Test export :
+        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294"].export(), tg))
+        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002"].export(), wk))
+        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
+        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))

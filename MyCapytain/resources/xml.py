@@ -63,6 +63,49 @@ class Text(inventory.Text):
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
 
+    def __str__(self):
+        """ Print the xml of the text
+        :rtype: basestring
+        :returns: XML representation of the text
+        """
+        strings = []
+        tag_start = "edition"
+        tag_end = tag_start
+        if self.subtype == "Translation":
+            tag_start = "translation"
+            tag_end = "translation"
+            if self.lang:
+                tag_start = tag_start + " xml:lang='" + self.lang + "'"
+
+        if self.urn is not None:
+            strings.append("<ti:{0} urn='{1}' workUrn='{2}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(tag_start, self.urn, self.urn["work"]))
+        else:
+            if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:
+                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.parents.urn))
+            else:
+                strings.append("<ti:work xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
+
+        for tag, metadatum in self.metadata:
+            for lang, value in metadatum:
+                strings.append("<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(tag=tag, lang=lang, value=value))
+
+        """
+        for urn in self.texts:
+            string.append(str(self.texts[urn]))
+        """
+
+        strings.append("</ti:{0}>".format(tag_end))
+        return "".join(strings)
+
+    def export(self, format="xml"):
+        """ Create a {format} version of the Work
+        :param format: Format to be chosen (Only XML for now)
+        :type param: basestring
+        :rtype: lxml.etree._Element
+        :returns: XML representation of the object
+        """
+        return parse(str(self))
+
     def parse(self, resource):
         self.xml = parse(resource)
 
@@ -96,6 +139,40 @@ class Work(inventory.Work):
 
     def __init__(self, **kwargs):
         super(Work, self).__init__(**kwargs)
+
+    def __str__(self):
+        """ Print the xml of the work
+        :rtype: basestring
+        :returns: XML representation of the work
+        """
+        strings = []
+        if self.urn is not None:
+            strings.append("<ti:work urn='{0}' groupUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.urn, self.urn["textgroup"]))
+        else:
+            if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:
+                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.parents.urn))
+            else:
+                strings.append("<ti:work xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
+
+        for tag, metadatum in self.metadata:
+            for lang, value in metadatum:
+                strings.append("<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(tag=tag, lang=lang, value=value))
+
+        for urn in self.texts:
+            strings.append(str(self.texts[urn]))
+
+        print(len(self.__editions), self.texts)
+        strings.append("</ti:work>")
+        return "".join(strings)
+
+    def export(self, format="xml"):
+        """ Create a {format} version of the Work
+        :param format: Format to be chosen (Only XML for now)
+        :type param: basestring
+        :rtype: lxml.etree._Element
+        :returns: XML representation of the object
+        """
+        return parse(str(self))
 
     def parse(self, resource):
         self.xml = parse(resource)
@@ -138,6 +215,36 @@ class TextGroup(inventory.TextGroup):
     def __init__(self, **kwargs):
         super(TextGroup, self).__init__(**kwargs)
 
+    def __str__(self):
+        """ Print the xml of the text group
+        :rtype: basestring
+        :returns: XML representation of the textgroup
+        """
+        strings = []
+        if self.urn is not None:
+            strings.append("<ti:textgroup urn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.urn))
+        else:
+            strings.append("<ti:textgroup xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
+
+        for tag, metadatum in self.metadata:
+            for lang, value in metadatum:
+                strings.append("<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(tag=tag, lang=lang, value=value))
+
+        for urn in self.works:
+            strings.append(str(self.works[urn]))
+
+        strings.append("</ti:textgroup>")
+        return "".join(strings)
+
+    def export(self, format="xml"):
+        """ Create a {format} version of the TextInventory
+        :param format: Format to be chosen (Only XML for now)
+        :type param: basestring
+        :rtype: lxml.etree._Element
+        :returns: XML representation of the object
+        """
+        return parse(str(self))
+
     def parse(self, resource):
         self.xml = parse(resource)
 
@@ -162,6 +269,31 @@ class TextInventory(inventory.TextInventory):
 
     def __init__(self, **kwargs):
         super(TextInventory, self).__init__(**kwargs)
+
+    def __str__(self):
+        """ Print the xml of the textinventory
+        :rtype: basestring
+        :returns: XML representation of the textinventory
+        """
+        strings = []
+        if self.id is not None:
+            strings.append("<ti:TextInventory tiid='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.id))
+        else:
+            strings.append("<ti:TextInventory xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
+
+        for urn in self.textgroups:
+            strings.append(str(self.textgroups[urn]))
+        strings.append("</ti:TextInventory>")
+        return "".join(strings)
+
+    def export(self, format="xml"):
+        """ Create a {format} version of the TextInventory
+        :param format: Format to be chosen (Only XML for now)
+        :type param: basestring
+        :rtype: lxml.etree._Element
+        :returns: XML representation of the object
+        """
+        return parse(str(self))
 
     def parse(self, resource):
         self.xml = parse(resource)

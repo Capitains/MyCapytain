@@ -43,6 +43,12 @@ class Resource(object):
             return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn)
         return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn) and self.resource == other.resource
 
+    def __str__(self):
+        raise NotImplementedError()
+
+    def export(self, format=None):
+        raise NotImplementedError()
+
     def __urnitem__(self, key):
         urn = URN(key)
 

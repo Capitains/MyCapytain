@@ -38,6 +38,47 @@ class TestXMLImplementation(unittest.TestCase):
         self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], Text)
         self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
+    def test_xml_work_getLang(self):
+        """ Test access to translation """
+        xml = """
+            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002">
+                <ti:title xml:lang="eng">Epigrammata</ti:title>
+                <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
+                </ti:edition>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng3" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-fre1" xml:lang="fre">
+                </ti:translation>
+            </ti:work>
+        """
+        W = Work(resource=xml, urn="urn:cts:latinLit:phi1294.phi002")
+        self.assertEqual(len(W.getLang("eng")), 2)
+        self.assertEqual(len(W.getLang()), 3)
+
+    def test_xml_Text_others(self):
+        """ Test access to translation """
+        xml = """
+            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002">
+                <ti:title xml:lang="eng">Epigrammata</ti:title>
+                <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
+                </ti:edition>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng3" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-fre1" xml:lang="fre">
+                </ti:translation>
+            </ti:work>
+        """
+        W = Work(resource=xml, urn="urn:cts:latinLit:phi1294.phi002")
+        E = W["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
+        T = W["urn:cts:latinLit:phi1294.phi002.perseus-fre1"]
+
+        self.assertEqual(E.translations("fre"), [T])
+        self.assertEqual(T.editions(), [E])
+
     def test_get_parent(self):
         TI = TextInventory(resource=self.getCapabilities, id="TestInv")
         tg = TI["urn:cts:latinLit:phi1294"]
@@ -81,3 +122,16 @@ class TestXMLImplementation(unittest.TestCase):
                 id="TestInv",
                 resource=5
             )
+
+
+    def test_Inventory_metadata(self):
+        """ Tests TextInventory parses without errors """
+        TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["eng"], "Martial")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["lat"], "Martialis")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["eng"], "Epigrammata")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["fre"], "Epigrammes")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["label"]["eng"], "Epigrammata Label")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["label"]["fre"], "Epigrammes Label")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["fre"], "G. Heraeus")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["eng"], "W. Heraeus")

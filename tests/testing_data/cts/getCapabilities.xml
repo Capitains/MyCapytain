@@ -242,13 +242,15 @@
             </ti:textgroup>
             <ti:textgroup urn="urn:cts:latinLit:phi1294">
                 <ti:groupname xml:lang="eng">Martial</ti:groupname>
+                <ti:groupname xml:lang="lat">Martialis</ti:groupname>
                 <ti:work urn="urn:cts:latinLit:phi1294.phi002">
                     <ti:title xml:lang="eng">Epigrammata</ti:title>
+                    <ti:title xml:lang="fre">Epigrammes</ti:title>
                     <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
-                        <ti:label xml:lang="eng">Epigrammata</ti:label>
-                        <ti:description xml:lang="eng">
-            M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus
-        </ti:description>
+                        <ti:label xml:lang="eng">Epigrammata Label</ti:label>
+                        <ti:label xml:lang="fre">Epigrammes Label</ti:label>
+                        <ti:description xml:lang="eng">W. Heraeus</ti:description>
+                        <ti:description xml:lang="fre">G. Heraeus</ti:description>
                         <ti:online docname="/db/apps/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml">
                             <ti:validate schema="tei-epidoc.rng"/>
                             <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>

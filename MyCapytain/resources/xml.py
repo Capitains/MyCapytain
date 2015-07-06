@@ -8,7 +8,8 @@ import collections
 ns = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ahab": "http://localhost.local",
-    "ti": "http://chs.harvard.edu/xmlns/cts"
+    "ti": "http://chs.harvard.edu/xmlns/cts",
+    "xml": "http://www.w3.org/XML/1998/namespace"
 }
 
 
@@ -23,7 +24,7 @@ def parse(xml):
         doclose = True
     else:
         raise TypeError("Unsupported type of resource")
-    parsed = etree.parse(xml)
+    parsed = etree.parse(xml).getroot()
     if doclose:
         xml.close()
     return parsed
@@ -61,10 +62,25 @@ class Text(inventory.Text):
     """
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
-        self.label = {}
-        self.descriptions = {}
 
     def parse(self, resource):
+        self.xml = parse(resource)
+
+        if self.subtype == "Translation":
+            lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
+            if lang is not None:
+                self.lang = lang
+
+        for child in self.xml.xpath("ti:description", namespaces=ns):
+            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+            if lg is not None:
+                self.metadata["description"][lg] = child.text
+
+        for child in self.xml.xpath("ti:label", namespaces=ns):
+            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+            if lg is not None:
+                self.metadata["label"][lg] = child.text
+
         return None
 
 def Edition(resource=None, urn=None, parents=None):
@@ -80,19 +96,26 @@ class Work(inventory.Work):
 
     def __init__(self, **kwargs):
         super(Work, self).__init__(**kwargs)
-        self.title = {}
-
 
     def parse(self, resource):
         self.xml = parse(resource)
 
-        self.editions = xpathDict(
+        lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
+        if lang is not None:
+            self.lang = lang
+
+        for child in self.xml.xpath("ti:title", namespaces=ns):
+            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+            if lg is not None:
+                self.metadata["title"][lg] = child.text
+
+        self.__editions = xpathDict(
             xml=self.xml,
             xpath='ti:edition',
             children=Edition,
             parents=tuple([self]) + self.parents
         )
-        self.translations = xpathDict(
+        self.__translations = xpathDict(
             xml=self.xml,
             xpath='ti:translation',
             children=Translation,
@@ -100,10 +123,10 @@ class Work(inventory.Work):
         )
 
         self.texts = collections.defaultdict(Text)
-        for urn in self.editions:
-            self.texts[urn] = self.editions[urn]
-        for urn in self.translations:
-            self.texts[urn] = self.translations[urn]
+        for urn in self.__editions:
+            self.texts[urn] = self.__editions[urn]
+        for urn in self.__translations:
+            self.texts[urn] = self.__translations[urn]
 
         return self.texts
 
@@ -114,10 +137,14 @@ class TextGroup(inventory.TextGroup):
 
     def __init__(self, **kwargs):
         super(TextGroup, self).__init__(**kwargs)
-        self.groupname = {}
 
     def parse(self, resource):
         self.xml = parse(resource)
+
+        for child in self.xml.xpath("ti:groupname", namespaces=ns):
+            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+            if lg is not None:
+                self.metadata["groupname"][lg] = child.text
 
         self.works = xpathDict(
             xml=self.xml,

@@ -1,7 +1,7 @@
 """
     Resources Prototypes
 """
-from ...utils import URN, Reference
+from ...utils import URN, Reference, Metadata
 from past.builtins import basestring
 from collections import defaultdict
 
@@ -13,6 +13,7 @@ class Resource(object):
         :param resource: Resource representing the TextInventory 
         :type resource: Any
         """
+        self.metadata = Metadata()
         self.resource = None
         if resource is not None:
             self.setResource(resource)
@@ -103,18 +104,31 @@ class Text(Resource):
         :param urn: Identifier of the Text
         :type urn: str
         """
+        self.lang = None
         self.urn = None
         self.parents = ()
         self.subtype = subtype
+        self.metadata = Metadata(keys=["label", "description"])
+        # self.citations = ()
 
         if urn is not None:
             self.urn = URN(urn)
 
         if parents is not None:
             self.parents = parents
+            self.lang = self.parents[0].lang
 
         if resource is not None:
             self.setResource(resource)
+
+        if self.subtype == "Edition":
+            self.translations = lambda key=None: self.parents[0].getLang(key)
+        elif self.subtype == "Translation":
+            self.editions = lambda: [
+                self.parents[0].texts[urn] 
+                for urn in self.parents[0].texts 
+                if self.parents[0].texts[urn].subtype == "Edition"
+            ]
 
 
 def Edition(resource=None, urn=None, parents=None):
@@ -136,9 +150,11 @@ class Work(Resource):
         :param parents: List of parents for current object
         :type parents: Tuple.<TextInventory> 
         """
+        self.lang = None
         self.urn = None
         self.texts = defaultdict(Text)
         self.parents = ()
+        self.metadata = Metadata(keys=["title"])
 
         if urn is not None:
             self.urn = URN(urn)
@@ -148,6 +164,19 @@ class Work(Resource):
 
         if resource is not None:
             self.setResource(resource)
+
+    def getLang(self, key=None):
+        """ Find a translation with given language
+
+        :param key: Language to find
+        :type key: basestring
+        :rtype: [Text]
+        :returns: List of availables translations
+        """
+        if key is not None:
+            return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation" and self.texts[urn].lang == key]
+        else:
+            return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation"]
 
 class TextGroup(Resource):
     """ Represents a CTS Textgroup
@@ -165,6 +194,7 @@ class TextGroup(Resource):
         self.urn = None
         self.works = defaultdict(Work)
         self.parents = ()
+        self.metadata = Metadata(keys=["groupname"])
 
         if urn is not None:
             self.urn = URN(urn)

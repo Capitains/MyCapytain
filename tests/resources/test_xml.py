@@ -38,6 +38,47 @@ class TestXMLImplementation(unittest.TestCase):
         self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], Text)
         self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
+    def test_xml_work_getLang(self):
+        """ Test access to translation """
+        xml = """
+            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002">
+                <ti:title xml:lang="eng">Epigrammata</ti:title>
+                <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
+                </ti:edition>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng3" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-fre1" xml:lang="fre">
+                </ti:translation>
+            </ti:work>
+        """
+        W = Work(resource=xml, urn="urn:cts:latinLit:phi1294.phi002")
+        self.assertEqual(len(W.getLang("eng")), 2)
+        self.assertEqual(len(W.getLang()), 3)
+
+    def test_xml_Text_others(self):
+        """ Test access to translation """
+        xml = """
+            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002">
+                <ti:title xml:lang="eng">Epigrammata</ti:title>
+                <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
+                </ti:edition>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng3" xml:lang="eng">
+                </ti:translation>
+                <ti:translation workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-fre1" xml:lang="fre">
+                </ti:translation>
+            </ti:work>
+        """
+        W = Work(resource=xml, urn="urn:cts:latinLit:phi1294.phi002")
+        E = W["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
+        T = W["urn:cts:latinLit:phi1294.phi002.perseus-fre1"]
+
+        self.assertEqual(E.translations("fre"), [T])
+        self.assertEqual(T.editions(), [E])
+
     def test_get_parent(self):
         TI = TextInventory(resource=self.getCapabilities, id="TestInv")
         tg = TI["urn:cts:latinLit:phi1294"]

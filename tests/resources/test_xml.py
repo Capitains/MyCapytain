@@ -8,6 +8,7 @@ import lxml.etree as etree
 import lxml.objectify
 import xmlunittest
 from copy import deepcopy
+from builtins import str
 
 def compareSTR(one, other):
     return (one.replace("\n", ""), other.replace("\n", ""))

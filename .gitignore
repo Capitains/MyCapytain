@@ -13,3 +13,4 @@ __pycache__
 .coverall
 .coverage
 lxml-3.4.4-py3.4-linux-x86_64.egg/
+*.egg

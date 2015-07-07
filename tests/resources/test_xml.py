@@ -5,21 +5,44 @@ import unittest
 from io import open
 from MyCapytain.resources.xml import *
 import lxml.etree as etree
-
+import lxml.objectify
+import xmlunittest
+from copy import deepcopy
 
 def compareSTR(one, other):
-    return (etree.tostring(parse(one), encoding=str).replace("\n", ""), etree.tostring(parse(other), encoding=str).replace("\n", ""))
+    return (one.replace("\n", ""), other.replace("\n", ""))
 
 def compareXML(one, other):
-    return (etree.tostring(parse(one), encoding=str).replace("\n", ""), etree.tostring(parse(other), encoding=str).replace("\n", ""))
+    return (etree.tostring(one, encoding=str).replace("\n", ""), other.replace("\n", ""))
 
-
-class TestXMLImplementation(unittest.TestCase):
+class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     """ Test XML Implementation of resources Endpoint request making """
 
     def setUp(self):
         self.getCapabilities = open("tests/testing_data/cts/getCapabilities.xml", "r")
+        self.ed = """<ti:edition urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:label xml:lang='eng'>Epigrammata Label</ti:label>
+<ti:label xml:lang='fre'>Epigrammes Label</ti:label>
+<ti:description xml:lang='eng'>W. Heraeus</ti:description>
+<ti:description xml:lang='fre'>G. Heraeus</ti:description>
+</ti:edition>""".replace("\n", "")
+
+        self.tr = """<ti:translation xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:label xml:lang='eng'>Epigrammata</ti:label>
+<ti:description xml:lang='eng'>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ti:description>
+</ti:translation>""".replace("\n", "")
+
+        self.wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:title xml:lang='eng'>Epigrammata</ti:title>
+<ti:title xml:lang='fre'>Epigrammes</ti:title>""" + self.tr + self.ed + """</ti:work>""".replace("\n", "")
+
+        self.tg = """<ti:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:groupname xml:lang='eng'>Martial</ti:groupname>
+<ti:groupname xml:lang='lat'>Martialis</ti:groupname>""" + self.wk + """</ti:textgroup>""".replace("\n", "")
+
+        self.t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + self.tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
+
 
     def tearDown(self):
         self.getCapabilities.close()
@@ -169,16 +192,87 @@ class TestXMLImplementation(unittest.TestCase):
         t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
 
         ti = TextInventory(resource=t, id="annotsrc")
-        self.assertEqual(*compareSTR(str(ti), t))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti), t))
 
         # Test individual :
-        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294"]), tg))
-        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002"]), wk))
-        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
-        self.assertEqual(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"]), ed))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294"]), tg))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002"]), wk))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"]), ed))
 
         # Test export :
-        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294"].export(), tg))
-        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002"].export(), wk))
-        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
-        self.assertEqual(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
+        self.assertXmlEquivalentOutputs(*compareXML(ti.export(), t))
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294"].export(), tg))
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002"].export(), wk))
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
+
+    def test_partial_str(self):
+        
+
+        ti = TextInventory(resource=self.t, id="annotsrc")
+
+        # Test individual :
+        """
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294"]), tg))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002"]), wk))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
+        """
+
+        e = deepcopy(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
+        e.urn = None
+        self.assertXmlEquivalentOutputs(
+            *compareSTR(
+                    str(e), 
+                    self.ed.replace("urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", "")
+                )
+            )
+        e.parents = ()
+        self.assertXmlEquivalentOutputs(
+            *compareSTR(
+                    str(e), 
+                    self.ed.replace(
+                        "urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", ""
+                    ).replace(
+                        "workUrn='urn:cts:latinLit:phi1294.phi002' ", ""
+                    )
+                )
+            )
+
+        wk = deepcopy(ti["urn='urn:cts:latinLit:phi1294.phi002"])
+        wk.urn = None
+        self.assertXmlEquivalentOutputs(
+            *compareSTR(
+                    str(wk), 
+                    self.wk.replace("urn='urn:cts:latinLit:phi1294.phi002' ", "")
+                )
+            )
+        wk.parents = ()
+        self.assertXmlEquivalentOutputs(
+            *compareSTR(
+                    str(wk), 
+                    self.wk.replace(
+                        "urn='urn:cts:latinLit:phi1294.phi002' ", ""
+                    ).replace(
+                        "groupUrn='urn:cts:latinLit:phi1294' ", ""
+                    )
+                )
+            )
+
+        tg = deepcopy(ti["urn='urn:cts:latinLit:phi1294"])
+        tg.urn = None
+        self.assertXmlEquivalentOutputs(
+            *compareSTR(
+                    str(tg), 
+                    self.tg.replace("urn='urn:cts:latinLit:phi1294' ", "")
+                )
+            )
+
+        ti = deepcopy(ti)
+        ti.id = None
+        self.assertXmlEquivalentOutputs(
+            *compareSTR(
+                    str(ti), 
+                    self.t.replace("tiid='annotsrc' ", "")
+                )
+            )

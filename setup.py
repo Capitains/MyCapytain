@@ -14,7 +14,8 @@ setup(name='MyCapytain',
       ],
       tests_require=[
         "mock==1.0.1",
-        "six==1.9.0"
+        "six==1.9.0",
+        "xmlunittest"
       ],
       extras_require = {
         "DOC" : ["Sphinx==1.3.1"]

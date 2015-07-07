@@ -81,9 +81,9 @@ class Text(inventory.Text):
             strings.append("<ti:{0} urn='{1}' workUrn='{2}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(tag_start, self.urn, self.urn["work"]))
         else:
             if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:
-                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.parents.urn))
+                strings.append("<ti:{0} workUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(tag_start, self.parents[0].urn))
             else:
-                strings.append("<ti:work xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
+                strings.append("<ti:{0} xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(tag_start))
 
         for tag, metadatum in self.metadata:
             for lang, value in metadatum:
@@ -150,7 +150,7 @@ class Work(inventory.Work):
             strings.append("<ti:work urn='{0}' groupUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.urn, self.urn["textgroup"]))
         else:
             if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:
-                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.parents.urn))
+                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.parents[0].urn))
             else:
                 strings.append("<ti:work xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
 
@@ -158,10 +158,11 @@ class Work(inventory.Work):
             for lang, value in metadatum:
                 strings.append("<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(tag=tag, lang=lang, value=value))
 
-        for urn in self.texts:
+        # Dev trick : For tests, we need to have always the same order....
+        keys = sorted([urn for urn in self.texts])
+        for urn in keys:
             strings.append(str(self.texts[urn]))
 
-        print(len(self.__editions), self.texts)
         strings.append("</ti:work>")
         return "".join(strings)
 

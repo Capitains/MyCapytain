@@ -9,12 +9,13 @@ import lxml.objectify
 import xmlunittest
 from copy import deepcopy
 from builtins import str
+from six import text_type
 
 def compareSTR(one, other):
     return (one.replace("\n", ""), other.replace("\n", ""))
 
 def compareXML(one, other):
-    return (etree.tostring(one, encoding=str).replace("\n", ""), other.replace("\n", ""))
+    return (etree.tostring(one, encoding=text_type).replace("\n", ""), other.replace("\n", ""))
 
 class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 

@@ -10,11 +10,11 @@ setup(name='MyCapytain',
       packages=['MyCapytain'],
       install_requires=[
         "requests==2.7.0",
+        "six==1.9.0",
         "lxml==3.4.4"
       ],
       tests_require=[
         "mock==1.0.1",
-        "six==1.9.0",
         "xmlunittest"
       ],
       extras_require = {

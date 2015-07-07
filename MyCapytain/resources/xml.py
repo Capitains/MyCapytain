@@ -2,6 +2,7 @@ from .proto import inventory
 from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
+from six import text_type as str
 import collections
 
 

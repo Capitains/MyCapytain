@@ -385,3 +385,52 @@ class TestMetadata(unittest.TestCase):
         self.assertEqual(len(a), 2)
         a["z"] = 1.5
         self.assertEqual(len(a), 2)
+
+class TestCitation(unittest.TestCase):
+    """ Test the citation object """
+    def test_updateRefsdecl(self):
+        c = Citation(
+            name="line",
+            scope="/TEI/text/body/div/div[@n=\"?\"]",
+            xpath="//l[@n=\"?\"]"
+        )
+        self.assertEqual(c.refsDecl, "/TEI/text/body/div/div[@n=\"$1\"]//l[@n=\"$2\"]")
+
+    def test_updateScopeXpath(self):
+        c = Citation(
+            name="line",
+            refsDecl="/TEI/text/body/div/div[@n=\"$1\"]//l[@n=\"$2\"]"
+        )
+        self.assertEqual(c.scope, "/TEI/text/body/div/div[@n=\"?\"]")
+        self.assertEqual(c.xpath, "//l[@n=\"?\"]")
+
+    def test_name(self):
+        c = Citation(
+            name="line"
+        )
+        self.assertEqual(c.name, "line")
+
+    def test_child(self):
+        c = Citation(
+            name="line"
+        )
+        b = Citation(
+            name="poem",
+            child=c
+        )
+        self.assertEqual(b.child, c)
+
+    def test_iter(self):
+        c = Citation(
+            name="line"
+        )
+        b = Citation(
+            name="poem",
+            child=c
+        )
+        a = Citation(
+            name="book",
+            child=b
+        )
+        self.assertEqual([e for e in a], [a, b, c])
+

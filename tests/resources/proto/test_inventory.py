@@ -67,3 +67,13 @@ class TestRepoProto(unittest.TestCase):
         self.assertIsInstance(b, inventory.Text)
         self.assertEqual(a.subtype, "Edition")
         self.assertEqual(b.subtype, "Translation")
+
+    def test_write(self):
+        a = Resource(resource="hello")
+        with self.assertRaises(NotImplementedError):
+            a.export()
+
+    def test_str(self):
+        a = Resource(resource="hello")
+        with self.assertRaises(NotImplementedError):
+            str(a)

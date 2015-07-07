@@ -5,6 +5,8 @@ from builtins import range, object
 import re
 
 
+REFSDECL_SPLITTER = re.compile("/+[a-zA-Z0-9:\[\]@=\\\{\$'\"\.]+")
+REFSDECL_REPLACER = re.compile("\$[0-9]+")
 """
     The ```utils``` modules
 """
@@ -438,3 +440,111 @@ class Metadata(object):
 
     def __len__(self):
         return len([k for k in self.__keys if isinstance(self.metadata[k], Metadatum)])
+
+
+class Citation(object):
+    """ A citation object gives informations about the scheme 
+    """
+
+    def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
+        """ Initialize a Citation object
+        :param name: Name of the citation (e.g. "book")
+        :type name: basestring
+        :param xpath: Xpath of the citation (As described by CTS norm)
+        :type xpath: basestring
+        :param scope: Scope of the citation (As described by CTS norm)
+        :type xpath: basestring
+        :param refsDecl: refsDecl version
+        :type refsDecl: basestring
+        :param child: A citation
+        :type child: Citation
+        """
+        self.__name = None
+        self.__xpath = None
+        self.__scope = None
+        self.__refsDecl = None
+        self.__child = None
+
+        self.__setName = name
+        self.__setScope = scope
+        self.__setXpath = xpath
+        self.__setRefsDecl = refsDecl
+
+        if child is not None:
+            self.__setChild = child
+
+    @property
+    def name(self): return self.__name
+
+
+    @name.setter
+    def __setName(self, val):
+        self.__name = val
+
+    @property
+    def xpath(self): return self.__xpath
+
+    @xpath.setter
+    def __setXpath(self, val):
+        if val is not None:
+            self.__xpath = val
+            self.__upRefsDecl()
+
+    @property
+    def scope(self): return self.__scope
+        
+    @scope.setter
+    def __setScope(self, val):
+        if val is not None:
+            self.__scope = val
+            self.__upRefsDecl()
+
+    @property
+    def refsDecl(self): return self.__refsDecl
+        
+    @refsDecl.setter
+    def __setRefsDecl(self, val):
+        if val is not None:
+            self.__refsDecl = val
+            self.__upXpathScope()
+
+    @property
+    def child(self): return self.__child
+        
+    @child.setter
+    def __setChild(self, val):
+        if isinstance(val, Citation):
+            self.__child = val
+
+    def __upXpathScope(self):
+        """ Update xpath and scope property when refsDecl is updated
+        """
+        rd = self.__refsDecl
+        matches = REFSDECL_SPLITTER.findall(rd)
+        self.__scope = REFSDECL_REPLACER.sub("?", "".join(matches[0:-1]))
+        self.__xpath = REFSDECL_REPLACER.sub("?", matches[-1])
+
+
+    def __upRefsDecl(self):
+        """ Update xpath and scope property when refsDecl is updated
+        """
+        if self.__scope is not None and self.__xpath is not None:
+            xpath = self.__scope + self.__xpath
+            i = xpath.find("?")
+            ii = 1
+            while i >= 0:
+                xpath = xpath[:i] + "$" + str(ii) + xpath[i+1:]
+                i = xpath.find("?")
+                ii += 1
+            self.__refsDecl = xpath
+
+    def __iter__(self):
+        """ Iteration function
+        """
+        e = self
+        while e is not None:
+            yield e
+            if hasattr(e, "child") and e.child is not None:
+                e = e.child
+            else:
+                break

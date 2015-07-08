@@ -465,27 +465,26 @@ class Citation(object):
         self.__refsDecl = None
         self.__child = None
 
-        self.__setName = name
-        self.__setScope = scope
-        self.__setXpath = xpath
-        self.__setRefsDecl = refsDecl
+        self.name = name
+        self.scope = scope
+        self.xpath = xpath
+        self.refsDecl = refsDecl
 
         if child is not None:
-            self.__setChild = child
+            self.child = child
 
     @property
     def name(self): return self.__name
 
-
     @name.setter
-    def __setName(self, val):
+    def name(self, val):
         self.__name = val
 
     @property
     def xpath(self): return self.__xpath
 
     @xpath.setter
-    def __setXpath(self, val):
+    def xpath(self, val):
         if val is not None:
             self.__xpath = val
             self.__upRefsDecl()
@@ -494,7 +493,7 @@ class Citation(object):
     def scope(self): return self.__scope
         
     @scope.setter
-    def __setScope(self, val):
+    def scope(self, val):
         if val is not None:
             self.__scope = val
             self.__upRefsDecl()
@@ -503,7 +502,7 @@ class Citation(object):
     def refsDecl(self): return self.__refsDecl
         
     @refsDecl.setter
-    def __setRefsDecl(self, val):
+    def refsDecl(self, val):
         if val is not None:
             self.__refsDecl = val
             self.__upXpathScope()
@@ -512,8 +511,8 @@ class Citation(object):
     def child(self): return self.__child
         
     @child.setter
-    def __setChild(self, val):
-        if isinstance(val, Citation):
+    def child(self, val):
+        if isinstance(val, self.__class__):
             self.__child = val
 
     def __upXpathScope(self):
@@ -523,7 +522,6 @@ class Citation(object):
         matches = REFSDECL_SPLITTER.findall(rd)
         self.__scope = REFSDECL_REPLACER.sub("?", "".join(matches[0:-1]))
         self.__xpath = REFSDECL_REPLACER.sub("?", matches[-1])
-
 
     def __upRefsDecl(self):
         """ Update xpath and scope property when refsDecl is updated

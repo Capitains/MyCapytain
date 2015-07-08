@@ -28,11 +28,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:label xml:lang='fre'>Epigrammes Label</ti:label>
 <ti:description xml:lang='eng'>W. Heraeus</ti:description>
 <ti:description xml:lang='fre'>G. Heraeus</ti:description>
+<ti:online></ti:online>
 </ti:edition>""".replace("\n", "")
 
         self.tr = """<ti:translation xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
 <ti:label xml:lang='eng'>Epigrammata</ti:label>
 <ti:description xml:lang='eng'>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ti:description>
+<ti:online></ti:online>
 </ti:translation>""".replace("\n", "")
 
         self.wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
@@ -176,11 +178,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:label xml:lang='fre'>Epigrammes Label</ti:label>
 <ti:description xml:lang='eng'>W. Heraeus</ti:description>
 <ti:description xml:lang='fre'>G. Heraeus</ti:description>
+<ti:online></ti:online>
 </ti:edition>""".replace("\n", "")
 
         tr = """<ti:translation xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
 <ti:label xml:lang='eng'>Epigrammata</ti:label>
 <ti:description xml:lang='eng'>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ti:description>
+<ti:online></ti:online>
 </ti:translation>""".replace("\n", "")
 
         wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
@@ -210,16 +214,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
 
     def test_partial_str(self):
-        
-
         ti = TextInventory(resource=self.t, id="annotsrc")
-
-        # Test individual :
-        """
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294"]), tg))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002"]), wk))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
-        """
 
         e = deepcopy(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
         e.urn = None
@@ -278,3 +273,23 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                     self.t.replace("tiid='annotsrc' ", "")
                 )
             )
+"""
+For Citation test
+"""
+"""
+<ti:edition workUrn="urn:cts:greekLit:tlg0003.tlg001" urn="urn:cts:greekLit:tlg0003.tlg001.perseus-grc2">
+<ti:label xml:lang="eng">The Peloponnesian War (Oxford 1942 Epidoc)</ti:label>
+<ti:description xml:lang="eng">Thucydides. Historiae in two volumes. Oxford, Oxford University Press. 1942.</ti:description>
+<ti:online docname="/db/apps/canonical-greekLit/data/tlg0003/tlg001/tlg0003.tlg001.perseus-grc2.xml">
+<ti:validate schema="tei-epidoc.rng"/>
+<ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+<ti:citationMapping>
+<ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
+<ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+<ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
+</ti:citation>
+</ti:citation>
+</ti:citationMapping>
+</ti:online>
+</ti:edition>
+"""

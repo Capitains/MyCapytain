@@ -4,15 +4,35 @@ from io import IOBase, StringIO
 from past.builtins import basestring
 from six import text_type as str
 import collections
+from ..utils import Citation as protoCitation
 
-
-ns = {
+NS = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ahab": "http://localhost.local",
     "ti": "http://chs.harvard.edu/xmlns/cts",
     "xml": "http://www.w3.org/XML/1998/namespace"
 }
 
+
+class Citation(protoCitation):
+    def __str__(self):
+        if self.xpath is None and self.scope is None and self.refsDecl is None:
+            return ""
+
+        child = ""
+        if isinstance(self.child, protoCitation):
+            child=str(self.child)
+
+        label = ""
+        if self.name is not None:
+            label = self.name
+
+        return "<ti:citation xmlns:ti='http//chs.harvard.edu/xmlns/cts' label='{label}' xpath='{xpath}' scope='{scope}'>{child}</ti:citation>".format(
+            child=child,
+            xpath=self.xpath,
+            scope=self.scope,
+            label=label
+        )
 
 def parse(xml):
     doclose = None
@@ -54,7 +74,7 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
                 parents=parents,
                 **kwargs
             )
-        ) for child in xml.xpath(xpath, namespaces=ns))
+        ) for child in xml.xpath(xpath, namespaces=NS))
     )
 
 
@@ -79,21 +99,60 @@ class Text(inventory.Text):
                 tag_start = tag_start + " xml:lang='" + self.lang + "'"
 
         if self.urn is not None:
-            strings.append("<ti:{0} urn='{1}' workUrn='{2}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(tag_start, self.urn, self.urn["work"]))
+            strings.append(
+                "<ti:{0} urn='{1}' workUrn='{2}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
+                    tag_start,
+                    self.urn,
+                    self.urn["work"]
+                )
+            )
         else:
             if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:
-                strings.append("<ti:{0} workUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(tag_start, self.parents[0].urn))
+                strings.append(
+                    "<ti:{0} workUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
+                        tag_start,
+                        self.parents[0].urn
+                    )
+                )
             else:
-                strings.append("<ti:{0} xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(tag_start))
+                strings.append(
+                    "<ti:{0} xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
+                        tag_start
+                    )
+                )
 
+        namespaces = []
         for tag, metadatum in self.metadata:
-            for lang, value in metadatum:
-                strings.append("<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(tag=tag, lang=lang, value=value))
+            if tag == "namespaceMapping":
+                for abbr, ns in metadatum:
+                    namespaces.append(
+                        '<ti:namespaceMapping abbreviation="" nsURI="" />'.format(
+                            abbr,
+                            ns
+                        )
+                    )
+            else:
+                for lang, value in metadatum:
+                    strings.append(
+                        "<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(
+                            tag=tag,
+                            lang=lang,
+                            value=value
+                        )
+                    )
 
-        """
-        for urn in self.texts:
-            string.append(str(self.texts[urn]))
-        """
+        # Maybe should have an online object...
+        docname = ""
+        if self.docname is not None:
+            docname = ' docname="{0}"'.format(self.docname)
+        strings.append("<ti:online{0}>".format(docname))
+        if len(namespaces) > 0:
+            string.append("".join(namespaces))
+        if self.validate is not None:
+            strings.append('<ti:validate schema="{0}"'.format(self.validate))
+        if self.citation is not None:
+            strings.append(str(self.citation))
+        strings.append("</ti:online>")
 
         strings.append("</ti:{0}>".format(tag_end))
         return "".join(strings)
@@ -107,7 +166,46 @@ class Text(inventory.Text):
         """
         return parse(str(self))
 
+    def __findCitations(self, xml, element, xpath="ti:citation"):
+        """ Find citation in current xml. Used as a loop for self.parse()
+        :param xml:
+        :param element:
+        :param xpath:
+        """
+        results = xml.xpath(xpath, namespaces=NS)
+
+        if len(results)> 0:
+            citation = Citation(
+                name=results[0].get("label"),
+                xpath=results[0].get("xpath"),
+                scope=results[0].get("scope")
+            )
+
+            if isinstance(element, Citation):
+                print(element.name)
+                print(element.child)
+                element.child = citation
+                """
+                element.child = citation
+                self.__findCitations(
+                    xml=results[0],
+                    element=element.child
+                )
+                """
+            else:
+                self.citation = citation
+                self.__findCitations(
+                    xml=results[0],
+                    element=self.citation
+                )
+
+
     def parse(self, resource):
+        """ Parse a resource to feed the object
+        :param resource: An xml representation object
+        :type resource: basestring or lxml.etree._Element
+        :returns: None
+        """
         self.xml = parse(resource)
 
         if self.subtype == "Translation":
@@ -115,17 +213,30 @@ class Text(inventory.Text):
             if lang is not None:
                 self.lang = lang
 
-        for child in self.xml.xpath("ti:description", namespaces=ns):
+        for child in self.xml.xpath("ti:description", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["description"][lg] = child.text
 
-        for child in self.xml.xpath("ti:label", namespaces=ns):
+        for child in self.xml.xpath("ti:label", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["label"][lg] = child.text
 
+        self.__findCitations(
+            xml=self.xml,
+            element=self,
+            xpath="//ti:citationMapping/ti:citation"
+        )
+
+        online = self.xml.xpath("ti:online", namespaces=NS)
+        if len(online) > 0:
+            online = online[0]
+            self.docname = online.get("docname")
+
         return None
+
+
 
 def Edition(resource=None, urn=None, parents=None):
     return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
@@ -183,7 +294,7 @@ class Work(inventory.Work):
         if lang is not None:
             self.lang = lang
 
-        for child in self.xml.xpath("ti:title", namespaces=ns):
+        for child in self.xml.xpath("ti:title", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["title"][lg] = child.text
@@ -250,7 +361,7 @@ class TextGroup(inventory.TextGroup):
     def parse(self, resource):
         self.xml = parse(resource)
 
-        for child in self.xml.xpath("ti:groupname", namespaces=ns):
+        for child in self.xml.xpath("ti:groupname", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["groupname"][lg] = child.text

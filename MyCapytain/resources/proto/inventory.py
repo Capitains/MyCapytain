@@ -110,11 +110,14 @@ class Text(Resource):
         :param urn: Identifier of the Text
         :type urn: str
         """
+        self.citation = None
         self.lang = None
         self.urn = None
+        self.docname = None
         self.parents = ()
         self.subtype = subtype
-        self.metadata = Metadata(keys=["label", "description"])
+        self.validate = None
+        self.metadata = Metadata(keys=["label", "description", "namespaceMapping"])
         # self.citations = ()
 
         if urn is not None:

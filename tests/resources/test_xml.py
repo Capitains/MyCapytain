@@ -283,23 +283,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                     self.t.replace("tiid='annotsrc' ", "")
                 )
             )
-"""
-For Citation test
-"""
-"""
-<ti:edition workUrn="urn:cts:greekLit:tlg0003.tlg001" urn="urn:cts:greekLit:tlg0003.tlg001.perseus-grc2">
-<ti:label xml:lang="eng">The Peloponnesian War (Oxford 1942 Epidoc)</ti:label>
-<ti:description xml:lang="eng">Thucydides. Historiae in two volumes. Oxford, Oxford University Press. 1942.</ti:description>
-<ti:online docname="/db/apps/canonical-greekLit/data/tlg0003/tlg001/tlg0003.tlg001.perseus-grc2.xml">
-<ti:validate schema="tei-epidoc.rng"/>
-<ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
-<ti:citationMapping>
-<ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
-<ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
-<ti:citation label="unknown" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
-</ti:citation>
-</ti:citation>
-</ti:citationMapping>
-</ti:online>
-</ti:edition>
-"""
+
+class TestCitation(unittest.TestCase):
+    def test_empty(self):
+        a = Citation(name="none")
+        self.assertEqual(str(a), "")

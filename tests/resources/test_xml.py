@@ -178,8 +178,18 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:label xml:lang='fre'>Epigrammes Label</ti:label>
 <ti:description xml:lang='eng'>W. Heraeus</ti:description>
 <ti:description xml:lang='fre'>G. Heraeus</ti:description>
-<ti:online></ti:online>
-</ti:edition>""".replace("\n", "")
+<ti:online docname='/db/apps/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml'>
+<ti:validate schema='tei-epidoc.rng'/>
+<ti:namespaceMapping abbreviation='tei' nsURI='http://www.tei-c.org/ns/1.0'/>
+<ti:citationMapping>
+<ti:citation label='book' xpath='/tei:div[@n="?"]' scope='/tei:TEI/tei:text/tei:body/tei:div'>
+<ti:citation label='poem' xpath='/tei:div[@n="?"]' scope='/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n="?"]'>
+<ti:citation label='line' xpath='/tei:l[@n="?"]' scope='/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n="?"]/tei:div[@n="?"]'></ti:citation>
+</ti:citation>
+</ti:citation>
+</ti:citationMapping>
+</ti:online
+></ti:edition>""".replace("\n", "")
 
         tr = """<ti:translation xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
 <ti:label xml:lang='eng'>Epigrammata</ti:label>

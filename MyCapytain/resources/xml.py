@@ -20,14 +20,14 @@ class Citation(protoCitation):
             return ""
 
         child = ""
-        if isinstance(self.child, protoCitation):
+        if isinstance(self.child, Citation):
             child=str(self.child)
 
         label = ""
         if self.name is not None:
             label = self.name
 
-        return "<ti:citation xmlns:ti='http//chs.harvard.edu/xmlns/cts' label='{label}' xpath='{xpath}' scope='{scope}'>{child}</ti:citation>".format(
+        return "<ti:citation label='{label}' xpath='{xpath}' scope='{scope}'>{child}</ti:citation>".format(
             child=child,
             xpath=self.xpath,
             scope=self.scope,
@@ -126,7 +126,7 @@ class Text(inventory.Text):
             if tag == "namespaceMapping":
                 for abbr, ns in metadatum:
                     namespaces.append(
-                        '<ti:namespaceMapping abbreviation="" nsURI="" />'.format(
+                        '<ti:namespaceMapping abbreviation=\'{0}\' nsURI=\'{1}\'/>'.format(
                             abbr,
                             ns
                         )
@@ -144,14 +144,21 @@ class Text(inventory.Text):
         # Maybe should have an online object...
         docname = ""
         if self.docname is not None:
-            docname = ' docname="{0}"'.format(self.docname)
+            docname = ' docname=\'{0}\''.format(self.docname)
+
         strings.append("<ti:online{0}>".format(docname))
-        if len(namespaces) > 0:
-            string.append("".join(namespaces))
+
         if self.validate is not None:
-            strings.append('<ti:validate schema="{0}"'.format(self.validate))
+            strings.append('<ti:validate schema=\'{0}\'/>'.format(self.validate))
+
+        if len(namespaces) > 0:
+            strings.append("".join(namespaces))
+
         if self.citation is not None:
+            strings.append("<ti:citationMapping>")
             strings.append(str(self.citation))
+            strings.append("</ti:citationMapping>")
+
         strings.append("</ti:online>")
 
         strings.append("</ti:{0}>".format(tag_end))
@@ -182,15 +189,13 @@ class Text(inventory.Text):
             )
 
             if isinstance(element, Citation):
-                print(element.name)
-                print(element.child)
-                element.child = citation
-                """
                 element.child = citation
                 self.__findCitations(
                     xml=results[0],
                     element=element.child
                 )
+                """
+                element.child = citation
                 """
             else:
                 self.citation = citation
@@ -226,13 +231,17 @@ class Text(inventory.Text):
         self.__findCitations(
             xml=self.xml,
             element=self,
-            xpath="//ti:citationMapping/ti:citation"
+            xpath="ti:online/ti:citationMapping/ti:citation"
         )
 
         online = self.xml.xpath("ti:online", namespaces=NS)
         if len(online) > 0:
             online = online[0]
             self.docname = online.get("docname")
+            for validate in online.xpath("ti:validate", namespaces=NS):
+                self.validate = validate.get("schema")
+            for namespaceMapping in online.xpath("ti:namespaceMapping", namespaces=NS):
+                self.metadata["namespaceMapping"][namespaceMapping.get("abbreviation")] = namespaceMapping.get("nsURI")
 
         return None
 

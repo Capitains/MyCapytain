@@ -13,3 +13,8 @@ class MyTest(TestCase):
             # Ensure patched get was called, called only once and with exactly these params.
             patched_get.assert_called_once_with("https://ec2.amazonaws.com/", params={'Action': 'GetConsoleOutput', 'InstanceId': 'i-123456'})
 ```
+
+###Useful links
+
+Submitting : 
+- http://peterdowns.com/posts/first-time-with-pypi.html

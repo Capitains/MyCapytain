@@ -1,14 +1,14 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
   name='MyCapytain',
-  version='0.1.0',
+  version='0.0.1',
   description='Abstraction of CTS API for Python',
   url='http://github.com/Capitains/MyCapytain',
   author='Thibault Clerice',
   author_email='leponteineptique@gmail.com',
   license='MIT',
-  packages=['MyCapytain'],
+  packages=find_packages(),
   install_requires=[
     "requests==2.7.0",
     "six==1.9.0",

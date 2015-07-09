@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 
 import unittest
 from io import open
-from MyCapytain.resources.xml import *
 import lxml.etree as etree
 import lxml.objectify
 import xmlunittest
 from copy import deepcopy
 from six import text_type as str
+
+from MyCapytain.resources.xml import *
 
 
 def compareSTR(one, other):

@@ -1,20 +1,14 @@
-from .proto import inventory
-from lxml import etree
-from io import IOBase, StringIO
-from past.builtins import basestring
+from __future__ import unicode_literals
+
+from MyCapytain.resources.proto import inventory
+from MyCapytain.common.reference import Citation as CitationPrototype
+from MyCapytain.common.utils import xmlparser, NS
+
 from six import text_type as str
 import collections
-from ..utils import Citation as protoCitation
-
-NS = {
-    "tei": "http://www.tei-c.org/ns/1.0",
-    "ahab": "http://localhost.local",
-    "ti": "http://chs.harvard.edu/xmlns/cts",
-    "xml": "http://www.w3.org/XML/1998/namespace"
-}
 
 
-class Citation(protoCitation):
+class Citation(CitationPrototype):
     def __str__(self):
         if self.xpath is None and self.scope is None and self.refsDecl is None:
             return ""
@@ -33,22 +27,6 @@ class Citation(protoCitation):
             scope=self.scope,
             label=label
         )
-
-def parse(xml):
-    doclose = None
-    if isinstance(xml, etree._Element):
-        return xml
-    elif isinstance(xml, IOBase):
-        pass
-    elif isinstance(xml, (basestring)):
-        xml = StringIO(xml)
-        doclose = True
-    else:
-        raise TypeError("Unsupported type of resource")
-    parsed = etree.parse(xml).getroot()
-    if doclose:
-        xml.close()
-    return parsed
 
 
 def xpathDict(xml, xpath, children, parents, **kwargs):
@@ -171,10 +149,10 @@ class Text(inventory.Text):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return parse(str(self))
+        return xmlparser(str(self))
 
     def __findCitations(self, xml, element, xpath="ti:citation"):
-        """ Find citation in current xml. Used as a loop for self.parse()
+        """ Find citation in current xml. Used as a loop for self.xmlparser()
         :param xml:
         :param element:
         :param xpath:
@@ -211,7 +189,7 @@ class Text(inventory.Text):
         :type resource: basestring or lxml.etree._Element
         :returns: None
         """
-        self.xml = parse(resource)
+        self.xml = xmlparser(resource)
 
         if self.subtype == "Translation":
             lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
@@ -294,10 +272,10 @@ class Work(inventory.Work):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return parse(str(self))
+        return xmlparser(str(self))
 
     def parse(self, resource):
-        self.xml = parse(resource)
+        self.xml = xmlparser(resource)
 
         lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
         if lang is not None:
@@ -365,10 +343,10 @@ class TextGroup(inventory.TextGroup):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return parse(str(self))
+        return xmlparser(str(self))
 
     def parse(self, resource):
-        self.xml = parse(resource)
+        self.xml = xmlparser(resource)
 
         for child in self.xml.xpath("ti:groupname", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
@@ -415,10 +393,10 @@ class TextInventory(inventory.TextInventory):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return parse(str(self))
+        return xmlparser(str(self))
 
     def parse(self, resource):
-        self.xml = parse(resource)
+        self.xml = xmlparser(resource)
 
         self.textgroups = xpathDict(
             xml=self.xml,

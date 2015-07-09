@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MyCapytain.resources.proto.inventory &mdash; MyCapytains 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="MyCapytains 0.0.1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for MyCapytain.resources.proto.inventory</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resources Prototypes</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">MyCapytain.common.reference</span> <span class="kn">import</span> <span class="n">URN</span><span class="p">,</span> <span class="n">Reference</span>
+<span class="kn">from</span> <span class="nn">MyCapytain.common.metadata</span> <span class="kn">import</span> <span class="n">Metadata</span>
+<span class="kn">from</span> <span class="nn">past.builtins</span> <span class="kn">import</span> <span class="nb">basestring</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<div class="viewcode-block" id="Resource"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Resource">[docs]</a><span class="k">class</span> <span class="nc">Resource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Resource represents any resource from the inventory &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initiate a TextInventory resource</span>
+
+<span class="sd">        :param resource: Resource representing the TextInventory </span>
+<span class="sd">        :type resource: Any</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setResource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Direct key access function for Text objects &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">key</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">key</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">r</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__urnitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c"># Not totally true</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">urn</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">urn</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">resource</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Resource.export"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Resource.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">__urnitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">urn</span> <span class="o">=</span> <span class="n">URN</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Not valid urn&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">==</span> <span class="n">urn</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;urn&quot;</span><span class="p">):</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urn</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">TextInventory</span><span class="p">):</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">textgroups</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">TextGroup</span><span class="p">):</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">works</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Work</span><span class="p">):</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span>
+
+            <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;textgroup&quot;</span><span class="p">,</span> <span class="s">&quot;work&quot;</span><span class="p">,</span> <span class="s">&quot;text&quot;</span><span class="p">]</span>
+
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="n">urn</span><span class="p">[</span><span class="n">order</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">children</span><span class="o">.</span><span class="n">urn</span><span class="p">)</span> <span class="o">!=</span> <span class="n">urn</span><span class="p">[</span><span class="n">order</span><span class="p">[</span><span class="n">i</span><span class="p">]]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Unrecognized urn at level &quot;</span> <span class="o">+</span> <span class="n">order</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">children</span>
+
+<div class="viewcode-block" id="Resource.setResource"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Resource.setResource">[docs]</a>    <span class="k">def</span> <span class="nf">setResource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the object property resource</span>
+
+<span class="sd">        :param resource: Resource representing the TextInventory </span>
+<span class="sd">        :type resource: Any</span>
+<span class="sd">        :rtype: Any</span>
+<span class="sd">        :returns: Input resource</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource</span>
+</div>
+<div class="viewcode-block" id="Resource.parse"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Resource.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Parse the object resource </span>
+
+<span class="sd">        :param resource: Resource representing the TextInventory </span>
+<span class="sd">        :type resource: Any</span>
+<span class="sd">        :rtype: List</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</div></div>
+<div class="viewcode-block" id="Text"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Text">[docs]</a><span class="k">class</span> <span class="nc">Text</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s">&quot;Edition&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initiate a Work resource</span>
+
+<span class="sd">        :param resource: Resource representing the TextInventory </span>
+<span class="sd">        :type resource: Any</span>
+<span class="sd">        :param urn: Identifier of the Text</span>
+<span class="sd">        :type urn: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">citation</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">docname</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">=</span> <span class="n">subtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;label&quot;</span><span class="p">,</span> <span class="s">&quot;description&quot;</span><span class="p">,</span> <span class="s">&quot;namespaceMapping&quot;</span><span class="p">])</span>
+        <span class="c"># self.citations = ()</span>
+
+        <span class="k">if</span> <span class="n">urn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">=</span> <span class="n">URN</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="n">parents</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lang</span>
+
+        <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setResource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="s">&quot;Edition&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">translations</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getLang</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="s">&quot;Translation&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">editions</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span> 
+                <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span> 
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="s">&quot;Edition&quot;</span>
+            <span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="Edition"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Edition">[docs]</a><span class="k">def</span> <span class="nf">Edition</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="n">urn</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="n">parents</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s">&quot;Edition&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Translation"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Translation">[docs]</a><span class="k">def</span> <span class="nf">Translation</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="n">urn</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="n">parents</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s">&quot;Translation&quot;</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Work"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Work">[docs]</a><span class="k">class</span> <span class="nc">Work</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Work</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initiate a Work resource</span>
+
+<span class="sd">        :param resource: Resource representing the TextInventory </span>
+<span class="sd">        :type resource: Any</span>
+<span class="sd">        :param urn: Identifier of the Work</span>
+<span class="sd">        :type urn: str</span>
+<span class="sd">        :param parents: List of parents for current object</span>
+<span class="sd">        :type parents: Tuple.&lt;TextInventory&gt; </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">texts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">urn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">=</span> <span class="n">URN</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="n">parents</span>
+
+        <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setResource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Work.getLang"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.Work.getLang">[docs]</a>    <span class="k">def</span> <span class="nf">getLang</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Find a translation with given language</span>
+
+<span class="sd">        :param key: Language to find</span>
+<span class="sd">        :type key: basestring</span>
+<span class="sd">        :rtype: [Text]</span>
+<span class="sd">        :returns: List of availables translations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span> <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="s">&quot;Translation&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span><span class="o">.</span><span class="n">lang</span> <span class="o">==</span> <span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span> <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="s">&quot;Translation&quot;</span><span class="p">]</span>
+</div></div>
+<div class="viewcode-block" id="TextGroup"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.TextGroup">[docs]</a><span class="k">class</span> <span class="nc">TextGroup</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Textgroup</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initiate a TextGroup resource</span>
+
+<span class="sd">        :param resource: Resource representing the TextInventory </span>
+<span class="sd">        :type resource: Any</span>
+<span class="sd">        :param urn: Identifier of the TextGroup</span>
+<span class="sd">        :type urn: str</span>
+<span class="sd">        :param parents: List of parents for current object</span>
+<span class="sd">        :type parents: Tuple.&lt;TextInventory&gt; </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">works</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">Work</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">Metadata</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;groupname&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">urn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">=</span> <span class="n">URN</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parents</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">[</span><span class="n">parents</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setResource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TextInventory"><a class="viewcode-back" href="../../../../MyCapytain.resources.proto.inventory.html#MyCapytain.resources.proto.inventory.TextInventory">[docs]</a><span class="k">class</span> <span class="nc">TextInventory</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Inventory file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initiate a TextInventory resource</span>
+
+<span class="sd">        :param resource: Resource representing the TextInventory </span>
+<span class="sd">        :type resource: Any</span>
+<span class="sd">        :param id: Identifier of the TextInventory</span>
+<span class="sd">        :type id: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textgroups</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">TextGroup</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">if</span> <span class="n">resource</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setResource</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Thibault Clérice.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

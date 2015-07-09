@@ -1,7 +1,8 @@
 """
     Resources Prototypes
 """
-from ...utils import URN, Reference, Metadata
+from MyCapytain.common.reference import URN, Reference
+from MyCapytain.common.metadata import Metadata
 from past.builtins import basestring
 from collections import defaultdict
 

@@ -7,7 +7,7 @@ import six
 from io import open
 from collections import defaultdict
 from MyCapytain.resources.proto import inventory
-from MyCapytain.utils import URN
+from MyCapytain.common.reference import URN
 
 class Resource(inventory.Resource):
     def parse(self, resource):

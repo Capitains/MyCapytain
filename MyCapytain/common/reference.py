@@ -23,6 +23,7 @@ SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
 class Reference(object):
 
     """ A reference object giving informations """
+        
 
     def __init__(self, reference):
         self.reference = reference
@@ -30,6 +31,7 @@ class Reference(object):
 
     def __eq__(self, other):
         """ Equality checker for Reference object
+        
         :param other: An object to be checked against
         :rtype: boolean
         :returns: Equality between other and self
@@ -39,6 +41,7 @@ class Reference(object):
 
     def __str__(self):
         """ Return full initial reference
+        
         :rtype: basestring
         :returns: String representation of Reference Object
         """
@@ -46,6 +49,7 @@ class Reference(object):
 
     def __getitem__(self, key):
         """ Return part of or full passage reference 
+        
         :param key: Identifier of the part to return
         :type key: basestring or int
         :rtype: basestring or List.<int> or None or Tuple.<string>
@@ -68,6 +72,7 @@ class Reference(object):
 
     def __model(self):
         """ 3-Tuple model for references
+        
             First element is full text reference,
             Second is list of passage identifiers
             Third is subreference
@@ -79,6 +84,7 @@ class Reference(object):
 
     def __regexp(self, subreference):
         """ Split components of subreference 
+        
         :param subreference: A subreference
         :type subreference: basestring
         :rtype: List.<Tuple>
@@ -88,6 +94,7 @@ class Reference(object):
 
     def __parse(self, reference):
         """ Parse references informations
+        
         """
 
         ref = reference.split("-")
@@ -107,6 +114,7 @@ class Reference(object):
 class URN(object):
 
     """ A URN object giving all useful sections """
+        
 
     __order = [
         "full",
@@ -125,6 +133,7 @@ class URN(object):
 
     def __len__(self):
         """ Warning : Does not take into account the passage ! """
+        
         items = [key for key in self.parsed if key not in ["passage", "reference", "full"] ]
         return len(items)
 
@@ -136,6 +145,7 @@ class URN(object):
 
     def __eq__(self, other):
         """ Equality checker for URN object
+        
         :param other: An object to be checked against
         :rtype: boolean
         :returns: Equality between other and self
@@ -145,6 +155,7 @@ class URN(object):
 
     def __str__(self):
         """ Return full initial urn
+        
         :rtype: basestring
         :returns: String representation of URN Object
         """
@@ -152,6 +163,7 @@ class URN(object):
 
     def __getitem__(self, key):
         """ Returns the urn (int) level or up to (str) level. 
+        
             Urn is not counted as an element !
 
         :param key: Identifier of the wished resource
@@ -283,6 +295,7 @@ class URN(object):
 
     def __parse(self, urn):
         """ Parse a URN
+        
 
         :param urn: A URN:CTS
         :type urn: basestring
@@ -315,10 +328,12 @@ class URN(object):
 
 class Citation(object):
     """ A citation object gives informations about the scheme 
+        
     """
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
         """ Initialize a Citation object
+        
         :param name: Name of the citation (e.g. "book")
         :type name: basestring
         :param xpath: Xpath of the citation (As described by CTS norm)
@@ -388,6 +403,7 @@ class Citation(object):
 
     def __upXpathScope(self):
         """ Update xpath and scope property when refsDecl is updated
+        
         """
         rd = self.__refsDecl
         matches = REFSDECL_SPLITTER.findall(rd)
@@ -396,6 +412,7 @@ class Citation(object):
 
     def __upRefsDecl(self):
         """ Update xpath and scope property when refsDecl is updated
+        
         """
         if self.__scope is not None and self.__xpath is not None:
             xpath = self.__scope + self.__xpath
@@ -409,6 +426,7 @@ class Citation(object):
 
     def __iter__(self):
         """ Iteration function
+        
         """
         e = self
         while e is not None:

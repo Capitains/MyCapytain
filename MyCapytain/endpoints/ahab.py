@@ -13,6 +13,7 @@ import requests
 
 class Ahab(proto.Ahab):
 
-    """ Basic integration of the proto.CTS abstractiojn
+    """ 
+    Basic integration of the proto.CTS abstraction
     """
     pass

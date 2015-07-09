@@ -12,6 +12,7 @@ from . import inventory
 class Resource(object):
     def __init__(self, urn, resource= None):
         """ Initiate a Resource object
+        
         :param resource: A resource
         :type resource: Any
         """
@@ -33,8 +34,10 @@ class Passage(Resource):
 
 class Text(Resource):
     """ A CTS Text """
+        
     def __parseReference(self, reference):
         """ Parse a CTS URN
+        
         :param reference: A urn or a passage reference
         :type reference: str
         :rtype: List.str
@@ -46,6 +49,7 @@ class Text(Resource):
 
     def getValidReff(self, level = None):
         """ Given a resource, Text will compute valid reffs 
+        
         :param level: Depth required. If not set, should retrieve deeper level
         :type level: Int
         :rtype: List
@@ -55,6 +59,7 @@ class Text(Resource):
 
     def getPassage(self, reference):
         """ Retrieve a passage and store it in the object
+        
         :param reference: Reference of the passage
         :type reference: str
         :rtype: Passage
@@ -64,6 +69,7 @@ class Text(Resource):
 
     def getLabel(self):
         """ Retrieve a passage and store it in the object
+        
         :param reference: Reference of the passage
         :type reference: str
         :rtype: dict

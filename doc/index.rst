@@ -9,8 +9,9 @@ Welcome to MyCapytains's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
 
+   MyCapytain
 
 
 Indices and tables

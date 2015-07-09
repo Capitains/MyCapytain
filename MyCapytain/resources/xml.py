@@ -40,6 +40,7 @@ class Citation(CitationPrototype):
 
 def xpathDict(xml, xpath, children, parents, **kwargs):
     """ Returns a default Dict given certain informations
+        
 
     :param xml: An xml tree
     :type xml: etree
@@ -67,12 +68,14 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
 
 class Text(inventory.Text):
     """ Represents a CTS Text
+        
     """
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
 
     def __str__(self):
         """ Print the xml of the text
+        
         :rtype: basestring
         :returns: XML representation of the text
         """
@@ -153,6 +156,7 @@ class Text(inventory.Text):
 
     def export(self, format="xml"):
         """ Create a {format} version of the Work
+        
         :param format: Format to be chosen (Only XML for now)
         :type param: basestring
         :rtype: lxml.etree._Element
@@ -162,6 +166,7 @@ class Text(inventory.Text):
 
     def __findCitations(self, xml, element, xpath="ti:citation"):
         """ Find citation in current xml. Used as a loop for self.xmlparser()
+        
         :param xml:
         :param element:
         :param xpath:
@@ -194,6 +199,7 @@ class Text(inventory.Text):
 
     def parse(self, resource):
         """ Parse a resource to feed the object
+        
         :param resource: An xml representation object
         :type resource: basestring or lxml.etree._Element
         :returns: None
@@ -243,6 +249,7 @@ def Translation(resource=None, urn=None, parents=None):
 class Work(inventory.Work):
 
     """ Represents a CTS Textgroup in XML
+        
     """
 
     def __init__(self, **kwargs):
@@ -250,6 +257,7 @@ class Work(inventory.Work):
 
     def __str__(self):
         """ Print the xml of the work
+        
         :rtype: basestring
         :returns: XML representation of the work
         """
@@ -276,6 +284,7 @@ class Work(inventory.Work):
 
     def export(self, format="xml"):
         """ Create a {format} version of the Work
+        
         :param format: Format to be chosen (Only XML for now)
         :type param: basestring
         :rtype: lxml.etree._Element
@@ -319,6 +328,7 @@ class Work(inventory.Work):
 class TextGroup(inventory.TextGroup):
 
     """ Represents a CTS Textgroup in XML
+        
     """
 
     def __init__(self, **kwargs):
@@ -326,6 +336,7 @@ class TextGroup(inventory.TextGroup):
 
     def __str__(self):
         """ Print the xml of the text group
+        
         :rtype: basestring
         :returns: XML representation of the textgroup
         """
@@ -347,6 +358,7 @@ class TextGroup(inventory.TextGroup):
 
     def export(self, format="xml"):
         """ Create a {format} version of the TextInventory
+        
         :param format: Format to be chosen (Only XML for now)
         :type param: basestring
         :rtype: lxml.etree._Element
@@ -374,6 +386,7 @@ class TextGroup(inventory.TextGroup):
 class TextInventory(inventory.TextInventory):
 
     """ Represents a CTS Inventory file
+        
     """
 
     def __init__(self, **kwargs):
@@ -381,6 +394,7 @@ class TextInventory(inventory.TextInventory):
 
     def __str__(self):
         """ Print the xml of the textinventory
+        
         :rtype: basestring
         :returns: XML representation of the textinventory
         """
@@ -397,6 +411,7 @@ class TextInventory(inventory.TextInventory):
 
     def export(self, format="xml"):
         """ Create a {format} version of the TextInventory
+        
         :param format: Format to be chosen (Only XML for now)
         :type param: basestring
         :rtype: lxml.etree._Element

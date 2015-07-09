@@ -13,11 +13,13 @@ import requests
 
 class CTS(proto.CTS):
 
-    """ Basic integration of the proto.CTS abstraction
+    """ 
+        Basic integration of the proto.CTS abstraction
     """
 
     def call(self, parameters):
         """ Call an endpoint given the parameters
+        
         :param parameters: Dictionary of parameters
         :type parameters: dict
         :rtype: text
@@ -33,6 +35,7 @@ class CTS(proto.CTS):
 
     def getCapabilities(self, inventory):
         """ Retrieve the inventory information of an API 
+        
         :param inventory: Name of the inventory
         :type inventory: text
         :rtype: str
@@ -44,6 +47,7 @@ class CTS(proto.CTS):
 
     def getValidReff(self, urn, inventory, level=None):
         """ Retrieve valid urn-references for a text
+        
         :param urn: URN identifying the text
         :type urn: text
         :param inventory: Name of the inventory
@@ -61,6 +65,7 @@ class CTS(proto.CTS):
 
     def getFirstUrn(self, urn, inventory):
         """ Retrieve the first passage urn of a text
+        
         :param urn: URN identifying the text
         :type urn: text
         :param inventory: Name of the inventory
@@ -75,6 +80,7 @@ class CTS(proto.CTS):
 
     def getPrevNextUrn(self, urn, inventory):
         """ Retrieve the previous and next passage urn of one passage
+        
         :param urn: URN identifying the text's passage (Minimum depth : 1)
         :type urn: text
         :param inventory: Name of the inventory
@@ -89,6 +95,7 @@ class CTS(proto.CTS):
 
     def getLabel(self, urn, inventory):
         """ Retrieve informations about a CTS Urn
+        
         :param urn: URN identifying the text's passage (Minimum depth : 1)
         :type urn: text
         :param inventory: Name of the inventory
@@ -103,6 +110,7 @@ class CTS(proto.CTS):
 
     def getPassage(self, urn, inventory, context=None):
         """ Retrieve a passage
+        
         :param urn: URN identifying the text's passage (Minimum depth : 1)
         :type urn: text
         :param inventory: Name of the inventory
@@ -120,6 +128,7 @@ class CTS(proto.CTS):
 
     def getPassagePlus(self, urn, inventory, context=None):
         """ Retrieve a passage and informations about it
+        
         :param urn: URN identifying the text's passage (Minimum depth : 1)
         :type urn: text
         :param inventory: Name of the inventory

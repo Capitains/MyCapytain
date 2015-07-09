@@ -18,9 +18,11 @@ from builtins import range, object
 class Metadatum(object):
 
     """ Metadatum object represent a single field of metadata """
+        
 
     def __init__(self, name, children=None):
         """ Initiate a Metadatum object
+        
         :param name: Name of the field
         :type name: basestring
         :param children: List.tuple
@@ -36,6 +38,7 @@ class Metadatum(object):
 
     def __getitem__(self, key):
         """ Add an iterable access method
+        
         :param key:
         :type key:
         :returns: An element of children whose index is key
@@ -59,6 +62,7 @@ class Metadatum(object):
 
     def __setitem__(self, key, value):
         """ Add an iterable access method
+        
         :param key:
         :type key:
         :param value:
@@ -100,6 +104,7 @@ class Metadata(object):
     """
     def __init__(self, keys=None):
         """ Initiate the object
+        
         :param key: A metadata field name
         :type key: List.<basestring>
         """
@@ -111,6 +116,7 @@ class Metadata(object):
 
     def __getitem__(self, key):
         """ Add an iterable access method
+        
         :param key:
         :type key:
         :returns: An element of children whose index is key
@@ -130,6 +136,7 @@ class Metadata(object):
 
     def __setitem__(self, key, value):
         """ Add an iterable access method
+        
         :param key:
         :type key:
         :param value:

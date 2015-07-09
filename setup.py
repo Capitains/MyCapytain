@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+import MyCapytain
+
 setup(
   name='MyCapytain',
-  version='0.0.1',
+  version=MyCapytain.__version__,
   description='Abstraction of CTS API for Python',
   url='http://github.com/Capitains/MyCapytain',
   author='Thibault Clerice',
@@ -12,7 +14,8 @@ setup(
   install_requires=[
     "requests==2.7.0",
     "six==1.9.0",
-    "lxml==3.4.4"
+    "lxml==3.4.4",
+    "future==0.14.3"
   ],
   tests_require=[
     "mock==1.0.1",

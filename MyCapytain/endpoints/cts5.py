@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.endpoints.cts5
+   :synopsis: CTS5 endpoint implementation
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
 from . import proto
 import requests
 

@@ -8,3 +8,7 @@
 
 
 """
+
+__name__ = "MyCapytain"
+__version__ = "0.0.1"
+__all__ = ["common", "endpoints", "resources"]

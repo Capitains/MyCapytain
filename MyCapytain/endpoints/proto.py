@@ -1,5 +1,11 @@
+# -*- coding: utf-8 -*-
 """
-    Prototypes used for implementation of API abstraction
+.. module:: MyCapytain.endpoints.proto
+   :synopsis: Prototypes of APIs endpoint
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
 """
 class API(object):
     """ API Prototype object """

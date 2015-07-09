@@ -1,0 +1,493 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MyCapytain.resources.xml &mdash; MyCapytains 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="MyCapytains 0.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for MyCapytain.resources.xml</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">from</span> <span class="nn">MyCapytain.resources.proto</span> <span class="kn">import</span> <span class="n">inventory</span>
+<span class="kn">from</span> <span class="nn">MyCapytain.common.reference</span> <span class="kn">import</span> <span class="n">Citation</span> <span class="k">as</span> <span class="n">CitationPrototype</span>
+<span class="kn">from</span> <span class="nn">MyCapytain.common.utils</span> <span class="kn">import</span> <span class="n">xmlparser</span><span class="p">,</span> <span class="n">NS</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">text_type</span> <span class="k">as</span> <span class="nb">str</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+
+<div class="viewcode-block" id="Citation"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Citation">[docs]</a><span class="k">class</span> <span class="nc">Citation</span><span class="p">(</span><span class="n">CitationPrototype</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">refsDecl</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;&quot;</span>
+
+        <span class="n">child</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">child</span><span class="p">,</span> <span class="n">Citation</span><span class="p">):</span>
+            <span class="n">child</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="k">return</span> <span class="s">&quot;&lt;ti:citation label=&#39;{label}&#39; xpath=&#39;{xpath}&#39; scope=&#39;{scope}&#39;&gt;{child}&lt;/ti:citation&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">child</span><span class="o">=</span><span class="n">child</span><span class="p">,</span>
+            <span class="n">xpath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xpath</span><span class="p">,</span>
+            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span>
+        <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="xpathDict"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.xpathDict">[docs]</a><span class="k">def</span> <span class="nf">xpathDict</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">xpath</span><span class="p">,</span> <span class="n">children</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns a default Dict given certain informations</span>
+
+<span class="sd">    :param xml: An xml tree</span>
+<span class="sd">    :type xml: etree</span>
+<span class="sd">    :param xpath: XPath to find children</span>
+<span class="sd">    :type basestring:</span>
+<span class="sd">    :param children: Object identifying children</span>
+<span class="sd">    :type children: inventory.Resource</span>
+<span class="sd">    :param parents: Tuple of parents</span>
+<span class="sd">    :type parents: tuple.&lt;inventory.Resource&gt;</span>
+<span class="sd">    :rtype: collections.defaultdict.&lt;basestring, inventory.Resource&gt;</span>
+<span class="sd">    :returns: Dictionary of children</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;urn&quot;</span><span class="p">),</span>
+            <span class="n">children</span><span class="p">(</span>
+                <span class="n">resource</span><span class="o">=</span><span class="n">child</span><span class="p">,</span>
+                <span class="n">urn</span><span class="o">=</span><span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;urn&quot;</span><span class="p">),</span>
+                <span class="n">parents</span><span class="o">=</span><span class="n">parents</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+        <span class="p">)</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">xml</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">xpath</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">))</span>
+    <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Text"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Text">[docs]</a><span class="k">class</span> <span class="nc">Text</span><span class="p">(</span><span class="n">inventory</span><span class="o">.</span><span class="n">Text</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Text</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Print the xml of the text</span>
+<span class="sd">        :rtype: basestring</span>
+<span class="sd">        :returns: XML representation of the text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tag_start</span> <span class="o">=</span> <span class="s">&quot;edition&quot;</span>
+        <span class="n">tag_end</span> <span class="o">=</span> <span class="n">tag_start</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="s">&quot;Translation&quot;</span><span class="p">:</span>
+            <span class="n">tag_start</span> <span class="o">=</span> <span class="s">&quot;translation&quot;</span>
+            <span class="n">tag_end</span> <span class="o">=</span> <span class="s">&quot;translation&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">:</span>
+                <span class="n">tag_start</span> <span class="o">=</span> <span class="n">tag_start</span> <span class="o">+</span> <span class="s">&quot; xml:lang=&#39;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">+</span> <span class="s">&quot;&#39;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s">&quot;&lt;ti:{0} urn=&#39;{1}&#39; workUrn=&#39;{2}&#39; xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">tag_start</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">urn</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">urn</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s">&quot;&lt;ti:{0} workUrn=&#39;{1}&#39; xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">tag_start</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">urn</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s">&quot;&lt;ti:{0} xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">tag_start</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="n">namespaces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">metadatum</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s">&quot;namespaceMapping&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">abbr</span><span class="p">,</span> <span class="n">ns</span> <span class="ow">in</span> <span class="n">metadatum</span><span class="p">:</span>
+                    <span class="n">namespaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s">&#39;&lt;ti:namespaceMapping abbreviation=</span><span class="se">\&#39;</span><span class="s">{0}</span><span class="se">\&#39;</span><span class="s"> nsURI=</span><span class="se">\&#39;</span><span class="s">{1}</span><span class="se">\&#39;</span><span class="s">/&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">abbr</span><span class="p">,</span>
+                            <span class="n">ns</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">lang</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metadatum</span><span class="p">:</span>
+                    <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s">&quot;&lt;ti:{tag} xml:lang=&#39;{lang}&#39;&gt;{value}&lt;/ti:{tag}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
+                            <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span>
+                            <span class="n">value</span><span class="o">=</span><span class="n">value</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="c"># Maybe should have an online object...</span>
+        <span class="n">docname</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">docname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">docname</span> <span class="o">=</span> <span class="s">&#39; docname=</span><span class="se">\&#39;</span><span class="s">{0}</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">docname</span><span class="p">)</span>
+
+        <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:online{0}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">docname</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&lt;ti:validate schema=</span><span class="se">\&#39;</span><span class="s">{0}</span><span class="se">\&#39;</span><span class="s">/&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">namespaces</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">namespaces</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">citation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:citationMapping&gt;&quot;</span><span class="p">)</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">citation</span><span class="p">))</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/ti:citationMapping&gt;&quot;</span><span class="p">)</span>
+
+        <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/ti:online&gt;&quot;</span><span class="p">)</span>
+
+        <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/ti:{0}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag_end</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Text.export"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Text.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;xml&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a {format} version of the Work</span>
+<span class="sd">        :param format: Format to be chosen (Only XML for now)</span>
+<span class="sd">        :type param: basestring</span>
+<span class="sd">        :rtype: lxml.etree._Element</span>
+<span class="sd">        :returns: XML representation of the object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">xmlparser</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">__findCitations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xpath</span><span class="o">=</span><span class="s">&quot;ti:citation&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Find citation in current xml. Used as a loop for self.xmlparser()</span>
+<span class="sd">        :param xml:</span>
+<span class="sd">        :param element:</span>
+<span class="sd">        :param xpath:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="n">xpath</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">citation</span> <span class="o">=</span> <span class="n">Citation</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;label&quot;</span><span class="p">),</span>
+                <span class="n">xpath</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;xpath&quot;</span><span class="p">),</span>
+                <span class="n">scope</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;scope&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">Citation</span><span class="p">):</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">child</span> <span class="o">=</span> <span class="n">citation</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__findCitations</span><span class="p">(</span>
+                    <span class="n">xml</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">element</span><span class="o">=</span><span class="n">element</span><span class="o">.</span><span class="n">child</span>
+                <span class="p">)</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                element.child = citation</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">citation</span> <span class="o">=</span> <span class="n">citation</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__findCitations</span><span class="p">(</span>
+                    <span class="n">xml</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">element</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">citation</span>
+                <span class="p">)</span>
+
+
+<div class="viewcode-block" id="Text.parse"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Text.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Parse a resource to feed the object</span>
+<span class="sd">        :param resource: An xml representation object</span>
+<span class="sd">        :type resource: basestring or lxml.etree._Element</span>
+<span class="sd">        :returns: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">xmlparser</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtype</span> <span class="o">==</span> <span class="s">&quot;Translation&quot;</span><span class="p">:</span>
+            <span class="n">lang</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;{http://www.w3.org/XML/1998/namespace}lang&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;ti:description&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">):</span>
+            <span class="n">lg</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;{http://www.w3.org/XML/1998/namespace}lang&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&quot;description&quot;</span><span class="p">][</span><span class="n">lg</span><span class="p">]</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;ti:label&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">):</span>
+            <span class="n">lg</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;{http://www.w3.org/XML/1998/namespace}lang&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&quot;label&quot;</span><span class="p">][</span><span class="n">lg</span><span class="p">]</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__findCitations</span><span class="p">(</span>
+            <span class="n">xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">,</span>
+            <span class="n">element</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">xpath</span><span class="o">=</span><span class="s">&quot;ti:online/ti:citationMapping/ti:citation&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">online</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;ti:online&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">online</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">online</span> <span class="o">=</span> <span class="n">online</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">docname</span> <span class="o">=</span> <span class="n">online</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;docname&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">validate</span> <span class="ow">in</span> <span class="n">online</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;ti:validate&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">validate</span> <span class="o">=</span> <span class="n">validate</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;schema&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">namespaceMapping</span> <span class="ow">in</span> <span class="n">online</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;ti:namespaceMapping&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&quot;namespaceMapping&quot;</span><span class="p">][</span><span class="n">namespaceMapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;abbreviation&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">namespaceMapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;nsURI&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">None</span>
+
+
+</div></div>
+<div class="viewcode-block" id="Edition"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Edition">[docs]</a><span class="k">def</span> <span class="nf">Edition</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="n">urn</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="n">parents</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s">&quot;Edition&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Translation"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Translation">[docs]</a><span class="k">def</span> <span class="nf">Translation</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Text</span><span class="p">(</span><span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span> <span class="n">urn</span><span class="o">=</span><span class="n">urn</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="n">parents</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s">&quot;Translation&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Work"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Work">[docs]</a><span class="k">class</span> <span class="nc">Work</span><span class="p">(</span><span class="n">inventory</span><span class="o">.</span><span class="n">Work</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Textgroup in XML</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Work</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Print the xml of the work</span>
+<span class="sd">        :rtype: basestring</span>
+<span class="sd">        :returns: XML representation of the work</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:work urn=&#39;{0}&#39; groupUrn=&#39;{1}&#39; xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&quot;urn&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:work groupUrn=&#39;{0}&#39; xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">urn</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:work xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">metadatum</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">lang</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metadatum</span><span class="p">:</span>
+                <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:{tag} xml:lang=&#39;{lang}&#39;&gt;{value}&lt;/ti:{tag}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="c"># Dev trick : For tests, we need to have always the same order....</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">urn</span> <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]))</span>
+
+        <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/ti:work&gt;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Work.export"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Work.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;xml&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a {format} version of the Work</span>
+<span class="sd">        :param format: Format to be chosen (Only XML for now)</span>
+<span class="sd">        :type param: basestring</span>
+<span class="sd">        :rtype: lxml.etree._Element</span>
+<span class="sd">        :returns: XML representation of the object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">xmlparser</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Work.parse"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.Work.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">xmlparser</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+        <span class="n">lang</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;{http://www.w3.org/XML/1998/namespace}lang&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lang</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;ti:title&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">):</span>
+            <span class="n">lg</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;{http://www.w3.org/XML/1998/namespace}lang&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&quot;title&quot;</span><span class="p">][</span><span class="n">lg</span><span class="p">]</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__editions</span> <span class="o">=</span> <span class="n">xpathDict</span><span class="p">(</span>
+            <span class="n">xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">,</span>
+            <span class="n">xpath</span><span class="o">=</span><span class="s">&#39;ti:edition&#39;</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="n">Edition</span><span class="p">,</span>
+            <span class="n">parents</span><span class="o">=</span><span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__translations</span> <span class="o">=</span> <span class="n">xpathDict</span><span class="p">(</span>
+            <span class="n">xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">,</span>
+            <span class="n">xpath</span><span class="o">=</span><span class="s">&#39;ti:translation&#39;</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="n">Translation</span><span class="p">,</span>
+            <span class="n">parents</span><span class="o">=</span><span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">texts</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__editions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__editions</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__translations</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__translations</span><span class="p">[</span><span class="n">urn</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span>
+</div></div>
+<div class="viewcode-block" id="TextGroup"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.TextGroup">[docs]</a><span class="k">class</span> <span class="nc">TextGroup</span><span class="p">(</span><span class="n">inventory</span><span class="o">.</span><span class="n">TextGroup</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Textgroup in XML</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TextGroup</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Print the xml of the text group</span>
+<span class="sd">        :rtype: basestring</span>
+<span class="sd">        :returns: XML representation of the textgroup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:textgroup urn=&#39;{0}&#39; xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urn</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:textgroup xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">metadatum</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">lang</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metadatum</span><span class="p">:</span>
+                <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:{tag} xml:lang=&#39;{lang}&#39;&gt;{value}&lt;/ti:{tag}&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">works</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">works</span><span class="p">[</span><span class="n">urn</span><span class="p">]))</span>
+
+        <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/ti:textgroup&gt;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TextGroup.export"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.TextGroup.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;xml&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a {format} version of the TextInventory</span>
+<span class="sd">        :param format: Format to be chosen (Only XML for now)</span>
+<span class="sd">        :type param: basestring</span>
+<span class="sd">        :rtype: lxml.etree._Element</span>
+<span class="sd">        :returns: XML representation of the object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">xmlparser</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TextGroup.parse"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.TextGroup.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">xmlparser</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;ti:groupname&quot;</span><span class="p">,</span> <span class="n">namespaces</span><span class="o">=</span><span class="n">NS</span><span class="p">):</span>
+            <span class="n">lg</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;{http://www.w3.org/XML/1998/namespace}lang&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&quot;groupname&quot;</span><span class="p">][</span><span class="n">lg</span><span class="p">]</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">works</span> <span class="o">=</span> <span class="n">xpathDict</span><span class="p">(</span>
+            <span class="n">xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">,</span>
+            <span class="n">xpath</span><span class="o">=</span><span class="s">&#39;ti:work&#39;</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="n">Work</span><span class="p">,</span>
+            <span class="n">parents</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">works</span>
+
+</div></div>
+<div class="viewcode-block" id="TextInventory"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.TextInventory">[docs]</a><span class="k">class</span> <span class="nc">TextInventory</span><span class="p">(</span><span class="n">inventory</span><span class="o">.</span><span class="n">TextInventory</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Represents a CTS Inventory file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TextInventory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Print the xml of the textinventory</span>
+<span class="sd">        :rtype: basestring</span>
+<span class="sd">        :returns: XML representation of the textinventory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:TextInventory tiid=&#39;{0}&#39; xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;ti:TextInventory xmlns:ti=&#39;http://chs.harvard.edu/xmlns/cts&#39;&gt;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">urn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">textgroups</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">textgroups</span><span class="p">[</span><span class="n">urn</span><span class="p">]))</span>
+        <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;/ti:TextInventory&gt;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TextInventory.export"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.TextInventory.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&quot;xml&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a {format} version of the TextInventory</span>
+<span class="sd">        :param format: Format to be chosen (Only XML for now)</span>
+<span class="sd">        :type param: basestring</span>
+<span class="sd">        :rtype: lxml.etree._Element</span>
+<span class="sd">        :returns: XML representation of the object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">xmlparser</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TextInventory.parse"><a class="viewcode-back" href="../../../MyCapytain.resources.xml.html#MyCapytain.resources.xml.TextInventory.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">xmlparser</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">textgroups</span> <span class="o">=</span> <span class="n">xpathDict</span><span class="p">(</span>
+            <span class="n">xml</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">,</span>
+            <span class="n">xpath</span><span class="o">=</span><span class="s">&#39;//ti:textgroup&#39;</span><span class="p">,</span>
+            <span class="n">children</span><span class="o">=</span><span class="n">TextGroup</span><span class="p">,</span>
+            <span class="n">parents</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">textgroups</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Thibault Clérice.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

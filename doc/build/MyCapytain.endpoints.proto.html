@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MyCapytain.endpoints.proto module &mdash; MyCapytains 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MyCapytains 0.0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-MyCapytain.endpoints.proto">
+<span id="mycapytain-endpoints-proto-module"></span><h1>MyCapytain.endpoints.proto module<a class="headerlink" href="#module-MyCapytain.endpoints.proto" title="Permalink to this headline">¶</a></h1>
+<p>Prototypes used for implementation of API abstraction</p>
+<dl class="class">
+<dt id="MyCapytain.endpoints.proto.API">
+<em class="property">class </em><code class="descclassname">MyCapytain.endpoints.proto.</code><code class="descname">API</code><span class="sig-paren">(</span><em>endpoint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#API"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.API" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>API Prototype object</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="MyCapytain.endpoints.proto.Ahab">
+<em class="property">class </em><code class="descclassname">MyCapytain.endpoints.proto.</code><code class="descname">Ahab</code><span class="sig-paren">(</span><em>endpoint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#Ahab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.Ahab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#MyCapytain.endpoints.proto.API" title="MyCapytain.endpoints.proto.API"><code class="xref py py-class docutils literal"><span class="pre">MyCapytain.endpoints.proto.API</span></code></a></p>
+<p>Abstract Capitains Ahab API
+See : <a class="reference external" href="http://capitains.github.io/pages/ahab.html">http://capitains.github.io/pages/ahab.html</a></p>
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.Ahab.permalink">
+<code class="descname">permalink</code><span class="sig-paren">(</span><em>urn</em>, <em>format='xml'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#Ahab.permalink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.Ahab.permalink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a permalink request on API
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.Ahab.search">
+<code class="descname">search</code><span class="sig-paren">(</span><em>query</em>, <em>urn</em>, <em>start=1</em>, <em>limit=5</em>, <em>format='json'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#Ahab.search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.Ahab.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a search on given namespace
+:param query: Term to perform search on
+:type query: text
+:param urn: Partial or complete urn identifying the request
+:type urn: text
+:param start: Starting element to display
+:type start: int
+:param limit: Limit of result displayed
+:type limit: int
+:param format: Format to request (json or xml)
+:type format: str
+:rtype: str</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="MyCapytain.endpoints.proto.CTS">
+<em class="property">class </em><code class="descclassname">MyCapytain.endpoints.proto.</code><code class="descname">CTS</code><span class="sig-paren">(</span><em>endpoint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#MyCapytain.endpoints.proto.API" title="MyCapytain.endpoints.proto.API"><code class="xref py py-class docutils literal"><span class="pre">MyCapytain.endpoints.proto.API</span></code></a></p>
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.CTS.getCapabilities">
+<code class="descname">getCapabilities</code><span class="sig-paren">(</span><em>inventory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS.getCapabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS.getCapabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the inventory information of an API 
+:param inventory: Name of the inventory
+:type inventory: text
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.CTS.getFirstUrn">
+<code class="descname">getFirstUrn</code><span class="sig-paren">(</span><em>urn</em>, <em>inventory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS.getFirstUrn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS.getFirstUrn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the first passage urn of a text
+:param urn: URN identifying the text
+:type urn: text
+:param inventory: Name of the inventory
+:type inventory: text
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.CTS.getLabel">
+<code class="descname">getLabel</code><span class="sig-paren">(</span><em>urn</em>, <em>inventory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS.getLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS.getLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve informations about a CTS Urn
+:param urn: URN identifying the text&#8217;s passage (Minimum depth : 1)
+:type urn: text
+:param inventory: Name of the inventory
+:type inventory: text
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.CTS.getPassage">
+<code class="descname">getPassage</code><span class="sig-paren">(</span><em>urn</em>, <em>inventory</em>, <em>context=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS.getPassage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS.getPassage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a passage
+:param urn: URN identifying the text&#8217;s passage (Minimum depth : 1)
+:type urn: text
+:param inventory: Name of the inventory
+:type inventory: text
+:param context: Number of citation units at the same level of the citation hierarchy as the requested urn, immediately preceding and immediately following the requested urn to include in the reply
+:type context: int
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.CTS.getPassagePlus">
+<code class="descname">getPassagePlus</code><span class="sig-paren">(</span><em>urn</em>, <em>inventory</em>, <em>context=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS.getPassagePlus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS.getPassagePlus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a passage and informations about it
+:param urn: URN identifying the text&#8217;s passage (Minimum depth : 1)
+:type urn: text
+:param inventory: Name of the inventory
+:type inventory: text
+:param context: Number of citation units at the same level of the citation hierarchy as the requested urn, immediately preceding and immediately following the requested urn to include in the reply
+:type context: int
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.CTS.getPrevNextUrn">
+<code class="descname">getPrevNextUrn</code><span class="sig-paren">(</span><em>urn</em>, <em>inventory</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS.getPrevNextUrn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS.getPrevNextUrn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the previous and next passage urn of one passage
+:param urn: URN identifying the text&#8217;s passage (Minimum depth : 1)
+:type urn: text
+:param inventory: Name of the inventory
+:type inventory: text
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="MyCapytain.endpoints.proto.CTS.getValidReff">
+<code class="descname">getValidReff</code><span class="sig-paren">(</span><em>urn</em>, <em>inventory</em>, <em>level=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MyCapytain/endpoints/proto.html#CTS.getValidReff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MyCapytain.endpoints.proto.CTS.getValidReff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve valid urn-references for a text
+:param urn: URN identifying the text
+:type urn: text
+:param inventory: Name of the inventory
+:type inventory: text
+:param level: Depth of references expected
+:type level: int
+:rtype: str</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/MyCapytain.endpoints.proto.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Thibault Clérice.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/MyCapytain.endpoints.proto.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>MyCapytain.common.reference &mdash; MyCapytains 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="MyCapytains 0.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for MyCapytain.common.reference</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">past.builtins</span> <span class="kn">import</span> <span class="nb">basestring</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">object</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+
+<span class="n">REFSDECL_SPLITTER</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;/+[a-zA-Z0-9:\[\]@=</span><span class="se">\\</span><span class="s">\{\$&#39;</span><span class="se">\&quot;</span><span class="s">\.]+&quot;</span><span class="p">)</span>
+<span class="n">REFSDECL_REPLACER</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;\$[0-9]+&quot;</span><span class="p">)</span>
+<span class="n">SUBREFERENCE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;(\w*)\[{0,1}([0-9]*)\]{0,1}&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">UNICODE</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Reference"><a class="viewcode-back" href="../../../MyCapytain.common.reference.html#MyCapytain.common.reference.Reference">[docs]</a><span class="k">class</span> <span class="nc">Reference</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; A reference object giving informations &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="n">reference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Equality checker for Reference object</span>
+<span class="sd">        :param other: An object to be checked against</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        :returns: Equality between other and self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return full initial reference</span>
+<span class="sd">        :rtype: basestring</span>
+<span class="sd">        :returns: String representation of Reference Object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return part of or full passage reference </span>
+<span class="sd">        :param key: Identifier of the part to return</span>
+<span class="sd">        :type key: basestring or int</span>
+<span class="sd">        :rtype: basestring or List.&lt;int&gt; or None or Tuple.&lt;string&gt;</span>
+<span class="sd">        :returns: Desired part of the passage reference</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;start&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;end&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;start_list&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;end_list&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;start_sub&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;end_sub&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span>
+
+    <span class="k">def</span> <span class="nf">__model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; 3-Tuple model for references</span>
+<span class="sd">            First element is full text reference,</span>
+<span class="sd">            Second is list of passage identifiers</span>
+<span class="sd">            Third is subreference</span>
+
+<span class="sd">        :rtype: Tuple</span>
+<span class="sd">        :returns: An empty tuple to model data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="p">[],</span> <span class="bp">None</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__regexp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subreference</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Split components of subreference </span>
+<span class="sd">        :param subreference: A subreference</span>
+<span class="sd">        :type subreference: basestring</span>
+<span class="sd">        :rtype: List.&lt;Tuple&gt;</span>
+<span class="sd">        :returns: List where first element is a tuple representing different components</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SUBREFERENCE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">subreference</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Parse references informations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">element</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+            <span class="n">subreference</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subreference</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">element</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__regexp</span><span class="p">(</span><span class="n">subreference</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">subreference</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">element</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">element</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">element</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="URN"><a class="viewcode-back" href="../../../MyCapytain.common.reference.html#MyCapytain.common.reference.URN">[docs]</a><span class="k">class</span> <span class="nc">URN</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; A URN object giving all useful sections &quot;&quot;&quot;</span>
+
+    <span class="n">__order</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s">&quot;full&quot;</span><span class="p">,</span>
+        <span class="s">&quot;urn_namespace&quot;</span><span class="p">,</span>
+        <span class="s">&quot;cts_namespace&quot;</span><span class="p">,</span>
+        <span class="s">&quot;textgroup&quot;</span><span class="p">,</span>
+        <span class="s">&quot;work&quot;</span><span class="p">,</span>
+        <span class="s">&quot;text&quot;</span><span class="p">,</span>
+        <span class="s">&quot;passage&quot;</span><span class="p">,</span>
+        <span class="s">&quot;reference&quot;</span>  <span class="c"># Reference is a more complex object</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urn</span> <span class="o">=</span> <span class="n">urn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urn</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Warning : Does not take into account the passage ! &quot;&quot;&quot;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;passage&quot;</span><span class="p">,</span> <span class="s">&quot;reference&quot;</span><span class="p">,</span> <span class="s">&quot;full&quot;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Equality checker for URN object</span>
+<span class="sd">        :param other: An object to be checked against</span>
+<span class="sd">        :rtype: boolean</span>
+<span class="sd">        :returns: Equality between other and self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;full&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">other</span><span class="p">[</span><span class="s">&quot;full&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return full initial urn</span>
+<span class="sd">        :rtype: basestring</span>
+<span class="sd">        :returns: String representation of URN Object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">urn</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the urn (int) level or up to (str) level. </span>
+<span class="sd">            Urn is not counted as an element !</span>
+
+<span class="sd">        :param key: Identifier of the wished resource</span>
+<span class="sd">        :type key: int or basestring</span>
+<span class="sd">        :rtype: basestring or Reference</span>
+<span class="sd">        :returns: Part or complete URN</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">URN</span><span class="o">.</span><span class="n">__order</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="n">URN</span><span class="o">.</span><span class="n">__order</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;urn_namespace&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;urn&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;cts_namespace&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;textgroup&quot;</span> <span class="ow">and</span> <span class="s">&quot;textgroup&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">]</span>
+            <span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;work&quot;</span> <span class="ow">and</span> <span class="s">&quot;work&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">]</span>
+                    <span class="p">])</span>
+            <span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;text&quot;</span> <span class="ow">and</span> <span class="s">&quot;text&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span>
+                    <span class="p">])</span>
+            <span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;passage&quot;</span> <span class="ow">and</span> <span class="s">&quot;passage&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&quot;text&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                    <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span>
+                        <span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;passage&quot;</span><span class="p">]</span>
+                <span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                    <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">]</span>
+                        <span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;passage&quot;</span><span class="p">]</span>
+                <span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;start&quot;</span> <span class="ow">and</span> <span class="s">&quot;passage&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&quot;text&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                    <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span>
+                        <span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;reference&quot;</span><span class="p">][</span><span class="s">&quot;start&quot;</span><span class="p">]</span>
+                <span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                    <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">]</span>
+                        <span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;reference&quot;</span><span class="p">][</span><span class="s">&quot;start&quot;</span><span class="p">]</span>
+                <span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;end&quot;</span> <span class="ow">and</span> <span class="s">&quot;passage&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;reference&quot;</span><span class="p">][</span><span class="s">&quot;end&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&quot;text&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                    <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span>
+                    <span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;reference&quot;</span><span class="p">][</span><span class="s">&quot;end&quot;</span><span class="p">]</span>
+                <span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s">&quot;urn&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">],</span>
+                    <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">]</span>
+                    <span class="p">]),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;reference&quot;</span><span class="p">][</span><span class="s">&quot;end&quot;</span><span class="p">]</span>
+                <span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;full&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;full&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&quot;reference&quot;</span> <span class="ow">and</span> <span class="s">&quot;reference&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;reference&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Parse a URN</span>
+
+<span class="sd">        :param urn: A URN:CTS</span>
+<span class="sd">        :type urn: basestring</span>
+<span class="sd">        :rtype: defaultdict.basestring</span>
+<span class="sd">        :returns: Dictionary representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;full&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">urn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">urn</span> <span class="o">=</span> <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;full&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">urn</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;urn_namespace&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">urn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;cts_namespace&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">urn</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;passage&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">urn</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;reference&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">urn</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">urn</span> <span class="o">=</span> <span class="n">urn</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;textgroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">urn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;work&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">urn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urn</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">parsed</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">urn</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;URN is empty&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parsed</span>
+
+</div>
+<div class="viewcode-block" id="Citation"><a class="viewcode-back" href="../../../MyCapytain.common.reference.html#MyCapytain.common.reference.Citation">[docs]</a><span class="k">class</span> <span class="nc">Citation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A citation object gives informations about the scheme </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">xpath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">refsDecl</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">child</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize a Citation object</span>
+<span class="sd">        :param name: Name of the citation (e.g. &quot;book&quot;)</span>
+<span class="sd">        :type name: basestring</span>
+<span class="sd">        :param xpath: Xpath of the citation (As described by CTS norm)</span>
+<span class="sd">        :type xpath: basestring</span>
+<span class="sd">        :param scope: Scope of the citation (As described by CTS norm)</span>
+<span class="sd">        :type xpath: basestring</span>
+<span class="sd">        :param refsDecl: refsDecl version</span>
+<span class="sd">        :type refsDecl: basestring</span>
+<span class="sd">        :param child: A citation</span>
+<span class="sd">        :type child: Citation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__xpath</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scope</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__refsDecl</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__child</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xpath</span> <span class="o">=</span> <span class="n">xpath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refsDecl</span> <span class="o">=</span> <span class="n">refsDecl</span>
+
+        <span class="k">if</span> <span class="n">child</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">child</span> <span class="o">=</span> <span class="n">child</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
+    <span class="nd">@name.setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">xpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__xpath</span>
+
+    <span class="nd">@xpath.setter</span>
+    <span class="k">def</span> <span class="nf">xpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__xpath</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__upRefsDecl</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scope</span>
+        
+    <span class="nd">@scope.setter</span>
+    <span class="k">def</span> <span class="nf">scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__scope</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__upRefsDecl</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">refsDecl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__refsDecl</span>
+        
+    <span class="nd">@refsDecl.setter</span>
+    <span class="k">def</span> <span class="nf">refsDecl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__refsDecl</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__upXpathScope</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">child</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__child</span>
+        
+    <span class="nd">@child.setter</span>
+    <span class="k">def</span> <span class="nf">child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__child</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">__upXpathScope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update xpath and scope property when refsDecl is updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__refsDecl</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">REFSDECL_SPLITTER</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">rd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__scope</span> <span class="o">=</span> <span class="n">REFSDECL_REPLACER</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;?&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__xpath</span> <span class="o">=</span> <span class="n">REFSDECL_REPLACER</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;?&quot;</span><span class="p">,</span> <span class="n">matches</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__upRefsDecl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Update xpath and scope property when refsDecl is updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__xpath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">xpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__scope</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__xpath</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">xpath</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&quot;?&quot;</span><span class="p">)</span>
+            <span class="n">ii</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">xpath</span> <span class="o">=</span> <span class="n">xpath</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;$&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="o">+</span> <span class="n">xpath</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">xpath</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&quot;?&quot;</span><span class="p">)</span>
+                <span class="n">ii</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__refsDecl</span> <span class="o">=</span> <span class="n">xpath</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iteration function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">while</span> <span class="n">e</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">e</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s">&quot;child&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">child</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">child</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Thibault Clérice.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

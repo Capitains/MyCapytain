@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.common.metadata
+   :synopsis: Metadata related objects
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
 from __future__ import unicode_literals
 
 

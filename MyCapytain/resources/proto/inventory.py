@@ -1,6 +1,13 @@
+# -*- coding: utf-8 -*-
 """
-    Resources Prototypes
+.. module:: MyCapytain.resources.proto.inventory
+   :synopsis: Prototypes for repository/inventory
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
 """
+
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.common.metadata import Metadata
 from past.builtins import basestring

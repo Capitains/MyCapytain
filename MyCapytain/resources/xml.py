@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.resources.xml
+   :synopsis: XML based Text and repository
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
 from __future__ import unicode_literals
 
 from MyCapytain.resources.proto import inventory

@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.resources.proto.text
+   :synopsis: Prototypes for Text
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
 from . import inventory
 
 class Resource(object):

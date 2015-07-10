@@ -6,12 +6,21 @@
 Welcome to MyCapytains's documentation!
 =======================================
 
+.. image:: https://travis-ci.org/Capitains/MyCapytain.svg?branch=master 
+.. image:: https://coveralls.io/repos/Capitains/MyCapytain/badge.svg?branch=master 
+.. image:: https://gemnasium.com/Capitains/MyCapytain.svg 
+.. image:: https://badge.fury.io/py/MyCapytain.svg 
+.. image:: https://readthedocs.org/projects/mycapytain/badge/?version=latest 
+
+
 Contents:
 
 .. toctree::
    :maxdepth: 4
 
-   MyCapytain
+   MyCapytain.common
+   MyCapytain.resources
+   MyCapytain.endpoints
 
 
 Indices and tables

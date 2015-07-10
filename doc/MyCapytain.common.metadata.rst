@@ -1,4 +1,4 @@
-MyCapytain.common.metadata module
+MyCapytain.common.metadata
 =================================
 
 .. automodule:: MyCapytain.common.metadata

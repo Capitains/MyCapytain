@@ -12,15 +12,17 @@
 class API(object):
     """
     API Prototype object
+
+    :param self: Object
+    :type self: API
+    :param endpoint: URL of the API
+    :type endpoint: text
+
+    :ivar endpoint: Url of the endpoint
     """
 
     def __init__(self, endpoint):
         """ Instantiate an API class
-
-        :param self: Object
-        :type self: API
-        :param endpoint: URL of the API
-        :type endpoint: text
         """
         self.endpoint = endpoint
 

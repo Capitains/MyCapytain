@@ -17,16 +17,26 @@ from builtins import range, object
 
 class Metadatum(object):
 
-    """ Metadatum object represent a single field of metadata """
+    """ Metadatum object represent a single field of metadata 
+        
+    :param name: Name of the field
+    :type name: basestring
+    :param children: List of tuples, where first element is the key, and second the value
+    :type children: List
+
+    :Example: 
+        >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+        >>>    print(a["lat"]) # == "Amores"
+
+    .. automethod:: __getitem__
+    .. automethod:: __setitem__
+    .. automethod:: __iter__
+
+    """
         
 
     def __init__(self, name, children=None):
         """ Initiate a Metadatum object
-        
-        :param name: Name of the field
-        :type name: basestring
-        :param children: List.tuple
-        :type children: dict
         """
         self.name = name
         self.children = OrderedDict()
@@ -38,10 +48,23 @@ class Metadatum(object):
 
     def __getitem__(self, key):
         """ Add an iterable access method
+
+        Int typed key access to the *n* th registered key in the instance. 
+        If string based key does not exist, see for a default.
         
-        :param key:
-        :type key:
+        :param key: Key of wished value
+        :type key: basestring, tuple, int
         :returns: An element of children whose index is key
+
+        :raises: KeyError if key is unknown (when using Int based key or when default is not set)
+
+        :Example:
+            >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    print(a["lat"]) # Amores
+            >>>    print(a[("lat", "fre")]) # Amores, Les Amours
+            >>>    print(a[0]) # Amores 
+            >>>    print(a["dut"]) # Amores
+
         """
         if isinstance(key, int):
             items = list(self.children.keys())
@@ -61,14 +84,30 @@ class Metadatum(object):
             return self.children[key]
 
     def __setitem__(self, key, value):
-        """ Add an iterable access method
+        """ Register index key and value for the instance
         
-        :param key:
-        :type key:
-        :param value:
-        :type value:
+        :param key: Index key(s) for the metadata
+        :type key: basestring, list, tuple
+        :param value: Values for the metadata
+        :type value: basestring, list, tuple
         :returns: An element of children whose index is key
+
+        :raises: `TypeError` if key is not basestring or tuple of basestring
+        :raises: `ValueError` if key and value are list and are not the same size
+
+        :Example:
+            >>> a = Metadata(name="label")
+
+            >>> a["eng"] = "Illiad"
+            >>> print(a["eng"]) # Illiad
+
+            >>> a[("fre", "grc")] = ("Illiade", "Ἰλιάς")
+            >>> print(a["fre"], a["grc"]) # Illiade, Ἰλιάς
+
+            >>> a[("ger", "dut")] = "Iliade"
+            >>> print(a["ger"], a["dut"]) # Iliade, Iliade
         """
+
         if isinstance(key, tuple):
             if not isinstance(value, (tuple, list)):
                 value = [value]*len(key)
@@ -85,6 +124,19 @@ class Metadatum(object):
                 self.default = key
 
     def setDefault(self, key):
+        """ Set a default key when a field does not exist
+
+        :param key: An existing key of the instance
+        :type key: basestring
+        :returns: Default key
+        :raises: `ValueError` If key is not registered
+
+        :Example: 
+            >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    a.setDefault("fre")
+            >>>    print(a["eng"]) # == "Les Amours"
+
+        """
         if key not in self.children:
             raise ValueError("Can not set a default to an unknown key")
         else:
@@ -92,6 +144,13 @@ class Metadatum(object):
         return self.default
 
     def __iter__(self):
+        """ Iter method of Metadatum
+
+        :Example:
+            >>> a = Metadata(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>> for key, value in a:
+            >>>     print(key, value) # Print ("lat", "Amores") and then ("fre", "Les Amours")
+        """
         i = 0
         for key in self.children:
             yield (key, self.children[key])
@@ -101,12 +160,19 @@ class Metadatum(object):
 class Metadata(object):
     """ 
         A metadatum aggregation object provided to centralize metadata
-    """
-    def __init__(self, keys=None):
-        """ Initiate the object
         
         :param key: A metadata field name
         :type key: List.<basestring>
+
+        :ivar metadata: Dictionary of metadatum
+
+        .. automethod:: __getitem__
+        .. automethod:: __setitem__
+        .. automethod:: __iter__
+        .. automethod:: __len__
+    """
+    def __init__(self, keys=None):
+        """ Initiate the object
         """
         self.metadata = defaultdict(Metadatum)
         self.__keys = []
@@ -115,11 +181,24 @@ class Metadata(object):
                 self[key] = Metadatum(name=key)
 
     def __getitem__(self, key):
-        """ Add an iterable access method
+        """ Add a quick access system through getitem on the instance
         
-        :param key:
-        :type key:
+        :param key: Index key representing a set of metadatum
+        :type key: basestring, int, tuple
         :returns: An element of children whose index is key
+        :raises: `KeyError` If key is not registered or recognized
+
+        :Example:
+            >>>    a = Metadata()
+            >>>    m1 = Metadatum(name="title", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    m2 = Metadatum(name="author", [("lat", "Ovidius"), ("fre", "Ovide")])
+            >>>    a[("title", "author")] = (m1, m2)
+
+            >>>    a["title"] == m1
+            >>>    a[0] == m1
+            >>>    a[("title", "author")] == (m1, m2)
+
+
         """
         if isinstance(key, int):
             if key + 1 > len(self.__keys):
@@ -135,13 +214,29 @@ class Metadata(object):
             return self.metadata[key]
 
     def __setitem__(self, key, value):
-        """ Add an iterable access method
+        """ Set a new metadata field
         
-        :param key:
-        :type key:
-        :param value:
-        :type value:
+        :param key: Name of metadatum field
+        :type key: basestring, tuple
+        :param value: Metadum dictionary
+        :type value: Metadatum
         :returns: An element of children whose index is key
+
+        :raises: `TypeError` if key is not basestring or tuple of basestring
+        :raises: `ValueError` if key and value are list and are not the same size
+
+        :Example:
+            >>>    a = Metadata()
+
+            >>>    a["title"] = Metadatum(name="title", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    print(a["title"]["lat"]) # Amores
+
+            >>>    a[("title", "author")] = (
+            >>>         Metadatum(name="title", [("lat", "Amores"), ("fre", "Les Amours")]),
+            >>>         Metadatum(name="author", [("lat", "Ovidius"), ("fre", "Ovide")])
+            >>>     )
+            >>>    print(a["title"]["lat"], a["author"]["fre"]) # Amores, Ovide
+
         """
         if isinstance(key, tuple):
             if len(value) < len(key):
@@ -161,12 +256,28 @@ class Metadata(object):
                 self.__keys.append(key)
 
     def __iter__(self):
+        """ Iter method of Metadata
+
+        :Example:
+            >>> a = Metadata(("title", "desc", "author"))
+            >>> for key, value in a:
+            >>>     print(key, value) # Print ("title", "<Metadatum object>") then ("desc", "<Metadatum object>")...
+        """
         i = 0
         for key in self.__keys:
             yield (key, self.metadata[key])
             i += 1
 
     def __len__(self):
+        """ Returns the number of Metadatum registered in the object
+
+        :rtype: int
+        :returns: Number of metadatum objects
+
+        :Example:
+            >>>    a = Metadata(("title", "description", "author"))
+            >>>    print(len(a)) # 3
+        """
         return len(
             [
                 k

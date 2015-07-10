@@ -14,6 +14,7 @@ from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
 
+#: Dictionary of namespace that can be useful
 NS = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ahab": "http://localhost.local",
@@ -22,6 +23,15 @@ NS = {
 }
 
 def xmlparser(xml):
+    """ Parse xml 
+
+    :param xml: XML element
+    :type xml: basestring, lxml.etree._Element
+    :rtype: lxml.etree._Element
+    :returns: An element object
+    :raises: TypeError if element is not in accepted type
+
+    """
     doclose = None
     if isinstance(xml, etree._Element):
         return xml

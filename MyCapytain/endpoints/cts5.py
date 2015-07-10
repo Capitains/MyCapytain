@@ -7,14 +7,14 @@
 
 
 """
-from . import proto
+import MyCapytain.endpoints.proto
 import requests
 
 
-class CTS(proto.CTS):
+class CTS(MyCapytain.endpoints.proto.CTS):
 
     """ 
-        Basic integration of the proto.CTS abstraction
+        Basic integration of the MyCapytain.endpoints.proto.CTS abstraction
     """
 
     def call(self, parameters):

@@ -18,7 +18,16 @@ import collections
 
 
 class Citation(CitationPrototype):
+    """ Citation XML implementation for TextInventory
+
+    """
     def __str__(self):
+        """ Returns a string text inventory version of the object 
+
+        :Example:
+            >>>    a = Citation(name="book", xpath="/tei:TEI/tei:body/tei:text/tei:div", scope="/tei:div[@n=\"1\"]")
+            >>>    str(a) == <ti:citation label='book' xpath='/tei:TEI/tei:body/tei:text/tei:div' scope='/tei:div[@n=\"1\"]'>...</ti:citation>
+        """
         if self.xpath is None and self.scope is None and self.refsDecl is None:
             return ""
 
@@ -69,6 +78,7 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
 class Text(inventory.Text):
     """ Represents a CTS Text
         
+        .. automethod:: __str__
     """
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
@@ -241,18 +251,24 @@ class Text(inventory.Text):
 
 
 def Edition(resource=None, urn=None, parents=None):
+    """ Create an edition subtyped Text object 
+    """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
 
 def Translation(resource=None, urn=None, parents=None):
+    """ Create a translation subtyped Text object 
+    """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
 
 class Work(inventory.Work):
 
     """ Represents a CTS Textgroup in XML
-        
+
+        .. automethod:: __str__
     """
 
     def __init__(self, **kwargs):
+
         super(Work, self).__init__(**kwargs)
 
     def __str__(self):
@@ -293,6 +309,11 @@ class Work(inventory.Work):
         return xmlparser(str(self))
 
     def parse(self, resource):
+        """ Parse a resource 
+
+        :param resource: Element rerpresenting a work
+        :param type: basestring, etree._Element
+        """
         self.xml = xmlparser(resource)
 
         lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
@@ -329,6 +350,7 @@ class TextGroup(inventory.TextGroup):
 
     """ Represents a CTS Textgroup in XML
         
+        .. automethod:: __str__
     """
 
     def __init__(self, **kwargs):
@@ -367,6 +389,11 @@ class TextGroup(inventory.TextGroup):
         return xmlparser(str(self))
 
     def parse(self, resource):
+        """ Parse a resource 
+
+        :param resource: Element rerpresenting the textgroup
+        :param type: basestring, etree._Element
+        """
         self.xml = xmlparser(resource)
 
         for child in self.xml.xpath("ti:groupname", namespaces=NS):
@@ -387,6 +414,7 @@ class TextInventory(inventory.TextInventory):
 
     """ Represents a CTS Inventory file
         
+    .. automethod:: __str__
     """
 
     def __init__(self, **kwargs):
@@ -420,6 +448,11 @@ class TextInventory(inventory.TextInventory):
         return xmlparser(str(self))
 
     def parse(self, resource):
+        """ Parse a resource 
+
+        :param resource: Element rerpresenting the text inventory
+        :param type: basestring, etree._Element
+        """
         self.xml = xmlparser(resource)
 
         self.textgroups = xpathDict(

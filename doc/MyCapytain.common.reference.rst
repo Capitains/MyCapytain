@@ -1,4 +1,4 @@
-MyCapytain.common.reference module
+MyCapytain.common.reference
 ==================================
 
 .. automodule:: MyCapytain.common.reference

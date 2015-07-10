@@ -7,11 +7,11 @@
 
 
 """
-from . import proto
+import MyCapytain.endpoints.proto
 import requests
 
 
-class Ahab(proto.Ahab):
+class Ahab(MyCapytain.endpoints.proto.Ahab):
 
     """ 
     Basic integration of the proto.CTS abstraction

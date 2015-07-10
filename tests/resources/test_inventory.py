@@ -9,7 +9,7 @@ import xmlunittest
 from copy import deepcopy
 from six import text_type as str
 
-from MyCapytain.resources.xml import *
+from MyCapytain.resources.inventory import *
 
 
 def compareSTR(one, other):

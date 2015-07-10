@@ -34,18 +34,10 @@ class Passage(Resource):
 
 class Text(Resource):
     """ A CTS Text """
-        
-    def __parseReference(self, reference):
-        """ Parse a CTS URN
-        
-        :param reference: A urn or a passage reference
-        :type reference: str
-        :rtype: List.str
-        :returns: List of references
+    
+    def parse(self, resource):
+        """ Parse a given resource
         """
-        if ":" in reference:
-            reference = reference.split(":")[-1]
-        return reference.split("-")
 
     def getValidReff(self, level = None):
         """ Given a resource, Text will compute valid reffs 

@@ -10,7 +10,6 @@
 """
 from __future__ import unicode_literals
 
-
 from collections import defaultdict
 from past.builtins import basestring
 from builtins import range, object

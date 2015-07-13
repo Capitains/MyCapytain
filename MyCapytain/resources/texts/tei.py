@@ -8,8 +8,20 @@ Shared elements for TEI Citation
 """
 
 import MyCapytain.common.reference
+from builtins import range, object
+
+
+def childOrNone(liste):
+    if len(liste) > 0:
+        return liste[-1]
+    else:
+        return None
 
 class Citation(MyCapytain.common.reference.Citation):
+    """ Implementation of Citation for TEI markup
+
+    .. automethod:: __str__
+    """
     def __str__(self):
         """ Returns a string refsDecl version of the object 
 
@@ -33,5 +45,30 @@ class Citation(MyCapytain.common.reference.Citation):
         return "<tei:cRefPattern n=\"{label}\" matchPattern=\"{regexp}\" replacementPattern=\"#xpath({refsDecl})\"><tei:p>This pointer pattern extracts {label}</tei:p></tei:cRefPattern>".format(
             refsDecl=self.refsDecl,
             label=label,
-            regexp="\.".join(["(\\w+)" for dollar in self.refsDecl.find("$")])
+            regexp="\.".join(["(\w+)" for i in range(0, self.refsDecl.count("$"))])
         )
+
+    def ingest(self, resource):
+        """ Ingest a resource
+
+        :param resource: XML node cRefPattern or list of them in ASC hierarchy order (deepest to highest, eg. lines to poem to book)
+        :type resource: lxml.etre._Element
+        """
+        resources = []
+        if not isinstance(resource, (list)):
+            resource = list(resource)
+
+        for x in range(0,len(resource)):
+            resources.append(
+                self.__class__(
+                    name=resource[x].get("n"),
+                    refsDecl=resource[x].get("replacementPattern")[7:-1],
+                    child=childOrNone(resources)
+                )
+            )
+        self.name = resources[-1].name
+        self.refsDecl = resources[-1].refsDecl
+        self.child = resources[-1].child
+
+
+

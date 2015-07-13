@@ -254,3 +254,17 @@ class TestCitation(unittest.TestCase):
         )
         self.assertEqual([e for e in a], [a, b, c])
 
+    def test_len(self):
+        c = Citation(
+            name="line"
+        )
+        b = Citation(
+            name="poem",
+            child=c
+        )
+        a = Citation(
+            name="book",
+            child=b
+        )
+        self.assertEqual(len(a), 3)
+

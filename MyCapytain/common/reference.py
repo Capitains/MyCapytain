@@ -467,6 +467,7 @@ class Citation(object):
     :type child: Citation
 
     .. automethod:: __iter__
+    .. automethod:: __len__
     """
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
@@ -600,3 +601,9 @@ class Citation(object):
                 e = e.child
             else:
                 break
+
+    def __len__(self):
+       """ Length method
+       returns: Number of nested citation
+       """
+       return len([item for item in self])

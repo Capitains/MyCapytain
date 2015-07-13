@@ -8,6 +8,7 @@ Shared elements for TEI Citation
 """
 
 import MyCapytain.common.reference
+from lxml.etree import _Element
 from builtins import range, object
 
 
@@ -55,8 +56,8 @@ class Citation(MyCapytain.common.reference.Citation):
         :type resource: lxml.etre._Element
         """
         resources = []
-        if not isinstance(resource, (list)):
-            resource = list(resource)
+        if isinstance(resource, _Element):
+            resource = [resource]
 
         for x in range(0,len(resource)):
             resources.append(

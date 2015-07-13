@@ -44,7 +44,6 @@ class Text(text.Text):
             self.__findCRefPattern(self.xml)
 
     def __findCRefPattern(self, xml):
-        print([el.get("n") for el in xml.xpath("//tei:cRefPattern", namespaces=NS)])
         self.citation.ingest(xml.xpath("//tei:cRefPattern", namespaces=NS))
 
     @property
@@ -62,8 +61,8 @@ class Text(text.Text):
         :type value:  MyCapytain.resources.texts.tei.Citation or Citation
         :raises: TypeError when value is not a TEI Citation or a Citation
         """
-        if isinstance(value,  MyCapytain.resources.texts.tei.Citation):
+        if isinstance(value, MyCapytain.resources.texts.tei.Citation):
             self._cRefPattern = value
         elif isinstance(value, Citation):
             # .. todo:: Should support conversion between Citation...
-            self._cRefPattern = MyCapytain.resources.texts.tei.Citation(name=value.name, xpath=value.xpath, scope=value.scope, child=value.child)
+            self._cRefPattern = MyCapytain.resources.texts.tei.Citation(name=value.name, refsDecl=value.refsDecl, child=value.child)

@@ -12,7 +12,7 @@ Local files handler for CTS
 
 from collections import OrderedDict
 from MyCapytain.common.utils import xmlparser, NS
-from MyCapytain.common.reference import URN, Citation
+from MyCapytain.common.reference import URN, Citation, Reference
 import MyCapytain.resources.texts.tei
 from MyCapytain.resources.proto import text
 
@@ -66,3 +66,38 @@ class Text(text.Text):
         elif isinstance(value, Citation):
             # .. todo:: Should support conversion between Citation...
             self._cRefPattern = MyCapytain.resources.texts.tei.Citation(name=value.name, refsDecl=value.refsDecl, child=value.child)
+
+    def __getNode(self, passage=None):
+        """ Retrieve a node from a passage
+
+        :param passage:
+        :type passage:
+        """
+        pass
+
+    def getValidReff(self, level=1, passage=None):
+        """ Retrieve valid passages directly 
+
+        :param level: (1 Based)
+        :type level: Level required
+        :param passage: Passage Reference
+        :type passage: Reference
+        """
+        a = OrderedDict()
+        start = 1
+        citations = [cite for cite in self.citation]
+
+        if passage is not None:
+            xml = self.__getNode(passage=passage)
+            start = len(passage[2])
+            nodes = passage[2] + [None]
+            if level < start:
+                level = start + 1
+        else:
+            xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
+            nodes = [None] * level
+
+        for x in range(start, level+1):
+            elements = xml.xpath("."+citations[x - 1].fill(passage=nodes[x-1], xpath=True), namespaces=NS)
+            break
+

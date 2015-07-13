@@ -54,3 +54,6 @@ class TestLocalXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(a.citation.refsDecl, "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']")
         self.assertEqual(a.citation.scope, "/tei:TEI/tei:text/tei:body/tei:div")
         self.assertEqual(a.citation.xpath, "/tei:div[@n='?']")
+
+    def testFindCitation(self):
+        self.assertEqual(self.TEI.getValidReff(), None)

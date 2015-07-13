@@ -19,6 +19,7 @@ import re
 REFSDECL_SPLITTER = re.compile("/+[a-zA-Z0-9:\[\]@=\\\{\$'\"\.]+")
 REFSDECL_REPLACER = re.compile("\$[0-9]+")
 SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
+REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
 
 class Reference(object):
 
@@ -607,3 +608,24 @@ class Citation(object):
        returns: Number of nested citation
        """
        return len([item for item in self])
+
+    def fill(self, passage=None, xpath=None):
+        """ Fill the xpath with given informations
+
+        :param passage: Passage reference
+        :type passage: Reference or lsit
+        :rtype: basestring
+        :returns: Xpath to find the passage
+        """
+        if passage is None:
+            replacement = r"\1"
+        else:
+            replacement = r"\1\2'" + passage + "'"
+
+        if isinstance(passage, Reference):
+            passage = passage[2]
+
+        if xpath is True: # Then passage is a string or None
+            xpath = self.xpath
+            print(REFERENCE_REPLACER.findall(xpath))
+            return REFERENCE_REPLACER.sub(replacement, xpath)

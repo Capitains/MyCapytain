@@ -617,14 +617,34 @@ class Citation(object):
         :rtype: basestring
         :returns: Xpath to find the passage
         """
-        if passage is None:
-            replacement = r"\1"
-        else:
-            replacement = r"\1\2'" + passage + "'"
-
-        if isinstance(passage, Reference):
-            passage = passage[2]
-
         if xpath is True: # Then passage is a string or None
             xpath = self.xpath
+
+            if passage is None:
+                replacement = r"\1"
+            elif isinstance(passage, basestring):
+                replacement = r"\1\2'" + passage + "'"
+
             return REFERENCE_REPLACER.sub(replacement, xpath)
+        else:        
+            if isinstance(passage, Reference):
+                passage = passage[2]
+            passage = iter(passage)    
+            return REFERENCE_REPLACER.sub(
+                lambda m: REF_REPLACER(m, passage),
+                self.refsDecl
+            )
+
+def REF_REPLACER(match, passage):
+    """ System replacer for items
+
+    :param match: 
+    :type match: re.SRE_MATCH
+    :retur
+    """
+    groups = match.groups()
+    ref = next(passage)
+    if ref is None:
+        return groups[0]
+    else:
+        return "{1}='{0}'".format(ref, groups[0])

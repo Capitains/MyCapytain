@@ -268,3 +268,15 @@ class TestCitation(unittest.TestCase):
         )
         self.assertEqual(len(a), 3)
 
+    def test_fill(self):
+        c = Citation(
+            name="line",
+            scope="/TEI/text/body/div/div[@n=\"?\"]",
+            xpath="//l[@n=\"?\"]"
+        )
+        self.assertEqual(c.fill(Reference("1.2")), "/TEI/text/body/div/div[@n='1']//l[@n='2']")
+        self.assertEqual(c.fill(Reference("1.1")), "/TEI/text/body/div/div[@n='1']//l[@n='1']")
+        self.assertEqual(c.fill("1", xpath=True), "//l[@n='1']")
+        self.assertEqual(c.fill("2", xpath=True), "//l[@n='2']")
+        self.assertEqual(c.fill(None, xpath=True), "//l[@n]")
+        self.assertEqual(c.fill([None, None]), "/TEI/text/body/div/div[@n]//l[@n]")

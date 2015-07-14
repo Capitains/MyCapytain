@@ -56,4 +56,10 @@ class TestLocalXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(a.citation.xpath, "/tei:div[@n='?']")
 
     def testFindCitation(self):
-        self.assertEqual(self.TEI.getValidReff(), None)
+        self.assertEqual(self.TEI.getValidReff(), ["1", "2"])
+        self.assertEqual(self.TEI.getValidReff(level=2)[0], "1.pr")
+        self.assertEqual(self.TEI.getValidReff(level=3)[0], "1.pr.1")
+        self.assertEqual(self.TEI.getValidReff(level=3)[-1], "2.40.8")
+        self.assertEqual(self.TEI.getValidReff(passage=MyCapytain.common.reference.Reference("2.1"),level=3)[1], "2.1.2")
+        self.assertEqual(self.TEI.getValidReff(passage=MyCapytain.common.reference.Reference("2.1"),level=3)[-1], "2.1.12")
+        self.assertEqual(self.TEI.getValidReff(passage=MyCapytain.common.reference.Reference("2.1.1"),level=3), [])

@@ -627,5 +627,4 @@ class Citation(object):
 
         if xpath is True: # Then passage is a string or None
             xpath = self.xpath
-            print(REFERENCE_REPLACER.findall(xpath))
             return REFERENCE_REPLACER.sub(replacement, xpath)

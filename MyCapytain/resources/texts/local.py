@@ -10,7 +10,7 @@ Local files handler for CTS
 
 """
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.common.reference import URN, Citation, Reference
 import MyCapytain.resources.texts.tei
@@ -29,11 +29,14 @@ class Text(text.Text):
     :ivar resource: Test
     """
 
-    def __init__(self, citation=None, resource=None):
-        self.passages = OrderedDict()
+    def __init__(self, urn=None, citation=None, resource=None):
+        self._passages = OrderedDict() #: Represents real full passages / reffs informations. Only way to set it up is getValidReff without passage ?
+        self._orphan = defaultdict(Reference) #: Represents passage we got without asking for all. Storing convenience ?
+
         self._cRefPattern = MyCapytain.resources.texts.tei.Citation()
         self.resource = None
         self.xml = None
+        self._URN = None
 
         if citation is not None:
             self.citation = citation
@@ -43,8 +46,40 @@ class Text(text.Text):
 
             self.__findCRefPattern(self.xml)
 
+
     def __findCRefPattern(self, xml):
         self.citation.ingest(xml.xpath("//tei:cRefPattern", namespaces=NS))
+
+    @property
+    def reffs(self):
+        """ Get the lowest cRefPattern in the hierarchy
+        :rtype: MyCapytain.resources.texts.tei.Citation
+        """
+        return self.getValidReff()
+
+    @property
+    def passages(self):
+        """ Get the lowest cRefPattern in the hierarchy
+        :rtype: MyCapytain.resources.texts.tei.Citation
+        """
+        return self._passages
+
+    @property
+    def urn(self):
+        """ Get the lowest cRefPattern in the hierarchy
+        :rtype: MyCapytain.resources.texts.tei.Citation
+        """
+        return self._URN
+    
+    @urn.setter
+    def urn(self, value):
+        """ Set the cRefPattern
+
+        :param value: Citation to be saved
+        :type value:  MyCapytain.resources.texts.tei.Citation or Citation
+        :raises: TypeEr
+        """
+        self._URN = value
 
     @property
     def citation(self):
@@ -82,22 +117,74 @@ class Text(text.Text):
         :type level: Level required
         :param passage: Passage Reference
         :type passage: Reference
+
+        .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid informations. Maybe something is more powerfull ?
         """
         a = OrderedDict()
         start = 1
-        citations = [cite for cite in self.citation]
+        xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
 
         if passage is not None:
-            xml = self.__getNode(passage=passage)
             start = len(passage[2])
-            nodes = passage[2] + [None]
+            nodes = [".".join(passage[2][0:i+1]) for i in range(0, start)] + [None]
             if level < start:
                 level = start + 1
         else:
-            xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
-            nodes = [None] * level
+            nodes = [None for i in range(0, level)]
 
-        for x in range(start, level+1):
-            elements = xml.xpath("."+citations[x - 1].fill(passage=nodes[x-1], xpath=True), namespaces=NS)
-            break
+        self._passages = TextTree(xml=xml, citation=self.citation, id=None)
+        passages = [self._passages] # For consistency
+        while len(nodes) >= 1:
+            passages = [passage for sublist in [p.get(nodes[0]) for p in passages] for passage in sublist]
+            nodes.pop(0)
 
+        return [".".join(passage.id) for passage in passages]
+
+class TextTree(object):
+    """ Helper class for GetValidReff 
+
+    """
+
+    def __init__(self, xml, citation, id):
+        self.xml = xml
+        self.citation = citation
+        self.id = id
+
+        if id is None:
+            self.id = []
+
+        self.__children = OrderedDict()
+        self.__parsed = False
+
+    def get(self, key=None):
+        if len(self.__children) == 0:
+            if self.__parsed is True:
+                return None
+            else:
+                self.__parse()
+
+        if key is None:
+            return [self.__children[key] for key in self.__children]
+        elif key not in self.__children:
+            print(key, list(self.__children.keys()))
+            raise KeyError()
+        else:
+            return [self.__children[key]]
+
+    def __parse(self):
+        if self.citation is None:
+            return []
+        elements = self.xml.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
+        for element in elements:
+            n = self.id + [element.get("n")]
+            self.__children[".".join(n)] = TextTree(
+                xml=element,
+                citation=self.citation.child,
+                id=n
+            )
+        self.__parsed = True
+
+    def __iter__(self):
+        for key in self.__children:
+            yield (key, self.__children[key])
+    

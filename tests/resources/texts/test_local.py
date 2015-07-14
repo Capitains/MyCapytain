@@ -79,6 +79,7 @@ class TestLocalXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         with self.assertRaises(KeyError): 
             self.assertEqual(self.TEI.getValidReff(passage=MyCapytain.common.reference.Reference("2.hellno"),level=3), [])
 
+
     def test_reffs(self):
         """ Check that every level is returned trough reffs property """
         self.assertEqual(("1" in self.TEI.reffs), True)

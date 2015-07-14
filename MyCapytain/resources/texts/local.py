@@ -37,6 +37,7 @@ class Text(text.Text):
         self.resource = None
         self.xml = None
         self._URN = None
+        self.citation = []
 
         if citation is not None:
             self.citation = citation
@@ -55,14 +56,7 @@ class Text(text.Text):
         """ Get the lowest cRefPattern in the hierarchy
         :rtype: MyCapytain.resources.texts.tei.Citation
         """
-        return self.getValidReff()
-
-    @property
-    def passages(self):
-        """ Get the lowest cRefPattern in the hierarchy
-        :rtype: MyCapytain.resources.texts.tei.Citation
-        """
-        return self._passages
+        return [reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]
 
     @property
     def urn(self):
@@ -79,6 +73,10 @@ class Text(text.Text):
         :type value:  MyCapytain.resources.texts.tei.Citation or Citation
         :raises: TypeEr
         """
+        if isinstance(value, basestring):
+            value = URN(value)
+        elif not isinstance(value, URN):
+            raise TypeError()
         self._URN = value
 
     @property
@@ -127,7 +125,7 @@ class Text(text.Text):
         if passage is not None:
             start = len(passage[2])
             nodes = [".".join(passage[2][0:i+1]) for i in range(0, start)] + [None]
-            if level < start:
+            if level <= start:
                 level = start + 1
         else:
             nodes = [None for i in range(0, level)]
@@ -157,16 +155,12 @@ class TextTree(object):
         self.__parsed = False
 
     def get(self, key=None):
-        if len(self.__children) == 0:
-            if self.__parsed is True:
-                return None
-            else:
-                self.__parse()
+        if len(self.__children) == 0 and self.__parsed is False:
+            self.__parse()
 
         if key is None:
             return [self.__children[key] for key in self.__children]
         elif key not in self.__children:
-            print(key, list(self.__children.keys()))
             raise KeyError()
         else:
             return [self.__children[key]]
@@ -183,8 +177,4 @@ class TextTree(object):
                 id=n
             )
         self.__parsed = True
-
-    def __iter__(self):
-        for key in self.__children:
-            yield (key, self.__children[key])
     

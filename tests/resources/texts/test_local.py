@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 from six import text_type as str
-from codecs import open
+from io import open
 import xmlunittest
 
 import MyCapytain.resources.texts.local
@@ -15,7 +15,7 @@ class TestLocalXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test XML Implementation of resources found in local file """
 
     def setUp(self):
-        self.text = open("tests/testing_data/texts/sample.xml", "r")
+        self.text = open("tests/testing_data/texts/sample.xml", "rb")
         self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
 
     def tearDown(self):

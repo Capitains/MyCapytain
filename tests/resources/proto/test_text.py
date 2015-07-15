@@ -64,7 +64,7 @@ class TestProtoText(unittest.TestCase):
         # It takes two parameters, should not issue TypeError
         # Consistency check
         with self.assertRaises(NotImplementedError):
-            a.getValidReff(level=1, passage=["1"])
+            a.getValidReff(level=1, reference=["1"])
 
 
     def test_proto_passage(self):

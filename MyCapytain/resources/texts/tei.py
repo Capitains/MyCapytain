@@ -114,7 +114,7 @@ class Passage(MyCapytain.resources.proto.text.Passage):
                 [
                     element
                     for element
-                    in self.resource.xpath("//descendant-or-self::text()" + exclude, namespaces=MyCapytain.common.utils.NS)
+                    in self.resource.xpath(".//descendant-or-self::text()" + exclude, namespaces=MyCapytain.common.utils.NS)
                 ]
             )
         )

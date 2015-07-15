@@ -85,7 +85,7 @@ class Text(Resource):
         if citation is not None:
             self.citation = citation
 
-    def getValidReff(self, level=1, passage=None):
+    def getValidReff(self, level=1, reference=None):
         """ Given a resource, Text will compute valid reffs 
         
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)

@@ -11,6 +11,7 @@ Local files handler for CTS
 """
 
 from collections import OrderedDict, defaultdict
+from past.builtins import basestring
 
 from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.common.reference import URN, Citation, Reference
@@ -48,6 +49,9 @@ class Text(text.Text):
 
             self.__findCRefPattern(self.xml)
 
+            xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
+            self._passages = Passage(resource=xml, citation=self.citation, id=None, urn=self.urn)
+
     def __findCRefPattern(self, xml):
         self.citation.ingest(xml.xpath("//tei:cRefPattern", namespaces=NS))
 
@@ -73,14 +77,35 @@ class Text(text.Text):
             # .. todo:: Should support conversion between Citation...
             self._cRefPattern = MyCapytain.resources.texts.tei.Citation(name=value.name, refsDecl=value.refsDecl, child=value.child)
 
+    def getPassage(self, reference):
+        if isinstance(reference, MyCapytain.common.reference.Reference):
+            reference = reference["start_list"]
 
-    def getValidReff(self, level=1, passage=None):
+        reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
+        print(reference)
+
+        passages = [self._passages]
+        while len(reference) > 0:
+            passages = [passage for sublist in [p.get(reference[0]) for p in passages] for passage in sublist]
+            reference.pop(0)
+            
+        return passages[0]
+
+    def getPassagePlus(self, reference):
+        P = self.getPassage(reference=reference)
+        return {
+            "passage" : P,
+            "next" : P.next.urn,
+            "prev" : P.prev.urn
+        }
+
+    def getValidReff(self, level=1, reference=None):
         """ Retrieve valid passages directly 
         
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
+        :param reference: Subreference (optional)
+        :type reference: Reference
         :rtype: List.basestring
         :returns: List of levels
 
@@ -88,17 +113,15 @@ class Text(text.Text):
         """
         a = OrderedDict()
         start = 1
-        xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
 
-        if passage is not None:
-            start = len(passage[2])
-            nodes = [".".join(passage[2][0:i+1]) for i in range(0, start)] + [None]
+        if reference is not None:
+            start = len(reference[2])
+            nodes = [".".join(reference[2][0:i+1]) for i in range(0, start)] + [None]
             if level <= start:
                 level = start + 1
         else:
             nodes = [None for i in range(0, level)]
 
-        self._passages = Passage(resource=xml, citation=self.citation, id=None, urn=self.urn)
         passages = [self._passages] # For consistency
         while len(nodes) >= 1:
             passages = [passage for sublist in [p.get(nodes[0]) for p in passages] for passage in sublist]
@@ -118,15 +141,51 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if isinstance(citation, Citation):
             self.citation = citation
 
-        self.id = id
+        self.__id = []
 
-        if id is None:
-            self.id = []
+        if id is not None:
+            self.id = id
 
         self.__children = OrderedDict()
         self.__parsed = False
 
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, value):
+        if isinstance(value, (list, tuple)):
+            self.__id = value
+            self.__updateURN()
+
+    @property
+    def urn(self):
+        return self._URN
+
+    @urn.setter
+    def urn(self, value):
+        a = self._URN
+        if isinstance(value, basestring):
+            value = MyCapytain.common.reference.URN(value)
+        elif not isinstance(value, MyCapytain.common.reference.URN):
+            raise TypeError()
+        if str(a) != str(value):
+            self._URN = value
+            self.__updateURN()
+
+    def __updateURN(self):
+        if self.id is not None and len(self.id) > 0 and isinstance(self.urn, URN):
+            self.urn = URN(self.urn["text"] + ":" + ".".join(self.id))
+        elif self._URN is not None \
+             and self._URN["reference"] is not None \
+             and len(self._URN["reference"][2]) > 0 \
+             and self.id != self._URN["reference"][2]:
+
+            self.__id = self._URN["reference"][2]
+    
     def get(self, key=None):
+        """ Get a children """
         if len(self.__children) == 0 and self.__parsed is False:
             self.__parse()
 

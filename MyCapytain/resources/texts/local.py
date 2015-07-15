@@ -11,10 +11,11 @@ Local files handler for CTS
 """
 
 from collections import OrderedDict, defaultdict
+
 from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.common.reference import URN, Citation, Reference
-import MyCapytain.resources.texts.tei
 from MyCapytain.resources.proto import text
+import MyCapytain.resources.texts.tei
 
 class Text(text.Text):
     """ Implementation of CTS tools for local files 
@@ -24,7 +25,7 @@ class Text(text.Text):
     :param resource:
     :type resource:
 
-    :ivar passages: (OrderedDict) Dictionary of passages
+    :ivar passages: (OrderedDict) Dictionary of TextTree
     :ivar citation: (`MyCapytain.resources.texts.tei.Citation`)
     :ivar resource: Test
     """
@@ -37,7 +38,6 @@ class Text(text.Text):
         self.resource = None
         self.xml = None
         self._URN = None
-        self.citation = []
 
         if citation is not None:
             self.citation = citation
@@ -47,37 +47,8 @@ class Text(text.Text):
 
             self.__findCRefPattern(self.xml)
 
-
     def __findCRefPattern(self, xml):
         self.citation.ingest(xml.xpath("//tei:cRefPattern", namespaces=NS))
-
-    @property
-    def reffs(self):
-        """ Get the lowest cRefPattern in the hierarchy
-        :rtype: MyCapytain.resources.texts.tei.Citation
-        """
-        return [reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]
-
-    @property
-    def urn(self):
-        """ Get the lowest cRefPattern in the hierarchy
-        :rtype: MyCapytain.resources.texts.tei.Citation
-        """
-        return self._URN
-    
-    @urn.setter
-    def urn(self, value):
-        """ Set the cRefPattern
-
-        :param value: Citation to be saved
-        :type value:  MyCapytain.resources.texts.tei.Citation or Citation
-        :raises: TypeEr
-        """
-        if isinstance(value, basestring):
-            value = URN(value)
-        elif not isinstance(value, URN):
-            raise TypeError()
-        self._URN = value
 
     @property
     def citation(self):
@@ -110,11 +81,13 @@ class Text(text.Text):
 
     def getValidReff(self, level=1, passage=None):
         """ Retrieve valid passages directly 
-
-        :param level: (1 Based)
-        :type level: Level required
-        :param passage: Passage Reference
+        
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
         :type passage: Reference
+        :rtype: List.basestring
+        :returns: List of levels
 
         .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid informations. Maybe something is more powerfull ?
         """
@@ -139,7 +112,7 @@ class Text(text.Text):
         return [".".join(passage.id) for passage in passages]
 
 class TextTree(object):
-    """ Helper class for GetValidReff 
+    """ Helper class for GetValidReff : class for ordered tree path discovering
 
     """
 

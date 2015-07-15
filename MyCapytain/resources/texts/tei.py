@@ -22,6 +22,7 @@ class Citation(MyCapytain.common.reference.Citation):
     """ Implementation of Citation for TEI markup
 
     .. automethod:: __str__
+    
     """
     def __str__(self):
         """ Returns a string refsDecl version of the object 
@@ -50,7 +51,7 @@ class Citation(MyCapytain.common.reference.Citation):
         )
 
     def ingest(self, resource):
-        """ Ingest a resource
+        """ Ingest a resource and store data in its instance
 
         :param resource: XML node cRefPattern or list of them in ASC hierarchy order (deepest to highest, eg. lines to poem to book)
         :type resource: lxml.etre._Element

@@ -15,6 +15,8 @@ import MyCapytain.common.reference
 class Resource(object):
     """ Initiate a Resource object
     
+    :param urn: A URN identifier
+    :type urn: MyCapytain.common.reference.URN
     :param resource: A resource
     :type resource: Any
     """

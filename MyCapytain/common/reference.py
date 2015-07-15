@@ -605,7 +605,9 @@ class Citation(object):
 
     def __len__(self):
        """ Length method
-       returns: Number of nested citation
+
+       :rtype: int
+       :returns: Number of nested citations
        """
        return len([item for item in self])
 
@@ -614,6 +616,8 @@ class Citation(object):
 
         :param passage: Passage reference
         :type passage: Reference or lsit
+        :param xpath: If set to True, will return the replaced self.xpath value and not the whole self.refsDecl
+        :type xpath: Boolean
         :rtype: basestring
         :returns: Xpath to find the passage
         """
@@ -636,11 +640,15 @@ class Citation(object):
             )
 
 def REF_REPLACER(match, passage):
-    """ System replacer for items
+    """ Helper to replace xpath/scope/refsDecl on iteration with passage value
 
-    :param match: 
+    :param match: A RegExp match
     :type match: re.SRE_MATCH
-    :retur
+    :param passage: A list with subreference informations
+    :type passage: iter
+
+    :rtype: basestring
+    :return: Replaced string
     """
     groups = match.groups()
     ref = next(passage)

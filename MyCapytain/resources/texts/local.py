@@ -19,15 +19,15 @@ import MyCapytain.resources.texts.tei
 
 class Text(text.Text):
     """ Implementation of CTS tools for local files 
+    
+    :param urn: A URN identifier
+    :type urn: MyCapytain.common.reference.URN
+    :param resource: A resource
+    :type resource: lxml.etree._Element
+    :param citation: Highest Citation level 
+    :type citation: MyCapytain.common.reference.Citation
 
-    :param citation: A citation object
-    :type citation: Citation
-    :param resource:
-    :type resource:
-
-    :ivar passages: (OrderedDict) Dictionary of TextTree
-    :ivar citation: (`MyCapytain.resources.texts.tei.Citation`)
-    :ivar resource: Test
+    :ivar resource: lxml
     """
 
     def __init__(self, urn=None, citation=None, resource=None):
@@ -53,6 +53,7 @@ class Text(text.Text):
     @property
     def citation(self):
         """ Get the lowest cRefPattern in the hierarchy
+
         :rtype: MyCapytain.resources.texts.tei.Citation
         """
         return self._cRefPattern

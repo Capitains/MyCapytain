@@ -76,5 +76,21 @@ class TestTEICitation(unittest.TestCase):
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
 
-"""
-"""
+class TestTEIPassage(unittest.TestCase):
+    def test_text(self):
+        """ Test text attribute """
+        P = Passage(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
+        # Without exclusion
+        self.assertEqual(P.text(), "Ibis hello b ab excusso missus in astra sago. ")
+        # With Exclusion
+        self.assertEqual(P.text(exclude=["note"]), "Ibis ab excusso missus in astra sago. ")
+
+    def test_str(self):
+        """ Test STR conversion of xml """
+        P = Passage(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
+        self.assertEqual(str(P), '<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+
+    def test_xml(self):
+        X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+        P = Passage(resource=X)
+        self.assertIs(X, P.xml)

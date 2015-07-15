@@ -17,6 +17,7 @@ from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 import MyCapytain.resources.texts.tei
 
+
 class Text(text.Text):
     """ Implementation of CTS tools for local files 
     
@@ -72,13 +73,6 @@ class Text(text.Text):
             # .. todo:: Should support conversion between Citation...
             self._cRefPattern = MyCapytain.resources.texts.tei.Citation(name=value.name, refsDecl=value.refsDecl, child=value.child)
 
-    def __getNode(self, passage=None):
-        """ Retrieve a node from a passage
-
-        :param passage:
-        :type passage:
-        """
-        pass
 
     def getValidReff(self, level=1, passage=None):
         """ Retrieve valid passages directly 
@@ -104,7 +98,7 @@ class Text(text.Text):
         else:
             nodes = [None for i in range(0, level)]
 
-        self._passages = TextTree(xml=xml, citation=self.citation, id=None)
+        self._passages = Passage(resource=xml, citation=self.citation, id=None, urn=self.urn)
         passages = [self._passages] # For consistency
         while len(nodes) >= 1:
             passages = [passage for sublist in [p.get(nodes[0]) for p in passages] for passage in sublist]
@@ -112,14 +106,18 @@ class Text(text.Text):
 
         return [".".join(passage.id) for passage in passages]
 
-class TextTree(object):
+class Passage(MyCapytain.resources.texts.tei.Passage):
     """ Helper class for GetValidReff : class for ordered tree path discovering
 
     """
 
-    def __init__(self, xml, citation, id):
-        self.xml = xml
-        self.citation = citation
+    def __init__(self, urn=None, resource=None, parent=None, citation=None, id=None):
+        super(Passage, self).__init__(urn=urn, resource=resource, parent=parent)
+
+        self.citation = None
+        if isinstance(citation, Citation):
+            self.citation = citation
+
         self.id = id
 
         if id is None:
@@ -142,13 +140,15 @@ class TextTree(object):
     def __parse(self):
         if self.citation is None:
             return []
-        elements = self.xml.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
+        elements = self.resource.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
         for element in elements:
             n = self.id + [element.get("n")]
-            self.__children[".".join(n)] = TextTree(
-                xml=element,
+            self.__children[".".join(n)] = Passage(
+                resource=element,
                 citation=self.citation.child,
-                id=n
+                id=n,
+                urn=self.urn,
+                parent=self.parent
             )
         self.__parsed = True
     

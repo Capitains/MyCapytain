@@ -59,6 +59,9 @@ class Resource(object):
 class Passage(Resource):
     def __init__(self, parent=None, **kwargs):
         super(Passage, self).__init__(**kwargs)
+        self.parent = None
+        if parent is not None and isinstance(parent, self.__class):
+            self.parent = parent
 
     def setText(self):
         raise NotImplementedError()

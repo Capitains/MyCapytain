@@ -1,0 +1,1 @@
+sample.xml : Courtesy of github.com/PerseusDL/canonical-latinLit. See license information there

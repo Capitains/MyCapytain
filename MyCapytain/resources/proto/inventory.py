@@ -44,9 +44,9 @@ class Resource(object):
     def __eq__(self, other):
         if self is other:
             return True
-        if not isinstance(other, self.__class__):
+        elif not isinstance(other, self.__class__):
             return False
-        if self.resource is None:
+        elif self.resource is None:
             # Not totally true
             return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn)
         return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn) and self.resource == other.resource

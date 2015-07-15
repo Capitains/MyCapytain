@@ -10,7 +10,6 @@
 """
 from __future__ import unicode_literals
 
-
 from collections import defaultdict
 from past.builtins import basestring
 from builtins import range, object
@@ -20,6 +19,7 @@ import re
 REFSDECL_SPLITTER = re.compile("/+[a-zA-Z0-9:\[\]@=\\\{\$'\"\.]+")
 REFSDECL_REPLACER = re.compile("\$[0-9]+")
 SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
+REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
 
 class Reference(object):
 
@@ -468,6 +468,7 @@ class Citation(object):
     :type child: Citation
 
     .. automethod:: __iter__
+    .. automethod:: __len__
     """
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
@@ -601,3 +602,57 @@ class Citation(object):
                 e = e.child
             else:
                 break
+
+    def __len__(self):
+       """ Length method
+
+       :rtype: int
+       :returns: Number of nested citations
+       """
+       return len([item for item in self])
+
+    def fill(self, passage=None, xpath=None):
+        """ Fill the xpath with given informations
+
+        :param passage: Passage reference
+        :type passage: Reference or lsit
+        :param xpath: If set to True, will return the replaced self.xpath value and not the whole self.refsDecl
+        :type xpath: Boolean
+        :rtype: basestring
+        :returns: Xpath to find the passage
+        """
+        if xpath is True: # Then passage is a string or None
+            xpath = self.xpath
+
+            if passage is None:
+                replacement = r"\1"
+            elif isinstance(passage, basestring):
+                replacement = r"\1\2'" + passage + "'"
+
+            return REFERENCE_REPLACER.sub(replacement, xpath)
+        else:        
+            if isinstance(passage, Reference):
+                passage = passage[2]
+            passage = iter(passage)    
+            return REFERENCE_REPLACER.sub(
+                lambda m: REF_REPLACER(m, passage),
+                self.refsDecl
+            )
+
+def REF_REPLACER(match, passage):
+    """ Helper to replace xpath/scope/refsDecl on iteration with passage value
+
+    :param match: A RegExp match
+    :type match: re.SRE_MATCH
+    :param passage: A list with subreference informations
+    :type passage: iter
+
+    :rtype: basestring
+    :return: Replaced string
+    """
+    groups = match.groups()
+    ref = next(passage)
+    if ref is None:
+        return groups[0]
+    else:
+        return "{1}='{0}'".format(ref, groups[0])

@@ -36,6 +36,7 @@ class TestRepoProto(unittest.TestCase):
 
         self.assertNotEqual(a, b)
         self.assertNotEqual(a, 5)
+        self.assertEqual((a == "i"), False)
         self.assertNotEqual(c, d)
         c.urn = "hello"
         d.urn = c.urn 

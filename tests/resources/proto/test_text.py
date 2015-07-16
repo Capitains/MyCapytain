@@ -43,7 +43,10 @@ class TestProtoResource(unittest.TestCase):
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
 class TestProtoText(unittest.TestCase):
+    """ Test the text prototype, mainly to ensure consistency """
+
     def test_init(self):
+        """ Test init works correctly """
         a = Text()
         self.assertEqual(a.resource, None)
 

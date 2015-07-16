@@ -110,12 +110,18 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"))
         self.assertEqual(a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
+
 class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test passage implementation """
 
     def setUp(self):
         self.URN = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
+        self.text = open("tests/testing_data/texts/sample.xml", "rb")
+        self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
+
+    def tearDown(self):
+        self.text.close()
 
     def test_urn(self):
         """ Test URN and ids getters/setters """
@@ -150,5 +156,56 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         a = MyCapytain.resources.texts.local.Passage(id=["1", "pr", "1"])
         self.assertEqual(a.id, ["1", "pr", "1"])
 
+    def test_next(self):
+        """ Test next property """
+        # Normal passage checking
+        p = self.TEI.getPassage(["1", "pr", "1"])
+        self.assertEqual(p.next.id, ["1", "pr", "2"])
+
+        # End of lowest level passage checking but not end of parent level
+        p = self.TEI.getPassage(["1", "pr", "22"])
+        self.assertEqual(p.next.id, ["1", "1", "1"])
+
+        # End of lowest level passage and end of parent level
+        p = self.TEI.getPassage(["1", "39", "8"])
+        self.assertEqual(p.next.id, ["2", "pr", "sa"])
+
+        # Last line should always be None
+        p = self.TEI.getPassage(["2", "40", "8"])
+        self.assertIsNone(p.next)
+        p = self.TEI.getPassage(["2", "40"])
+        self.assertIsNone(p.next)
+        p = self.TEI.getPassage(["2"])
+        self.assertIsNone(p.next)
+
+    def test_children(self):
+        """ Test children property """
+        # Normal children checking
+        self.text = open("tests/testing_data/texts/sample.xml", "rb")
+        self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
+        self.text.close()
+
+        p = self.TEI.getPassage(["1", "pr"])
+        self.assertEqual(p.children["1.pr.1"].id, ["1", "pr", "1"])
+        
+        p = self.TEI.getPassage(["1", "pr", "1"])
+        self.assertEqual(len(p.children), 0)
+
+    def test_first(self):
+        """ Test first property """
+        # Test when there is one
+        p = self.TEI.getPassage(["1", "pr"])
+        self.assertEqual(p.first.id, ["1", "pr", "1"])
+        # #And failing when no first
+        p = self.TEI.getPassage(["1", "pr", "1"])
+        self.assertEqual(p.first, None)
 
 
+    def test_last(self):
+        """ Test last property """
+        # Test when there is one
+        p = self.TEI.getPassage(["1", "pr"])
+        self.assertEqual(p.last.id, ["1", "pr", "22"])
+        # #And failing when no last
+        p = self.TEI.getPassage(["1", "pr", "1"])
+        self.assertEqual(p.last, None)

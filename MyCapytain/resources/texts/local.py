@@ -82,6 +82,13 @@ class Text(text.Text):
             )
 
     def getPassage(self, reference):
+        """ Finds a passage in the current text
+
+        :param reference: Identifier of the subreference / passages
+        :type reference: List, MyCapytain.common.reference.Reference
+        :rtype: Passage 
+        :returns: Asked passage
+        """
         if isinstance(reference, MyCapytain.common.reference.Reference):
             reference = reference["start_list"]
 
@@ -94,12 +101,15 @@ class Text(text.Text):
         return passages[0]
 
     def getPassagePlus(self, reference):
+        """ Finds a passage in the current text with its previous and following node
+
+        :param reference: Identifier of the subreference / passages
+        :type reference: List, MyCapytain.common.reference.Reference
+        :rtype: text.PassagePlus
+        :returns: Asked passage with metainformations
+        """
         P = self.getPassage(reference=reference)
-        return {
-            "passage" : P,
-            "next" : P.next.urn,
-            "prev" : P.prev.urn
-        }
+        return text.PassagePlus(P, P.prev.id, P.next.id)
 
     def getValidReff(self, level=1, reference=None):
         """ Retrieve valid passages directly 
@@ -131,7 +141,7 @@ class Text(text.Text):
 
 
 class Passage(MyCapytain.resources.texts.tei.Passage):
-    """ Helper class for GetValidReff : class for ordered tree path discovering
+    """ Passage representing object
     
     :param urn: A URN identifier
     :type urn: MyCapytain.common.reference.URN
@@ -296,6 +306,11 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
     @property
     def children(self):
+        """ Children of the passage
+
+        :rtype: OrderedDict
+        :returns: Dictionary of chidren, where key are subreferences
+        """
         if len(self.__children) == 0 and self.__parsed is False:
             self.__parse()
 
@@ -327,3 +342,29 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
         return self.__next
     
+    
+    @property
+    def prev(self):
+        """ Previous passage 
+
+        :rtype: Passage
+        :returns: Previous passage at same level
+        """ 
+        if self.__prev is False:
+
+            if self.parent is None: # When top of hierarchy is access, should return None
+                self.__prev = None
+                return None
+
+            keys = list(self.parent.children.copy().keys())
+            current = keys.index(".".join(self.id))
+            if current > 0:
+                self.__prev = self.parent.get(keys[current - 1])[0]
+            else:
+                n = self.parent.prev
+                if n is None:
+                    self.__prev = None
+                else:
+                    self.__prev = n.last
+
+        return self.__prev

@@ -129,3 +129,23 @@ class TestProtoText(unittest.TestCase):
         #On init ?
         b = Text(citation=MyCapytain.common.reference.Citation(name="label"))
         self.assertEqual(a.citation.name, "label")
+
+class TestProtoPassage(unittest.TestCase):
+    """ Test the passage prototype, mainly to ensure consistency """
+    def test_not_implemented(self):
+        a = Passage()
+
+        with self.assertRaises(NotImplementedError):
+            a.next
+
+        with self.assertRaises(NotImplementedError):
+            a.prev
+
+        with self.assertRaises(NotImplementedError):
+            a.last
+
+        with self.assertRaises(NotImplementedError):
+            a.first
+
+        with self.assertRaises(NotImplementedError):
+            a.children

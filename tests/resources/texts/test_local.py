@@ -110,6 +110,15 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"))
         self.assertEqual(a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
+    def test_get_passage_plus(self):
+        """ Test GetPassage Plus """
+        # No label in local 
+        a = self.TEI.getPassagePlus(["1", "pr", "2"])
+
+        self.assertEqual(a.prev, ["1", "pr", "1"])
+        self.assertEqual(a.next, ["1", "pr", "3"])
+        self.assertEqual(a.passage.text(), "tum, ut de illis queri non possit quisquis de se bene ")
+
 
 class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test passage implementation """
@@ -209,3 +218,29 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         # #And failing when no last
         p = self.TEI.getPassage(["1", "pr", "1"])
         self.assertEqual(p.last, None)
+
+    def test_prev(self):
+        """ Test prev property """
+        # Normal passage checking
+        p = self.TEI.getPassage(["2", "40", "8"])
+        self.assertEqual(p.prev.id, ["2", "40", "7"])
+        p = self.TEI.getPassage(["2", "40"])
+        self.assertEqual(p.prev.id, ["2", "39"])
+        p = self.TEI.getPassage(["2"])
+        self.assertEqual(p.prev.id, ["1"])
+
+        # test failing passage
+        p = self.TEI.getPassage(["1", "pr", "1"])
+        self.assertEqual(p.prev, None)
+        p = self.TEI.getPassage(["1", "pr"])
+        self.assertEqual(p.prev, None)
+        p = self.TEI.getPassage(["1"])
+        self.assertEqual(p.prev, None)
+
+        # First child should get to parent's prev last child
+        p = self.TEI.getPassage(["1", "1", "1"])
+        self.assertEqual(p.prev.id, ["1", "pr", "22"])
+
+        # Beginning of lowest level passage and beginning of parent level
+        p = self.TEI.getPassage(["2", "pr", "sa"])
+        self.assertEqual(p.prev.id, ["1", "39", "8"])

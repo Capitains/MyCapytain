@@ -11,6 +11,9 @@ from past.builtins import basestring
 
 from MyCapytain.resources.proto import inventory
 import MyCapytain.common.reference
+from collections import namedtuple
+
+PassagePlus = namedtuple("PassagePlus", ["passage", "prev", "next"])
 
 class Resource(object):
     """ Initiate a Resource object
@@ -57,23 +60,72 @@ class Resource(object):
 
 
 class Passage(Resource):
+    """ Passage representing object prototype
+    
+    :param urn: A URN identifier
+    :type urn: MyCapytain.common.reference.URN
+    :param resource: A resource
+    :type resource: lxml.etree._Element
+    :param parent: Parent of the current passage
+    :type parent: MyCapytain.resources.texts.tei.Passage
+    :param citation: Citation for children level
+    :type citation: MyCapytain.resources.texts.tei.Citation
+    :param id: Identifier of the subreference without URN informations
+    :type id: List
+    
+    """
+
     def __init__(self, parent=None, **kwargs):
         super(Passage, self).__init__(**kwargs)
         self.parent = None
         if parent is not None and isinstance(parent, Passage):
             self.parent = parent
 
-    def setText(self):
+    @property
+    def prev(self):
+        """ Previous passage 
+
+        :rtype: Passage
+        :returns: Previous passage at same level
+        """ 
         raise NotImplementedError()
 
-    def getText(self):
+    @property
+    def next(self):
+        """ Following passage 
+
+        :rtype: Passage
+        :returns: Following passage at same level
+        """ 
         raise NotImplementedError()
 
-    def getNext(self):
+    @property
+    def first(self):
+        """ First child of current Passage 
+        
+        :rtype: None or Passage
+        :returns: None if current Passage has no children,  first child passage if available
+        """
         raise NotImplementedError()
 
-    def getPrev(self):
+    @property
+    def last(self):
+        """ Last child of current Passage 
+        
+        :rtype: None or Passage
+        :returns: None if current Passage has no children, last child passage if available
+        """
         raise NotImplementedError()
+
+    @property
+    def children(self):
+        """ Children of the passage
+
+        :rtype: OrderedDict
+        :returns: Dictionary of chidren, where key are subreferences
+        """
+        raise NotImplementedError()
+
 
 class Text(Resource):
     """ A CTS Text """

@@ -8,9 +8,12 @@ Shared elements for TEI Citation
 """
 
 import MyCapytain.common.reference
-from lxml.etree import _Element
-from builtins import range, object
+import MyCapytain.common.utils
+import MyCapytain.resources.proto.text
 
+from lxml.etree import _Element, tostring
+from builtins import range, object
+from six import text_type as str
 
 def childOrNone(liste):
     if len(liste) > 0:
@@ -73,4 +76,54 @@ class Citation(MyCapytain.common.reference.Citation):
         self.child = resources[-1].child
 
 
+class Passage(MyCapytain.resources.proto.text.Passage):
+    def __str__(self):
+        """ Text based representation of the passage
+    
+        :rtype: basestring
+        :returns: XML of the passage in string form 
+        """
+        return tostring(self.resource, encoding=str)
 
+    def text(self, exclude=None):
+        """ Text content of the passage
+
+        :param filter: Remove some nodes from text
+        :type filter: List
+        :rtype: basestring
+        :returns: Text of the xml node
+        :Example:
+            >>>    P = Passage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+            >>>    P.text == "Ibis hello b ab excusso missus in astra sago. "
+            >>>    P.text(exclude=["note"]) == "Ibis hello b ab excusso missus in astra sago. "
+
+
+        """
+
+        if exclude is None:
+            exclude = ""
+        else:
+            exclude = "[{0}]".format(
+                " and ".join(
+                    "not(./ancestor-or-self::{0})".format(excluded)
+                    for excluded in exclude
+                )
+            )
+
+        return MyCapytain.common.utils.normalize(" ".join(
+                [
+                    element
+                    for element
+                    in self.resource.xpath(".//descendant-or-self::text()" + exclude, namespaces=MyCapytain.common.utils.NS)
+                ]
+            )
+        )
+
+    @property
+    def xml(self):
+        """ XML Representation of the Passage
+
+        :rtype: lxml.etree._Element
+        :returns: XML element representing the passage
+        """
+        return self.resource

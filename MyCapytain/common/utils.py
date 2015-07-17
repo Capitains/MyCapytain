@@ -13,6 +13,18 @@ from __future__ import unicode_literals
 from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
+import re
+
+__strip = re.compile("([ ]{2,})+")
+def normalize(string):
+    """ Remove double-or-more spaces in a string
+
+    :param string: A string to change
+    :type string: basestring
+    :rtype: Basestring
+    :returns: Clean string
+    """
+    return __strip.sub(" ", string)
 
 #: Dictionary of namespace that can be useful
 NS = {

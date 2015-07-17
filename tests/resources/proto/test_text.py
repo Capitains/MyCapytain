@@ -43,7 +43,10 @@ class TestProtoResource(unittest.TestCase):
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
 class TestProtoText(unittest.TestCase):
+    """ Test the text prototype, mainly to ensure consistency """
+
     def test_init(self):
+        """ Test init works correctly """
         a = Text()
         self.assertEqual(a.resource, None)
 
@@ -64,7 +67,7 @@ class TestProtoText(unittest.TestCase):
         # It takes two parameters, should not issue TypeError
         # Consistency check
         with self.assertRaises(NotImplementedError):
-            a.getValidReff(level=1, passage=["1"])
+            a.getValidReff(level=1, reference=["1"])
 
 
     def test_proto_passage(self):
@@ -126,3 +129,23 @@ class TestProtoText(unittest.TestCase):
         #On init ?
         b = Text(citation=MyCapytain.common.reference.Citation(name="label"))
         self.assertEqual(a.citation.name, "label")
+
+class TestProtoPassage(unittest.TestCase):
+    """ Test the passage prototype, mainly to ensure consistency """
+    def test_not_implemented(self):
+        a = Passage()
+
+        with self.assertRaises(NotImplementedError):
+            a.next
+
+        with self.assertRaises(NotImplementedError):
+            a.prev
+
+        with self.assertRaises(NotImplementedError):
+            a.last
+
+        with self.assertRaises(NotImplementedError):
+            a.first
+
+        with self.assertRaises(NotImplementedError):
+            a.children

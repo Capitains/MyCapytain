@@ -33,7 +33,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
         request = requests.get(self.endpoint, params=parameters)
         return request.text
 
-    def getCapabilities(self, inventory):
+    def getCapabilities(self, inventory=None):
         """ Retrieve the inventory information of an API 
         
         :param inventory: Name of the inventory
@@ -45,7 +45,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
             "request": "GetCapabilities"
         })
 
-    def getValidReff(self, urn, inventory, level=None):
+    def getValidReff(self, urn, inventory=None, level=None):
         """ Retrieve valid urn-references for a text
         
         :param urn: URN identifying the text
@@ -63,7 +63,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
             "request": "GetValidReff"
         })
 
-    def getFirstUrn(self, urn, inventory):
+    def getFirstUrn(self, urn, inventory=None):
         """ Retrieve the first passage urn of a text
         
         :param urn: URN identifying the text
@@ -78,7 +78,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
             "request": "GetFirstUrn"
         })
 
-    def getPrevNextUrn(self, urn, inventory):
+    def getPrevNextUrn(self, urn, inventory=None):
         """ Retrieve the previous and next passage urn of one passage
         
         :param urn: URN identifying the text's passage (Minimum depth : 1)
@@ -93,7 +93,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
             "request": "GetPrevNextUrn"
         })
 
-    def getLabel(self, urn, inventory):
+    def getLabel(self, urn, inventory=None):
         """ Retrieve informations about a CTS Urn
         
         :param urn: URN identifying the text's passage (Minimum depth : 1)
@@ -108,7 +108,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
             "request": "GetLabel"
         })
 
-    def getPassage(self, urn, inventory, context=None):
+    def getPassage(self, urn, inventory=None, context=None):
         """ Retrieve a passage
         
         :param urn: URN identifying the text's passage (Minimum depth : 1)
@@ -126,7 +126,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
             "request": "GetPassage"
         })
 
-    def getPassagePlus(self, urn, inventory, context=None):
+    def getPassagePlus(self, urn, inventory=None, context=None):
         """ Retrieve a passage and informations about it
         
         :param urn: URN identifying the text's passage (Minimum depth : 1)

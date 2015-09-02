@@ -33,7 +33,7 @@ class Citation(CitationPrototype):
 
         child = ""
         if isinstance(self.child, Citation):
-            child=str(self.child)
+            child = str(self.child)
 
         label = ""
         if self.name is not None:

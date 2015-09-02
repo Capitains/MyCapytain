@@ -9,6 +9,7 @@ import xmlunittest
 import MyCapytain.resources.texts.local
 import MyCapytain.resources.texts.tei
 import MyCapytain.common.reference
+        
 
 class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 

@@ -95,7 +95,7 @@ class Reference(object):
             >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
             >>>    print(a[1]) # "1.1@Achiles[1]"
             >>>    print(a["start_list"]) # ("1", "1")
-            >>>    print(a[6"]) # ("Zeus", "1")
+            >>>    print(a[6]) # ("Zeus", "1")
             >>>    print(a[7]) # "1.1@Achiles[1]-1.2@Zeus[1]"
         """
         if key == 1 or key == "start":

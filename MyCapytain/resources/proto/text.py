@@ -171,7 +171,7 @@ class Text(Resource):
 
     @property
     def reffs(self):
-        """ Get the lowest cRefPattern in the hierarchy
+        """ Get all valid reffs for every part of the Text
 
         :rtype: MyCapytain.resources.texts.tei.Citation
         """

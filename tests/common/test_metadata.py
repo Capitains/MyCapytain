@@ -57,6 +57,13 @@ class TestMetadatum(unittest.TestCase):
         with six.assertRaisesRegex(self, ValueError, "Can not set a default to an unknown key"):
             a.setDefault(None)
 
+    def test_len(self):
+        a = Metadatum("title", [
+                ("eng", "Epigrams"),
+                ("fre", "Epigrammes")
+            ])
+        self.assertEqual(len(a), 2)
+
     def test_get_item(self):
         a = Metadatum("title", [
                 ("eng", "Epigrams"),
@@ -185,3 +192,21 @@ class TestMetadata(unittest.TestCase):
         self.assertEqual(len(a), 2)
         a["z"] = 1.5
         self.assertEqual(len(a), 2)
+
+    def test_add(self):
+        """ Test sum of two Metadata objects  """
+        a = Metadata()
+        m1 = Metadatum("desc", [("eng", "desc")])
+        m2 = Metadatum("label", [("eng", "lbl"), ("fre", "label")])
+        a["desc"] = m1
+        a["label"] = m2
+
+        b = Metadata()
+        m3 = Metadatum("desc", [("fre", "Omelette")])
+        m4 = Metadatum("title", [("eng", "ttl"), ("fre", "titre")])
+        b[("desc", "title")] = (m3, m4)
+
+        c = a + b
+        self.assertEqual(len(c), 3)
+        self.assertEqual(len(c["desc"]), 2)
+

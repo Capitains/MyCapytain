@@ -24,7 +24,7 @@ class Resource(object):
     :type resource: Any
     """
 
-    def __init__(self, urn=None, resource= None):
+    def __init__(self, urn=None, resource=None):
         self.resource = None
         self._URN = None
 

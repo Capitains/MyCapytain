@@ -10,6 +10,7 @@ from copy import deepcopy
 from six import text_type as str
 
 from MyCapytain.resources.inventory import *
+import MyCapytain.resources.proto.text
 
 
 def compareSTR(one, other):
@@ -160,7 +161,6 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 resource=5
             )
 
-
     def test_Inventory_metadata(self):
         """ Tests TextInventory parses without errors """
         TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
@@ -223,6 +223,20 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002"].export(), wk))
         self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
         self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
+
+    def test_export_to_text(self):
+        """ Test export to Text object """
+        TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
+        ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
+
+        txt_text = ti_text.export(output=MyCapytain.resources.proto.text.Text)
+        self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.assertEqual(txt_text.metadata["groupname"]["eng"], "Martial")  # Check inheritance of textgroup metadata
+        self.assertEqual(txt_text.metadata["title"]["eng"], "Epigrammata")  # Check inheritance of work metadata
+        self.assertEqual(txt_text.metadata["title"]["fre"], "Epigrammes")  # Check inheritance of work metadata
+        self.assertEqual(txt_text.metadata["description"]["fre"], "G. Heraeus")  # Check inheritance of work metadata
+        self.assertEqual(txt_text.citation, ti_text.citation)
+        self.assertEqual(txt_text.citation.scope, "/tei:TEI/tei:text/tei:body/tei:div")
 
     def test_partial_str(self):
         ti = TextInventory(resource=self.t, id="annotsrc")

@@ -9,7 +9,7 @@
 """
 from __future__ import unicode_literals
 
-from MyCapytain.resources.proto import inventory
+from MyCapytain.resources.proto import inventory, text
 from MyCapytain.common.reference import Citation as CitationPrototype
 from MyCapytain.common.utils import xmlparser, NS
 
@@ -164,15 +164,22 @@ class Text(inventory.Text):
         strings.append("</ti:{0}>".format(tag_end))
         return "".join(strings)
 
-    def export(self, format="xml"):
+    def export(self, output="xml", **kwargs):
         """ Create a {format} version of the Work
         
-        :param format: Format to be chosen (Only XML for now)
-        :type param: basestring
+        :param output: Format to be chosen (Only XML for now)
+        :type output: basestring, citation
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return xmlparser(str(self))
+        if output == "xml":
+            return xmlparser(str(self))
+        elif issubclass(output, text.Text):
+            complete_metadata = self.metadata
+            for parent in self.parents:
+                if isinstance(parent, inventory.Resource):
+                    complete_metadata = complete_metadata + parent.metadata
+            return output(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
 
     def __findCitations(self, xml, element, xpath="ti:citation"):
         """ Find citation in current xml. Used as a loop for self.xmlparser()
@@ -205,7 +212,6 @@ class Text(inventory.Text):
                     xml=results[0],
                     element=self.citation
                 )
-
 
     def parse(self, resource):
         """ Parse a resource to feed the object
@@ -249,16 +255,17 @@ class Text(inventory.Text):
         return None
 
 
-
 def Edition(resource=None, urn=None, parents=None):
     """ Create an edition subtyped Text object 
     """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
 
+
 def Translation(resource=None, urn=None, parents=None):
     """ Create a translation subtyped Text object 
     """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
+
 
 class Work(inventory.Work):
 
@@ -298,11 +305,11 @@ class Work(inventory.Work):
         strings.append("</ti:work>")
         return "".join(strings)
 
-    def export(self, format="xml"):
+    def export(self, output="xml"):
         """ Create a {format} version of the Work
         
-        :param format: Format to be chosen (Only XML for now)
-        :type param: basestring
+        :param output: Format to be chosen (Only XML for now)
+        :type output: basestring
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
@@ -378,11 +385,11 @@ class TextGroup(inventory.TextGroup):
         strings.append("</ti:textgroup>")
         return "".join(strings)
 
-    def export(self, format="xml"):
+    def export(self, output="xml"):
         """ Create a {format} version of the TextInventory
         
-        :param format: Format to be chosen (Only XML for now)
-        :type param: basestring
+        :param output: Format to be chosen (Only XML for now)
+        :type output: basestring
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
@@ -437,11 +444,11 @@ class TextInventory(inventory.TextInventory):
         strings.append("</ti:TextInventory>")
         return "".join(strings)
 
-    def export(self, format="xml"):
-        """ Create a {format} version of the TextInventory
+    def export(self, output="xml"):
+        """ Create a {output} version of the TextInventory
         
-        :param format: Format to be chosen (Only XML for now)
-        :type param: basestring
+        :param output: output to be chosen (Only XML for now)
+        :type output: basestring
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """

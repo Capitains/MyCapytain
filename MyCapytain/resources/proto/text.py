@@ -9,8 +9,8 @@
 """
 from past.builtins import basestring
 
-from MyCapytain.resources.proto import inventory
 import MyCapytain.common.reference
+import MyCapytain.common.metadata
 from collections import namedtuple
 
 PassagePlus = namedtuple("PassagePlus", ["passage", "prev", "next"])
@@ -129,13 +129,17 @@ class Passage(Resource):
 
 class Text(Resource):
     """ A CTS Text """
-    def __init__(self, citation=None, **kwargs):
+    def __init__(self, citation=None, metadata=None, **kwargs):
         super(Text, self).__init__(**kwargs)
 
         self._cRefPattern = MyCapytain.common.reference.Citation()
-
         if citation is not None:
             self.citation = citation
+
+        if metadata is not None:
+            self.metadata = metadata
+        else:
+            self.metadata = MyCapytain.common.metadata.Metadata()
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, Text will compute valid reffs 

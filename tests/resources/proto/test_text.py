@@ -8,6 +8,7 @@ from io import open
 from collections import defaultdict
 from MyCapytain.resources.proto.text import *
 import MyCapytain.common.reference
+import MyCapytain.common.metadata
 
 class TestProtoResource(unittest.TestCase):
     """ Test for resource, mother class of Text and Passage """
@@ -42,6 +43,7 @@ class TestProtoResource(unittest.TestCase):
         b = Text(urn="urn:cts:latinLit:tg.wk.v")
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
+
 class TestProtoText(unittest.TestCase):
     """ Test the text prototype, mainly to ensure consistency """
 
@@ -55,6 +57,15 @@ class TestProtoText(unittest.TestCase):
 
         a.resource = True
         self.assertEqual(a.resource, True)
+
+        #  Test with metadata
+        a = Text()
+        self.assertIsInstance(a.metadata, MyCapytain.common.metadata.Metadata)
+
+        m = MyCapytain.common.metadata.Metadata(keys=["title", "author"])
+        m["title"]["fre"] = "I am a metadata"
+        a = Text(metadata=m)
+        self.assertEqual(a.metadata["title"]["fre"], "I am a metadata")
 
     def test_proto_reff(self):
         """ Test that getValidReff function are not implemented """

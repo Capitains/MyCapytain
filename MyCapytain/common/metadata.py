@@ -13,10 +13,10 @@ from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 from past.builtins import basestring
 from builtins import range, object
+from copy import copy
 
 
 class Metadatum(object):
-
     """ Metadatum object represent a single field of metadata 
         
     :param name: Name of the field
@@ -33,7 +33,6 @@ class Metadatum(object):
     .. automethod:: __iter__
 
     """
-        
 
     def __init__(self, name, children=None):
         """ Initiate a Metadatum object
@@ -96,7 +95,7 @@ class Metadatum(object):
         :raises: `ValueError` if key and value are list and are not the same size
 
         :Example:
-            >>> a = Metadata(name="label")
+            >>> a = Metadatum(name="label")
 
             >>> a["eng"] = "Illiad"
             >>> print(a["eng"]) # Illiad
@@ -156,6 +155,18 @@ class Metadatum(object):
             yield (key, self.children[key])
             i += 1
 
+    def __len__(self):
+        """ Get the length of the current Metadatum object
+
+        :return: Number of variant of the metadatum
+        :rtype: int
+
+        :Example:
+            >>> a = Metadata(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>> len(a) == 2
+        """
+        return len(self.children)
+
 
 class Metadata(object):
     """ 
@@ -170,6 +181,7 @@ class Metadata(object):
         .. automethod:: __setitem__
         .. automethod:: __iter__
         .. automethod:: __len__
+        .. automethod:: __add__
     """
     def __init__(self, keys=None):
         """ Initiate the object
@@ -267,6 +279,28 @@ class Metadata(object):
         for key in self.__keys:
             yield (key, self.metadata[key])
             i += 1
+
+    def __add__(self, other):
+        """ Merge Metadata objects together
+
+        :param other: Metadata object to merge with the current one
+        :type other: Metadata
+        :returns: The merge result of both metadata object
+        :rtype: Metadata
+
+        :Example:
+            >>> a = Metadata(name="label")
+            >>> b = Metadata(name="title")
+            >>> a + b == Metadata(name=["label", "title"])
+        """
+        result = copy(self)
+        for metadata_key, metadatum in other:
+            if metadata_key in self.__keys:
+                for key, value in metadatum:
+                    result[metadata_key][key] = value
+            else:
+                result[metadata_key] = metadatum
+        return result
 
     def __len__(self):
         """ Returns the number of Metadatum registered in the object

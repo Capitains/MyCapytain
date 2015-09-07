@@ -341,8 +341,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
                     self.__next = n.first
 
         return self.__next
-    
-    
+
     @property
     def prev(self):
         """ Previous passage 

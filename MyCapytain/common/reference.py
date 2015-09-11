@@ -21,6 +21,7 @@ REFSDECL_REPLACER = re.compile("\$[0-9]+")
 SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
 REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
 
+
 class Reference(object):
 
     """ A reference object giving informations
@@ -37,7 +38,6 @@ class Reference(object):
     .. automethod:: __getitem__
     .. automethod:: __setitem__
     """
-        
 
     def __init__(self, reference):
         self.reference = reference
@@ -59,6 +59,34 @@ class Reference(object):
         """
         return (isinstance(other, self.__class__)
                 and self.reference == str(other))
+
+    @property
+    def parent(self):
+        """
+
+        :return:
+        """
+        if len(self.parsed[0][1]) == 1 and len(self.parsed[1][1]) <= 1:
+            return None
+        else:
+            if len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) == 0:
+                return "{0}{1}".format(
+                    ".".join(list(self.parsed[0][1])[0:-1]),
+                    self.parsed[0][3] or ""
+                )
+            elif len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) > 1:
+                first = list(self.parsed[0][1])[0:-1]
+                last = list(self.parsed[1][1])[0:-1]
+                if first == last and self.parsed[1][3] is None \
+                    and self.parsed[0][3] is None:
+                    return ".".join(first)
+                else:
+                    return "{0}{1}-{2}{3}".format(
+                        ".".join(first),
+                        self.parsed[0][3] or "",
+                        ".".join(list(self.parsed[1][1])[0:-1]),
+                        self.parsed[1][3] or ""
+                    )
 
     def __str__(self):
         """ Return full reference in string format
@@ -123,7 +151,7 @@ class Reference(object):
         :rtype: Tuple
         :returns: An empty tuple to model data
         """
-        return [None, [], None]
+        return [None, [], None, None]
 
     def __regexp(self, subreference):
         """ Split components of subreference 
@@ -148,6 +176,7 @@ class Reference(object):
             subreference = r.split("@")
             if len(subreference) == 2:
                 element[i][2] = self.__regexp(subreference[1])
+                element[i][3] = "@" + subreference[1]
                 r = subreference[0]
             element[i][1] = r.split(".")
             element[i] = tuple(element[i])

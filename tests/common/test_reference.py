@@ -66,6 +66,21 @@ class TestReferenceImplementation(unittest.TestCase):
         self.assertNotEqual(a, c)
         self.assertNotEqual(a, d)
 
+    def test_get_parent(self):
+        a = Reference("1.1")
+        b = Reference("1")
+        c = Reference("1.1-2.3")
+        d = Reference("1.1-1.2")
+        e = Reference("1.1@Something[0]-1.2@SomethingElse[2]")
+        f = Reference("1-2")
+
+        self.assertEqual(str(a.parent), "1")
+        self.assertEqual(b.parent, None)
+        self.assertEqual(str(c.parent), "1-2")
+        self.assertEqual(str(d.parent), "1")
+        self.assertEqual(str(e.parent), "1@Something[0]-1@SomethingElse[2]")
+        self.assertEqual(f.parent, None)
+
 
 class TestURNImplementation(unittest.TestCase):
 

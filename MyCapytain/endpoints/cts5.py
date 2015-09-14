@@ -25,11 +25,9 @@ class CTS(MyCapytain.endpoints.proto.CTS):
         :rtype: text
         """
         # DEV !
-        parameters = dict(
-            [
-                (key, parameters[key]) for key in parameters if parameters[key] is not None
-            ]
-        )
+        parameters = {
+            key: str(parameters[key]) for key in parameters if parameters[key] is not None
+        }
         request = requests.get(self.endpoint, params=parameters)
         return request.text
 

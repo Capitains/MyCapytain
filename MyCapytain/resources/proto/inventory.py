@@ -222,6 +222,7 @@ class TextGroup(Resource):
         if resource is not None:
             self.setResource(resource)
 
+
 class TextInventory(Resource):
     """ Represents a CTS Inventory file
     """

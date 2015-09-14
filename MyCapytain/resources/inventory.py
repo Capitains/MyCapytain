@@ -353,6 +353,7 @@ class Work(inventory.Work):
 
         return self.texts
 
+
 class TextGroup(inventory.TextGroup):
 
     """ Represents a CTS Textgroup in XML

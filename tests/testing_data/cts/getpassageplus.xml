@@ -1,0 +1,51 @@
+<CTS:GetPassagePlus xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:CTS="http://chs.harvard.edu/xmlns/cts">
+    <CTS:request elapsed-time="171">
+        <CTS:requestName>GetPassagePlus</CTS:requestName>
+        <CTS:requestUrn>urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1</CTS:requestUrn>
+        <CTS:psg>1.1</CTS:psg>
+        <CTS:workurn>urn:cts:latinLit:phi1294.phi002</CTS:workurn>
+        <CTS:groupname xml:lang="eng">Martial</CTS:groupname>
+        <CTS:title xml:lang="eng">Epigrammata</CTS:title>
+        <CTS:label xml:lang="eng">Epigrammata</CTS:label>
+    </CTS:request>
+    <CTS:reply>
+        <CTS:urn>urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1</CTS:urn>
+        <CTS:label xmlns:ti="http://chs.harvard.edu/xmlns/cts">
+            <CTS:label>
+                <ti:groupname xml:lang="eng">Martial</ti:groupname>
+                <ti:title xml:lang="eng">Epigrammata</ti:title>
+                <ti:work>urn:cts:latinLit:phi1294.phi002</ti:work>
+                <ti:version xml:lang="eng">
+            M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus
+        </ti:version>
+                <ti:citation>book, poem, line</ti:citation>
+            </CTS:label>
+        </CTS:label>
+        <CTS:passage>
+            <tei:body>
+                <tei:div type="edition" n="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
+                    <tei:div type="textpart" subtype="book" n="1">
+                        <tei:div type="textpart" subtype="poem" n="1">
+                            <head xmlns="http://www.tei-c.org/ns/1.0">I</head>
+                            <l xmlns="http://www.tei-c.org/ns/1.0" n="1">Hic est quem legis ille, quem requiris, </l>
+                            <l xmlns="http://www.tei-c.org/ns/1.0" n="2">Toto notus in orbe Martialis </l>
+                            <l xmlns="http://www.tei-c.org/ns/1.0" n="3">Argutis epigrammaton libellis: <pb/>
+                            </l>
+                            <l xmlns="http://www.tei-c.org/ns/1.0" n="4">Cui, lector studiose, quod dedisti </l>
+                            <l xmlns="http://www.tei-c.org/ns/1.0" n="5">Viventi decus atque sentienti, </l>
+                            <l xmlns="http://www.tei-c.org/ns/1.0" n="6">Rari post cineres habent poetae. </l>
+                        </tei:div>
+                    </tei:div>
+                </tei:div>
+            </tei:body>
+        </CTS:passage>
+        <CTS:prevnext>
+            <CTS:prev>
+                <CTS:urn>urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr</CTS:urn>
+            </CTS:prev>
+            <CTS:next>
+                <CTS:urn>urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2</CTS:urn>
+            </CTS:next>
+        </CTS:prevnext>
+    </CTS:reply>
+</CTS:GetPassagePlus>

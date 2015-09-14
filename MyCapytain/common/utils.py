@@ -16,6 +16,8 @@ from past.builtins import basestring
 import re
 
 __strip = re.compile("([ ]{2,})+")
+
+
 def normalize(string):
     """ Remove double-or-more spaces in a string
 
@@ -34,6 +36,7 @@ NS = {
     "xml": "http://www.w3.org/XML/1998/namespace"
 }
 
+
 def xmlparser(xml):
     """ Parse xml 
 
@@ -49,7 +52,7 @@ def xmlparser(xml):
         return xml
     elif isinstance(xml, IOBase):
         pass
-    elif isinstance(xml, (basestring)):
+    elif isinstance(xml, basestring):
         xml = StringIO(xml)
         doclose = True
     else:

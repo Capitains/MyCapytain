@@ -76,6 +76,7 @@ class TestTEICitation(unittest.TestCase):
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
 
+
 class TestTEIPassage(unittest.TestCase):
     def test_text(self):
         """ Test text attribute """

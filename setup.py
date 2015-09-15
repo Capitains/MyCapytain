@@ -10,7 +10,7 @@ setup(
   author='Thibault Clerice',
   author_email='leponteineptique@gmail.com',
   license='MIT',
-  packages=find_packages(),
+  packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
   install_requires=[
     "requests==2.7.0",
     "six==1.9.0",

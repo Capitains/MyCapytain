@@ -15,10 +15,10 @@ setup(
     "requests==2.7.0",
     "six==1.9.0",
     "lxml==3.4.4",
-    "future==0.14.3"
+    "future==0.15.2"
   ],
   tests_require=[
-    "mock==1.0.1",
+    "mock==1.3.0",
     "xmlunittest"
   ],
   extras_require = {

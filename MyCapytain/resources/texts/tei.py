@@ -15,6 +15,7 @@ from lxml.etree import _Element, tostring
 from builtins import range, object
 from six import text_type as str
 
+
 def childOrNone(liste):
     if len(liste) > 0:
         return liste[-1]
@@ -70,7 +71,8 @@ class Citation(MyCapytain.common.reference.Citation):
         elif not isinstance(resource, _Element):
             return None
 
-        resources = resource.xpath(xpath, namespaces=MyCapytain.common.utils.NS)
+        resource = resource.xpath(xpath, namespaces=MyCapytain.common.utils.NS)
+        resources = []
 
         for x in range(0, len(resource)):
             resources.append(

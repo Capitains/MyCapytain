@@ -21,6 +21,13 @@ class TestTEICitation(unittest.TestCase):
         a = Citation()
         self.assertEqual(str(a), "")
 
+    def test_ingest_none(self):
+        """ When list of node is empty or when not a list nor a node """
+        a = Citation.ingest([])
+        self.assertEqual(a, None)
+        a = Citation.ingest({})
+        self.assertEqual(a, None)
+
     def test_ingest_multiple(self):
         b = xmlparser("""
 <tei:tei xmlns:tei="http://www.tei-c.org/ns/1.0">

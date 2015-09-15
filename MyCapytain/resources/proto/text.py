@@ -15,6 +15,7 @@ from collections import namedtuple
 
 PassagePlus = namedtuple("PassagePlus", ["passage", "prev", "next"])
 
+
 class Resource(object):
     """ Initiate a Resource object
     
@@ -79,6 +80,8 @@ class Passage(Resource):
         super(Passage, self).__init__(**kwargs)
         self.parent = None
         if parent is not None and isinstance(parent, Passage):
+            self.parent = parent
+        elif isinstance(parent, Text):
             self.parent = parent
 
     @property

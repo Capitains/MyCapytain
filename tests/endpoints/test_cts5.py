@@ -29,8 +29,8 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetValidReff",
-                    "level" : 1,
-                    "urn" : "urn"
+                    "level": "1",
+                    "urn": "urn"
                 }
             )
         with patch('requests.get') as patched_get:
@@ -39,7 +39,7 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetValidReff",
-                    "urn" : "urn"
+                    "urn": "urn"
                 }
             )
 
@@ -51,8 +51,8 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetPassage",
-                    "context": 1,
-                    "urn" : "urn"
+                    "context": "1",
+                    "urn": "urn"
                 }
             )
         with patch('requests.get') as patched_get:
@@ -61,7 +61,7 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetPassage",
-                    "urn" : "urn"
+                    "urn": "urn"
                 }
             )
 
@@ -74,8 +74,8 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetPassagePlus",
-                    "context": 1,
-                    "urn" : "urn"
+                    "context": "1",
+                    "urn": "urn"
                 }
             )
         with patch('requests.get') as patched_get:
@@ -84,7 +84,7 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetPassagePlus",
-                    "urn" : "urn"
+                    "urn": "urn"
                 }
             )
 
@@ -96,7 +96,7 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetFirstUrn",
-                    "urn" : "urn"
+                    "urn": "urn"
                 }
             )
 
@@ -108,7 +108,7 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetPrevNextUrn",
-                    "urn" : "urn"
+                    "urn": "urn"
                 }
             )
 
@@ -120,6 +120,6 @@ class TestEndpointsCTS5(unittest.TestCase):
                 "http://domainname.com/rest/cts", params={
                     "inv": "inventory",
                     "request": "GetLabel",
-                    "urn" : "urn"
+                    "urn": "urn"
                 }
             )

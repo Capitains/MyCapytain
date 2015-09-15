@@ -191,15 +191,14 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
     def test_children(self):
         """ Test children property """
         # Normal children checking
-        self.text = open("tests/testing_data/texts/sample.xml", "rb")
-        self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
-        self.text.close()
+        with open("tests/testing_data/texts/sample.xml", "rb") as text:
+            self.TEI = MyCapytain.resources.texts.local.Text(resource=text)
 
-        p = self.TEI.getPassage(["1", "pr"])
-        self.assertEqual(p.children["1.pr.1"].id, ["1", "pr", "1"])
-        
-        p = self.TEI.getPassage(["1", "pr", "1"])
-        self.assertEqual(len(p.children), 0)
+            p = self.TEI.getPassage(["1", "pr"])
+            self.assertEqual(p.children["1.pr.1"].id, ["1", "pr", "1"])
+
+            p = self.TEI.getPassage(["1", "pr", "1"])
+            self.assertEqual(len(p.children), 0)
 
     def test_first(self):
         """ Test first property """
@@ -209,7 +208,6 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         # #And failing when no first
         p = self.TEI.getPassage(["1", "pr", "1"])
         self.assertEqual(p.first, None)
-
 
     def test_last(self):
         """ Test last property """

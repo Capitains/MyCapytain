@@ -46,6 +46,41 @@ class Citation(CitationPrototype):
             label=label
         )
 
+    @staticmethod
+    def ingest(resource, element=None, xpath="ti:citation"):
+        """ Ingest xml to create a citation
+
+        :param xml: XML on which to do xpath
+        :param element: Element where the citation should be stored
+        :param xpath: XPath to use to retrieve citation
+
+        :return: Citation
+        """
+        # Reuse of of find citation
+        results = resource.xpath(xpath, namespaces=NS)
+        if len(results) > 0:
+            citation = Citation(
+                name=results[0].get("label"),
+                xpath=results[0].get("xpath"),
+                scope=results[0].get("scope")
+            )
+
+            if isinstance(element, Citation):
+                element.child = citation
+                Citation.ingest(
+                    resource=results[0],
+                    element=element.child
+                )
+            else:
+                element = citation
+                Citation.ingest(
+                    resource=results[0],
+                    element=element
+                )
+
+            return citation
+
+        return None
 
 def xpathDict(xml, xpath, children, parents, **kwargs):
     """ Returns a default Dict given certain informations
@@ -78,7 +113,7 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
 class Text(inventory.Text):
     """ Represents a CTS Text
         
-        .. automethod:: __str__
+        ..automethod:: __str__
     """
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
@@ -181,37 +216,14 @@ class Text(inventory.Text):
                     complete_metadata = complete_metadata + parent.metadata
             return output(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
 
-    def __findCitations(self, xml, element, xpath="ti:citation"):
+    def __findCitations(self, xml, xpath="ti:citation"):
         """ Find citation in current xml. Used as a loop for self.xmlparser()
         
-        :param xml:
-        :param element:
-        :param xpath:
+        :param xml: Xml resource to be parsed
+        :param xpath: Xpath to use to retrieve the xml node
         """
-        results = xml.xpath(xpath, namespaces=NS)
+        self.citation = Citation.ingest(xml, self.citation, xpath)
 
-        if len(results)> 0:
-            citation = Citation(
-                name=results[0].get("label"),
-                xpath=results[0].get("xpath"),
-                scope=results[0].get("scope")
-            )
-
-            if isinstance(element, Citation):
-                element.child = citation
-                self.__findCitations(
-                    xml=results[0],
-                    element=element.child
-                )
-                """
-                element.child = citation
-                """
-            else:
-                self.citation = citation
-                self.__findCitations(
-                    xml=results[0],
-                    element=self.citation
-                )
 
     def parse(self, resource):
         """ Parse a resource to feed the object
@@ -239,7 +251,6 @@ class Text(inventory.Text):
 
         self.__findCitations(
             xml=self.xml,
-            element=self,
             xpath="ti:online/ti:citationMapping/ti:citation"
         )
 
@@ -271,7 +282,7 @@ class Work(inventory.Work):
 
     """ Represents a CTS Textgroup in XML
 
-        .. automethod:: __str__
+        ..automethod:: __str__
     """
 
     def __init__(self, **kwargs):
@@ -286,10 +297,15 @@ class Work(inventory.Work):
         """
         strings = []
         if self.urn is not None:
-            strings.append("<ti:work urn='{0}' groupUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.urn, self.urn["textgroup"]))
+            strings.append(
+                "<ti:work urn='{0}' groupUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
+                    self.urn, self.urn["textgroup"])
+            )
         else:
             if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:
-                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(self.parents[0].urn))
+                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
+                    self.parents[0].urn)
+                )
             else:
                 strings.append("<ti:work xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
 
@@ -352,6 +368,7 @@ class Work(inventory.Work):
             self.texts[urn] = self.__translations[urn]
 
         return self.texts
+
 
 class TextGroup(inventory.TextGroup):
 
@@ -457,7 +474,7 @@ class TextInventory(inventory.TextInventory):
     def parse(self, resource):
         """ Parse a resource 
 
-        :param resource: Element rerpresenting the text inventory
+        :param resource: Element representing the text inventory
         :param type: basestring, etree._Element
         """
         self.xml = xmlparser(resource)

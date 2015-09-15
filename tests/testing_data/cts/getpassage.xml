@@ -1,0 +1,41 @@
+<CTS:GetPassage xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:CTS="http://chs.harvard.edu/xmlns/cts">
+    <CTS:request elapsed-time="63">
+        <CTS:requestName>GetPassage</CTS:requestName>
+        <CTS:requestUrn>urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1</CTS:requestUrn>
+        <CTS:psg>1.1</CTS:psg>
+        <CTS:workurn>urn:cts:latinLit:phi1294.phi002</CTS:workurn>
+        <CTS:groupname xml:lang="eng">Martial</CTS:groupname>
+        <CTS:title xml:lang="eng">Epigrammata</CTS:title>
+        <CTS:label xml:lang="eng">Epigrammata</CTS:label>
+        <CTS:citation label="book" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
+            <CTS:citation label="poem" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+                <CTS:citation label="line" xpath="/tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
+            </CTS:citation>
+        </CTS:citation>
+    </CTS:request>
+    <CTS:reply>
+        <CTS:urn>urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1</CTS:urn>
+        <CTS:passage>
+            <tei:TEI>
+                <tei:text n="urn:cts:latinLit:phi1294.phi002.perseus-lat2" xml:lang="lat" xml:id="stoa0045.stoa0">
+                    <tei:body>
+                        <tei:div type="edition" n="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
+                            <tei:div type="textpart" subtype="book" n="1">
+                                <tei:div type="textpart" subtype="poem" n="1">
+                                    <head xmlns="http://www.tei-c.org/ns/1.0">I</head>
+                                    <l xmlns="http://www.tei-c.org/ns/1.0" n="1">Hic est quem legis ille, quem requiris, </l>
+                                    <l xmlns="http://www.tei-c.org/ns/1.0" n="2">Toto notus in orbe Martialis </l>
+                                    <l xmlns="http://www.tei-c.org/ns/1.0" n="3">Argutis epigrammaton libellis: <pb/>
+                                    </l>
+                                    <l xmlns="http://www.tei-c.org/ns/1.0" n="4">Cui, lector studiose, quod dedisti </l>
+                                    <l xmlns="http://www.tei-c.org/ns/1.0" n="5">Viventi decus atque sentienti, </l>
+                                    <l xmlns="http://www.tei-c.org/ns/1.0" n="6">Rari post cineres habent poetae. </l>
+                                </tei:div>
+                            </tei:div>
+                        </tei:div>
+                    </tei:body>
+                </tei:text>
+            </tei:TEI>
+        </CTS:passage>
+    </CTS:reply>
+</CTS:GetPassage>

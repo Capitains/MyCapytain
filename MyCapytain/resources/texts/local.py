@@ -53,7 +53,10 @@ class Text(text.Text):
             self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, id=None)
 
     def __findCRefPattern(self, xml):
-        self.citation.ingest(xml.xpath("//tei:cRefPattern", namespaces=NS))
+        self.citation = MyCapytain.resources.texts.tei.Citation.ingest(
+            resource=xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
+            xpath=".//tei:cRefPattern"
+        )
 
     @property
     def citation(self):

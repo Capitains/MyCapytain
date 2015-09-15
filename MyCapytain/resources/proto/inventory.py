@@ -13,6 +13,7 @@ from MyCapytain.common.metadata import Metadata
 from past.builtins import basestring
 from collections import defaultdict
 
+
 class Resource(object):
     """ Resource represents any resource from the inventory """
     def __init__(self, resource=None):
@@ -221,6 +222,7 @@ class TextGroup(Resource):
 
         if resource is not None:
             self.setResource(resource)
+
 
 class TextInventory(Resource):
     """ Represents a CTS Inventory file

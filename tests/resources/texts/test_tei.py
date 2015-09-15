@@ -22,7 +22,6 @@ class TestTEICitation(unittest.TestCase):
         self.assertEqual(str(a), "")
 
     def test_ingest_multiple(self):
-        a = Citation()
         b = xmlparser("""
 <tei:tei xmlns:tei="http://www.tei-c.org/ns/1.0">
 <tei:cRefPattern n="line"
@@ -41,9 +40,9 @@ class TestTEICitation(unittest.TestCase):
     <tei:p>This pointer pattern extracts book</tei:p>
 </tei:cRefPattern>
 </tei:tei>
-""".replace("\n", "").replace("\s+", " ")).xpath("//tei:cRefPattern", namespaces={"tei" : "http://www.tei-c.org/ns/1.0"})
+""".replace("\n", "").replace("\s+", " "))
 
-        a.ingest(b)
+        a = Citation.ingest(b)
 
         self.assertEqual(
             str(a),
@@ -59,7 +58,6 @@ class TestTEICitation(unittest.TestCase):
         )
 
     def test_ingest_single(self):
-        a = Citation()
         b = xmlparser("""
 <tei:tei xmlns:tei="http://www.tei-c.org/ns/1.0">
 <tei:cRefPattern n="line"
@@ -68,8 +66,8 @@ class TestTEICitation(unittest.TestCase):
     <tei:p>This pointer pattern extracts book and poem and line</tei:p>
 </tei:cRefPattern>
 </tei:tei>
-""".replace("\n", "").replace("\s+", " ")).xpath("//tei:cRefPattern", namespaces={"tei" : "http://www.tei-c.org/ns/1.0"})[0]
-        a.ingest(b)
+""".replace("\n", "").replace("\s+", " "))
+        a = Citation.ingest(b)
 
         self.assertEqual(
             str(a),

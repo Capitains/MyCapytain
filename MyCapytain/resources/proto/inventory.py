@@ -13,6 +13,7 @@ from MyCapytain.common.metadata import Metadata
 from past.builtins import basestring
 from collections import defaultdict
 
+
 class Resource(object):
     """ Resource represents any resource from the inventory """
     def __init__(self, resource=None):

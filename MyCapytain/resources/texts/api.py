@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
 from six import text_type as str
 
-from lxml import etree
-
 import MyCapytain.resources.proto.text
 import MyCapytain.resources.texts.tei
+import MyCapytain.resources.inventory
 import MyCapytain.endpoints.proto
 import MyCapytain.common.metadata
 import MyCapytain.common.utils
@@ -30,7 +29,7 @@ class Text(MyCapytain.resources.proto.text.Text):
         __doc__ = Text.__doc__
         super(Text, self).__init__(urn=urn, citation=citation, **kwargs)
 
-        self._cRefPattern = MyCapytain.common.reference.Citation()
+        self._cRefPattern = None
 
         self.resource = resource
 
@@ -51,8 +50,8 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
+        :param reference: Subreference (optional)
+        :type reference: Reference
         :rtype: List.basestring
         :returns: List of levels
         """
@@ -68,9 +67,12 @@ class Text(MyCapytain.resources.proto.text.Text):
             level=level,
             urn=urn
         )
-        for ref in MyCapytain.common.utils.xmlparser(xml).xpath(
-                "//ti:reply//ti:urn/text()",
-                namespaces=MyCapytain.common.utils.NS
+        xml = MyCapytain.common.utils.xmlparser(xml)
+        self.__parse_request(xml.xpath("//ti:request", namespaces=MyCapytain.common.utils.NS)[0])
+
+        for ref in xml.xpath(
+            "//ti:reply//ti:urn/text()",
+            namespaces=MyCapytain.common.utils.NS
         ):
             self.passages.append(ref)
 
@@ -92,33 +94,68 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         response = MyCapytain.common.utils.xmlparser(self.resource.getPassage(urn=urn))
 
-        self.__parse_request(response)
+        self.__parse_request(response.xpath("//ti:request", namespaces=MyCapytain.common.utils.NS)[0])
+        return Passage(urn=urn, resource=response, parent=self)
+
+    def getPassagePlus(self, reference=None):
+        """ Retrieve a passage and informations around it and store it in the object
+
+        :param reference: Reference of the passage
+        :type reference: MyCapytain.common.reference.Reference or List of basestring
+        :rtype: Passage
+        :returns: Object representing the passage
+        :raises: *TypeError* when reference is not a list or a Reference
+        """
+        if reference:
+            urn = "{0}:{1}".format(self.urn, reference)
+        else:
+            urn = str(self.urn)
+
+        response = MyCapytain.common.utils.xmlparser(self.resource.getPassagePlus(urn=urn))
+
+        self.__parse_request(response.xpath("//ti:reply/ti:label", namespaces=MyCapytain.common.utils.NS)[0])
         return Passage(urn=urn, resource=response, parent=self)
 
     def __parse_request(self, xml):
-        for node in xml.xpath("//ti:request/ti:groupname", namespaces=MyCapytain.common.utils.NS):
+        """
+
+        :param xml:
+        :return:
+
+        .. TODO: Finish self.citation parsing
+        """
+        for node in xml.xpath(".//ti:groupname", namespaces=MyCapytain.common.utils.NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
             self.metadata["groupname"][lang] = node.text
 
-        for node in xml.xpath("//ti:request/ti:title", namespaces=MyCapytain.common.utils.NS):
+        for node in xml.xpath(".//ti:title", namespaces=MyCapytain.common.utils.NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
             self.metadata["title"][lang] = node.text
 
-        for node in xml.xpath("//ti:request/ti:label", namespaces=MyCapytain.common.utils.NS):
+        for node in xml.xpath(".//ti:label", namespaces=MyCapytain.common.utils.NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
             self.metadata["label"][lang] = node.text
 
-        # Need to code that
+        # Need to code that p
         if self.citation is None:
-            self.citation = ""
+            self.citation = MyCapytain.resources.inventory.Citation.ingest(
+                xml,
+                xpath=".//ti:citation[not(ancestor::ti:citation)]"
+            )
 
     def getLabel(self):
         """ Retrieve metadata about the text
 
-        :rtype: dict
+        :rtype: Metadata
         :returns: Dictionary with label informations
         """
-        raise NotImplementedError()
+        response = MyCapytain.common.utils.xmlparser(
+            self.resource.getLabel(urn=str(self.urn))
+        )
+
+        self.__parse_request(response.xpath("//ti:reply/ti:label", namespaces=MyCapytain.common.utils.NS)[0])
+
+        return self.metadata
 
     @property
     def reffs(self):
@@ -126,25 +163,15 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         :rtype: MyCapytain.resources.texts.tei.Citation
         """
-        return [reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]
-
-    @property
-    def citation(self):
-        """ Get the lowest cRefPattern in the hierarchy
-
-        :rtype: MyCapytain.common.reference.Citation
-        """
-        return self._cRefPattern
-
-    @citation.setter
-    def citation(self, value):
-        """ Set the cRefPattern
-
-        :param value: Citation to be saved
-        :type value:  MyCapytain.common.reference.Citation
-        """
-        if isinstance(value, MyCapytain.common.reference.Citation):
-            self._cRefPattern = value
+        if self.citation is None:
+            reffs = [self.getValidReff()]
+            return reffs + [
+                reff for reffs in [self.getValidReff(level=i) for i in range(2, len(self.citation) + 1)] for reff in reffs
+            ]
+        else:
+            return [
+                reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs
+            ]
 
 
 class Passage(MyCapytain.resources.texts.tei.Passage):
@@ -196,32 +223,12 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
         return self.parent.resource.getPassage(urn=_prev)
 
-    @property
-    def first(self):
-        """ First child of current Passage
-
-        :rtype: None or Passage
-        :returns: None if current Passage has no children,  first child passage if available
-        """
-        raise NotImplementedError()
-
-    @property
-    def last(self):
-        """ Last child of current Passage
-
-        :rtype: None or Passage
-        :returns: None if current Passage has no children, last child passage if available
-        """
-        raise NotImplementedError()
-
     def __parse(self):
         """ Given self.resource, split informations from the CTS API
 
         :return: None
         """
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=MyCapytain.common.utils.NS)[0]
-        if not self.urn:
-            self.urn = self.resource.xpath("//ti:reply/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)[0]
 
         self.__prev, self.__next = Passage.prevnext(self.resource)
 

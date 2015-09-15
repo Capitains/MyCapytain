@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 from six import text_type as str
+from io import open
 
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.resources.texts.api import *

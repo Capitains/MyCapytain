@@ -7,6 +7,11 @@
         <CTS:groupname xml:lang="eng">Martial</CTS:groupname>
         <CTS:title xml:lang="eng">Epigrammata</CTS:title>
         <CTS:label xml:lang="eng">Epigrammata</CTS:label>
+        <CTS:citation label="book" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
+            <CTS:citation label="poem" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+                <CTS:citation label="line" xpath="/tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>
+            </CTS:citation>
+        </CTS:citation>
     </CTS:request>
     <CTS:reply>
         <CTS:urn>urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1</CTS:urn>

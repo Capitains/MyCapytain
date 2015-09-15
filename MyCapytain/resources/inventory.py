@@ -58,7 +58,6 @@ class Citation(CitationPrototype):
         """
         # Reuse of of find citation
         results = resource.xpath(xpath, namespaces=NS)
-
         if len(results) > 0:
             citation = Citation(
                 name=results[0].get("label"),

@@ -182,8 +182,8 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         self.urn = urn
 
         # Could be set during parsing
-        self.__next = None
-        self.__prev = None
+        self._next = None
+        self._prev = None
         self.__first = None
         self.__last = None
 
@@ -196,8 +196,8 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: Passage
         :returns: Following passage at same level
         """
-        if self.__next is not None:
-            _next = self.__next
+        if self._next is not None:
+            _next = self._next
         else:
             # Request the next urn
             _prev, _next = Passage.prevnext(
@@ -213,8 +213,8 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: Passage
         :returns: Previous passage at same level
         """
-        if self.__prev is not None:
-           _prev = self.__prev
+        if self._prev is not None:
+           _prev = self._prev
         else:
             # Request the next urn
             _prev, _next = Passage.prevnext(
@@ -230,7 +230,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         """
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=MyCapytain.common.utils.NS)[0]
 
-        self.__prev, self.__next = Passage.prevnext(self.resource)
+        self._prev, self._next = Passage.prevnext(self.resource)
 
     @staticmethod
     def prevnext(resource):

@@ -247,14 +247,14 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
         if len(prevnext) > 0:
             prevnext = prevnext[0]
-            _next = prevnext.xpath("ti:next/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
-            _prev = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
+            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
+            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
 
-            if len(_next):
-               _next = _next[0]
+            if len(_next_xpath):
+               _next = _next_xpath[0]
 
-            if len(_prev):
-                _prev = _prev[0]
+            if len(_prev_xpath):
+                _prev = _prev_xpath[0]
 
         return _prev, _next
 

@@ -17,6 +17,22 @@ class CTS(MyCapytain.endpoints.proto.CTS):
         Basic integration of the MyCapytain.endpoints.proto.CTS abstraction
     """
 
+    def __init__(self, endpoint, inventory=None):
+        """ API Prototype object
+
+        :param self: Object
+        :type self: API
+        :param endpoint: URL of the API
+        :type endpoint: str
+        :param inventory: Inventory to use
+        :type inventory: str
+
+        :ivar endpoint: Url of the endpoint
+        :ivar inventory: Default Inventory
+        """
+        super(CTS, self).__init__(endpoint)
+        self.inventory = inventory
+
     def call(self, parameters):
         """ Call an endpoint given the parameters
         
@@ -28,6 +44,9 @@ class CTS(MyCapytain.endpoints.proto.CTS):
         parameters = {
             key: str(parameters[key]) for key in parameters if parameters[key] is not None
         }
+        if self.inventory is not None and "inv" not in parameters:
+            parameters["inv"] = self.inventory
+
         request = requests.get(self.endpoint, params=parameters)
         return request.text
 

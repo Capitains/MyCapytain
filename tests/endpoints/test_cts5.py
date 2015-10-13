@@ -65,6 +65,18 @@ class TestEndpointsCTS5(unittest.TestCase):
                 }
             )
 
+    def test_call_with_default(self):
+        inv = CTS("http://domainname.com/rest/cts", inventory="annotsrc")
+        with patch('requests.get') as patched_get:
+            inv.getPassage(urn="urn")
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "inv": "annotsrc",
+                    "request": "GetPassage",
+                    "urn": "urn"
+                }
+            )
+
     def test_request_CTS_getPassagePlus_arguments(self):
         """ Tests that methods getPassagePlus maps correctly to request"""
         with patch('requests.get') as patched_get:

@@ -6,6 +6,7 @@ from six import text_type as str
 
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.resources.texts.tei import *
+from MyCapytain.common.reference import Reference
 
 
 class TestTEICitation(unittest.TestCase):
@@ -33,7 +34,7 @@ class TestTEICitation(unittest.TestCase):
 <tei:tei xmlns:tei="http://www.tei-c.org/ns/1.0">
 <tei:cRefPattern n="line"
              matchPattern="(\\w+).(\\w+).(\\w+)"
-             replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:l[@n='$3'])">
+             replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']/tei:div[@n='$2']/tei:l[@n='$3'])">
     <tei:p>This pointer pattern extracts line</tei:p>
 </tei:cRefPattern>
 <tei:cRefPattern n="poem"
@@ -61,7 +62,11 @@ class TestTEICitation(unittest.TestCase):
         )
         self.assertEqual(
             str(a.child.child),
-            """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
+            """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\' and @type=\'section\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
+        )
+        self.assertEqual(
+            a.child.child.fill(Reference("1.2.3")),
+            "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'1\' and @type=\'section\']/tei:div[@n=\'2\']/tei:l[@n=\'3\']"
         )
 
     def test_ingest_single(self):
@@ -81,12 +86,28 @@ class TestTEICitation(unittest.TestCase):
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
 
+    def test_ingest_single_and(self):
+        text = xmlparser("""
+<tei:tei xmlns:tei="http://www.tei-c.org/ns/1.0">
+    <tei:cRefPattern n="section" matchPattern="(.+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='$1' and @type='section'])" />
+</tei:tei>
+""".replace("\n", "").replace("\s+", " "))
+        citation = Citation.ingest(text)
+        self.maxDiff = None
+        self.assertEqual(
+            str(citation),
+            """<tei:cRefPattern n="section" matchPattern="(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n=\'$1\' and @type='section'])"><tei:p>This pointer pattern extracts section</tei:p></tei:cRefPattern>"""
+        )
+        self.assertEqual(citation.scope, "/tei:TEI/tei:text/tei:body/tei:div[@type='edition']")
+        self.assertEqual(citation.xpath, "/tei:div[@n='?' and @type='section']")
+        self.assertEqual(citation.fill("1"), "/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n=\'1\' and @type='section']")
+
 
 class TestTEIPassage(unittest.TestCase):
     def test_text(self):
         """ Test text attribute """
         P = Passage(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
-        # Without exclusion
+        # Without exclusion0
         self.assertEqual(P.text(), "Ibis hello b ab excusso missus in astra sago. ")
         # With Exclusion
         self.assertEqual(P.text(exclude=["note"]), "Ibis ab excusso missus in astra sago. ")

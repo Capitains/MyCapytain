@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.stoa.org/epidoc/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Corpus Scriptorum Ecclesiasticorum Latinorum (CSEL)</title>
+        <sponsor>University of Leipzig</sponsor>
+        <funder>European Social Fund Saxony</funder>
+        <principal>Gregory Crane</principal>
+        <respStmt>
+          <persName xml:id="Jouve">Jouve</persName>
+          <resp>OCR-ed, corrected and encoded the text</resp>
+        </respStmt>
+        <respStmt>
+          <persName>Greta Franzini</persName>
+          <resp>Project Manager (University of Leipzig)</resp>
+        </respStmt>
+        <respStmt>
+          <persName>Simona Stoyanova</persName>
+          <resp>Project Assistant (University of Leipzig)</resp>
+        </respStmt>
+        <respStmt>
+          <persName>Bruce Robertson</persName>
+          <resp>Technical Advisor (Mount Allison University)</resp>
+        </respStmt>
+        <respStmt>
+          <persName>Uvius Fonticola</persName>
+          <resp>Technical Advisor (Ludwig Maximilians University Munich)</resp>
+        </respStmt>
+      </titleStmt>
+      
+      <publicationStmt>
+        <authority>University of Leipzig</authority>
+        <idno type="filename">CSEL60.xml</idno>
+        <availability>
+          <licence target="https://creativecommons.org/licenses/by-sa/4.0/">Available under a Creative Commons Attribution-ShareAlike 4.0 International License</licence>
+        </availability>
+        <date>2014</date>
+        <publisher>University of Leipzig</publisher>
+        <pubPlace>Germany</pubPlace>
+      </publicationStmt>
+      
+      <sourceDesc>
+        <listBibl xml:lang="la">
+          <biblStruct>
+            <monogr>
+              <editor>
+                <persName>
+                  <name xml:lang="la">Carolus F. Vrba</name>
+                  <addName xml:lang="de">Karl F. Vrba</addName>
+                </persName>
+              </editor> 
+              <editor>
+                <persName>
+                  <name xml:lang="la">Iosephus Zycha</name>
+                  <addName xml:lang="de">Joseph Zycha</addName>
+                </persName>
+              </editor> 
+              <author ref="http://data.perseus.org/catalog/urn:cts:latinLit:stoa0040">Augustinus</author>  
+              <title ref="http://data.perseus.org/catalog/urn:cts:latinLit:stoa0040.stoa057">De Peccatorum Meritis et Remissione et de Baptismo Parvulorum</title>
+              <title ref="http://data.perseus.org/catalog/urn:cts:latinLit:stoa0040.stoa062">De Spiritu et Littera</title>
+              <title ref="http://data.perseus.org/catalog/urn:cts:latinLit:stoa0040.stoa054">De Natura et Gratia</title>
+              <title ref="http://data.perseus.org/catalog/urn:cts:latinLit:stoa0040.stoa033">De Natura et Origine Animae</title>
+              <title ref="http://data.perseus.org/catalog/urn:cts:latinLit:stoa0040.stoa021">Contra Duas Epistulas Pelagianorum</title>
+              <imprint>
+                <publisher>Österreichische Akademie der Wissenschaften (ÖAW)</publisher>
+                <pubPlace>Wien, Österreich</pubPlace>
+                <date>1913</date>
+              </imprint>
+              <biblScope unit="volume">60</biblScope>
+            </monogr>
+            <ref target="http://archive.org/stream/corpusscriptorum60auguuoft#page/n7/mode/2up">Internet Archive</ref>
+            
+          </biblStruct>
+        </listBibl>
+      </sourceDesc>
+      
+    </fileDesc>
+    <encodingDesc>
+      <p>The following text is encoded in accordance with EpiDoc standards and with the
+        CTS/CITE Architecture. 
+</p>
+      <refsDecl n="CTS">
+        <cRefPattern n="book" matchPattern="(.+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='$1' and @subtype='book']//tei:div[@n='$2' and @subtype='section'])"/>
+        <cRefPattern n="section" matchPattern="(.+).(.+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n='$1' and @subtype='book']//tei:div[@n='$2' and @subtype='section'])"/>
+      </refsDecl>
+    </encodingDesc>
+    
+    <profileDesc>
+      <langUsage>
+        <language ident="la">Latin</language>
+      </langUsage>
+    </profileDesc>
+    
+</teiHeader>
+<text>
+<body>
+<div type="edition" n="urn:cts:latinLit:stoa0040.stoa033.opp-lat1">
+<div n="1" subtype="book" type="textpart">           
+          <ab>
+            <title type="sub">LIBER PRIMVS. AD RENATVM. </title>
+          </ab>
+  <div n="1" subtype="section" type="textpart">
+          <p><milestone n="1" unit="altchapter"/>
+         Sinceritatem tuam erga nos, Renate frater carissime, <lb/>
+            et <choice><sic>fratcrnam</sic><corr>fraternam</corr></choice> beniuolentiam ac <choice><sic>mutuao</sic><corr>mutuae</corr></choice> dilectionis affectum probatum <lb/>
+            <choice><sic>quitlem</sic><corr>quidem</corr></choice> et antea tenebamus, uerum nunc probatiorem <lb/>
+             nobis <choice><sic>ainica</sic><corr>amica</corr></choice> diligentia <choice><sic>delllonstrasti</sic><corr>demonstrasti</corr></choice>, quod mihi duos libros eius <lb n="5"/>
+            quidem hominis, quem penitus ignorabam. nec tamen ideo <lb/>
+            contemnendi, <sic>Vincontii</sic> Victoris — sic enim <sic>praonotatum</sic> ibi <lb/>
+            nomen eius <choice><sic>inucni</sic><corr>inueni</corr></choice> — proxime praeterita <choice><sic>aestato</sic><corr>aestate</corr></choice> misisti, quamuis <lb/>
+            mihi eo quod absens fuissem in autumni fine sint redditi. quomodo <lb/>
+            <choice><sic>onim</sic><corr>enim</corr></choice> tu <choice><sic>earissimus</sic><corr>carissimus</corr></choice> meus posses ucl <choice><sic>deberos</sic><corr>deberes</corr></choice> in <choice><sic>moam</sic><corr>meam</corr></choice> <lb n="10"/>
+            non <choice><sic>porferre</sic><corr>perferre</corr></choice> notitiam, cum in manus tuas uenissent <choice><sic>euiuslibet</sic><corr>cuiuslibet</corr></choice> <lb/>
+            hominis <sic>qualcscumque</sic> litterae licet ad alium scribentis, ubi tamen <lb/>
+            nomen <choice><sic>cominemorarctur</sic><corr>commemoraretur</corr></choice> et <choice><sic>legoretur</sic><corr>legeretur</corr></choice> meum, ita ut contradiceretur <lb/>
+            uerbis meis quae in quibusdam opusculis edidissem? hoc itaque <lb/>
+            fecisti, quod sincerissimus et dilectissimus amicus meus <choice n="0.00"><sic n="1">faccre</sic><corr n="2575">facere</corr></choice> <lb n="15"/>
+            debuisti.
+
+<note rend="script" type="footnote"> AVRELII AVGVSTINI EPI DE NATVRA ET ORIGINE ANIMAE <lb/>
+            AD RENATVM AMICVM LIB I. <hi rend="italic">A</hi> AVRELII AGVSTINI EPI DE NA- <lb/>
+            TVRA ET ORIGINE ANIMAE. AD RENATVM LIBER 1 AD PETRVM <lb/>
+            PRBM EPiSTOLA I AD VINCENTIVM VICTORE LIMRI <hi rend="italic">DVO Ii</hi> <lb/>
+            EXPLICIT LlBER DE ANIME QVANTITATE AVRELII AGVSTINl <lb/>
+            EPISCOPI DE NATVRA ET ORIGINE ANIME AD RENATVSI LIB <lb/>
+            PRIMVS AD PETRV PRESBITERVM EPISTOLA AD VINCENTIV <lb/>
+            VICTOREM LIB II <hi rend="italic">C</hi> EIVSDEM INCIPIT AD KENATVM <hi rend="italic">D</hi> EXPLI- <lb/>
+            CIT EPLA SCDA AD OPTATV DE NATVRA ET ORIGINE ANIME <lb/>
+            SCI AVG INCIPIT EIVSDE AD RENATVM DE EADEM RE <hi rend="italic">E</hi> <lb/>
+            Incipit liber sci augustini ad reuatum do natura et origine animae <hi rend="italic">F</hi> aurelii <lb/>
+            augustini epi ilo natura et origine animę ad renatum liber primus incipit <hi rend="italic">G</hi> <lb/>
+            Explicit soliloquiorum lib II do gratias finit am. Ad reuatii lib de origine <lb/>
+            animv incip augustini epi <hi rend="italic">M</hi> 3 fraterna <hi rend="italic">M</hi> beneuolentuim E <lb/>
+            acfectum <hi rend="italic">M</hi> 5 eius quidem] eiusdem <hi rend="italic">M</hi> 7 uicontii <hi rend="italic">C nincenti E <lb/>
+            8 proxima EG</hi> 11 non] <hi rend="italic">uel A</hi> 12 qualiscumque M <hi rend="italic">latore Mml</hi> <lb/>
+            ad <hi rend="italic">ex</hi> ab <hi rend="italic">R</hi> ibi <hi rend="italic">ABCG ta M</hi> 15 fecisti <hi rend="italic">om. G</hi> sincari simus <hi rend="italic">C</hi> </note> 
+<pb n="304"/>
+            
+</p>
+          
+</div>
+
+<div n="2" subtype="section" type="textpart">
+<p><milestone n="2" unit="altchapter"/> Sed hinc angor paululum, quod adhuc tuae sanctitati <lb/>
+            minus quam <choice><sic>nellem</sic><corr>uellem</corr></choice> cognitus sum, quando quidem putasti me <lb/>
+            sic accepturum, quasi tu mihi iniuriam feceris notum faciendo <lb/>
+            quod alius fecit. quantum autem hoc absit ab animo meo, <lb/>
+            uide, ut ne ab illo quidem me passum iniuriam conquerar. cum<lb n="5"/>
+            enim aliter quaedam quam ego saperet, numquidnam debuit <lb/>
+            <choice><sic>reticerc</sic><corr>reticere</corr></choice> ? unde mihi gratum esse debet, quod ita non tacuit, ut <lb/>
+            id etiam legere possimus. debuisse quis dixerit eum scribere potius <lb/>
+            ad me quam ad alterum de me; sed quod mihi esset ignotus, <lb/>
+            non est ausus se mihi ingerere in meorum refutatione dictorum. <lb n="10"/>
+            nec consulendum me putauit, ubi sibi uidetur minime dubitandam, <lb/>
+            sed plane cognitam et certam tenere sententiam. obtemperauit <lb/>
+            autem amico suo, a quo se, ut scriberet, dicit esse conpulsum. <lb/>
+            et si quid inter disputandum, quod in meam contumeliam redundaret, <lb/>
+            expressit, non eum conuiciantis uoluntate crediderim,<lb n="15"/>
+            sed diuersa sentientis necessitate fecisse. ubi enim mihi animus <lb/>
+            erga me hominis ignotus est et incertus, melius arbitror meliora <lb/>
+            sentire quam inexplorata culpare. fortassis enim amore mei fecit <lb/>
+            sciens ad me peruenire posse quod scripsit, dum in eis rebus <lb/>
+            errare me non uult, in quibus se potius errare non putat. et<lb n="20"/>
+            ideo debeo etiam eius habere gratam beniuolentiam, cuius me <lb/>
+            necesse est inprobare sententiam. ac per hoc in eis quae non <lb/>
+            recte sapit adhuc leniter corrigendus mihi uidetur, non aspere <lb/>
+            detestandus, praesertim quia, sicut audio, nuper catholicus <lb/>
+            factus est, quod ei gratulandum est. caruit enim Donatistarum<lb n="25"/>
+            uel potius Rogatistarum diuisione et errore, quo antea tenebatur, <lb/>
+            si tamen catholicam ueritatem sicut oportet intellegat, ut uere <lb/>
+            de illius conuersione gaudeamus.
+
+<note rend="script" type="footnote"> 2 sim <hi rend="italic">A</hi> 3 quçsi <hi rend="italic">A</hi> 5 nec b conquerar] coequaret <hi rend="italic">A</hi> coaequarer <lb/>
+            <hi rend="italic">BFmlG</hi> cocquarer <hi rend="italic">C</hi> 6 aliter] utiliter <hi rend="italic">ABCF, b in mg</hi>. quaedam <hi rend="italic">om.E</hi> <lb/>
+            ergo <hi rend="italic">C</hi> nuqua <hi rend="italic">ABCFG</hi> 7 retinere <hi rend="italic">M</hi> tacui <hi rend="italic">BGM</hi> 8 deberes quidem tu <lb/>
+            (tu <hi rend="italic">om. A)</hi> tautum scribere <hi rend="italic">ABFG</hi> deberes tu quidem tantum scribere <hi rend="italic">C</hi> <lb/>
+            deberet <hi rend="italic">Id</hi> 9 <hi rend="italic">alt</hi>. ad <hi rend="italic">om. E</hi> de] ad <hi rend="italic">G</hi> sed] <hi rend="italic">add</hi>. illc b 11 dubitandum <hi rend="italic">ABCFbd</hi> <lb/>
+            13 scribere C <hi rend="italic">15 cui*ciantis M 17 incertis A me incertus M 18 inexeplorata C</hi> <lb/>
+            enim <hi rend="italic">om. Bml G</hi> amorem ei <hi rend="italic">BC</hi> 19 scientes <hi rend="italic">C</hi> possit <hi rend="italic">B</hi> 20 me non] <lb/>
+            nemo <hi rend="italic">M</hi> 21 menes see <hi rend="italic">C</hi> 24 odio <hi rend="italic">E</hi> 25 gratulandus <hi rend="italic">C</hi> 26 rogatistarunt A <lb/>
+            rogat istaru <hi rend="italic">Fm1</hi> detinebatur <hi rend="italic">E</hi> </note> 
+<pb n="305"/>
+            
+</p>
+          
+</div>
+
+<div n="3" subtype="section" type="textpart">
+<p><milestone n="3" unit="altchapter"/> I <sic>rabet</sic> enim eloquium, quo possit <choice><sic>cxplicarc</sic><corr>explicare</corr></choice> <choice n="0.00"><sic n="5">quac</sic><corr n="30156">quae</corr></choice> <lb/>
+            <sic>scnlit</sic>. unde <choice n="7.04"><sic n="3">cuin</sic><corr n="42581">cum</corr></choice> illo agendum est eique optandum, ut recta <lb/>
+            sentiat. ne faciat <choice><sic>essc</sic><corr>esse</corr></choice> delectabilia, <choice n="0.00"><sic n="5">quac</sic><corr n="30156">quae</corr></choice> sunt <choice><sic>inntilia</sic><corr>inutilia</corr></choice> et quae <lb/>
+            <choice><sic>discrta</sic><corr>diserta</corr></choice> dixerit uera dixisse <choice><sic>uidcatur</sic><corr>uideatur</corr></choice>; quamuis et in ipso eloquio <lb/>
+             habeat multa emendanda et a nimia exundantia reprimenda, quod <lb n="5"/>
+            in illo tibi quoque ut uiro graui, sicut tua indicant scripta, <lb/>
+            displicuit. sed <choice><sic>hoe</sic><corr>hoc</corr></choice> uel facile corrigitur uel sine detrimento fidei <lb/>
+            a <choice n="0.73"><sic n="105">leuibus</sic><corr n="37">lenibus</corr></choice> <choice><sic>nientibus</sic><corr>mentibus</corr></choice> amatur, toleratur a <choice><sic>granibus</sic><corr>grauibus</corr></choice>; habemus enim <lb/>
+            iam quosdam spumeos in sermone, sed in fide <choice><sic>sauos</sic><corr>sanos</corr></choice>. non itaque <lb/>
+            desperandum est etiam hoc in isto, quamuis sit tolerabile, si <lb n="10"/>
+            <choice><sic>permanscrit</sic><corr>permanserit</corr></choice> <choice><sic>possc</sic><corr>posse</corr></choice> tamen expurgari et temperari <choice n="6.20"><sic n="1">atquc</sic><corr n="16104">atque</corr></choice> ad <lb/>
+            <choice><sic>integrllm</sic><corr>integrum</corr></choice> et solidum <sic>ucl</sic> <sic>perduei</sic> uel reuocari modum. <lb/>
+            praesertim quia iuuenis esse perhibetur, ut quod minus habet <lb/>
+            peritia suppleat <choice><sic>diligcntia</sic><corr>diligentia</corr></choice> et quod <choice n="0.84"><sic n="11">cruditas</sic><corr n="2">eruditas</corr></choice> loquacitatis eructat. <lb/>
+             aetatis <choice><sic>niaturitas</sic><corr>maturitas</corr></choice> <choice><sic>dceoquat</sic><corr>decoquat</corr></choice>. illud molestum est et <choice><sic>periciilosum</sic><corr>periculosum</corr></choice> <choice n="0.00"><sic n="20">ue</sic><corr n="10367">uel</corr></choice>] <lb n="15"/>
+            perniciosum, si, cum laudatur eloquentia persuadeatur insipientia <lb/>
+            et in pretioso <choice><sic>poeulo</sic><corr>poculo</corr></choice> bibatur pestifera potio. 
+</p>
+          
+</div>
+
+</div>
+</div>
+</body>
+</text>
+</TEI>

@@ -19,9 +19,15 @@ from MyCapytain.resources.proto import text
 import MyCapytain.resources.texts.tei
 
 
+class RefsDeclError(Exception):
+    """ Error issued when an the refsDecl does not succeed in xpath (no results)
+    """
+    pass
+
+
 class Text(text.Text):
     """ Implementation of CTS tools for local files
-    
+
     :param urn: A URN identifier
     :type urn: MyCapytain.common.reference.URN
     :param resource: A resource
@@ -49,7 +55,14 @@ class Text(text.Text):
 
             self.__findCRefPattern(self.xml)
 
-            xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
+            try:
+                xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
+            except IndexError:
+                msg = "Main citation scope does not result in any result ({0})".format(self.citation.scope)
+                raise RefsDeclError(msg)
+            except Exception as E:
+                raise E
+
             self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, id=None)
 
     def __findCRefPattern(self, xml):
@@ -89,7 +102,7 @@ class Text(text.Text):
 
         :param reference: Identifier of the subreference / passages
         :type reference: List, MyCapytain.common.reference.Reference
-        :rtype: Passage 
+        :rtype: Passage
         :returns: Asked passage
         """
         if isinstance(reference, MyCapytain.common.reference.Reference):
@@ -115,8 +128,8 @@ class Text(text.Text):
         return text.PassagePlus(P, P.prev.id, P.next.id)
 
     def getValidReff(self, level=1, reference=None):
-        """ Retrieve valid passages directly 
-        
+        """ Retrieve valid passages directly
+
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
         :param reference: Subreference (optional)

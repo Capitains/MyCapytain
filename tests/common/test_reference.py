@@ -231,6 +231,13 @@ class TestCitation(unittest.TestCase):
         )
         self.assertEqual(c.refsDecl, "/TEI/text/body/div/div[@n=\"$1\"]//l[@n=\"$2\"]")
 
+    def test_updateRefsdecl_and(self):
+        c = Citation(
+            name="line",
+            refsDecl="/TEI/text/body/div/div[@n=\"?\" and @subtype='edition']/l[@n=\"?\"]"
+        )
+        self.assertEqual(c.refsDecl, "/TEI/text/body/div/div[@n=\"?\" and @subtype='edition']/l[@n=\"?\"]")
+
     def test_updateScopeXpath(self):
         c = Citation(
             name="line",

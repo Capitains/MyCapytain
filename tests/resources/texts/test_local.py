@@ -80,6 +80,10 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         with self.assertRaises(KeyError): 
             self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.hellno"),level=3), [])
 
+    def test_wrong_main_scope(self):
+        with open("tests/testing_data/texts/sample2.xml", "rb") as file:
+            with self.assertRaises(MyCapytain.resources.texts.local.RefsDeclError):
+                text = MyCapytain.resources.texts.local.Text(resource=file)
 
     def test_reffs(self):
         """ Check that every level is returned trough reffs property """

@@ -93,6 +93,8 @@ class TestTEICitation(unittest.TestCase):
             str(citation),
             """<tei:cRefPattern n="section" matchPattern="(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n=\'$1\' and @type='section'])"><tei:p>This pointer pattern extracts section</tei:p></tei:cRefPattern>"""
         )
+        self.assertEqual(citation.scope, "/tei:TEI/tei:text/tei:body/tei:div[@type='edition']")
+        self.assertEqual(citation.xpath, "/tei:div[@n='?' and @type='section']")
 
 
 class TestTEIPassage(unittest.TestCase):

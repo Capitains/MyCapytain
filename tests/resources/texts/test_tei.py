@@ -6,6 +6,7 @@ from six import text_type as str
 
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.resources.texts.tei import *
+from MyCapytain.common.reference import Reference
 
 
 class TestTEICitation(unittest.TestCase):
@@ -63,6 +64,10 @@ class TestTEICitation(unittest.TestCase):
             str(a.child.child),
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\' and @type=\'section\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
+        self.assertEqual(
+            a.child.child.fill(Reference("1.2.3")),
+            "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'1\' and @type=\'section\']/tei:div[@n=\'2\']/tei:l[@n=\'3\']"
+        )
 
     def test_ingest_single(self):
         b = xmlparser("""
@@ -95,6 +100,7 @@ class TestTEICitation(unittest.TestCase):
         )
         self.assertEqual(citation.scope, "/tei:TEI/tei:text/tei:body/tei:div[@type='edition']")
         self.assertEqual(citation.xpath, "/tei:div[@n='?' and @type='section']")
+        self.assertEqual(citation.fill("1"), "/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n=\'1\' and @type='section']")
 
 
 class TestTEIPassage(unittest.TestCase):

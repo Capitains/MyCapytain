@@ -3,7 +3,7 @@
 [![Dependency Status](https://gemnasium.com/Capitains/MyCapytain.svg)](https://gemnasium.com/Capitains/MyCapytain)
 [![PyPI version](https://badge.fury.io/py/MyCapytain.svg)](http://badge.fury.io/py/MyCapytain)
 [![Documentation Status](https://readthedocs.org/projects/mycapytain/badge/?version=latest)](https://readthedocs.org/projects/mycapytain/?badge=latest)
-
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.32704.svg)](http://dx.doi.org/10.5281/zenodo.32704)
 
 **Useful dev links**
 

@@ -3,9 +3,6 @@
 [![Dependency Status](https://gemnasium.com/Capitains/MyCapytain.svg)](https://gemnasium.com/Capitains/MyCapytain)
 [![PyPI version](https://badge.fury.io/py/MyCapytain.svg)](http://badge.fury.io/py/MyCapytain)
 [![Documentation Status](https://readthedocs.org/projects/mycapytain/badge/?version=latest)](https://readthedocs.org/projects/mycapytain/?badge=latest)
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.32763.svg)](http://dx.doi.org/10.5281/zenodo.32763)
+[![DOI](https://zenodo.org/badge/3923/Capitains/MyCapytain.svg)](https://zenodo.org/badge/latestdoi/3923/Capitains/MyCapytain)
 
-**Useful dev links**
-
-- http://deusyss.developpez.com/tutoriels/Python/Epydoc/
-- http://sphinx-doc.org/
+MyCapytain 

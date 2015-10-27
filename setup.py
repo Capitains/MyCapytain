@@ -12,8 +12,8 @@ setup(
   license='MIT',
   packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
   install_requires=[
-    "requests==2.7.0",
-    "six==1.9.0",
+    "requests>=2.8.1",
+    "six>=1.10.0",
     "lxml==3.4.4",
     "future==0.15.2"
   ],

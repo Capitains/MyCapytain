@@ -39,8 +39,8 @@ class Text(text.Text):
     """
 
     def __init__(self, urn=None, citation=None, resource=None):
-        self._passages = OrderedDict() # Represents real full passages / reffs informations. Only way to set it up is getValidReff without passage ?
-        self._orphan = defaultdict(Reference) # Represents passage we got without asking for all. Storing convenience ?
+        self._passages = OrderedDict()  # Represents real full passages / reffs informations. Only way to set it up is getValidReff without passage ?
+        self._orphan = defaultdict(Reference)  # Represents passage we got without asking for all. Storing convenience ?
 
         self._cRefPattern = MyCapytain.resources.texts.tei.Citation()
         self.resource = None

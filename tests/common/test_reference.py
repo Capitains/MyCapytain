@@ -246,6 +246,31 @@ class TestCitation(unittest.TestCase):
         self.assertEqual(c.scope, "/TEI/text/body/div/div[@n=\"?\"]")
         self.assertEqual(c.xpath, "//l[@n=\"?\"]")
 
+    def test_or_in_xpath(self):
+        """ Test that the xpath and scope generation accepts or xpath expression in form of "|" or " or "
+        """
+        a = Citation(
+            name="line",
+            refsDecl="/TEI/text/body/div/div[@n=\"$1\"]/*[self::tei:l or self::tei:p][@n=\"$2\"]"
+        )
+        b = Citation(
+            name="line",
+            refsDecl="/TEI/text/body/div/div[@n=\"$1\"]/*[self::tei:l or self::tei:p][@n=\"$2\"]"
+        )
+        c = Citation(
+            name="line",
+            refsDecl="/TEI/text/body/div/*[self::tei:l or self::tei:p][@n=\"$1\"]"
+        )
+        self.assertEqual(a.scope, "/TEI/text/body/div/div[@n=\"?\"]")
+        self.assertEqual(a.xpath, "/*[self::tei:l or self::tei:p][@n=\"?\"]")
+        self.assertEqual(a.fill(["1", "2"], xpath=False), "/TEI/text/body/div/div[@n='1']/*[self::tei:l or self::tei:p][@n='2']")
+
+        self.assertEqual(b.scope, "/TEI/text/body/div/div[@n=\"?\"]")
+        self.assertEqual(b.xpath, "/*[self::tei:l or self::tei:p][@n=\"?\"]")
+
+        self.assertEqual(c.scope, "/TEI/text/body/div")
+        self.assertEqual(c.xpath, "/*[self::tei:l or self::tei:p][@n=\"?\"]")
+
     def test_name(self):
         c = Citation(
             name="line"

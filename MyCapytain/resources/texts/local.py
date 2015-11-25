@@ -284,7 +284,6 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if self.citation is None:
             self.__parsed = True
             return []
-        print("."+self.citation.fill(passage=None, xpath=True))
         elements = self.resource.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
         for element in elements:
             n = self.id + [element.get("n")]

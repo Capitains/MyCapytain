@@ -19,6 +19,9 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
         self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
 
+        with open("tests/testing_data/texts/text_or_xpath.xml") as f:
+            self.text_complex = MyCapytain.resources.texts.local.Text(resource=f)
+
     def tearDown(self):
         self.text.close()
 
@@ -37,6 +40,9 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         )
 
         self.assertEqual(len(self.TEI.citation), 3)
+
+    def testFindComplexCitation(self):
+        self.assertEqual(len(self.text_complex.citation), 2)
 
     def testCitationSetters(self):
         d = MyCapytain.resources.texts.tei.Citation()
@@ -90,6 +96,11 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         self.assertEqual(("1" in self.TEI.reffs), True)
         self.assertEqual(("1.pr" in self.TEI.reffs), True)
         self.assertEqual(("2.40.8" in self.TEI.reffs), True)
+
+    def test_complex_reffs(self):
+        """ Test when there is a (something|something) xpath
+        """
+        self.assertEqual(("pr.1" in self.text_complex.reffs), True)
 
     def test_urn(self):
         """ Test setters and getters for urn """

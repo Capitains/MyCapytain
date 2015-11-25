@@ -16,7 +16,7 @@ from builtins import range, object
 import re
 
 
-REFSDECL_SPLITTER = re.compile("/+[a-zA-Z0-9:\[\]@=\\\{\$'\"\.\s]+")
+REFSDECL_SPLITTER = re.compile("/+[\*()|\sa-zA-Z0-9:\[\]@=\\\{\$'\"\.\s]+")
 REFSDECL_REPLACER = re.compile("\$[0-9]+")
 SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
 REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")

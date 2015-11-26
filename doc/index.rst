@@ -8,18 +8,21 @@ Welcome to MyCapytains's documentation!
 
 .. include:: ../README.rst
 
-Contents:
+
+Contents
+########
 
 .. toctree::
    :maxdepth: 2
 
-   MyCapytain.common
+   ../README.rst
+   MyCapytain.api
    MyCapytain.resources
    MyCapytain.endpoints
 
 
 Indices and tables
-==================
+##################
 
 * :ref:`modules`
 * :ref:`genindex`

@@ -6,13 +6,7 @@
 Welcome to MyCapytains's documentation!
 =======================================
 
-.. image:: https://travis-ci.org/Capitains/MyCapytain.svg?branch=master 
-.. image:: https://coveralls.io/repos/Capitains/MyCapytain/badge.svg?branch=master 
-.. image:: https://gemnasium.com/Capitains/MyCapytain.svg 
-.. image:: https://badge.fury.io/py/MyCapytain.svg 
-.. image:: https://readthedocs.org/projects/mycapytain/badge/?version=latest 
-.. image:: https://zenodo.org/badge/3923/Capitains/MyCapytain.svg
-   :target: https://zenodo.org/badge/latestdoi/3923/Capitains/MyCapytain
+.. include:: ../README.rst
 
 Contents:
 

@@ -7,7 +7,7 @@
 .. image:: https://badge.fury.io/py/MyCapytain.svg 
    :target: http://badge.fury.io/py/MyCapytain
 .. image:: https://readthedocs.org/projects/mycapytain/badge/?version=latest
-   :target: https://readthedocs.org/projects/mycapytain/badge/?version=latest
+   :target: https://readthedocs.org/mycapytain
 .. image:: https://zenodo.org/badge/3923/Capitains/MyCapytain.svg
    :target: https://zenodo.org/badge/latestdoi/3923/Capitains/MyCapytain
 

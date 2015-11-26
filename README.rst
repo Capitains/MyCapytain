@@ -1,5 +1,4 @@
-MyCapytain
-==========
+.. image:: doc/assets/My_Capytains.png
 
 .. image:: https://travis-ci.org/Capitains/MyCapytain.svg?branch=master 
    :target: https://travis-ci.org/Capitains/MyCapytain
@@ -30,7 +29,6 @@ If you prefer to use setup.py, you should clone and use the following
    git clone https://github.com/Capitains/MyCapytain.git
    cd MyCapytain
    python setup.py install
-
 
 
 Known issues and recommendations

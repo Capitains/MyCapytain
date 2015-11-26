@@ -15,7 +15,10 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   ../README.rst
+   MyCapytain.uses
+   MyCapytain.local
+   MyCapytain.endpoint
+   MyCapytain.workarounds
    MyCapytain.api
 
 

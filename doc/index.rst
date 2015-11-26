@@ -11,7 +11,7 @@ Welcome to MyCapytains's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    MyCapytain.common
    MyCapytain.resources

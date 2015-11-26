@@ -1,5 +1,3 @@
-.. image:: doc/assets/My_Capytains.png
-
 .. image:: https://travis-ci.org/Capitains/MyCapytain.svg?branch=master 
    :target: https://travis-ci.org/Capitains/MyCapytain
 .. image:: https://coveralls.io/repos/Capitains/MyCapytain/badge.svg?branch=master 
@@ -20,7 +18,9 @@ Installation and Requirements
 
 The best way to install MyCapytain is to use pip. MyCapytain tries to support both Python 2.7 and Python 3.4.
 
-`pip install MyCapytain`
+.. code-block:: shell
+
+   pip install MyCapytain
 
 If you prefer to use setup.py, you should clone and use the following
 

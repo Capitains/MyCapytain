@@ -13,16 +13,13 @@ Local files handler for CTS
 from collections import OrderedDict, defaultdict
 from past.builtins import basestring
 
+from MyCapytain.errors import DuplicateReference, RefsDeclError
 from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 import MyCapytain.resources.texts.tei
 
 
-class RefsDeclError(Exception):
-    """ Error issued when an the refsDecl does not succeed in xpath (no results)
-    """
-    pass
 
 
 class Text(text.Text):
@@ -34,11 +31,12 @@ class Text(text.Text):
     :type resource: lxml.etree._Element
     :param citation: Highest Citation level
     :type citation: MyCapytain.common.reference.Citation
-
+    :param autoreffs: Parse references on load (default : True)
+    :type autoreffs: bool
     :ivar resource: lxml
     """
 
-    def __init__(self, urn=None, citation=None, resource=None):
+    def __init__(self, urn=None, citation=None, resource=None, autoreffs=True):
         self._passages = OrderedDict()  # Represents real full passages / reffs informations. Only way to set it up is getValidReff without passage ?
         self._orphan = defaultdict(Reference)  # Represents passage we got without asking for all. Storing convenience ?
 
@@ -55,21 +53,33 @@ class Text(text.Text):
 
             self.__findCRefPattern(self.xml)
 
-            try:
-                xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
-            except IndexError:
-                msg = "Main citation scope does not result in any result ({0})".format(self.citation.scope)
-                raise RefsDeclError(msg)
-            except Exception as E:
-                raise E
-
-            self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, id=None)
+            if autoreffs is True:
+                self.parse()
 
     def __findCRefPattern(self, xml):
+        """ Find CRefPattern in the text and set object.citation
+        :param xml: Xml Resource
+        :return: None
+        """
         self.citation = MyCapytain.resources.texts.tei.Citation.ingest(
             resource=xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
             xpath=".//tei:cRefPattern"
         )
+
+    def parse(self):
+        """ Parse the object and generate the children
+
+        :return:
+        """
+        try:
+            xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
+        except IndexError:
+            msg = "Main citation scope does not result in any result ({0})".format(self.citation.scope)
+            raise RefsDeclError(msg)
+        except Exception as E:
+            raise E
+
+        self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, id=None)
 
     @property
     def citation(self):
@@ -148,7 +158,7 @@ class Text(text.Text):
         else:
             nodes = [None for i in range(0, level)]
 
-        passages = [self._passages] # For consistency
+        passages = [self._passages]  # For consistency
         while len(nodes) >= 1:
             passages = [passage for sublist in [p.get(nodes[0]) for p in passages] for passage in sublist]
             nodes.pop(0)

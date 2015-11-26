@@ -5,10 +5,14 @@ import unittest
 from six import text_type as str
 from io import open
 import xmlunittest
+import warnings
 
 import MyCapytain.resources.texts.local
 import MyCapytain.resources.texts.tei
 import MyCapytain.common.reference
+import MyCapytain.common.utils
+import MyCapytain.errors
+
         
 
 class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
@@ -85,6 +89,19 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         # Test wrong citation
         with self.assertRaises(KeyError): 
             self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.hellno"),level=3), [])
+
+    def test_warning(self):
+        with open("tests/testing_data/texts/duplicate_references.xml") as xml:
+            text = MyCapytain.resources.texts.local.Text(resource=xml)
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            for i in [1,2,3]:
+                passages = text.getValidReff(level=i)
+
+        self.assertEqual(len(w), 3, "There should be warning on each level")
+        self.assertEqual(issubclass(w[-1].category, MyCapytain.errors.DuplicateReference), True, "Warning should be DuplicateReference")
+        self.assertEqual(str(w[0].message), "1", "Warning message should be list of duplicate")
 
     def test_wrong_main_scope(self):
         with open("tests/testing_data/texts/sample2.xml", "rb") as file:

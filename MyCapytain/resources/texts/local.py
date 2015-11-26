@@ -12,6 +12,7 @@ Local files handler for CTS
 
 from collections import OrderedDict, defaultdict
 from past.builtins import basestring
+import warnings
 
 from MyCapytain.errors import DuplicateReference, RefsDeclError
 from MyCapytain.common.utils import xmlparser, NS
@@ -294,13 +295,22 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if self.citation is None:
             self.__parsed = True
             return []
+
         elements = self.resource.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
-        for element in elements:
-            n = self.id + [element.get("n")]
-            self.__children[".".join(n)] = Passage(
+        ids = [self.id+[element.get("n")] for element in elements]
+        ns = [".".join(_id) for _id in ids]
+
+        # Checking for duplicates
+        duplicates = set([n for n in ns if ns.count(n) > 1])
+        if len(duplicates) > 0:
+            message = ", ".join(duplicates)
+            warnings.warn(message, DuplicateReference)
+
+        for element, _id, n in zip(elements, ids, ns):
+            self.__children[n] = Passage(
                 resource=element,
                 citation=self.citation.child,
-                id=n,
+                id=_id,
                 urn=self.urn,
                 parent=self
             )

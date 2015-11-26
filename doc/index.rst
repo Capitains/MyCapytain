@@ -17,8 +17,6 @@ Contents
 
    ../README.rst
    MyCapytain.api
-   MyCapytain.resources
-   MyCapytain.endpoints
 
 
 Indices and tables

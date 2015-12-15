@@ -650,17 +650,17 @@ class Citation(object):
         :rtype: basestring
         :returns: Xpath to find the passage
 
-        :example:
+        .. code-block:: python
 
-            >>> citation = Citation(name="line", scope="/TEI/text/body/div/div[@n=\"?\"]",xpath="//l[@n=\"?\"]")
-            >>> print(citation.fill(["1", None]))
-            /TEI/text/body/div/div[@n='1']//l[@n]
-            >>> print(citation.fill(None))
-            /TEI/text/body/div/div[@n]//l[@n]
-            >>> print(citation.fill(Reference("1.1"))
-            /TEI/text/body/div/div[@n='1']//l[@n='1']
-            >>> print(citation.fill("1", xpath=True)
-            //l[@n='1']
+            citation = Citation(name="line", scope="/TEI/text/body/div/div[@n=\"?\"]",xpath="//l[@n=\"?\"]")
+            print(citation.fill(["1", None]))
+            # /TEI/text/body/div/div[@n='1']//l[@n]
+            print(citation.fill(None))
+            # /TEI/text/body/div/div[@n]//l[@n]
+            print(citation.fill(Reference("1.1"))
+            # /TEI/text/body/div/div[@n='1']//l[@n='1']
+            print(citation.fill("1", xpath=True)
+            # //l[@n='1']
 
 
         """

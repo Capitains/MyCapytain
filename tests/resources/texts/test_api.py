@@ -5,13 +5,15 @@ import unittest
 from six import text_type as str
 from io import open
 
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.resources.texts.api import *
 from MyCapytain.resources.texts.tei import Citation
 from MyCapytain.endpoints.cts5 import CTS
 from MyCapytain.common.reference import Reference, URN
+from lxml import etree
 import mock
-
+import responses
+import requests
 
 with open("tests/testing_data/cts/getValidReff.xml") as f:
     GET_VALID_REFF = xmlparser(f)
@@ -248,14 +250,17 @@ class TestCTSPassage(unittest.TestCase):
             name="book",
             child=b
         )
-        self.endpoint = CTS("http://services.perseids.org/api/cts")
+        self.url = "http://services.perseids.org/api/cts"
+        self.endpoint = CTS(self.url)
         self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
         self.text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
 
+    @responses.activate
     def test_next_getprevnext(self):
         """ Test next property, given that next information already exists or not)
         """
+
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
@@ -266,6 +271,8 @@ class TestCTSPassage(unittest.TestCase):
         __next = passage.next
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2")
+        self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
+        self.assertIsInstance(__next, Passage)
 
     def test_next_resource(self):
         """ Test next property, given that next information already exists
@@ -279,9 +286,11 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         # When next does not exist from the original resource
-        passage.next
+        __next = passage.next
         # print(self.endpoint.getPrevNextUrn.mock_calls)
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2")
+        self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
+        self.assertIsInstance(__next, Passage)
 
 
     def test_prev_getprevnext(self):
@@ -294,9 +303,11 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         # When next does not exist from the original resource
-        __next = passage.prev
+        __prev = passage.prev
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
+        self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
+        self.assertIsInstance(__prev, Passage)
 
     def test_prev_resource(self):
         """ Test next property, given that next information already exists
@@ -310,6 +321,7 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         # When next does not exist from the original resource
-        __next = passage.prev
-        # print(self.endpoint.getPrevNextUrn.mock_calls)
+        __prev  = passage.prev
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
+        self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
+        self.assertIsInstance(__prev, Passage)

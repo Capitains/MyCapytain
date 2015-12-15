@@ -7,6 +7,7 @@ import MyCapytain.resources.inventory
 import MyCapytain.endpoints.proto
 import MyCapytain.common.metadata
 import MyCapytain.common.utils
+import MyCapytain.common.reference
 
 
 class Text(MyCapytain.resources.proto.text.Text):
@@ -82,13 +83,19 @@ class Text(MyCapytain.resources.proto.text.Text):
         """ Retrieve a passage and store it in the object
 
         :param reference: Reference of the passage
-        :type reference: MyCapytain.common.reference.Reference or List of basestring
+        :type reference: MyCapytain.common.reference.Reference, or MyCapytain.common.reference.URN, or str or list(str)
         :rtype: Passage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
         """
-        if reference:
+        if isinstance(reference, MyCapytain.common.reference.URN):
+            urn = str(reference)
+        elif isinstance(reference, MyCapytain.common.reference.Reference):
+            urn = "{0}:{1}".format(self.urn, str(reference))
+        elif isinstance(reference, str):
             urn = "{0}:{1}".format(self.urn, reference)
+        elif isinstance(reference, list):
+            urn = "{0}:{1}".format(self.urn, ".".join(reference))
         else:
             urn = str(self.urn)
 
@@ -204,7 +211,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
                 self.parent.resource.getPrevNextUrn(urn=str(self.urn))
             )
 
-        self.parent.resource.getPassage(urn=_next)
+        return self.parent.getPassage(reference=_next)
 
     @property
     def prev(self):
@@ -221,7 +228,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
                 self.parent.resource.getPrevNextUrn(urn=str(self.urn))
             )
 
-        return self.parent.resource.getPassage(urn=_prev)
+        return self.parent.getPassage(reference=_prev)
 
     def __parse(self):
         """ Given self.resource, split informations from the CTS API
@@ -239,7 +246,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :param resource: XML Resource
         :type resource: etree._Element
         :return: Tuple representing previous and next urn
-        :rtype: (str, str)
+        :rtype: (URN, URN)
         """
         _prev, _next = None, None
         resource = MyCapytain.common.utils.xmlparser(resource)
@@ -251,10 +258,10 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
             _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
 
             if len(_next_xpath):
-               _next = _next_xpath[0]
+               _next = MyCapytain.common.reference.URN(_next_xpath[0])
 
             if len(_prev_xpath):
-                _prev = _prev_xpath[0]
+                _prev = MyCapytain.common.reference.URN(_prev_xpath[0])
 
         return _prev, _next
 

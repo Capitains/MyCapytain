@@ -651,6 +651,7 @@ class Citation(object):
         :returns: Xpath to find the passage
 
         :example:
+
             citation = Citation(
                 name="line",
                 scope="/TEI/text/body/div/div[@n=\"?\"]",

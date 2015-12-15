@@ -321,7 +321,7 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         # When next does not exist from the original resource
-        __prev  = passage.prev
+        __prev = passage.prev
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
         self.assertIsInstance(__prev, Passage)

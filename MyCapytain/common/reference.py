@@ -644,13 +644,30 @@ class Citation(object):
         """ Fill the xpath with given informations
 
         :param passage: Passage reference
-        :type passage: Reference or lsit
+        :type passage: Reference or list or None. Can be list of None and not None
         :param xpath: If set to True, will return the replaced self.xpath value and not the whole self.refsDecl
         :type xpath: Boolean
         :rtype: basestring
         :returns: Xpath to find the passage
+
+        :example:
+            citation = Citation(
+                name="line",
+                scope="/TEI/text/body/div/div[@n=\"?\"]",
+                xpath="//l[@n=\"?\"]"
+            )
+            print(citation.fill(["1", None]))
+            # /TEI/text/body/div/div[@n='1']//l[@n]
+            print(citation.fill(None))
+            # /TEI/text/body/div/div[@n]//l[@n]
+            print(citation.fill(Reference("1.1"))
+            # /TEI/text/body/div/div[@n='1']//l[@n='1']
+            print(citation.fill("1", xpath=True)
+            # //l[@n='1']
+
+
         """
-        if xpath is True: # Then passage is a string or None
+        if xpath is True:  # Then passage is a string or None
             xpath = self.xpath
 
             if passage is None:
@@ -662,11 +679,17 @@ class Citation(object):
         else:        
             if isinstance(passage, Reference):
                 passage = passage[2]
-            passage = iter(passage)    
+            elif passage is None:
+                return REFERENCE_REPLACER.sub(
+                    r"\1",
+                    self.refsDecl
+                )
+            passage = iter(passage)
             return REFERENCE_REPLACER.sub(
                 lambda m: REF_REPLACER(m, passage),
                 self.refsDecl
             )
+
 
 def REF_REPLACER(match, passage):
     """ Helper to replace xpath/scope/refsDecl on iteration with passage value

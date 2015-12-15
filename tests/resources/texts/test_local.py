@@ -13,7 +13,7 @@ import MyCapytain.common.reference
 import MyCapytain.common.utils
 import MyCapytain.errors
 
-        
+
 
 class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 

@@ -12,8 +12,6 @@ from MyCapytain.endpoints.cts5 import CTS
 from MyCapytain.common.reference import Reference, URN
 from lxml import etree
 import mock
-import responses
-import requests
 
 with open("tests/testing_data/cts/getValidReff.xml") as f:
     GET_VALID_REFF = xmlparser(f)
@@ -256,7 +254,6 @@ class TestCTSPassage(unittest.TestCase):
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
         self.text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
 
-    @responses.activate
     def test_next_getprevnext(self):
         """ Test next property, given that next information already exists or not)
         """

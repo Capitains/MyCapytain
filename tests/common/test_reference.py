@@ -13,6 +13,12 @@ class TestReferenceImplementation(unittest.TestCase):
         a = Reference("1-1")
         self.assertEqual(str(a), "1-1")
 
+    def test_len_ref(self):
+        a = Reference("1.1@Achilles[0]-1.10@Atreus[3]")
+        self.assertEqual(len(a), 2)
+        a = Reference("1.1.1")
+        self.assertEqual(len(a), 3)
+
     def test_str_getitem(self):
         a = Reference("1.1@Achilles[0]-1.10@Atreus[3]")
         self.assertEqual(a["any"], "1.1@Achilles[0]-1.10@Atreus[3]")

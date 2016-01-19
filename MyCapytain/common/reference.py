@@ -141,6 +141,11 @@ class Reference(object):
         else:
             return self.reference
 
+    def __len__(self):
+        """ Return depth of Reference (Start list)
+        """
+        return len(self.parsed[0][1])
+
     def __model(self):
         """ 3-Tuple model for references
         

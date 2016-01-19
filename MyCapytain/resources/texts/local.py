@@ -38,13 +38,12 @@ class Text(text.Text):
     """
 
     def __init__(self, urn=None, citation=None, resource=None, autoreffs=True):
+        super(Text, self).__init__(urn=urn, citation=citation)
         self._passages = OrderedDict()  # Represents real full passages / reffs informations. Only way to set it up is getValidReff without passage ?
         self._orphan = defaultdict(Reference)  # Represents passage we got without asking for all. Storing convenience ?
 
         self._cRefPattern = MyCapytain.resources.texts.tei.Citation()
-        self.resource = None
         self.xml = None
-        self._URN = None
 
         if citation is not None:
             self.citation = citation
@@ -119,7 +118,7 @@ class Text(text.Text):
         if isinstance(reference, MyCapytain.common.reference.Reference):
             reference = reference["start_list"]
 
-        reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1 )]
+        reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
         passages = [self._passages]
         while len(reference) > 0:
             passages = [passage for sublist in [p.get(reference[0]) for p in passages] for passage in sublist]

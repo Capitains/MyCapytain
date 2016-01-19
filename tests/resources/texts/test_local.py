@@ -29,6 +29,11 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
     def tearDown(self):
         self.text.close()
 
+    def testURN(self):
+        """ Check that urn is set"""
+        TEI = MyCapytain.resources.texts.local.Text(resource=self.TEI.xml, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.assertEqual(str(TEI.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+
     def testFindCitation(self):
         self.assertEqual(
             str(self.TEI.citation),

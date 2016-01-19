@@ -49,8 +49,8 @@ class Resource(object):
             return False
         elif self.resource is None:
             # Not totally true
-            return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn)
-        return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn) and self.resource == other.resource
+            return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn
+        return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn and self.resource == other.resource
 
     def __str__(self):
         raise NotImplementedError()
@@ -79,7 +79,6 @@ class Resource(object):
                 children = self.texts
 
             order = ["", "", "textgroup", "work", "text"]
-
             while i <= len(urn) - 1:
                 children = children[urn[order[i]]]
                 if not hasattr(children, "urn") or str(children.urn) != urn[order[i]]:

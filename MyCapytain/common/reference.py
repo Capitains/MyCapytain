@@ -237,7 +237,11 @@ class URN(object):
 
         """
         
-        items = [key for key in self.parsed if key not in ["passage", "reference", "full"] ]
+        items = [
+            key
+            for key, value in self.parsed.items()
+            if key not in ["passage", "reference", "full"] and value is not None
+        ]
         return len(items)
 
     def __gt__(self, other):
@@ -320,6 +324,7 @@ class URN(object):
             - *5* :  Text of the URN
             - *text* : URN until the Text
             - *6* or *passage*:  Passage of URN
+            - *reference* : Passage of URN
 
         :param key: Identifier of the wished resource
         :type key: int or basestring
@@ -341,48 +346,45 @@ class URN(object):
                 "urn",
                 self.parsed["urn_namespace"],
                 self.parsed["cts_namespace"]])
-        elif key == "textgroup" and "textgroup" in self.parsed:
+        elif key == "textgroup" and self.parsed["textgroup"]:
             return ":".join([
                 "urn",
                 self.parsed["urn_namespace"],
                 self.parsed["cts_namespace"],
                 self.parsed["textgroup"]
             ])
-        elif key == "work" and "work" in self.parsed:
+        elif key == "work" and self.parsed["work"]:
             return ":".join([
                 "urn",
                 self.parsed["urn_namespace"],
                 self.parsed["cts_namespace"],
-                ".".join(
-                    [
-                        self.parsed["textgroup"],
-                        self.parsed["work"]
-                    ])
+                ".".join([
+                    self.parsed["textgroup"],
+                    self.parsed["work"]
+                ])
             ])
-        elif key == "text" and "text" in self.parsed:
+        elif key == "text" and self.parsed["text"]:
             return ":".join([
                 "urn",
                 self.parsed["urn_namespace"],
                 self.parsed["cts_namespace"],
-                ".".join(
-                    [
+                ".".join([
+                    self.parsed["textgroup"],
+                    self.parsed["work"],
+                    self.parsed["text"]
+                ])
+            ])
+        elif key == "passage" and self.parsed["passage"]:
+            if self.parsed["text"]:
+                return ":".join([
+                    "urn",
+                    self.parsed["urn_namespace"],
+                    self.parsed["cts_namespace"],
+                    ".".join([
                         self.parsed["textgroup"],
                         self.parsed["work"],
                         self.parsed["text"]
-                    ])
-            ])
-        elif key == "passage" and "passage" in self.parsed:
-            if "text" in self.parsed:
-                return ":".join([
-                    "urn",
-                    self.parsed["urn_namespace"],
-                    self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"],
-                            self.parsed["text"]
-                        ]),
+                    ]),
                     self.parsed["passage"]
                 ])
             else:
@@ -390,25 +392,23 @@ class URN(object):
                     "urn",
                     self.parsed["urn_namespace"],
                     self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"]
-                        ]),
+                    ".".join([
+                        self.parsed["textgroup"],
+                        self.parsed["work"]
+                    ]),
                     self.parsed["passage"]
                 ])
-        elif key == "start" and "passage" in self.parsed:
-            if "text" in self.parsed:
+        elif key == "start" and self.parsed["passage"]:
+            if self.parsed["text"]:
                 return ":".join([
                     "urn",
                     self.parsed["urn_namespace"],
                     self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"],
-                            self.parsed["text"]
-                        ]),
+                    ".".join([
+                        self.parsed["textgroup"],
+                        self.parsed["work"],
+                        self.parsed["text"]
+                    ]),
                     self.parsed["reference"]["start"]
                 ])
             else:
@@ -416,15 +416,14 @@ class URN(object):
                     "urn",
                     self.parsed["urn_namespace"],
                     self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"]
-                        ]),
+                    ".".join([
+                        self.parsed["textgroup"],
+                        self.parsed["work"]
+                    ]),
                     self.parsed["reference"]["start"]
                 ])
-        elif key == "end" and "passage" in self.parsed and self.parsed["reference"]["end"] is not None:
-            if "text" in self.parsed:
+        elif key == "end" and self.parsed["passage"] and self.parsed["reference"]["end"] is not None:
+            if self.parsed["text"]:
                 return ":".join([
                     "urn",
                     self.parsed["urn_namespace"],
@@ -454,16 +453,27 @@ class URN(object):
         else:
             return None
 
+    def __model(self):
+        return {
+            "full": None,
+            "urn_namespace": None,
+            "cts_namespace": None,
+            "textgroup": None,
+            "work": None,
+            "text": None,
+            "passage": None,
+            "reference": None
+        }
+
     def __parse(self, urn):
         """ Parse a URN
-        
 
         :param urn: A URN:CTS
         :type urn: basestring
         :rtype: defaultdict.basestring
         :returns: Dictionary representation
         """
-        parsed = defaultdict(str)
+        parsed = self.__model()
         parsed["full"] = urn.split("#")[0]
         urn = parsed["full"].split(":")
         if isinstance(urn, list) and len(urn) > 2:

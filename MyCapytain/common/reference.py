@@ -448,7 +448,7 @@ class URN(object):
                 ])
         elif key == "full":
             return self.parsed["full"]
-        elif key == "reference" and "reference" in self.parsed:
+        elif key == "reference" and self.parsed["reference"]:
             return self.parsed["reference"]
         else:
             return None

@@ -3,6 +3,7 @@
 .idea
 build
 env
+src
 
 # Setuptools distribution folder.
 /dist/

@@ -19,8 +19,7 @@ from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 import MyCapytain.resources.texts.tei
-
-
+from lxml import etree
 
 
 class Text(text.Text):
@@ -107,14 +106,19 @@ class Text(text.Text):
                 child=value.child
             )
 
-    def getPassage(self, reference):
+    def getPassage(self, reference, hypercontext=False):
         """ Finds a passage in the current text
 
         :param reference: Identifier of the subreference / passages
         :type reference: List, MyCapytain.common.reference.Reference
+        :param hypercontext: If set to true, retrieves nodes up to the given one, cleaning non required siblings.
+        :type hypercontext: bool
         :rtype: Passage
         :returns: Asked passage
         """
+        if hypercontext is True:
+            return self._getPassageContext(reference)
+
         if isinstance(reference, MyCapytain.common.reference.Reference):
             reference = reference["start_list"]
 
@@ -125,6 +129,94 @@ class Text(text.Text):
             reference.pop(0)
 
         return passages[0]
+
+    def _getPassageContext(self, reference):
+        """ Retrieves nodes up to the given one, cleaning non required siblings.
+
+        :param reference: Identifier of the subreference / passages
+        :type reference: List, MyCapytain.common.reference.Reference
+        :rtype: Passage
+        :returns: Asked passage
+        """
+        if isinstance(reference, list):
+            start, end = reference, reference
+        elif len(reference["end_list"]) == 0 or isinstance(reference, list):
+            start, end = reference["start_list"], reference["start_list"]
+        else:
+            start, end = reference["start_list"], reference["end_list"]
+
+        ls = "/a/b//c[e]".split("/")
+
+        if len(start) > len(self.citation):
+            raise ReferenceError("URN is deeper than citation scheme")
+        citation = [citation for citation in self.citation][len(start)-1]
+
+        start, end = citation.fill(passage=start), citation.fill(passage=end)
+
+        nodes = etree._ElementTree()
+
+        start, end = start.split("/")[2:], end.split("/")[2:]
+
+        nodes._setroot(self.xml)
+        print(etree.tostring(nodes, encoding=str))
+
+        return start, end
+
+    def _passageLoop(self, parent, xpath1, xpath2):
+        """
+
+        :param parent:
+        :param xpath:
+        :return:
+        """
+        xpath1_reduced = xpath1[1:]
+        xpath2_reduced = xpath2[1:]
+
+        xpath_result_1 = parent.xpath()
+
+        if xpath1 != xpath2:
+            xpath_result_2 = parent.xpath()
+        else:
+            xpath_result_2 = xpath_result_1
+
+        if xpath_result_1 == xpath_result_2:
+            child = xpath_result_1[0]
+            child.append(self._passageLoop(child, xpath1_reduced, xpath2_reduced))
+            return parent.append(child)
+        else:
+            children = list(parent)
+            index_1 = children.index(xpath_result_1[0])
+            index_2 = children.index(xpath_result_2[0])
+            parent.append([child for child in children if index_1 < children.index(child) < index_2])
+
+    def _copyNode(self, node, children=False, parent=False):
+        """
+
+        :param node:
+        :param children:
+        :param parent:
+        :return:
+        """
+        if parent:
+            element = etree.SubElement(
+                parent,
+                node.tag,
+                attr=node.attrib,
+                nsmap={
+                    None: "http://www.tei-c.org/ns/1.0"
+                }
+            )
+        else:
+            element = etree.Element(
+                node.tag,
+                attrib=node.attrib,
+                nsmap={None: "http://www.tei-c.org/ns/1.0"}
+            )
+        if children:
+            element.text = node.text
+            for child in node:
+                element.append(child)
+        return element
 
     def getPassagePlus(self, reference):
         """ Finds a passage in the current text with its previous and following node

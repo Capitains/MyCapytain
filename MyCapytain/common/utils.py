@@ -61,4 +61,3 @@ def xmlparser(xml):
     if doclose:
         xml.close()
     return parsed
-

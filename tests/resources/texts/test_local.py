@@ -6,6 +6,8 @@ from six import text_type as str
 from io import open
 import xmlunittest
 import warnings
+from lxml import etree
+from copy import copy
 
 import MyCapytain.resources.texts.local
 import MyCapytain.resources.texts.tei
@@ -22,6 +24,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
     def setUp(self):
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
         self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
+        self.treeroot = etree._ElementTree()
 
         with open("tests/testing_data/texts/text_or_xpath.xml") as f:
             self.text_complex = MyCapytain.resources.texts.local.Text(resource=f)
@@ -71,7 +74,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         self.assertEqual(a.citation.scope, "/tei:TEI/tei:text/tei:body/tei:div")
         self.assertEqual(a.citation.xpath, "/tei:div[@n='?']")
 
-    def testFindCitation(self):
+    def testValidReffs(self):
         # Test level 1
         self.assertEqual(self.TEI.getValidReff(), ["1", "2"])
         # Test level 2
@@ -156,6 +159,63 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         self.assertEqual(a.prev, ["1", "pr", "1"])
         self.assertEqual(a.next, ["1", "pr", "3"])
         self.assertEqual(a.passage.text(), "tum, ut de illis queri non possit quisquis de se bene ")
+
+    def test_get_Passage_context(self):
+        """ Check that get Passage contexts return right information """"""
+        simple = self.TEI.getPassage(["1", "pr", "2"], hypercontext=True)
+        self.assertEqual(
+            simple, (["1", "pr", "2"], ["1", "pr", "2"]),
+            "There should be two lists"
+        )
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=True)
+        self.assertEqual(
+            simple, (["1", "pr", "2"], ["1", "pr", "2"]),
+            "There should be two lists"
+        )
+        complex = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.1-1.pr.7"), hypercontext=True)
+        self.assertEqual(
+            complex, (["1", "pr", "1"], ["1", "pr", "7"])
+        )"""
+
+    def test_copy_node_without_children(self):
+        node = MyCapytain.common.utils.xmlparser("<a b='foo' xmlns='http://www.tei-c.org/ns/1.0'>M<b>c</b></a>")
+
+        no_text = copy(node)
+        no_text.text = None  # Remove text
+        [no_text.remove(a) for a in no_text]  # Remove nodes
+        copied_node = self.TEI._copyNode(node)
+        self.assertEqual(
+            etree.tostring(copied_node),
+            etree.tostring(no_text),
+            "Text without children should have no text nor xml nodes"
+        )
+        self.assertNotIn(
+            "<b>",
+            etree.tostring(copied_node, encoding=str),
+            "Text without children should have no text nor xml nodes"
+        )
+        self.assertNotIn(
+            "M",
+            etree.tostring(copied_node, encoding=str),
+            "Text without children should have no text nor xml nodes"
+        )
+
+    def test_copy_node_with_children(self):
+        node = MyCapytain.common.utils.xmlparser("<a b='foo' xmlns='http://www.tei-c.org/ns/1.0'>M<b>c</b></a>")
+        comparison = copy(node)
+
+        copied_node = self.TEI._copyNode(node, children=True)
+        self.assertEqual(
+            etree.tostring(copied_node),
+            etree.tostring(comparison),
+            "Text without children should have no text nor xml nodes"
+        )
+        self.assertIn(
+            "<b>",
+            etree.tostring(copied_node, encoding=str),
+            "Text without children should have no text nor xml nodes"
+        )
+
 
 
 class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):

@@ -189,7 +189,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Empty list element should be replaced with / in the next element"
         )
 
-    def test_get_Passage_context(self):
+    def test_get_Passage_context_no_double_slash(self):
         """ Check that get Passage contexts return right information """
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=True)
         str_simple = etree.tostring(simple, encoding=str)
@@ -199,9 +199,87 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         )
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
-            "tum, ut de illis queri non possit quisquis de se bene"
+            "tum, ut de illis queri non possit quisquis de se bene",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (One reference Passage)"
         )
-        pass
+
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.pr.7"), hypercontext=True)
+        str_simple = etree.tostring(simple, encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.TEI.citation
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            "tum, ut de illis queri non possit quisquis de se bene",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.3")).text().strip(),
+            "senserit, cum salva infimarum quoque personarum re-",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
+        )
+        self.assertEqual(
+            text.getValidReff(level=3),
+            ["1.pr.2", "1.pr.3", "1.pr.4", "1.pr.5", "1.pr.6", "1.pr.7"],
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
+        )
+
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.1.6"), hypercontext=True)
+        str_simple = etree.tostring(simple, encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.TEI.citation
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            "tum, ut de illis queri non possit quisquis de se bene",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.1.6")).text().strip(),
+            "Rari post cineres habent poetae.",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
+        )
+        self.assertEqual(
+            text.getValidReff(level=3),
+            [
+                "1.pr.2", "1.pr.3", "1.pr.4", "1.pr.5", "1.pr.6", "1.pr.7",
+                "1.pr.8", "1.pr.9", "1.pr.10", "1.pr.11", "1.pr.12", "1.pr.13",
+                "1.pr.14", "1.pr.15", "1.pr.16", "1.pr.17", "1.pr.18", "1.pr.19",
+                "1.pr.20", "1.pr.21", "1.pr.22",
+                "1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.1.5", "1.1.6",
+            ],
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
+        )
+
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.2"), hypercontext=True)
+        str_simple = etree.tostring(simple, encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.TEI.citation
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            "tum, ut de illis queri non possit quisquis de se bene",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.1.6")).text().strip(),
+            "Rari post cineres habent poetae.",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+        self.assertEqual(
+            text.getValidReff(level=3),
+            [
+                "1.pr.2", "1.pr.3", "1.pr.4", "1.pr.5", "1.pr.6", "1.pr.7",
+                "1.pr.8", "1.pr.9", "1.pr.10", "1.pr.11", "1.pr.12", "1.pr.13",
+                "1.pr.14", "1.pr.15", "1.pr.16", "1.pr.17", "1.pr.18", "1.pr.19",
+                "1.pr.20", "1.pr.21", "1.pr.22",
+                "1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.1.5", "1.1.6",
+            ],
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
 
     def test_copy_node_without_children(self):
         node = MyCapytain.common.utils.xmlparser("<a b='foo' xmlns='http://www.tei-c.org/ns/1.0'>M<b>c</b></a>")

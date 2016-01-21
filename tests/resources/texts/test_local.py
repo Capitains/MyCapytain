@@ -253,6 +253,31 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
 
+    def test_get_passage_hypercontext_complex_xpath(self):
+        simple = self.text_complex.getPassage(MyCapytain.common.reference.Reference("pr.1-1.2"), hypercontext=True)
+        str_simple = etree.tostring(simple, encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.text_complex.citation
+        )
+        self.assertIn(
+            "Pervincis tandem",
+            text.getPassage(MyCapytain.common.reference.Reference("pr.1")).text(exclude=["tei:note"]).strip(),
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.2")).text().strip(),
+            "lusimus quos in Suebae gratiam virgunculae,",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+        self.assertEqual(
+            text.getValidReff(level=2),
+            [
+                "pr.1", "1.1", "1.2"
+            ],
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+
 
 class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test passage implementation """

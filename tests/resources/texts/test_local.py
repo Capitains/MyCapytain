@@ -29,6 +29,9 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         with open("tests/testing_data/texts/text_or_xpath.xml") as f:
             self.text_complex = MyCapytain.resources.texts.local.Text(resource=f)
 
+        with open("tests/testing_data/texts/seneca.xml") as f:
+            self.seneca = MyCapytain.resources.texts.local.Text(resource=f)
+
     def tearDown(self):
         self.text.close()
 
@@ -275,6 +278,46 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             [
                 "pr.1", "1.1", "1.2"
             ],
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+
+    def test_get_passage_hypercontext_double_slash_xpath(self):
+        simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1-10"), hypercontext=True)
+        str_simple = etree.tostring(simple, encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.seneca.citation
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1")).text(exclude=["tei:note"]).strip(),
+            "Di coniugales tuque genialis tori,",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("10")).text().strip(),
+            "aversa superis regna manesque impios",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+        self.assertEqual(
+            text.getValidReff(level=1),
+            ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+
+        simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=True)
+        str_simple = etree.tostring(simple, encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.seneca.citation
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1")).text(exclude=["tei:note"]).strip(),
+            "Di coniugales tuque genialis tori,",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+        self.assertEqual(
+            text.getValidReff(level=1),
+            ["1"],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
 

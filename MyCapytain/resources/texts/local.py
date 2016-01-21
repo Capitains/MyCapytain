@@ -15,7 +15,7 @@ from past.builtins import basestring
 import warnings
 
 from MyCapytain.errors import DuplicateReference, RefsDeclError
-from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop
+from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 import MyCapytain.resources.texts.tei
@@ -155,7 +155,7 @@ class Text(text.Text):
 
         nodes = etree._ElementTree()
 
-        start, end = start.split("/")[2:], end.split("/")[2:]
+        start, end = normalizeXpath(start.split("/")[2:]), normalizeXpath(end.split("/")[2:])
 
         root = copyNode(self.xml)
         nodes._setroot(root)

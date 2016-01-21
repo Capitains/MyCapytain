@@ -86,24 +86,26 @@ def performXpath(parent, xpath):
 
     :param parent:
     :param xpath:
-    :return:
+    :return: (Result, Loop Indicator)
     """
+    loop = False
     if xpath.startswith(".//"):
         result = parent.xpath(
-            parent.replace(".//", "./"),
+            xpath.replace(".//", "./"),
             namespaces=NS
         )
         if len(result) == 0:
             result = parent.xpath(
-                xpath,
+                "*[{}]".format(xpath),
                 namespaces=NS
             )
+            loop = True
     else:
         result = parent.xpath(
             xpath,
             namespaces=NS
         )
-    return result
+    return result[0], loop
 
 
 def copyNode(node, children=False, parent=False):
@@ -163,7 +165,9 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
 
     current_1, queue_1 = formatXpath(xpath1)
     if xpath2 is None:  # In case we need what is following or preceding our node
-        result_1 = performXpath(parent, current_1)[0]
+        result_1, loop = performXpath(parent, current_1)
+        if loop is True:
+            queue_1 = xpath1
         siblings = list(parent)
         index_1 = siblings.index(result_1)
         children = len(queue_1) == 0
@@ -194,16 +198,23 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
                 following_siblings=following_siblings
             )
     else:
-        current_2, queue_2 = formatXpath(xpath2)
 
-        result_1 = performXpath(parent, current_1)
+        result_1, loop = performXpath(parent, current_1)
+        if loop is True:
+            queue_1 = xpath1
+            if xpath2 == xpath1:
+                current_2, queue_2 = current_1, queue_1
+            else:
+                current_2, queue_2 = formatXpath(xpath2)
+        else:
+            current_2, queue_2 = formatXpath(xpath2)
 
         if xpath1 != xpath2:
-            result_2 = performXpath(parent, current_2)
-            result_1 = result_1[0]
-            result_2 = result_2[0]
+            result_2, loop = performXpath(parent, current_2)
+            if loop is True:
+                queue_2 = xpath2
         else:
-            result_2 = result_1 = result_1[0]
+            result_2 = result_1
 
         if result_1 == result_2:
             children = len(queue_1) == 0

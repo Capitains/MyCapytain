@@ -106,7 +106,7 @@ class Text(text.Text):
                 child=value.child
             )
 
-    def getPassage(self, reference, hypercontext=False):
+    def getPassage(self, reference, hypercontext=True):
         """ Finds a passage in the current text
 
         :param reference: Identifier of the subreference / passages
@@ -163,7 +163,7 @@ class Text(text.Text):
 
         return root
 
-    def getPassagePlus(self, reference):
+    def getPassagePlus(self, reference, hypercontext=False):
         """ Finds a passage in the current text with its previous and following node
 
         :param reference: Identifier of the subreference / passages
@@ -171,7 +171,7 @@ class Text(text.Text):
         :rtype: text.PassagePlus
         :returns: Asked passage with metainformations
         """
-        P = self.getPassage(reference=reference)
+        P = self.getPassage(reference=reference, hypercontext=hypercontext)
         return text.PassagePlus(P, P.prev.id, P.next.id)
 
     def getValidReff(self, level=1, reference=None):

@@ -148,16 +148,16 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             self.TEI.urn = 2
 
     def test_get_passage(self):
-        a = self.TEI.getPassage(["1", "pr", "2"])
+        a = self.TEI.getPassage(["1", "pr", "2"], hypercontext=False)
         self.assertEqual(a.text(), "tum, ut de illis queri non possit quisquis de se bene ")
         # With reference
-        a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"))
+        a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), hypercontext=False)
         self.assertEqual(a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
     def test_get_passage_plus(self):
         """ Test GetPassage Plus """
         # No label in local 
-        a = self.TEI.getPassagePlus(["1", "pr", "2"])
+        a = self.TEI.getPassagePlus(["1", "pr", "2"], hypercontext=False)
 
         self.assertEqual(a.prev, ["1", "pr", "1"])
         self.assertEqual(a.next, ["1", "pr", "3"])
@@ -165,31 +165,31 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def test_get_Passage_context_no_double_slash(self):
         """ Check that get Passage contexts return right information """
-        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=True)
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"))
         str_simple = etree.tostring(simple, encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (One reference Passage)"
         )
 
-        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.pr.7"), hypercontext=True)
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.pr.7"))
         str_simple = etree.tostring(simple, encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.3")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.3"), hypercontext=False).text().strip(),
             "senserit, cum salva infimarum quoque personarum re-",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
         )
@@ -199,19 +199,19 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
         )
 
-        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.1.6"), hypercontext=True)
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.1.6"))
         str_simple = etree.tostring(simple, encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.1.6")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.1.6"), hypercontext=False).text().strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
@@ -227,19 +227,19 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
 
-        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.2"), hypercontext=True)
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.2"))
         str_simple = etree.tostring(simple, encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.1.6")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.1.6"), hypercontext=False).text().strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -257,7 +257,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         )
 
     def test_get_passage_hypercontext_complex_xpath(self):
-        simple = self.text_complex.getPassage(MyCapytain.common.reference.Reference("pr.1-1.2"), hypercontext=True)
+        simple = self.text_complex.getPassage(MyCapytain.common.reference.Reference("pr.1-1.2"))
         str_simple = etree.tostring(simple, encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
@@ -265,11 +265,11 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         )
         self.assertIn(
             "Pervincis tandem",
-            text.getPassage(MyCapytain.common.reference.Reference("pr.1")).text(exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("pr.1"), hypercontext=False).text(exclude=["tei:note"]).strip(),
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.2")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.2"), hypercontext=False).text().strip(),
             "lusimus quos in Suebae gratiam virgunculae,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -282,19 +282,19 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         )
 
     def test_get_passage_hypercontext_double_slash_xpath(self):
-        simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1-10"), hypercontext=True)
+        simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1-10"))
         str_simple = etree.tostring(simple, encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1")).text(exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(exclude=["tei:note"]).strip(),
             "Di coniugales tuque genialis tori,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("10")).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("10"), hypercontext=False).text().strip(),
             "aversa superis regna manesque impios",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -304,14 +304,14 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
 
-        simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=True)
+        simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1"))
         str_simple = etree.tostring(simple, encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1")).text(exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(exclude=["tei:note"]).strip(),
             "Di coniugales tuque genialis tori,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -370,23 +370,23 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
     def test_next(self):
         """ Test next property """
         # Normal passage checking
-        p = self.TEI.getPassage(["1", "pr", "1"])
+        p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(p.next.id, ["1", "pr", "2"])
 
         # End of lowest level passage checking but not end of parent level
-        p = self.TEI.getPassage(["1", "pr", "22"])
+        p = self.TEI.getPassage(["1", "pr", "22"], hypercontext=False)
         self.assertEqual(p.next.id, ["1", "1", "1"])
 
         # End of lowest level passage and end of parent level
-        p = self.TEI.getPassage(["1", "39", "8"])
+        p = self.TEI.getPassage(["1", "39", "8"], hypercontext=False)
         self.assertEqual(p.next.id, ["2", "pr", "sa"])
 
         # Last line should always be None
-        p = self.TEI.getPassage(["2", "40", "8"])
+        p = self.TEI.getPassage(["2", "40", "8"], hypercontext=False)
         self.assertIsNone(p.next)
-        p = self.TEI.getPassage(["2", "40"])
+        p = self.TEI.getPassage(["2", "40"], hypercontext=False)
         self.assertIsNone(p.next)
-        p = self.TEI.getPassage(["2"])
+        p = self.TEI.getPassage(["2"], hypercontext=False)
         self.assertIsNone(p.next)
 
     def test_children(self):
@@ -395,52 +395,52 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         with open("tests/testing_data/texts/sample.xml", "rb") as text:
             self.TEI = MyCapytain.resources.texts.local.Text(resource=text)
 
-            p = self.TEI.getPassage(["1", "pr"])
+            p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
             self.assertEqual(p.children["1.pr.1"].id, ["1", "pr", "1"])
 
-            p = self.TEI.getPassage(["1", "pr", "1"])
+            p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
             self.assertEqual(len(p.children), 0)
 
     def test_first(self):
         """ Test first property """
         # Test when there is one
-        p = self.TEI.getPassage(["1", "pr"])
+        p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
         self.assertEqual(p.first.id, ["1", "pr", "1"])
         # #And failing when no first
-        p = self.TEI.getPassage(["1", "pr", "1"])
+        p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(p.first, None)
 
     def test_last(self):
         """ Test last property """
         # Test when there is one
-        p = self.TEI.getPassage(["1", "pr"])
+        p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
         self.assertEqual(p.last.id, ["1", "pr", "22"])
         # #And failing when no last
-        p = self.TEI.getPassage(["1", "pr", "1"])
+        p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(p.last, None)
 
     def test_prev(self):
         """ Test prev property """
         # Normal passage checking
-        p = self.TEI.getPassage(["2", "40", "8"])
+        p = self.TEI.getPassage(["2", "40", "8"], hypercontext=False)
         self.assertEqual(p.prev.id, ["2", "40", "7"])
-        p = self.TEI.getPassage(["2", "40"])
+        p = self.TEI.getPassage(["2", "40"], hypercontext=False)
         self.assertEqual(p.prev.id, ["2", "39"])
-        p = self.TEI.getPassage(["2"])
+        p = self.TEI.getPassage(["2"], hypercontext=False)
         self.assertEqual(p.prev.id, ["1"])
 
         # test failing passage
-        p = self.TEI.getPassage(["1", "pr", "1"])
+        p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(p.prev, None)
-        p = self.TEI.getPassage(["1", "pr"])
+        p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
         self.assertEqual(p.prev, None)
-        p = self.TEI.getPassage(["1"])
+        p = self.TEI.getPassage(["1"], hypercontext=False)
         self.assertEqual(p.prev, None)
 
         # First child should get to parent's prev last child
-        p = self.TEI.getPassage(["1", "1", "1"])
+        p = self.TEI.getPassage(["1", "1", "1"], hypercontext=False)
         self.assertEqual(p.prev.id, ["1", "pr", "22"])
 
         # Beginning of lowest level passage and beginning of parent level
-        p = self.TEI.getPassage(["2", "pr", "sa"])
+        p = self.TEI.getPassage(["2", "pr", "sa"], hypercontext=False)
         self.assertEqual(p.prev.id, ["1", "39", "8"])

@@ -160,35 +160,6 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         self.assertEqual(a.next, ["1", "pr", "3"])
         self.assertEqual(a.passage.text(), "tum, ut de illis queri non possit quisquis de se bene ")
 
-    def test_get_Passage_context(self):
-        """ Check that get Passage contexts return right information """"""
-        simple = self.TEI.getPassage(["1", "pr", "2"], hypercontext=True)
-        self.assertEqual(
-            simple, (["1", "pr", "2"], ["1", "pr", "2"]),
-            "There should be two lists"
-        )
-        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=True)
-        self.assertEqual(
-            simple, (["1", "pr", "2"], ["1", "pr", "2"]),
-            "There should be two lists"
-        )
-        complex = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.1-1.pr.7"), hypercontext=True)
-        self.assertEqual(
-            complex, (["1", "pr", "1"], ["1", "pr", "7"])
-        )"""
-
-    def test_clean_xpath(self):
-        """ Cleaning XPATH and normalizing them """
-        l = ['tei:text', 'tei:body', 'tei:div', "tei:div[@n='1']", "tei:div[@n='pr']", "tei:l[@n='2']"]
-        self.assertEqual(self.TEI._normalizeXpath(l), l)
-
-        l = ['tei:text', 'tei:body', 'tei:div', "tei:div[@n='1']", "", "tei:div[@n='pr']", "tei:l[@n='2']"]
-        self.assertEqual(
-            self.TEI._normalizeXpath(l),
-            ['tei:text', 'tei:body', 'tei:div', "tei:div[@n='1']", "/tei:div[@n='pr']", "tei:l[@n='2']"],
-            "Empty list element should be replaced with / in the next element"
-        )
-
     def test_get_Passage_context_no_double_slash(self):
         """ Check that get Passage contexts return right information """
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=True)
@@ -259,7 +230,6 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             resource=str_simple,
             citation=self.TEI.citation
         )
-        print(text.text())
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
@@ -282,46 +252,6 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             ],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
-
-    def test_copy_node_without_children(self):
-        node = MyCapytain.common.utils.xmlparser("<a b='foo' xmlns='http://www.tei-c.org/ns/1.0'>M<b>c</b></a>")
-
-        no_text = copy(node)
-        no_text.text = None  # Remove text
-        [no_text.remove(a) for a in no_text]  # Remove nodes
-        copied_node = self.TEI._copyNode(node)
-        self.assertEqual(
-            etree.tostring(copied_node),
-            etree.tostring(no_text),
-            "Text without children should have no text nor xml nodes"
-        )
-        self.assertNotIn(
-            "<b>",
-            etree.tostring(copied_node, encoding=str),
-            "Text without children should have no text nor xml nodes"
-        )
-        self.assertNotIn(
-            "M",
-            etree.tostring(copied_node, encoding=str),
-            "Text without children should have no text nor xml nodes"
-        )
-
-    def test_copy_node_with_children(self):
-        node = MyCapytain.common.utils.xmlparser("<a b='foo' xmlns='http://www.tei-c.org/ns/1.0'>M<b>c</b></a>")
-        comparison = copy(node)
-
-        copied_node = self.TEI._copyNode(node, children=True)
-        self.assertEqual(
-            etree.tostring(copied_node),
-            etree.tostring(comparison),
-            "Text without children should have no text nor xml nodes"
-        )
-        self.assertIn(
-            "<b>",
-            etree.tostring(copied_node, encoding=str),
-            "Text without children should have no text nor xml nodes"
-        )
-
 
 
 class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):

@@ -15,7 +15,7 @@ from past.builtins import basestring
 import warnings
 
 from MyCapytain.errors import DuplicateReference, RefsDeclError
-from MyCapytain.common.utils import xmlparser, NS
+from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 import MyCapytain.resources.texts.tei
@@ -157,178 +157,11 @@ class Text(text.Text):
 
         start, end = start.split("/")[2:], end.split("/")[2:]
 
-        root = self._copyNode(self.xml)
+        root = copyNode(self.xml)
         nodes._setroot(root)
-        root = self._passageLoop(self.xml, root, start, end)
+        root = passageLoop(self.xml, root, start, end)
 
         return root
-
-    def _normalizeXpath(self, xpath):
-        """ Normalize XPATH splitted around slashes
-
-        :param xpath: List of xpath elements
-        :type xpath: [str]
-        :return: List of refined xpath
-        :rtype: [str]
-        """
-        new_xpath = []
-        for x in range(0, len(xpath)):
-            if x > 0 and len(xpath[x-1]) == 0:
-                new_xpath.append("/"+xpath[x])
-            elif len(xpath[x]) > 0:
-                new_xpath.append(xpath[x])
-        return new_xpath
-
-    def _passageLoop(self, parent, new_tree, xpath1, xpath2=None, preceding_siblings=False, following_siblings=False):
-        """
-
-        :param parent: Parent on which to perform xpath
-        :param new_tree: Parent on which to add nodes
-        :param xpath: List of xpath elements
-        :type xpath: [str]
-        :return:
-        """
-
-        current_1, queue_1 = self._formatXpath(xpath1)
-        if xpath2 is None:  # In case we need what is following or preceding our node
-            result_1 = self._performXpath(parent, current_1)[0]
-            siblings = list(parent)
-            index_1 = siblings.index(result_1)
-            children = len(queue_1) == 0
-
-            # We fill the gaps using the list option of LXML
-            if preceding_siblings:
-                [
-                    self._copyNode(child, parent=new_tree, children=True)
-                    for child in siblings
-                    if index_1 > siblings.index(child)
-                ]
-                child = self._copyNode(result_1, children=children, parent=new_tree)
-            elif following_siblings:
-                child = self._copyNode(result_1, children=children, parent=new_tree)
-                [
-                    self._copyNode(child, parent=new_tree, children=True)
-                    for child in siblings
-                    if index_1 < siblings.index(child)
-                ]
-
-            if not children:
-                child = self._passageLoop(
-                    result_1,
-                    child,
-                    queue_1,
-                    None,
-                    preceding_siblings=preceding_siblings,
-                    following_siblings=following_siblings
-                )
-        else:
-            current_2, queue_2 = self._formatXpath(xpath2)
-
-            result_1 = self._performXpath(parent, current_1)
-
-            if xpath1 != xpath2:
-                result_2 = self._performXpath(parent, current_2)
-                result_1 = result_1[0]
-                result_2 = result_2[0]
-            else:
-                result_2 = result_1 = result_1[0]
-
-            if result_1 == result_2:
-                children = len(queue_1) == 0
-                child = self._copyNode(result_1, children=children, parent=new_tree)
-                if not children:
-                    child = self._passageLoop(
-                        result_1,
-                        child,
-                        queue_1,
-                        queue_2
-                    )
-            else:
-                children = list(parent)
-                index_1 = children.index(result_1)
-                index_2 = children.index(result_2)
-                # Appends the starting passage
-                children_1 = len(queue_1) == 0
-                child_1 = self._copyNode(result_1, children=children_1, parent=new_tree)
-                if not children_1:
-                    self._passageLoop(result_1, child_1, queue_1, None, following_siblings=True)
-                # Appends what's in between
-                nodes = [
-                    self._copyNode(child, parent=new_tree, children=True)
-                    for child in children
-                    if index_1 < children.index(child) < index_2
-                ]
-                # Appends the Ending passage
-                children_2 = len(queue_2) == 0
-                child_2 = self._copyNode(result_2, children=children_2, parent=new_tree)
-
-                if not children_2:
-                    self._passageLoop(result_2, child_2, queue_2, None, preceding_siblings=True)
-
-        return new_tree
-
-    def _formatXpath(self, xpath):
-        if len(xpath) > 1:
-            current, queue = xpath[0], xpath[1:]
-            current = "./{}[./{}]".format(
-                current,
-                "/".join(queue)
-            )
-        else:
-            current, queue = "./{}".format(xpath[0]), []
-
-        return current, queue
-
-    def _performXpath(self, parent, xpath):
-        """
-
-        :param parent:
-        :param xpath:
-        :return:
-        """
-        if xpath.startswith(".//"):
-            result = parent.xpath(
-                parent.replace(".//", "./"),
-                namespaces=MyCapytain.common.utils.NS
-            )
-            if len(result) == 0:
-                result = parent.xpath(
-                    xpath,
-                    namespaces=MyCapytain.common.utils.NS
-                )
-        else:
-            result = parent.xpath(
-                xpath,
-                namespaces=MyCapytain.common.utils.NS
-            )
-        return result
-
-    def _copyNode(self, node, children=False, parent=False):
-        """
-
-        :param node:
-        :param children:
-        :param parent:
-        :return:
-        """
-        if parent is not False:
-            element = etree.SubElement(
-                parent,
-                node.tag,
-                attrib=node.attrib,
-                nsmap={None: "http://www.tei-c.org/ns/1.0"}
-            )
-        else:
-            element = etree.Element(
-                node.tag,
-                attrib=node.attrib,
-                nsmap={None: "http://www.tei-c.org/ns/1.0"}
-            )
-        if children:
-            element.text = node.text
-            for child in node:
-                element.append(child)
-        return element
 
     def getPassagePlus(self, reference):
         """ Finds a passage in the current text with its previous and following node

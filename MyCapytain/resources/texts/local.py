@@ -157,37 +157,107 @@ class Text(text.Text):
 
         start, end = start.split("/")[2:], end.split("/")[2:]
 
-        nodes._setroot(self.xml)
-        print(etree.tostring(nodes, encoding=str))
+        root = self._copyNode(self.xml)
+        nodes._setroot(root)
+        root.append(self._passageLoop(self.xml, root, start, end))
 
-        return start, end
+        return root
 
-    def _passageLoop(self, parent, xpath1, xpath2):
+    def _normalizeXpath(self, xpath):
+        """ Normalize XPATH splitted around slashes
+
+        :param xpath: List of xpath elements
+        :type xpath: [str]
+        :return: List of refined xpath
+        :rtype: [str]
+        """
+        new_xpath = []
+        for x in range(0, len(xpath)):
+            if x > 0 and len(xpath[x-1]) == 0:
+                new_xpath.append("/"+xpath[x])
+            elif len(xpath[x]) > 0:
+                new_xpath.append(xpath[x])
+        return new_xpath
+
+    def _passageLoop(self, parent, tree_parent, xpath1, xpath2):
+        """
+
+        :param parent: Parent on which to perform xpath
+        :param tree_parent: Parent on which to add nodes
+        :param xpath: List of xpath elements
+        :type xpath: [str]
+        :return:
+        """
+
+        current_1, queue_1 = self._formatXpath(xpath1)
+        current_2, queue_2 = self._formatXpath(xpath1)
+
+        result_1 = self._performXpath(parent, current_1)
+
+        if current_1 != current_2:
+            result_2 = self._performXpath(parent, current_2)
+            result_1 = result_1[0]
+            result_2 = result_2[0]
+        else:
+            result_2 = result_1 = result_1[0]
+
+        if result_1 == result_2:
+            children = len(queue_1) == 0
+            child = self._copyNode(result_1, children=children)
+            if not children:
+                child.append(
+                    self._passageLoop(
+                        result_1,
+                        child,
+                        queue_1,
+                        queue_2
+                    )
+                )
+            return child
+        else:
+            children = list(parent)
+            """
+            index_1 = children.index(xpath_result_1)
+            index_2 = children.index(xpath_result_2)
+            # parent.append([child for child in children if index_1 < children.index(child) < index_2])
+            """
+        return parent
+
+    def _formatXpath(self, xpath):
+        if len(xpath) > 1:
+            current, queue = xpath[0], xpath[1:]
+            current = "./{}[./{}]".format(
+                current,
+                "/".join(queue)
+            )
+        else:
+            current, queue = "./{}".format(xpath[0]), []
+
+        return current, queue
+
+    def _performXpath(self, parent, xpath):
         """
 
         :param parent:
         :param xpath:
         :return:
         """
-        xpath1_reduced = xpath1[1:]
-        xpath2_reduced = xpath2[1:]
-
-        xpath_result_1 = parent.xpath()
-
-        if xpath1 != xpath2:
-            xpath_result_2 = parent.xpath()
+        if xpath.startswith(".//"):
+            result = parent.xpath(
+                parent.replace(".//", "./"),
+                namespaces=MyCapytain.common.utils.NS
+            )
+            if len(result) == 0:
+                result = parent.xpath(
+                    xpath,
+                    namespaces=MyCapytain.common.utils.NS
+                )
         else:
-            xpath_result_2 = xpath_result_1
-
-        if xpath_result_1 == xpath_result_2:
-            child = xpath_result_1[0]
-            child.append(self._passageLoop(child, xpath1_reduced, xpath2_reduced))
-            return parent.append(child)
-        else:
-            children = list(parent)
-            index_1 = children.index(xpath_result_1[0])
-            index_2 = children.index(xpath_result_2[0])
-            parent.append([child for child in children if index_1 < children.index(child) < index_2])
+            result = parent.xpath(
+                xpath,
+                namespaces=MyCapytain.common.utils.NS
+            )
+        return result
 
     def _copyNode(self, node, children=False, parent=False):
         """

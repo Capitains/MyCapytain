@@ -177,6 +177,32 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             complex, (["1", "pr", "1"], ["1", "pr", "7"])
         )"""
 
+    def test_clean_xpath(self):
+        """ Cleaning XPATH and normalizing them """
+        l = ['tei:text', 'tei:body', 'tei:div', "tei:div[@n='1']", "tei:div[@n='pr']", "tei:l[@n='2']"]
+        self.assertEqual(self.TEI._normalizeXpath(l), l)
+
+        l = ['tei:text', 'tei:body', 'tei:div', "tei:div[@n='1']", "", "tei:div[@n='pr']", "tei:l[@n='2']"]
+        self.assertEqual(
+            self.TEI._normalizeXpath(l),
+            ['tei:text', 'tei:body', 'tei:div', "tei:div[@n='1']", "/tei:div[@n='pr']", "tei:l[@n='2']"],
+            "Empty list element should be replaced with / in the next element"
+        )
+
+    def test_get_Passage_context(self):
+        """ Check that get Passage contexts return right information """
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=True)
+        str_simple = etree.tostring(simple, encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.TEI.citation
+        )
+        self.assertEqual(
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
+            "tum, ut de illis queri non possit quisquis de se bene"
+        )
+        pass
+
     def test_copy_node_without_children(self):
         node = MyCapytain.common.utils.xmlparser("<a b='foo' xmlns='http://www.tei-c.org/ns/1.0'>M<b>c</b></a>")
 

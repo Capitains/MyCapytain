@@ -259,6 +259,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             resource=str_simple,
             citation=self.TEI.citation
         )
+        print(text.text())
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1.pr.2")).text().strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
@@ -277,6 +278,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
                 "1.pr.14", "1.pr.15", "1.pr.16", "1.pr.17", "1.pr.18", "1.pr.19",
                 "1.pr.20", "1.pr.21", "1.pr.22",
                 "1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.1.5", "1.1.6",
+                '1.2.1', '1.2.2', '1.2.3', '1.2.4', '1.2.5', '1.2.6', '1.2.7', '1.2.8'
             ],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )

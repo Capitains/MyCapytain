@@ -38,7 +38,7 @@ class Text(text.Text):
 
     def __init__(self, urn=None, citation=None, resource=None, autoreffs=True):
         super(Text, self).__init__(urn=urn, citation=citation)
-        self._passages = OrderedDict()  # Represents real full passages / reffs informations. Only way to set it up is getValidReff without passage ?
+        self._passages = Passage()
         self._orphan = defaultdict(Reference)  # Represents passage we got without asking for all. Storing convenience ?
 
         self._cRefPattern = MyCapytain.resources.texts.tei.Citation()
@@ -195,6 +195,8 @@ class Text(text.Text):
             siblings = list(parent)
             index_1 = siblings.index(result_1)
             children = len(queue_1) == 0
+
+            # We fill the gaps using the list option of LXML
             if preceding_siblings:
                 [
                     self._copyNode(child, parent=new_tree, children=True)
@@ -257,7 +259,7 @@ class Text(text.Text):
                     if index_1 < children.index(child) < index_2
                 ]
                 # Appends the Ending passage
-                children_2 = len(queue_1) == 0
+                children_2 = len(queue_2) == 0
                 child_2 = self._copyNode(result_2, children=children_2, parent=new_tree)
 
                 if not children_2:
@@ -366,6 +368,9 @@ class Text(text.Text):
             nodes.pop(0)
 
         return [".".join(passage.id) for passage in passages]
+
+    def text(self, exclude=None):
+        return self._passages.text(exclude=exclude)
 
 
 class Passage(MyCapytain.resources.texts.tei.Passage):

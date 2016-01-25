@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 import unittest
 from six import text_type as str
 from io import open
@@ -8,7 +7,6 @@ import xmlunittest
 import warnings
 from lxml import etree
 from copy import copy
-
 import MyCapytain.resources.texts.local
 import MyCapytain.resources.texts.tei
 import MyCapytain.common.reference
@@ -16,28 +14,35 @@ import MyCapytain.common.utils
 import MyCapytain.errors
 
 
-
 class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
-
     """ Test XML Implementation of resources found in local file """
 
     def setUp(self):
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
-        self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
+        self.TEI = MyCapytain.resources.texts.local.Text(
+            resource=self.text,
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
+        )
         self.treeroot = etree._ElementTree()
 
         with open("tests/testing_data/texts/text_or_xpath.xml") as f:
-            self.text_complex = MyCapytain.resources.texts.local.Text(resource=f)
+            self.text_complex = MyCapytain.resources.texts.local.Text(
+                resource=f,
+                urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
+            )
 
         with open("tests/testing_data/texts/seneca.xml") as f:
-            self.seneca = MyCapytain.resources.texts.local.Text(resource=f)
+            self.seneca = MyCapytain.resources.texts.local.Text(
+                resource=f
+            )
 
     def tearDown(self):
         self.text.close()
 
     def testURN(self):
         """ Check that urn is set"""
-        TEI = MyCapytain.resources.texts.local.Text(resource=self.TEI.xml, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        TEI = MyCapytain.resources.texts.local.Text(resource=self.TEI.xml,
+                                                    urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(str(TEI.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
     def testFindCitation(self):
@@ -61,7 +66,9 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def testCitationSetters(self):
         d = MyCapytain.resources.texts.tei.Citation()
-        c = MyCapytain.common.reference.Citation(name="ahah", refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']", child=None)
+        c = MyCapytain.common.reference.Citation(name="ahah",
+                                                 refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']",
+                                                 child=None)
         b = MyCapytain.resources.texts.tei.Citation()
         a = MyCapytain.resources.texts.local.Text(citation=b)
         """ Test original setting """
@@ -79,27 +86,40 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def testValidReffs(self):
         # Test level 1
-        self.assertEqual(self.TEI.getValidReff(), ["1", "2"])
+        self.assertEqual(list(map(lambda x: str(x), self.TEI.getValidReff())), ["1", "2"])
         # Test level 2
-        self.assertEqual(self.TEI.getValidReff(level=2)[0], "1.pr")
+        self.assertEqual(list(map(lambda x: str(x), self.TEI.getValidReff(level=2)))[0], "1.pr")
         # Test level 3
-        self.assertEqual(self.TEI.getValidReff(level=3)[0], "1.pr.1")
-        self.assertEqual(self.TEI.getValidReff(level=3)[-1], "2.40.8")
+        self.assertEqual(list(map(lambda x: str(x), self.TEI.getValidReff(level=3)))[0], "1.pr.1")
+        self.assertEqual(list(map(lambda x: str(x), self.TEI.getValidReff(level=3)))[-1], "2.40.8")
 
         # Test with reference and level
-        self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"),level=3)[1], "2.1.2")
-        self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"),level=3)[-1], "2.1.12")
+        self.assertEqual(
+            str(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"), level=3)[1]),
+            "2.1.2"
+        )
+        self.assertEqual(
+            str(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"), level=3)[-1]),
+            "2.1.12"
+        )
 
         # Test with reference and level autocorrected because too small
-        self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"),level=0)[-1], "2.1.12")
-        self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"),level=2)[-1], "2.1.12")
+        self.assertEqual(
+            str(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"), level=0)[-1]),
+            "2.1.12"
+        )
+        self.assertEqual(
+            str(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"), level=2)[-1]),
+            "2.1.12"
+        )
 
         # Test when already too deep
-        self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1.1"),level=3), [])
+        self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1.1"), level=3), [])
 
         # Test wrong citation
-        with self.assertRaises(KeyError): 
-            self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.hellno"),level=3), [])
+        with self.assertRaises(KeyError):
+            self.assertEqual(
+                self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.hellno"), level=3), [])
 
     def test_warning(self):
         with open("tests/testing_data/texts/duplicate_references.xml") as xml:
@@ -107,11 +127,12 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         with warnings.catch_warnings(record=True) as w:
             # Cause all warnings to always be triggered.
             warnings.simplefilter("always")
-            for i in [1,2,3]:
-                passages = text.getValidReff(level=i)
+            for i in [1, 2, 3]:
+                text.getValidReff(level=i)
 
         self.assertEqual(len(w), 3, "There should be warning on each level")
-        self.assertEqual(issubclass(w[-1].category, MyCapytain.errors.DuplicateReference), True, "Warning should be DuplicateReference")
+        self.assertEqual(issubclass(w[-1].category, MyCapytain.errors.DuplicateReference), True,
+                         "Warning should be DuplicateReference")
         self.assertEqual(str(w[0].message), "1", "Warning message should be list of duplicate")
 
     def test_wrong_main_scope(self):
@@ -121,30 +142,30 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def test_reffs(self):
         """ Check that every level is returned trough reffs property """
-        self.assertEqual(("1" in self.TEI.reffs), True)
-        self.assertEqual(("1.pr" in self.TEI.reffs), True)
-        self.assertEqual(("2.40.8" in self.TEI.reffs), True)
+        self.assertEqual(("1" in list(map(lambda x: str(x), self.TEI.reffs))), True)
+        self.assertEqual(("1.pr" in list(map(lambda x: str(x), self.TEI.reffs))), True)
+        self.assertEqual(("2.40.8" in list(map(lambda x: str(x), self.TEI.reffs))), True)
 
     def test_complex_reffs(self):
         """ Test when there is a (something|something) xpath
         """
-        self.assertEqual(("pr.1" in self.text_complex.reffs), True)
+        self.assertEqual(("pr.1" in list(map(lambda x: str(x), self.text_complex.reffs))), True)
 
     def test_urn(self):
         """ Test setters and getters for urn """
 
         # Should work with string
-        self.TEI.urn = "urn:cts:latinLit:tg.wk.v" 
+        self.TEI.urn = "urn:cts:latinLit:tg.wk.v"
         self.assertEqual(isinstance(self.TEI.urn, MyCapytain.common.reference.URN), True)
         self.assertEqual(str(self.TEI.urn), "urn:cts:latinLit:tg.wk.v")
 
         # Test for URN
-        self.TEI.urn = MyCapytain.common.reference.URN("urn:cts:latinLit:tg.wk.v2") 
+        self.TEI.urn = MyCapytain.common.reference.URN("urn:cts:latinLit:tg.wk.v2")
         self.assertEqual(isinstance(self.TEI.urn, MyCapytain.common.reference.URN), True)
         self.assertEqual(str(self.TEI.urn), "urn:cts:latinLit:tg.wk.v2")
 
         # Test it fails if not basestring or URN
-        with self.assertRaises(TypeError): 
+        with self.assertRaises(TypeError):
             self.TEI.urn = 2
 
     def test_get_passage(self):
@@ -159,14 +180,14 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         # No label in local 
         a = self.TEI.getPassagePlus(["1", "pr", "2"], hypercontext=False)
 
-        self.assertEqual(a.prev, ["1", "pr", "1"])
-        self.assertEqual(a.next, ["1", "pr", "3"])
+        self.assertEqual(str(a.prev), "1.pr.1")
+        self.assertEqual(str(a.next), "1.pr.3")
         self.assertEqual(a.passage.text(), "tum, ut de illis queri non possit quisquis de se bene ")
 
     def test_get_Passage_context_no_double_slash(self):
         """ Check that get Passage contexts return right information """
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"))
-        str_simple = etree.tostring(simple, encoding=str)
+        str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
@@ -178,7 +199,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         )
 
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.pr.7"))
-        str_simple = etree.tostring(simple, encoding=str)
+        str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
@@ -194,13 +215,13 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
         )
         self.assertEqual(
-            text.getValidReff(level=3),
+            list(map(lambda x: str(x), text.getValidReff(level=3))),
             ["1.pr.2", "1.pr.3", "1.pr.4", "1.pr.5", "1.pr.6", "1.pr.7"],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
         )
 
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.1.6"))
-        str_simple = etree.tostring(simple, encoding=str)
+        str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
@@ -216,7 +237,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
         self.assertEqual(
-            text.getValidReff(level=3),
+            list(map(lambda x: str(x), text.getValidReff(level=3))),
             [
                 "1.pr.2", "1.pr.3", "1.pr.4", "1.pr.5", "1.pr.6", "1.pr.7",
                 "1.pr.8", "1.pr.9", "1.pr.10", "1.pr.11", "1.pr.12", "1.pr.13",
@@ -228,7 +249,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         )
 
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.2"))
-        str_simple = etree.tostring(simple, encoding=str)
+        str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.TEI.citation
@@ -244,7 +265,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getValidReff(level=3),
+            list(map(lambda x: str(x), text.getValidReff(level=3))),
             [
                 "1.pr.2", "1.pr.3", "1.pr.4", "1.pr.5", "1.pr.6", "1.pr.7",
                 "1.pr.8", "1.pr.9", "1.pr.10", "1.pr.11", "1.pr.12", "1.pr.13",
@@ -258,14 +279,15 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def test_get_passage_hypercontext_complex_xpath(self):
         simple = self.text_complex.getPassage(MyCapytain.common.reference.Reference("pr.1-1.2"))
-        str_simple = etree.tostring(simple, encoding=str)
+        str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.text_complex.citation
         )
         self.assertIn(
             "Pervincis tandem",
-            text.getPassage(MyCapytain.common.reference.Reference("pr.1"), hypercontext=False).text(exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("pr.1"), hypercontext=False).text(
+                exclude=["tei:note"]).strip(),
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
@@ -274,7 +296,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getValidReff(level=2),
+            list(map(lambda x: str(x), text.getValidReff(level=2))),
             [
                 "pr.1", "1.1", "1.2"
             ],
@@ -283,13 +305,14 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def test_get_passage_hypercontext_double_slash_xpath(self):
         simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1-10"))
-        str_simple = etree.tostring(simple, encoding=str)
+        str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(
+                exclude=["tei:note"]).strip(),
             "Di coniugales tuque genialis tori,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -299,24 +322,25 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getValidReff(level=1),
+            list(map(lambda x: str(x), text.getValidReff(level=1))),
             ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
 
         simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1"))
-        str_simple = etree.tostring(simple, encoding=str)
+        str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(
+                exclude=["tei:note"]).strip(),
             "Di coniugales tuque genialis tori,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getValidReff(level=1),
+            list(map(lambda x: str(x), text.getValidReff(level=1))),
             ["1"],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -338,12 +362,12 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         """ Test URN and ids getters/setters """
 
         a = MyCapytain.resources.texts.local.Passage()
- 
-        #~Test simple set up
+
+        # ~Test simple set up
         a.urn = self.URN
         self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         # Test update on ID update
-        a.id = ["1", "pr", "1"]
+        a.reference = "1.pr.1"
         self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
         # Should keep the ID if URN changes
         a.urn = self.URN_2
@@ -352,7 +376,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         a = MyCapytain.resources.texts.local.Passage(urn=self.URN)
         self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         # Test init with id and URN
-        a = MyCapytain.resources.texts.local.Passage(urn=self.URN, id=["1", "pr", "1"])
+        a = MyCapytain.resources.texts.local.Passage(urn=self.URN, reference=["1", "pr", "1"])
         self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
         # Should raise error if not URN for consistency
         with self.assertRaises(TypeError):
@@ -361,25 +385,25 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         a = MyCapytain.resources.texts.local.Passage()
         a.urn = "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1"
         self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
-        self.assertEqual(a.id, ["1", "pr", "1"])
+        self.assertEqual(str(a.reference), "1.pr.1")
         # This should affect id !
         # Test Id value on init
-        a = MyCapytain.resources.texts.local.Passage(id=["1", "pr", "1"])
-        self.assertEqual(a.id, ["1", "pr", "1"])
+        a = MyCapytain.resources.texts.local.Passage(reference=["1", "pr", "1"])
+        self.assertEqual(str(a.reference), "1.pr.1")
 
     def test_next(self):
         """ Test next property """
         # Normal passage checking
         p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
-        self.assertEqual(p.next.id, ["1", "pr", "2"])
+        self.assertEqual(str(p.next.reference), "1.pr.2")
 
         # End of lowest level passage checking but not end of parent level
         p = self.TEI.getPassage(["1", "pr", "22"], hypercontext=False)
-        self.assertEqual(p.next.id, ["1", "1", "1"])
+        self.assertEqual(str(p.next.reference), "1.1.1")
 
         # End of lowest level passage and end of parent level
         p = self.TEI.getPassage(["1", "39", "8"], hypercontext=False)
-        self.assertEqual(p.next.id, ["2", "pr", "sa"])
+        self.assertEqual(str(p.next.reference), "2.pr.sa")
 
         # Last line should always be None
         p = self.TEI.getPassage(["2", "40", "8"], hypercontext=False)
@@ -396,7 +420,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
             self.TEI = MyCapytain.resources.texts.local.Text(resource=text)
 
             p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
-            self.assertEqual(p.children["1.pr.1"].id, ["1", "pr", "1"])
+            self.assertEqual(str(p.children["1.pr.1"].reference), "1.pr.1")
 
             p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
             self.assertEqual(len(p.children), 0)
@@ -405,7 +429,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         """ Test first property """
         # Test when there is one
         p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
-        self.assertEqual(p.first.id, ["1", "pr", "1"])
+        self.assertEqual(str(p.first.reference), "1.pr.1")
         # #And failing when no first
         p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(p.first, None)
@@ -414,7 +438,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         """ Test last property """
         # Test when there is one
         p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
-        self.assertEqual(p.last.id, ["1", "pr", "22"])
+        self.assertEqual(str(p.last.reference), "1.pr.22")
         # #And failing when no last
         p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(p.last, None)
@@ -423,11 +447,11 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         """ Test prev property """
         # Normal passage checking
         p = self.TEI.getPassage(["2", "40", "8"], hypercontext=False)
-        self.assertEqual(p.prev.id, ["2", "40", "7"])
+        self.assertEqual(str(p.prev.reference), "2.40.7")
         p = self.TEI.getPassage(["2", "40"], hypercontext=False)
-        self.assertEqual(p.prev.id, ["2", "39"])
+        self.assertEqual(str(p.prev.reference), "2.39")
         p = self.TEI.getPassage(["2"], hypercontext=False)
-        self.assertEqual(p.prev.id, ["1"])
+        self.assertEqual(str(p.prev.reference), "1")
 
         # test failing passage
         p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
@@ -439,8 +463,28 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
 
         # First child should get to parent's prev last child
         p = self.TEI.getPassage(["1", "1", "1"], hypercontext=False)
-        self.assertEqual(p.prev.id, ["1", "pr", "22"])
+        self.assertEqual(str(p.prev.reference), "1.pr.22")
 
         # Beginning of lowest level passage and beginning of parent level
         p = self.TEI.getPassage(["2", "pr", "sa"], hypercontext=False)
-        self.assertEqual(p.prev.id, ["1", "39", "8"])
+        self.assertEqual(str(p.prev.reference), "1.39.8")
+
+
+class TestPassageRange(unittest.TestCase):
+    def setUp(self):
+        with open("tests/testing_data/texts/sample.xml", "rb") as text:
+            self.text = MyCapytain.resources.texts.local.Text(
+                resource=text, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
+            )
+        self.passage = self.text.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.pr.7"))
+
+    def test_errors(self):
+        """ Ensure that some results throws errors according to some standards """
+        DifferentRangePassage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("1.pr.2-1.2")
+        )
+        with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
+            a = DifferentRangePassage.next
+
+        with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
+            a = DifferentRangePassage.prev

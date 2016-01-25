@@ -18,6 +18,7 @@ from MyCapytain.errors import DuplicateReference, RefsDeclError
 from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
+from MyCapytain.errors import InvalidSiblingRequest
 import MyCapytain.resources.texts.tei
 from lxml import etree
 
@@ -78,7 +79,7 @@ class Text(text.Text):
         except Exception as E:
             raise E
 
-        self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, id=None)
+        self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, reference=None)
 
     @property
     def citation(self):
@@ -120,7 +121,7 @@ class Text(text.Text):
             return self._getPassageContext(reference)
 
         if isinstance(reference, MyCapytain.common.reference.Reference):
-            reference = reference["start_list"]
+            reference = reference.start
 
         reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
         passages = [self._passages]
@@ -140,10 +141,11 @@ class Text(text.Text):
         """
         if isinstance(reference, list):
             start, end = reference, reference
-        elif len(reference["end_list"]) == 0 or isinstance(reference, list):
-            start, end = reference["start_list"], reference["start_list"]
+            reference = Reference(".".join(reference))
+        elif len(reference.end) == 0 or isinstance(reference, list):
+            start, end = reference.start, reference.start
         else:
-            start, end = reference["start_list"], reference["end_list"]
+            start, end = reference.start, reference.end
 
         if len(start) > len(self.citation):
             raise ReferenceError("URN is deeper than citation scheme")
@@ -161,7 +163,14 @@ class Text(text.Text):
         nodes._setroot(root)
         root = passageLoop(self.xml, root, start, end)
 
-        return root
+        if self.urn:
+            urn, reeference = URN("{}:{}".format(self.urn, reference)), reference
+        else:
+            urn, reference = None, reference
+        return ContextPassage(
+            urn=urn,
+            resource=root, parent=self, citation=self.citation
+        )
 
     def getPassagePlus(self, reference, hypercontext=False):
         """ Finds a passage in the current text with its previous and following node
@@ -172,7 +181,7 @@ class Text(text.Text):
         :returns: Asked passage with metainformations
         """
         P = self.getPassage(reference=reference, hypercontext=hypercontext)
-        return text.PassagePlus(P, P.prev.id, P.next.id)
+        return text.PassagePlus(P, P.prev.reference, P.next.reference)
 
     def getValidReff(self, level=1, reference=None):
         """ Retrieve valid passages directly
@@ -200,7 +209,7 @@ class Text(text.Text):
             passages = [passage for sublist in [p.get(nodes[0]) for p in passages] for passage in sublist]
             nodes.pop(0)
 
-        return [".".join(passage.id) for passage in passages]
+        return [passage.reference for passage in passages]
 
     def text(self, exclude=None):
         return self._passages.text(exclude=exclude)
@@ -217,13 +226,13 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
     :type parent: MyCapytain.resources.texts.tei.Passage
     :param citation: Citation for children level
     :type citation: MyCapytain.resources.texts.tei.Citation
-    :param id: Identifier of the subreference without URN informations
-    :type id: List
+    :param reference: Identifier of the subreference without URN informations
+    :type reference: List
 
     .. note:: *id* is used in to identify the current passage in case the URN is unknown
     """
 
-    def __init__(self, urn=None, resource=None, parent=None, citation=None, id=None):
+    def __init__(self, urn=None, resource=None, parent=None, citation=None, reference=None):
         super(Passage, self).__init__(urn=urn, resource=resource, parent=parent)
 
         self.__next = False
@@ -233,25 +242,25 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if isinstance(citation, Citation):
             self.citation = citation
 
-        self.__id = []
+        self.__reference = Reference("")
 
-        if id is not None:
-            self.id = id
+        if reference is not None:
+            self.reference = reference
 
         self.__children = OrderedDict()
         self.__parsed = False
 
     @property
-    def id(self):
+    def reference(self):
         """ Id represents the passage subreference as a list of basestring
 
         :rtype: list
         :returns: Representation of the passage subreference as a list
         """
-        return self.__id
+        return self.__reference
 
-    @id.setter
-    def id(self, value):
+    @reference.setter
+    def reference(self, value):
         """ Set up ID property
 
         :param value: Representation of the passage subreference as a list
@@ -260,7 +269,13 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         .. note:: `Passage.id = [..]` will update automatically the URN property as well if correct
         """
         if isinstance(value, (list, tuple)):
-            self.__id = value
+            self.__reference = Reference(".".join(value))
+            self.__updateURN()
+        elif isinstance(value, str):
+            self.__reference = Reference(value)
+            self.__updateURN()
+        elif isinstance(value, Reference):
+            self.__reference = value
             self.__updateURN()
 
     @property
@@ -295,14 +310,16 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
     def __updateURN(self):
         """ Private method allowing for update of self.id or self.urn
         """
-        if self.id is not None and len(self.id) > 0 and isinstance(self.urn, URN):
-            self.urn = URN(self.urn["text"] + ":" + ".".join(self.id))
-        elif self._URN is not None \
+        if self.reference is not None and len(self.reference) > 0 and isinstance(self.urn, URN):
+            self.urn = URN(self.urn["text"] + ":" + str(self.reference))
+        elif isinstance(self._URN, URN) \
+            and self._URN is not None \
             and self._URN["reference"] is not None \
+            and isinstance(self._URN["reference"], Reference) \
             and len(self._URN["reference"][2]) > 0 \
-            and self.id != self._URN["reference"][2]:
+            and str(self.reference) != self._URN["reference"][2]:
 
-            self.__id = self._URN["reference"][2]
+            self.__reference = self._URN["reference"]
 
     def get(self, key=None):
         """ Get a child or multiple children
@@ -336,7 +353,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
             return []
 
         elements = self.resource.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
-        ids = [self.id+[element.get("n")] for element in elements]
+        ids = [self.reference["start_list"]+[element.get("n")] for element in elements]
         ns = [".".join(_id) for _id in ids]
 
         # Checking for duplicates
@@ -349,7 +366,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
             self.__children[n] = Passage(
                 resource=element,
                 citation=self.citation.child,
-                id=_id,
+                reference=_id,
                 urn=self.urn,
                 parent=self
             )
@@ -400,12 +417,12 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         """ 
         if self.__next is False:
 
-            if self.parent is None: # When top of hierarchy is access, should return None
+            if self.parent is None:  # When top of hierarchy is access, should return None
                 self.__next = None
                 return None
 
             keys = list(self.parent.children.copy().keys())
-            current = keys.index(".".join(self.id))
+            current = keys.index(str(self.reference))
             if len(keys) - 1 > current:
                 self.__next = self.parent.get(keys[current + 1])[0]
             else:
@@ -426,12 +443,12 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         """ 
         if self.__prev is False:
 
-            if self.parent is None: # When top of hierarchy is access, should return None
+            if self.parent is None:  # When top of hierarchy is access, should return None
                 self.__prev = None
                 return None
 
             keys = list(self.parent.children.copy().keys())
-            current = keys.index(".".join(self.id))
+            current = keys.index(str(self.reference))
             if current > 0:
                 self.__prev = self.parent.get(keys[current - 1])[0]
             else:
@@ -442,3 +459,114 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
                     self.__prev = n.last
 
         return self.__prev
+
+
+class ContextPassage(Passage):
+    """ Range / Tree Passage object """
+    def __init__(self, urn=None, resource=None, parent=None, citation=None, reference=None):
+        """
+
+        :param urn:
+        :param resource:
+        :param parent: Text object
+        :param citation:
+        :param reference:
+        :return:
+        """
+        super(ContextPassage, self).__init__(urn=urn, reference=reference)
+
+        self.resource = resource
+        self.parent = parent
+        self.citation = parent.citation
+
+        self.depth = self.depth_2 = 1
+
+        if self.reference.start:
+            self.depth_2 = self.depth = len(self.reference.start)
+        if self.reference and self.reference.end:
+            self.depth_2 = len(self.reference.end)
+
+    def xpath(self, *args, **kwargs):
+        return self.resource.xpath(*args, **kwargs)
+
+    def tostring(self, *args, **kwargs):
+        return etree.tostring(self.resource, *args, **kwargs)
+
+    def get(self, key=None):
+        """ Get a child or multiple children
+
+        :param key: String identifying a passage
+        :type key: basestring or int
+        :raises KeyError: When key identifies a child unknown to this passage
+        :rtype: List.Passage
+        :returns: List of passage identified by key. If key is None, returns all children
+
+        .. note:: Call time depends on parsing status. If the passage was never parsed, then on first call citation is
+            used to find children
+        """
+        pass
+
+    @property
+    def first(self):
+        """ First child of current Passage
+
+        :rtype: None or Passage
+        :returns: None if current Passage has no children,  first child passage if available
+        """
+        if self.depth >= len(self.citation):
+            return None
+        else:
+            return ""
+
+    @property
+    def last(self):
+        """ Last child of current Passage
+
+        :rtype: None or Passage
+        :returns: None if current Passage has no children, last child passage if available
+        """
+        if self.depth >= len(self.citation):
+            return None
+        else:
+            return ""
+
+    @property
+    def children(self):
+        """ Children of the passage
+
+        :rtype: OrderedDict
+        :returns: Dictionary of chidren, where key are subreferences
+        """
+        if self.depth >= len(self.citation):
+            return None
+        else:
+            return ""
+
+    @property
+    def next(self):
+        """ Next passage
+
+        :rtype: Passage
+        :returns: Next passage at same level
+        """
+        if self.depth != self.depth_2:
+            raise InvalidSiblingRequest()
+
+    @property
+    def prev(self):
+        """ Previous passage
+
+        :rtype: Passage
+        :returns: Previous passage at same level
+        """
+        if self.depth != self.depth_2:
+            raise InvalidSiblingRequest()
+
+    def __getSiblings(self):
+        """
+
+        :return: List of references
+        """
+        document_references = self.parent.getValidReff(level=self.depth)
+        passage_references = self.resource.getValidReff(level=self.depth)
+        return len(passage_references), document_references

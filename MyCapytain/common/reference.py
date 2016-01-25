@@ -39,9 +39,12 @@ class Reference(object):
     .. automethod:: __setitem__
     """
 
-    def __init__(self, reference):
+    def __init__(self, reference=""):
         self.reference = reference
-        self.parsed = self.__parse(reference)
+        if reference == "":
+            self.parsed = (self.__model(), self.__model())
+        else:
+            self.parsed = self.__parse(reference)
 
     def __eq__(self, other):
         """ Equality checker for Reference object
@@ -141,10 +144,22 @@ class Reference(object):
         else:
             return self.reference
 
-    def __len__(self):
-        """ Return depth of Reference (Start list)
+    @property
+    def highest(self):
+        """ Return highest citation level
         """
-        return len(self.parsed[0][1])
+        if len(self.start) < len(self.end) and len(self.start):
+            return self.start
+        elif len(self.start) > len(self.end) and len(self.end):
+            return self.end
+        elif len(self.start):
+            return self.start
+        return []
+
+    def __len__(self):
+        """ Return depth of smallest reference level (Start list)
+        """
+        return len(self.highest)
 
     def __model(self):
         """ 3-Tuple model for references
@@ -186,6 +201,14 @@ class Reference(object):
             element[i][1] = r.split(".")
             element[i] = tuple(element[i])
         return tuple(element)
+
+    @property
+    def start(self):
+        return self.parsed[0][1]
+
+    @property
+    def end(self):
+        return self.parsed[1][1]
 
 
 class URN(object):
@@ -452,6 +475,14 @@ class URN(object):
             return self.parsed["reference"]
         else:
             return None
+
+    @property
+    def reference(self):
+        """ Shortcut for reference
+
+        :return: Reference
+        """
+        return self.parsed["reference"]
 
     def __model(self):
         return {

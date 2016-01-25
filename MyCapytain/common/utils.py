@@ -14,6 +14,7 @@ from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
 import re
+from copy import copy
 
 __strip = re.compile("([ ]{2,})+")
 
@@ -132,7 +133,7 @@ def copyNode(node, children=False, parent=False):
     if children:
         element.text = node.text
         for child in node:
-            element.append(child)
+            element.append(copy(child))
     return element
 
 

@@ -164,7 +164,7 @@ class Text(text.Text):
         root = passageLoop(self.xml, root, start, end)
 
         if self.urn:
-            urn, reeference = URN("{}:{}".format(self.urn, reference)), reference
+            urn, reference = URN("{}:{}".format(self.urn, reference)), reference
         else:
             urn, reference = None, reference
         return ContextPassage(
@@ -474,7 +474,13 @@ class ContextPassage(Passage):
         """
         super(ContextPassage, self).__init__(urn=urn, reference=reference)
 
-        self.resource = resource
+        if isinstance(resource, etree._Element):
+            if urn:
+                self.resource = Text(resource=resource, urn=urn["text"], citation=parent.citation)
+            else:
+                self.resource = Text(resource=resource, citation=parent.citation)
+        else:
+            self.resource = resource
         self.parent = parent
         self.citation = parent.citation
 
@@ -485,11 +491,21 @@ class ContextPassage(Passage):
         if self.reference and self.reference.end:
             self.depth_2 = len(self.reference.end)
 
+        self.__prevnext = None  # For caching purpose
+
     def xpath(self, *args, **kwargs):
-        return self.resource.xpath(*args, **kwargs)
+        return self.resource.resource.xpath(*args, **kwargs)
 
     def tostring(self, *args, **kwargs):
-        return etree.tostring(self.resource, *args, **kwargs)
+        return etree.tostring(self.resource.resource, *args, **kwargs)
+
+    def __str__(self):
+        """ Text based representation of the passage
+
+        :rtype: basestring
+        :returns: XML of the passage in string form
+        """
+        return self.tostring(encoding=str)
 
     def get(self, key=None):
         """ Get a child or multiple children
@@ -548,24 +564,78 @@ class ContextPassage(Passage):
         :rtype: Passage
         :returns: Next passage at same level
         """
-        if self.depth != self.depth_2:
-            raise InvalidSiblingRequest()
+        return self.__getSiblings(direction=1)
 
     @property
     def prev(self):
         """ Previous passage
 
         :rtype: Passage
-        :returns: Previous passage at same level
+        :returns: Previ
+        return self.__getSiblings(direction=1)ous passage at same level
+        """
+        return self.__getSiblings(direction=0)
+
+    def __getSiblings(self, direction=1):
+        """
+
+        :return: Reference
         """
         if self.depth != self.depth_2:
             raise InvalidSiblingRequest()
 
-    def __getSiblings(self):
-        """
+        if self.__prevnext:
+            return self.__prevnext[direction]
 
-        :return: List of references
-        """
-        document_references = self.parent.getValidReff(level=self.depth)
-        passage_references = self.resource.getValidReff(level=self.depth)
-        return len(passage_references), document_references
+        document_references = list(map(lambda x: str(x), self.parent.getValidReff(level=self.depth)))
+        range_length = len(self.resource.getValidReff(level=self.depth))
+
+        if self.reference.end:
+            start, end = ".".join(self.reference.start), ".".join(self.reference.end)
+        else:
+            start = end = ".".join(self.reference.start)
+
+        start = document_references.index(start)
+        end = document_references.index(end)
+
+        _prev, _next = None, None
+
+        if start == 0:
+            # If the passage is already at the beginning
+            _prev = None
+        elif start - range_length < 0:
+            if start == end:
+                _prev = Reference(document_references[0])
+            else:
+                _prev = Reference(
+                    "{}-{}".format(document_references[0], document_references[start-1])
+                )
+        else:
+            if start == end:
+                _prev = Reference(document_references[start-1])
+            else:
+                _prev = Reference(
+                    "{}-{}".format(document_references[start-range_length], document_references[start-1])
+                )
+
+        if start + 1 == len(document_references) or end + 1 == len(document_references):
+            # If the passage is already at the end
+            _next = None
+        elif end + range_length > len(document_references):
+            if start == end:
+                _next = Reference(document_references[-1])
+            else:
+                _next = Reference(
+                    "{}-{}".format(document_references[end +1], document_references[-1])
+                )
+        else:
+            if start == end:
+                _next = Reference(document_references[end +1])
+            else:
+                _next = Reference(
+                    "{}-{}".format(document_references[end + 1], document_references[end + range_length])
+                )
+
+        self.__prevnext = (_prev, _next)
+        return self.__prevnext[direction]
+

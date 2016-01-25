@@ -4,15 +4,23 @@ python:
   - "3.4"
   - "pypy"
   - "pypy3"
-# command to install dependencies
-install: 
-    - pip install -r requirements.txt
+
+install:
+    - pip install --install-option="--no-cython-compile" -r requirements.txt
     - pip install coveralls
+
 # command to run tests
-script: 
+script:
     - coverage run --source=MyCapytain setup.py test
+
+matrix:
+  allow_failures:
+    - python: pypy
+    - python: pypy3
+
 after_success:
     - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then coveralls; fi
+
 branches:
   only:
     - master

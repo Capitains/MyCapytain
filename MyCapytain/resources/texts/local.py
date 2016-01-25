@@ -269,6 +269,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
         .. note:: `Passage.id = [..]` will update automatically the URN property as well if correct
         """
+        _value = None
         if isinstance(value, (list, tuple)):
             _value = Reference(".".join(value))
         elif isinstance(value, str):
@@ -276,7 +277,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         elif isinstance(value, Reference):
             _value = value
 
-        if self.__reference != _value:
+        if _value and self.__reference != _value:
             self.__reference = _value
             if self._URN and len(self._URN):
                 if len(value):

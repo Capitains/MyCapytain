@@ -272,7 +272,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         _value = None
         if isinstance(value, (list, tuple)):
             _value = Reference(".".join(value))
-        elif isinstance(value, str):
+        elif isinstance(value, basestring):
             _value = Reference(value)
         elif isinstance(value, Reference):
             _value = value

@@ -120,7 +120,7 @@ class Text(text.Text):
         if hypercontext is True:
             return self._getPassageContext(reference)
 
-        if isinstance(reference, MyCapytain.common.reference.Reference):
+        if isinstance(reference, Reference):
             reference = reference.start
 
         reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
@@ -233,7 +233,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
     """
 
     def __init__(self, urn=None, resource=None, parent=None, citation=None, reference=None):
-        super(Passage, self).__init__(urn=urn, resource=resource, parent=parent)
+        super(Passage, self).__init__(resource=resource, parent=parent)
 
         self.__next = False
         self.__prev = False
@@ -243,8 +243,9 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
             self.citation = citation
 
         self.__reference = Reference("")
-
-        if reference is not None:
+        if urn:
+            self.urn = urn
+        if reference:
             self.reference = reference
 
         self.__children = OrderedDict()
@@ -269,14 +270,16 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         .. note:: `Passage.id = [..]` will update automatically the URN property as well if correct
         """
         if isinstance(value, (list, tuple)):
-            self.__reference = Reference(".".join(value))
-            self.__updateURN()
+            _value = Reference(".".join(value))
         elif isinstance(value, str):
-            self.__reference = Reference(value)
-            self.__updateURN()
+            _value = Reference(value)
         elif isinstance(value, Reference):
-            self.__reference = value
-            self.__updateURN()
+            _value = value
+
+        if self.__reference != _value:
+            self.__reference = _value
+            if self._URN and len(self._URN):
+                self._URN = URN("{}:{}".format(self._URN["text"], str(_value)))
 
     @property
     def urn(self):
@@ -299,27 +302,19 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
         """
         a = self._URN
+
         if isinstance(value, basestring):
-            value = MyCapytain.common.reference.URN(value)
-        elif not isinstance(value, MyCapytain.common.reference.URN):
+            value = URN(value)
+        elif not isinstance(value, URN):
             raise TypeError()
+
         if str(a) != str(value):
             self._URN = value
-            self.__updateURN()
 
-    def __updateURN(self):
-        """ Private method allowing for update of self.id or self.urn
-        """
-        if self.reference is not None and len(self.reference) > 0 and isinstance(self.urn, URN):
-            self.urn = URN(self.urn["text"] + ":" + str(self.reference))
-        elif isinstance(self._URN, URN) \
-            and self._URN is not None \
-            and self._URN["reference"] is not None \
-            and isinstance(self._URN["reference"], Reference) \
-            and len(self._URN["reference"][2]) > 0 \
-            and str(self.reference) != self._URN["reference"][2]:
-
-            self.__reference = self._URN["reference"]
+            if value.reference and self.__reference != value.reference:
+                self.__reference = value.reference
+            elif not value.reference and self.__reference:
+                self._URN = URN("{}:{}".format(str(value), str(self.__reference)))
 
     def get(self, key=None):
         """ Get a child or multiple children

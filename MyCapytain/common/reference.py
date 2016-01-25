@@ -255,9 +255,7 @@ class URN(object):
 
         :Example:
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
-            >>>    print(len(a)) # 
-
-
+            >>>    print(len(a))
         """
         
         items = [

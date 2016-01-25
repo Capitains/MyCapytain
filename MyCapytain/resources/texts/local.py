@@ -279,7 +279,10 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if self.__reference != _value:
             self.__reference = _value
             if self._URN and len(self._URN):
-                self._URN = URN("{}:{}".format(self._URN["text"], str(_value)))
+                if len(value):
+                    self._URN = URN("{}:{}".format(self._URN["text"], str(_value)))
+                else:
+                    self._URN = URN(self._URN["text"])
 
     @property
     def urn(self):

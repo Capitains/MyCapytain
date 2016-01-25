@@ -316,7 +316,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
             if value.reference and self.__reference != value.reference:
                 self.__reference = value.reference
-            elif not value.reference and self.__reference:
+            elif not value.reference and self.__reference and len(self.__reference):
                 self._URN = URN("{}:{}".format(str(value), str(self.__reference)))
 
     def get(self, key=None):

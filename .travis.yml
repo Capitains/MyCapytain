@@ -6,7 +6,7 @@ python:
   - "pypy3"
 
 install:
-    - pip install --install-option="--no-cython-compile" -r requirements.txt
+    - pip install -r requirements.txt
     - pip install coveralls
 
 # command to run tests

@@ -4,6 +4,7 @@
 build
 env
 src
+env2
 
 # Setuptools distribution folder.
 /dist/

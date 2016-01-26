@@ -28,7 +28,7 @@ Getting all passages from a test
     for ref in text.getValidReff(level=len(text.citation)):
         # We retrieve a Passage object for each reference that we find
         # We can pass the reference many way, including in the form of a list of strings
-        psg = text.getPassage(ref.split("."))
+        psg = text.getPassage(ref.split("."), hypercontext=False)
         # We print the passage from which we retrieve <note> nodes
         print("\t".join([ref, psg.text(exclude=["note"])]))
 

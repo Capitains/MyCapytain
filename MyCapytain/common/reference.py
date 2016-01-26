@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from past.builtins import basestring
+from six import text_type as str
 from builtins import range, object
 import re
 

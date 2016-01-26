@@ -102,6 +102,10 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             str(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"), level=3)[-1]),
             "2.1.12"
         )
+        self.assertEqual(
+            self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.38-2.39"), level=3),
+            ["2.38.1", "2.38.2", "2.39.1", "2.39.2"]
+        )
 
         # Test with reference and level autocorrected because too small
         self.assertEqual(

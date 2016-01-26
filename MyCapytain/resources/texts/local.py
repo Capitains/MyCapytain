@@ -196,12 +196,16 @@ class Text(text.Text):
         """
         depth = 0
         xml = self.xml
+        _range = False
         if reference:
             if isinstance(reference, Reference):
                 if reference.end is None:
                     passages = [reference.list]
                 else:
-                    xml = self.getPassage(reference=reference).resource
+                    xml = self.getPassage(reference=reference)
+                    a, b = reference.start.list, reference.end.list
+                    passages = [[]]
+
             elif isinstance(reference, list):
                 passages = [reference]
 

@@ -37,7 +37,7 @@ class Text(text.Text):
     :ivar resource: lxml
     """
 
-    def __init__(self, urn=None, citation=None, resource=None, autoreffs=True):
+    def __init__(self, urn=None, citation=None, resource=None, autoreffs=False):
         super(Text, self).__init__(urn=urn, citation=citation)
         self._passages = Passage()
         self._orphan = defaultdict(Reference)  # Represents passage we got without asking for all. Storing convenience ?
@@ -47,6 +47,7 @@ class Text(text.Text):
 
         if citation is not None:
             self.citation = citation
+
         if resource is not None:
             self.resource = resource
             self.xml = xmlparser(resource)
@@ -124,6 +125,9 @@ class Text(text.Text):
 
         if isinstance(reference, Reference):
             reference = reference.list or reference.start.list
+
+        if self._passages.resource is None:
+            self.parse()
 
         reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
         passages = [self._passages]

@@ -140,7 +140,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
     def test_wrong_main_scope(self):
         with open("tests/testing_data/texts/sample2.xml", "rb") as file:
             with self.assertRaises(MyCapytain.resources.texts.local.RefsDeclError):
-                text = MyCapytain.resources.texts.local.Text(resource=file)
+                text = MyCapytain.resources.texts.local.Text(resource=file, autoreffs=True)
 
     def test_reffs(self):
         """ Check that every level is returned trough reffs property """
@@ -171,6 +171,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             self.TEI.urn = 2
 
     def test_get_passage(self):
+        self.TEI.parse()
         a = self.TEI.getPassage(["1", "pr", "2"], hypercontext=False)
         self.assertEqual(a.text(), "tum, ut de illis queri non possit quisquis de se bene ")
         # With reference
@@ -183,7 +184,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation
+            citation=self.TEI.citation,
+            autoreffs=True
         )
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
@@ -195,7 +197,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation
+            citation=self.TEI.citation,
+            autoreffs=True
         )
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
@@ -217,7 +220,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation
+            citation=self.TEI.citation,
+            autoreffs=True
         )
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
@@ -245,7 +249,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation
+            citation=self.TEI.citation,
+            autoreffs=True
         )
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
@@ -275,7 +280,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.text_complex.citation
+            citation=self.text_complex.citation,
+            autoreffs=True
         )
         self.assertIn(
             "Pervincis tandem",
@@ -301,7 +307,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.seneca.citation
+            citation=self.seneca.citation,
+            autoreffs=True
         )
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(
@@ -324,7 +331,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.seneca.citation
+            citation=self.seneca.citation,
+            autoreffs=True
         )
         self.assertEqual(
             text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(
@@ -387,6 +395,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
     def test_next(self):
         """ Test next property """
         # Normal passage checking
+        self.TEI.parse()
         p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(str(p.next.reference), "1.pr.2")
 
@@ -410,7 +419,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         """ Test children property """
         # Normal children checking
         with open("tests/testing_data/texts/sample.xml", "rb") as text:
-            self.TEI = MyCapytain.resources.texts.local.Text(resource=text)
+            self.TEI = MyCapytain.resources.texts.local.Text(resource=text, autoreffs=True)
 
             p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
             self.assertEqual(str(p.children["1.pr.1"].reference), "1.pr.1")
@@ -421,6 +430,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
     def test_first(self):
         """ Test first property """
         # Test when there is one
+        self.TEI.parse()
         p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
         self.assertEqual(str(p.first.reference), "1.pr.1")
         # #And failing when no first
@@ -429,6 +439,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
 
     def test_last(self):
         """ Test last property """
+        self.TEI.parse()
         # Test when there is one
         p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
         self.assertEqual(str(p.last.reference), "1.pr.22")
@@ -438,6 +449,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
 
     def test_prev(self):
         """ Test prev property """
+        self.TEI.parse()
         # Normal passage checking
         p = self.TEI.getPassage(["2", "40", "8"], hypercontext=False)
         self.assertEqual(str(p.prev.reference), "2.40.7")

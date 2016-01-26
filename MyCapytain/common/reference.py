@@ -65,31 +65,31 @@ class Reference(object):
 
     @property
     def parent(self):
-        """
+        """ Parent of the actual URN, for example, 1.1 for 1.1.1
 
-        :return:
+        :rtype: Reference
         """
         if len(self.parsed[0][1]) == 1 and len(self.parsed[1][1]) <= 1:
             return None
         else:
             if len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) == 0:
-                return "{0}{1}".format(
+                return Reference("{0}{1}".format(
                     ".".join(list(self.parsed[0][1])[0:-1]),
                     self.parsed[0][3] or ""
-                )
+                ))
             elif len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) > 1:
                 first = list(self.parsed[0][1])[0:-1]
                 last = list(self.parsed[1][1])[0:-1]
                 if first == last and self.parsed[1][3] is None \
                     and self.parsed[0][3] is None:
-                    return ".".join(first)
+                    return Reference(".".join(first))
                 else:
-                    return "{0}{1}-{2}{3}".format(
+                    return Reference("{0}{1}-{2}{3}".format(
                         ".".join(first),
                         self.parsed[0][3] or "",
                         ".".join(list(self.parsed[1][1])[0:-1]),
                         self.parsed[1][3] or ""
-                    )
+                    ))
 
     def __str__(self):
         """ Return full reference in string format

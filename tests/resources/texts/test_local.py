@@ -576,6 +576,7 @@ class TestPassageRange(unittest.TestCase):
             DifferentRangePassage.prev, None,
             "Prev reff should be None when at the start"
         )
+        
         DifferentRangePassage = self.text.getPassage(
             MyCapytain.common.reference.Reference("2.40")
         )

@@ -356,7 +356,7 @@ class URN(object):
         :Example:
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
             >>>    a["textgroup"] == "urn:cts:latinLit:phi1294"
-            >>>    a[3] == "phi1294
+            >>>    a[3] == "phi1294"
         """
         if isinstance(key, int) and key < len(URN.__order):
             return self.parsed[URN.__order[key]]

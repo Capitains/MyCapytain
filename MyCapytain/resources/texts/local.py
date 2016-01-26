@@ -174,17 +174,6 @@ class Text(text.Text):
             resource=root, parent=self, citation=self.citation
         )
 
-    def getPassagePlus(self, reference, hypercontext=False):
-        """ Finds a passage in the current text with its previous and following node
-
-        :param reference: Identifier of the subreference / passages
-        :type reference: list, Reference
-        :rtype: text.PassagePlus
-        :returns: Asked passage with meta-informations
-        """
-        P = self.getPassage(reference=reference, hypercontext=hypercontext)
-        return text.PassagePlus(P, P.prev, P.next)
-
     def getValidReff(self, level=1, reference=None):
         """ Retrieve valid passages directly
 
@@ -398,7 +387,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         """ First child of current Passage 
 
         :returns: None if current Passage has no children,  first child passage if available
-        :rtype: None or Passage
+        :rtype: None, Passage
         """
         try:
             return self.get(0)[0]
@@ -413,7 +402,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: None, Passage
         """
         try:
-            return self.get(0)[0]
+            return self.get(-1)[0]
         except :
             return None
 

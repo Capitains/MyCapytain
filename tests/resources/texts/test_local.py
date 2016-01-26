@@ -175,15 +175,6 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), hypercontext=False)
         self.assertEqual(a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
-    def test_get_passage_plus(self):
-        """ Test GetPassage Plus """
-        # No label in local 
-        a = self.TEI.getPassagePlus(["1", "pr", "2"], hypercontext=False)
-
-        self.assertEqual(str(a.prev), "1.pr.1")
-        self.assertEqual(str(a.next), "1.pr.3")
-        self.assertEqual(a.passage.text(), "tum, ut de illis queri non possit quisquis de se bene ")
-
     def test_get_Passage_context_no_double_slash(self):
         """ Check that get Passage contexts return right information """
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"))

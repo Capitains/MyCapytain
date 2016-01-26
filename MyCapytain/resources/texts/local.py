@@ -235,9 +235,10 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
         **Example** :  for a text with a citation scheme with following refsDecl :
         `/TEI/text/body/div[@type='edition']/div[@n='$1']/div[@n='$2']/l[@n='$3']` and a passage 1.1.1, this
-         class will build an XML tree looking like the following
+        class will build an XML tree looking like the following
 
          .. code-block:: xml
+
             <l n='1'>Lorem ipsum</l>
 
     :param urn: A URN identifier
@@ -489,7 +490,7 @@ class ContextPassage(Passage):
 
         **Example** :  for a text with a citation scheme with following refsDecl :
         `/TEI/text/body/div[@type='edition']/div[@n='$1']/div[@n='$2']/l[@n='$3']` and a passage 1.1.1-1.2.3, this
-         class will build an XML tree looking like the following
+        class will build an XML tree looking like the following
 
          .. code-block:: xml
 

@@ -123,7 +123,7 @@ class Text(text.Text):
             return self._getPassageContext(reference)
 
         if isinstance(reference, Reference):
-            reference = reference.start.list
+            reference = reference.list or reference.start.list
 
         reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
         passages = [self._passages]
@@ -187,8 +187,8 @@ class Text(text.Text):
         .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid informations. Maybe something is more powerfull ?
         """
         if reference is not None:
-            start = len(reference[2])
-            nodes = [".".join(reference[2][0:i+1]) for i in range(0, start)] + [None]
+            start = len(reference.list)
+            nodes = [".".join(reference.list[0:i+1]) for i in range(0, start)] + [None]
             if level <= start:
                 level = start + 1
         else:
@@ -363,7 +363,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
             return []
 
         elements = self.resource.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
-        ids = [self.reference["start_list"]+[element.get("n")] for element in elements]
+        ids = [self.reference.list+[element.get("n")] for element in elements]
         ns = [".".join(_id) for _id in ids]
 
         # Checking for duplicates

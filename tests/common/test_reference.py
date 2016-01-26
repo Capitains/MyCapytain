@@ -20,8 +20,10 @@ class TestReferenceImplementation(unittest.TestCase):
         self.assertEqual(len(a), 3)
 
     def test_str_getitem(self):
+        """
+        .. deprecated:: 0.1.0
+        """
         a = Reference("1.1@Achilles[0]-1.10@Atreus[3]")
-        self.assertEqual(a["any"], "1.1@Achilles[0]-1.10@Atreus[3]")
         self.assertEqual(a["start"], "1.1@Achilles[0]")
         self.assertEqual(a["start_list"], ["1", "1"])
         self.assertEqual(a["start_sub"][0], "Achilles")
@@ -32,36 +34,36 @@ class TestReferenceImplementation(unittest.TestCase):
 
     def test_int_getItem(self):
         a = Reference("1.1@Achilles-1.10@Atreus[3]")
-        self.assertEqual(a[1], "1.1@Achilles")
-        self.assertEqual(a[2], ["1", "1"])
-        self.assertEqual(a[3][0], "Achilles")
-        self.assertEqual(a[4], "1.10@Atreus[3]")
-        self.assertEqual(a[5], ["1", "10"])
-        self.assertEqual(a[6][1], "3")
-        self.assertEqual(a[6], ("Atreus", "3"))
+        self.assertEqual(str(a.start), "1.1@Achilles")
+        self.assertEqual(a.start.list, ["1", "1"])
+        self.assertEqual(a.start.subreference[0], "Achilles")
+        self.assertEqual(str(a.end), "1.10@Atreus[3]")
+        self.assertEqual(a.end.list, ["1", "10"])
+        self.assertEqual(a.end.subreference[1], 3)
+        self.assertEqual(a.end.subreference, ("Atreus", 3))
 
     def test_Unicode_Support(self):
         a = Reference("1.1@καὶ[0]-1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(a[1], "1.1@καὶ[0]")
-        self.assertEqual(a[2], ["1", "1"])
-        self.assertEqual(a[3][0], "καὶ")
-        self.assertEqual(a[4], "1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(a[5], ["1", "10"])
-        self.assertEqual(a[6][1], "3")
-        self.assertEqual(a[6], ("Ἀλκιβιάδου", "3"))
+        self.assertEqual(str(a.start), "1.1@καὶ[0]")
+        self.assertEqual(a.start.list, ["1", "1"])
+        self.assertEqual(a.start.subreference[0], "καὶ")
+        self.assertEqual(str(a.end), "1.10@Ἀλκιβιάδου[3]")
+        self.assertEqual(a.end.list, ["1", "10"])
+        self.assertEqual(a.end.subreference[1], 3)
+        self.assertEqual(a.end.subreference, ("Ἀλκιβιάδου", 3))
 
     def test_NoWord_Support(self):
         a = Reference("1.1@[0]-1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(a[1], "1.1@[0]")
-        self.assertEqual(a[3][0], "")
-        self.assertEqual(a[3][1], "0")
+        self.assertEqual(str(a.start), "1.1@[0]")
+        self.assertEqual(a.start.subreference[0], "")
+        self.assertEqual(a.start.subreference[1], 0)
 
     def test_No_End_Support(self):
         a = Reference("1.1@[0]")
-        self.assertEqual(a[4], None)
-        self.assertEqual(a[1], "1.1@[0]")
-        self.assertEqual(a[3][0], "")
-        self.assertEqual(a[3][1], "0")
+        self.assertEqual(a.end, None)
+        self.assertEqual(str(a.start), "1.1@[0]")
+        self.assertEqual(a.start.subreference[0], "")
+        self.assertEqual(a.start.subreference[1], 0)
 
     def test_equality(self):
         a = Reference("1.1@[0]")

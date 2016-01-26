@@ -46,23 +46,6 @@ class Reference(object):
         else:
             self.parsed = self.__parse(reference)
 
-    def __eq__(self, other):
-        """ Equality checker for Reference object
-        
-        :param other: An object to be checked against
-        :rtype: boolean
-        :returns: Equality between other and self
-
-        :Example:
-            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    b = Reference(reference="1.1")
-            >>>    c = Reference(reference="1.1")
-            >>>    (a == b) == False
-            >>>    (c == b) == True
-        """
-        return (isinstance(other, self.__class__)
-                and self.reference == str(other))
-
     @property
     def parent(self):
         """ Parent of the actual URN, for example, 1.1 for 1.1.1
@@ -91,9 +74,83 @@ class Reference(object):
                         self.parsed[1][3] or ""
                     ))
 
+    @property
+    def highest(self):
+        """ Return highest reference level
+
+        For references such as 1.1-1.2.8, with different level, it can be useful to access to the highest node in the
+        hierarchy. In this case, the highest level would be 1.1. The function would return ["1", "1"]
+
+        .. note:: By default, this property returns the start level
+
+        :rtype: list(str)
+        """
+        if not self.end:
+            return self.list
+        elif len(self.start) < len(self.end) and len(self.start):
+            return self.start
+        elif len(self.start) > len(self.end) and len(self.end):
+            return self.end
+        elif len(self.start):
+            return self.start
+        return []
+
+    @property
+    def start(self):
+        """ Quick access property for start list
+        """
+        if self.parsed[0][0] and len(self.parsed[0][0]):
+            return Reference(self.parsed[0][0])
+
+    @property
+    def end(self):
+        """ Quick access property for reference end list
+        """
+        if self.parsed[1][0] and len(self.parsed[1][0]):
+            return Reference(self.parsed[1][0])
+
+    @property
+    def list(self):
+        """ Return a list version of the object if it is a single passage
+
+        .. note:: Access to start list and end list should be done through obj.start.list and obj.end.list
+
+        :rtype: [str]
+        """
+        if not self.end:
+            return self.parsed[0][1]
+
+    @property
+    def subreference(self):
+        """ Return the subreference of a single node reference
+
+        .. note:: Access to start and end subreferencee should be done through obj.start.subreference
+        and obj.end.subreference
+
+        :rtype: (str, int)
+        """
+        if not self.end:
+            return Reference.convert_subreference(*self.parsed[0][2])
+
+    def __len__(self):
+        """ Return depth of highest reference level
+
+        For references such as 1.1-1.2.8, or simple references such as 1.a, with different level, it can be useful to
+        know the depth of the reference to access the right XPath for example. This property returns the depth of the
+        highest node
+
+        :example:
+            - len(1.1) == 2
+            - len(1.2.8-1.3) == 2
+            - len(1-1.2) == 1
+
+        :rtype: int
+        """
+        return len(self.highest)
+
     def __str__(self):
         """ Return full reference in string format
-        
+
         :rtype: basestring
         :returns: String representation of Reference Object
 
@@ -104,6 +161,23 @@ class Reference(object):
             >>>    str(b) == "1.1"
         """
         return self.reference
+
+    def __eq__(self, other):
+        """ Equality checker for Reference object
+
+        :param other: An object to be checked against
+        :rtype: boolean
+        :returns: Equality between other and self
+
+        :Example:
+            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
+            >>>    b = Reference(reference="1.1")
+            >>>    c = Reference(reference="1.1")
+            >>>    (a == b) == False
+            >>>    (c == b) == True
+        """
+        return (isinstance(other, self.__class__)
+                and self.reference == str(other))
 
     def __getitem__(self, key):
         """ Return part of or full passage reference
@@ -131,6 +205,9 @@ class Reference(object):
         | 6         | end_sub      | Subreference end parsed into a tuple *Ex.* `('Zeus', 1')`       |
         +-----------+--------------+-----------------------------------------------------------------+
 
+        .. deprecated:: 0.1.0
+            Use .start, .end, .list and .subreference instead
+
         :example:
             >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
             >>>    print(a[1]) # "1.1@Achiles[1]"
@@ -152,43 +229,6 @@ class Reference(object):
             return self.parsed[1][2]
         else:
             return self.reference
-
-    @property
-    def highest(self):
-        """ Return highest reference level
-
-        For references such as 1.1-1.2.8, with different level, it can be useful to access to the highest node in the
-        hierarchy. In this case, the highest level would be 1.1. The function would return ["1", "1"]
-
-        .. note:: By default, this property returns the start level
-
-        :rtype: list(str)
-        """
-        if not self.end:
-            return self.list
-        elif len(self.start) < len(self.end) and len(self.start):
-            return self.start
-        elif len(self.start) > len(self.end) and len(self.end):
-            return self.end
-        elif len(self.start):
-            return self.start
-        return []
-
-    def __len__(self):
-        """ Return depth of highest reference level
-
-        For references such as 1.1-1.2.8, or simple references such as 1.a, with different level, it can be useful to
-        know the depth of the reference to access the right XPath for example. This property returns the depth of the
-        highest node
-
-        :example:
-            - len(1.1) == 2
-            - len(1.2.8-1.3) == 2
-            - len(1-1.2) == 1
-
-        :rtype: int
-        """
-        return len(self.highest)
 
     def __model(self):
         """ 3-Tuple model for references
@@ -231,46 +271,14 @@ class Reference(object):
             element[i] = tuple(element[i])
         return tuple(element)
 
-    @property
-    def start(self):
-        """ Quick access property for start list
-        """
-        if self.parsed[0][0] and len(self.parsed[0][0]):
-            return Reference(self.parsed[0][0])
-
-    @property
-    def end(self):
-        """ Quick access property for reference end list
-        """
-        if self.parsed[1][0] and len(self.parsed[1][0]):
-            return Reference(self.parsed[1][0])
-
-    @property
-    def list(self):
-        """ Return a list version of the object if it is a single passage
-
-        .. note:: Access to start list and end list should be done through obj.start.list and obj.end.list
-
-        :rtype: [str]
-        """
-        if not self.end:
-            return self.parsed[0][1]
-
-    @property
-    def subreference(self):
-        """ Return the subreference of a single node reference
-
-        .. note:: Access to start and end subreferencee should be done through obj.start.subreference
-        and obj.end.subreference
-
-        :rtype: (str, int)
-        """
-        if not self.end:
-            return Reference.convert_subreference(*self.parsed[0][2])
-
     @staticmethod
     def convert_subreference(word, counter):
-        return str(word), int(counter)
+        if len(counter) and word:
+            return str(word), int(counter)
+        elif len(counter) == 0 and word:
+            return str(word), 0
+        else:
+            return "", 0
 
 
 class URN(object):
@@ -492,7 +500,7 @@ class URN(object):
                         self.parsed["work"],
                         self.parsed["text"]
                     ]),
-                    self.parsed["reference"]["start"]
+                    str(self.reference.start)
                 ])
             else:
                 return ":".join([
@@ -503,9 +511,9 @@ class URN(object):
                         self.parsed["textgroup"],
                         self.parsed["work"]
                     ]),
-                    self.parsed["reference"]["start"]
+                    str(self.reference.start)
                 ])
-        elif key == "end" and self.parsed["passage"] and self.parsed["reference"]["end"] is not None:
+        elif key == "end" and self.parsed["passage"] and self.reference.end is not None:
             if self.parsed["text"]:
                 return ":".join([
                     "urn",
@@ -516,7 +524,7 @@ class URN(object):
                         self.parsed["work"],
                         self.parsed["text"]
                     ]),
-                    self.parsed["reference"]["end"]
+                    str(self.reference.end)
                 ])
             else:
                 return ":".join([
@@ -527,12 +535,12 @@ class URN(object):
                         self.parsed["textgroup"],
                         self.parsed["work"]
                     ]),
-                    self.parsed["reference"]["end"]
+                    str(self.reference.end)
                 ])
         elif key == "full":
             return self.parsed["full"]
         elif key == "reference" and self.parsed["reference"]:
-            return self.parsed["reference"]
+            return self.reference
         else:
             return None
 
@@ -781,7 +789,7 @@ class Citation(object):
             return REFERENCE_REPLACER.sub(replacement, xpath)
         else:        
             if isinstance(passage, Reference):
-                passage = passage[2]
+                passage = passage.list or passage.start.list
             elif passage is None:
                 return REFERENCE_REPLACER.sub(
                     r"\1",

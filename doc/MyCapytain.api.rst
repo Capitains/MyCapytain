@@ -1,69 +1,72 @@
 MyCapytain API Documentation
 ============================
 
-MyCapytain.common
-#################
+Utilities, metadata and references
+##################################
 
-Module common contains tools such as a namespace dictionnary as well as cross-implementation objects, like URN, Citations...
+Module common contains tools such as a namespace dictionary as well as cross-implementation objects, like URN, Citations...
 
-MyCapytain.common.reference
-***************************
+URN, References and Citations
+*****************************
 
 .. automodule:: MyCapytain.common.reference
     :members:
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.common.metadata
-**************************
+Metadata containters
+********************
 
 .. automodule:: MyCapytain.common.metadata
     :members:
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.common.utils
-***********************
+Utilities
+*********
 
 .. automodule:: MyCapytain.common.utils
     :members:
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.endpoints
-####################
+API Endpoints
+#############
 
 Module endpoints contains prototypes and implementation of endpoints calls in MyCapytain
 
-MyCapytain.endpoints.ahab
-*************************
+Ahab
+****
 
 .. automodule:: MyCapytain.endpoints.ahab
     :members:
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.endpoints.cts5
-*************************
+CTS 5 API
+*********
 
 .. automodule:: MyCapytain.endpoints.cts5
     :members:
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.endpoints.proto
-**************************
+Prototypes
+**********
 
 .. automodule:: MyCapytain.endpoints.proto
     :members:
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.ressources
+Texts and inventories
 #####################
 
-MyCapytain.ressources.text
-**************************
+Text
+****
+
+TEI based texts
++++++++++++++++
 
 .. autoclass:: MyCapytain.resources.texts.tei.Citation
     :members:
@@ -75,10 +78,26 @@ MyCapytain.ressources.text
     :undoc-members:
     :show-inheritance:
 
+Locally read text
++++++++++++++++++
+
 .. autoclass:: MyCapytain.resources.texts.local.Text
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. autoclass:: MyCapytain.resources.texts.local.Passage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: MyCapytain.resources.texts.local.ContextPassage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+API's Text results
+++++++++++++++++++
 
 .. autoclass:: MyCapytain.resources.texts.api.Text
     :members:
@@ -90,24 +109,21 @@ MyCapytain.ressources.text
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.resources.xml
-************************
+Inventories
+***********
 
-.. automodule:: MyCapytain.resources.xml
+.. automodule:: MyCapytain.resources.inventory
     :members:
     :undoc-members:
     :show-inheritance:
 
-MyCapytain.resources.proto.text
-*******************************
+Prototypes
+**********
 
 .. automodule:: MyCapytain.resources.proto.text
     :members:
     :undoc-members:
     :show-inheritance:
-
-MyCapytain.resources.proto.inventory
-************************************
 
 .. automodule:: MyCapytain.resources.proto.inventory
     :members:

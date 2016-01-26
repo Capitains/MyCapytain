@@ -184,22 +184,66 @@ class Text(text.Text):
         :returns: List of levels
         :rtype: list(basestring, str)
 
-        .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid informations. Maybe something is more powerfull ?
-        """
-        if reference is not None:
-            start = len(reference.list)
-            nodes = [".".join(reference.list[0:i+1]) for i in range(0, start)] + [None]
-            if level <= start:
-                level = start + 1
-        else:
-            nodes = [None for i in range(0, level)]
+        :
 
-        passages = [self._passages]  # For consistency
+        .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid
+        informations. Maybe something is more powerfull ?
+
+        """
+        depth = 0
+        xml = self.xml
+        if reference:
+            if isinstance(reference, Reference):
+                if reference.end is None:
+                    passages = [reference.list]
+                else:
+                    xml = self.getPassage(reference=reference).resource
+            elif isinstance(reference, list):
+                passages = [reference]
+
+            depth = len(passages[0])
+        else:
+            passages = [[]]
+
+        if level <= len(passages[0]) and reference is not None:
+            level = len(passages[0]) + 1
+        if level > len(self.citation):
+            return []
+
+        nodes = [None for i in range(depth, level)]
+
+        citations = [citation for citation in self.citation]
+
         while len(nodes) >= 1:
-            passages = [passage for sublist in [p.get(nodes[0]) for p in passages] for passage in sublist]
+            passages = [
+                refs + [node.get("n")]
+                for xpath_result, refs in [
+                        (
+                            xml.xpath(
+                                citations[len(filling)-1].fill(filling),
+                                namespaces=NS
+                            ),
+                            refs
+                        )
+                        for filling, refs in
+                        [(refs + [None], refs) for refs in passages]
+                    ]
+                for node in xpath_result
+            ]
             nodes.pop(0)
 
-        return [passage.reference for passage in passages]
+            if len(passages) == 0:
+                msg = "Unknown reference {}".format(reference)
+                raise KeyError(msg)
+
+        passages = [".".join(passage) for passage in passages]
+        duplicates = set([n for n in passages if passages.count(n) > 1])
+        if len(duplicates) > 0:
+            message = ", ".join(duplicates)
+            warnings.warn(message, DuplicateReference)
+        del duplicates
+
+        return passages
 
     def text(self, exclude=None):
         """ Returns the text of the XML resource without the excluded nodes
@@ -530,6 +574,7 @@ class ContextPassage(Passage):
             self.resource = resource
         self.parent = parent
         self.citation = parent.citation
+        self.__children = None
 
         self.depth = self.depth_2 = 1
 
@@ -577,7 +622,7 @@ class ContextPassage(Passage):
         if self.depth >= len(self.citation):
             return None
         else:
-            return ""
+            return self.children[0]
 
     @property
     def last(self):
@@ -589,19 +634,23 @@ class ContextPassage(Passage):
         if self.depth >= len(self.citation):
             return None
         else:
-            return ""
+            return self.children[-1]
 
     @property
     def children(self):
         """ Children of the passage
 
-        :returns: Dictionary of chidren, where key are subreferences
         :rtype: None, Reference
+        :returns: Dictionary of chidren, where key are subreferences
         """
+        self.__raiseDepth()
         if self.depth >= len(self.citation):
-            return None
+            return []
+        elif self.__children and len(self.__children):
+            return self.__children
         else:
-            return ""
+            self.__children = self.resource.getValidReff(level=self.depth+1)
+            return self.__children
 
     @property
     def next(self):

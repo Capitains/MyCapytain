@@ -5,7 +5,7 @@
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
->>> from MyCapytain.common.reference import (URN, Reference, Citation)
+>>> from MyCapytain.common.reference import URN, Reference, Citation
 
 """
 from __future__ import unicode_literals

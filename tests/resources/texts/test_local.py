@@ -106,11 +106,13 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         # Test with reference and level autocorrected because too small
         self.assertEqual(
             str(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"), level=0)[-1]),
-            "2.1.12"
+            "2.1.12",
+            "Level should be autocorrected to len(citation) + 1"
         )
         self.assertEqual(
             str(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1"), level=2)[-1]),
-            "2.1.12"
+            "2.1.12",
+            "Level should be autocorrected to len(citation) + 1 even if level == len(citation)"
         )
 
         # Test when already too deep

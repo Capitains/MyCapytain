@@ -123,7 +123,7 @@ class Text(text.Text):
             return self._getPassageContext(reference)
 
         if isinstance(reference, Reference):
-            reference = reference.start
+            reference = reference.start.list
 
         reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
         passages = [self._passages]
@@ -144,10 +144,10 @@ class Text(text.Text):
         if isinstance(reference, list):
             start, end = reference, reference
             reference = Reference(".".join(reference))
-        elif len(reference.end) == 0 or isinstance(reference, list):
-            start, end = reference.start, reference.start
+        elif not reference.end:
+            start, end = reference.start.list, reference.start.list
         else:
-            start, end = reference.start, reference.end
+            start, end = reference.start.list, reference.end.list
 
         if len(start) > len(self.citation):
             raise ReferenceError("URN is deeper than citation scheme")
@@ -645,9 +645,9 @@ class ContextPassage(Passage):
         range_length = len(self.resource.getValidReff(level=self.depth))
 
         if self.reference.end:
-            start, end = ".".join(self.reference.start), ".".join(self.reference.end)
+            start, end = str(self.reference.start), str(self.reference.end)
         else:
-            start = end = ".".join(self.reference.start)
+            start = end = str(self.reference.start)
 
         start = document_references.index(start)
         end = document_references.index(end)

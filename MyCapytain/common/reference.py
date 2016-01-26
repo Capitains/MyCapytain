@@ -106,23 +106,32 @@ class Reference(object):
         return self.reference
 
     def __getitem__(self, key):
-        """ Return part of or full passage reference 
-        
-        Available keys :
-            - *1 | start* : First part of the reference
-            - *2 | start_list* : Reference start parsed into a list
-            - *3 | start_sub* : Subreference start parsed into a tuple
-            - *4 | end* : Last part of the reference
-            - *5 | end_list* : Reference start parsed into a list
-            - *6 | end_sub* : Subreference end parsed into a tuple
-            - *default* : full string reference 
+        """ Return part of or full passage reference
 
         :param key: Identifier of the part to return
         :type key: basestring or int
         :rtype: basestring or List.<int> or None or Tuple.<string>
         :returns: Desired part of the passage reference
 
-        :Example:
+        +-----------+--------------+-----------------------------------------------------------------+
+        | Int Index | String Index | Identified part (examples uses 1.1@Achiles[1]-1.2@Zeus[1])      |
+        +===========+==============+=================================================================+
+        | 0         |              | Full object                                                     |
+        +-----------+--------------+-----------------------------------------------------------------+
+        | 1         | start        | First part of the reference. *Ex.* `1.1@Achiles[1]`             |
+        +-----------+--------------+-----------------------------------------------------------------+
+        | 2         | start_list   | Reference start parsed into a list. *Ex.* `['1', '1']`          |
+        +-----------+--------------+-----------------------------------------------------------------+
+        | 3         | start_sub    | Subreference start parsed into a tuple  *Ex.* `('Achiles', 1')` |
+        +-----------+--------------+-----------------------------------------------------------------+
+        | 4         | end          | First part of the reference. *Ex.* `1.2@Zeus[1]`                |
+        +-----------+--------------+-----------------------------------------------------------------+
+        | 5         | end_list     | Reference end parsed into a list. *Ex.* `['1', '2']`            |
+        +-----------+--------------+-----------------------------------------------------------------+
+        | 6         | end_sub      | Subreference end parsed into a tuple *Ex.* `('Zeus', 1')`       |
+        +-----------+--------------+-----------------------------------------------------------------+
+
+        :example:
             >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
             >>>    print(a[1]) # "1.1@Achiles[1]"
             >>>    print(a["start_list"]) # ("1", "1")
@@ -146,9 +155,18 @@ class Reference(object):
 
     @property
     def highest(self):
-        """ Return highest citation level
+        """ Return highest reference level
+
+        For references such as 1.1-1.2.8, with different level, it can be useful to access to the highest node in the
+        hierarchy. In this case, the highest level would be 1.1. The function would return ["1", "1"]
+
+        .. note:: By default, this property returns the start level
+
+        :rtype: list(str)
         """
-        if len(self.start) < len(self.end) and len(self.start):
+        if not self.end:
+            return self.list
+        elif len(self.start) < len(self.end) and len(self.start):
             return self.start
         elif len(self.start) > len(self.end) and len(self.end):
             return self.end
@@ -157,19 +175,30 @@ class Reference(object):
         return []
 
     def __len__(self):
-        """ Return depth of smallest reference level (Start list)
+        """ Return depth of highest reference level
+
+        For references such as 1.1-1.2.8, or simple references such as 1.a, with different level, it can be useful to
+        know the depth of the reference to access the right XPath for example. This property returns the depth of the
+        highest node
+
+        :example:
+            - len(1.1) == 2
+            - len(1.2.8-1.3) == 2
+            - len(1-1.2) == 1
+
+        :rtype: int
         """
         return len(self.highest)
 
     def __model(self):
         """ 3-Tuple model for references
         
-            First element is full text reference,
-            Second is list of passage identifiers
-            Third is subreference
+        First element is full text reference,
+        Second is list of passage identifiers
+        Third is subreference
 
-        :rtype: Tuple
-        :returns: An empty tuple to model data
+        :returns: An empty list to model data
+        :rtype: list
         """
         return [None, [], None, None]
 
@@ -204,11 +233,44 @@ class Reference(object):
 
     @property
     def start(self):
-        return self.parsed[0][1]
+        """ Quick access property for start list
+        """
+        if self.parsed[0][0] and len(self.parsed[0][0]):
+            return Reference(self.parsed[0][0])
 
     @property
     def end(self):
-        return self.parsed[1][1]
+        """ Quick access property for reference end list
+        """
+        if self.parsed[1][0] and len(self.parsed[1][0]):
+            return Reference(self.parsed[1][0])
+
+    @property
+    def list(self):
+        """ Return a list version of the object if it is a single passage
+
+        .. note:: Access to start list and end list should be done through obj.start.list and obj.end.list
+
+        :rtype: [str]
+        """
+        if not self.end:
+            return self.parsed[0][1]
+
+    @property
+    def subreference(self):
+        """ Return the subreference of a single node reference
+
+        .. note:: Access to start and end subreferencee should be done through obj.start.subreference
+        and obj.end.subreference
+
+        :rtype: (str, int)
+        """
+        if not self.end:
+            return Reference.convert_subreference(*self.parsed[0][2])
+
+    @staticmethod
+    def convert_subreference(word, counter):
+        return str(word), int(counter)
 
 
 class URN(object):

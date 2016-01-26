@@ -51,9 +51,9 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param reference: Subreference (optional)
+        :param reference: Passage reference
         :type reference: Reference
-        :rtype: List.basestring
+        :rtype: list(str)
         :returns: List of levels
         """
         if reference:

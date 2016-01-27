@@ -182,6 +182,15 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), hypercontext=False)
         self.assertEqual(a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
+    def test_get_passage_autoparse(self):
+        self.assertEqual(self.TEI._passages.resource, None)
+        a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), hypercontext=False)
+        self.assertNotEqual(self.TEI._passages.resource, None)
+        self.assertEqual(
+            a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ",
+            "Text are automatically parsed in GetPassage hypercontext = False"
+        )
+
     def test_get_Passage_context_no_double_slash(self):
         """ Check that get Passage contexts return right information """
         simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.2"))
@@ -279,6 +288,28 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
 
+    def test_get_passage_with_list(self):
+        """ In range, passage in between could be removed from the original text by error
+        """
+        simple = self.TEI.getPassage(["1", "pr", "2"])
+        self.assertEqual(
+            simple.text().strip(),
+            "tum, ut de illis queri non possit quisquis de se bene",
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+
+    def test_type_accepted_reference_validreff(self):
+        """ In range, passage in between could be removed from the original text by error
+        """
+        with self.assertRaises(TypeError):
+            self.TEI.getValidReff(reference=["1", "pr", "2", "5"])
+
+    def test_citation_length_error(self):
+        """ In range, passage in between could be removed from the original text by error
+        """
+        with self.assertRaises(ReferenceError):
+            self.TEI.getPassage(["1", "pr", "2", "5"])
+
     def test_ensure_passage_is_not_removed(self):
         """ In range, passage in between could be removed from the original text by error
         """
@@ -321,6 +352,20 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
                 "pr.1", "1.1", "1.2"
             ],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
+        )
+
+    def test_Text_text_function(self):
+        simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1"))
+        str_simple = simple.tostring(encoding=str)
+        text = MyCapytain.resources.texts.local.Text(
+            resource=str_simple,
+            citation=self.seneca.citation,
+            autoreffs=True
+        )
+        self.assertEqual(
+            text.text(exclude=["tei:note"]).strip(),
+            "Di coniugales tuque genialis tori,",
+            "Ensure text methods works on Text object"
         )
 
     def test_get_passage_hypercontext_double_slash_xpath(self):
@@ -613,4 +658,29 @@ class TestPassageRange(unittest.TestCase):
         self.assertEqual(
             DifferentRangePassage.next, None,
             "Next reff should be None when at the start"
+        )
+
+    def test_first_list(self):
+        DifferentRangePassage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("2.39")
+        )
+        self.assertEqual(
+            str(DifferentRangePassage.first), "2.39.1",
+            "First reff should be the first"
+        )
+        self.assertEqual(
+            str(DifferentRangePassage.last), "2.39.2",
+            "Last reff should be the last"
+        )
+
+        DifferentRangePassage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("2.39-2.40")
+        )
+        self.assertEqual(
+            str(DifferentRangePassage.first), "2.39.1",
+            "First reff should be the first"
+        )
+        self.assertEqual(
+            str(DifferentRangePassage.last), "2.40.8",
+            "Last reff should be the last"
         )

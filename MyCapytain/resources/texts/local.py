@@ -15,7 +15,7 @@ from past.builtins import basestring
 import warnings
 
 from MyCapytain.errors import DuplicateReference, RefsDeclError
-from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath
+from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 from MyCapytain.errors import InvalidSiblingRequest
@@ -183,7 +183,7 @@ class Text(text.Text):
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: int
-        :param reference: Subreference (optional)
+        :param reference: Passage Reference
         :type reference: Reference
         :returns: List of levels
         :rtype: list(basestring, str)
@@ -206,8 +206,8 @@ class Text(text.Text):
                     a, b = reference.start.list, reference.end.list
                     passages = [[]]
 
-            elif isinstance(reference, list):
-                passages = [reference]
+            else:
+                raise TypeError()
 
             depth = len(passages[0])
         else:
@@ -677,6 +677,44 @@ class ContextPassage(Passage):
         :rtype: None, Reference
         """
         return self.__getSiblings(direction=0)
+
+    def text(self, exclude=None):
+        """ Text content of the passage
+
+        :param exclude: Remove some nodes from text
+        :type exclude: List
+        :rtype: basestring
+        :returns: Text of the xml node
+        :Example:
+            >>>    P = Passage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+            >>>    P.text == "Ibis hello b ab excusso missus in astra sago. "
+            >>>    P.text(exclude=["note"]) == "Ibis hello b ab excusso missus in astra sago. "
+
+
+        """
+
+        if exclude is None:
+            exclude = ""
+        else:
+            exclude = "[{0}]".format(
+                " and ".join(
+                    "not(./ancestor-or-self::{0})".format(excluded)
+                    for excluded in exclude
+                )
+            )
+
+        return normalize(
+            " ".join(
+                [
+                    element
+                    for element
+                    in self.xpath(
+                        ".//descendant-or-self::text()" + exclude,
+                        namespaces=NS
+                    )
+                ]
+            )
+        )
 
     def __raiseDepth(self):
         """ Simple check that raises an exception if the passage cannot run first, last, next or prev

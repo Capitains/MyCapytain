@@ -9,7 +9,7 @@ The module `MyCapytain.resources.local.text` requires the `guidelines of Capitai
 Basics and examples
 ###################
 
-Getting all passages from a test
+Getting all passages from a text
 ********************************
 
 .. code-block:: python

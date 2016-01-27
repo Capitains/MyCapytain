@@ -279,6 +279,23 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
 
+    def test_ensure_passage_is_not_removed(self):
+        """ In range, passage in between could be removed from the original text by error
+        """
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr.1-1.2.5"))
+        orig_refs = self.TEI.getValidReff(level=3)
+        self.assertIn("1.pr.1", orig_refs)
+        self.assertIn("1.1.1", orig_refs)
+        self.assertIn("1.2.4", orig_refs)
+        self.assertIn("1.2.5", orig_refs)
+
+        simple = self.TEI.getPassage(MyCapytain.common.reference.Reference("1.pr-1.2"))
+        orig_refs = self.TEI.getValidReff(level=3)
+        self.assertIn("1.pr.1", orig_refs)
+        self.assertIn("1.1.1", orig_refs)
+        self.assertIn("1.2.4", orig_refs)
+        self.assertIn("1.2.5", orig_refs)
+
     def test_get_passage_hypercontext_complex_xpath(self):
         simple = self.text_complex.getPassage(MyCapytain.common.reference.Reference("pr.1-1.2"))
         str_simple = simple.tostring(encoding=str)

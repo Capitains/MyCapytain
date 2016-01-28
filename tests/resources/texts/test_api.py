@@ -232,6 +232,7 @@ class TestAPIText(unittest.TestCase):
             params={'urn': 'urn:cts:latinLit:phi1294.phi002.perseus-lat3', 'request': 'GetValidReff', 'level': '3'}
         )
 
+
 class TestCTSPassage(unittest.TestCase):
     """ Test CTS API implementation of Text
     """
@@ -322,3 +323,17 @@ class TestCTSPassage(unittest.TestCase):
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
         self.assertIsInstance(__prev, Passage)
+
+
+    def test_unicode_text(self):
+        """ Test text properties for pypy
+        """
+        # Now with a resource containing prevnext
+
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            resource=GET_PASSAGE,
+            parent=self.text
+        )
+
+        self.assertIn("لا یا ایها الساقی ادر کاسا و ناولها ###", passage.text())

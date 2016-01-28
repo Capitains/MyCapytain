@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
+from past.builtins import basestring
 from six import text_type as str
 
 import MyCapytain.resources.proto.text
@@ -254,8 +257,8 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
 
         if len(prevnext) > 0:
             prevnext = prevnext[0]
-            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
-            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
+            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, smart_strings=False)
+            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, smart_strings=False)
 
             if len(_next_xpath):
                _next = MyCapytain.common.reference.URN(_next_xpath[0])

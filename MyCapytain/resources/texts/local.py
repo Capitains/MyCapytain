@@ -601,6 +601,8 @@ class ContextPassage(Passage):
         :return: Result list
         :rtype: list(etree._Element)
         """
+        if "smart_strings" not in kwargs:
+            kwargs["smart_strings"] = False
         return self.resource.resource.xpath(*args, **kwargs)
 
     def tostring(self, *args, **kwargs):

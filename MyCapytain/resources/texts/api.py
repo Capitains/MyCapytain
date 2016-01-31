@@ -167,6 +167,23 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         return self.metadata
 
+    def getPrevNextUrn(self, reference):
+        """ Get the previous URN of a refeence of the text
+
+        :param reference: Reference from which to find siblings
+        :type reference: Reference
+        :return: (Previous Passage Reference,Next Passage Reference)
+        """
+        _prev, _next = Passage.prevnext(
+            self.resource.getPrevNextUrn(
+                urn="{}:{}".format(
+                    str(MyCapytain.common.reference.URN(str(self.urn))["text"]),
+                    str(reference)
+                )
+            )
+        )
+        return _prev, _next
+
     @property
     def reffs(self):
         """ Get all valid reffs for every part of the Text
@@ -192,10 +209,10 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         self.urn = urn
 
         # Could be set during parsing
-        self._next = None
-        self._prev = None
-        self.__first = None
-        self.__last = None
+        self._next = False
+        self._prev = False
+        self.__first = False
+        self.__last = False
 
         self.__parse()
 
@@ -206,7 +223,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: Passage
         :returns: Following passage at same level
         """
-        if self._next is not None:
+        if self._next is not False:
             _next = self._next
         else:
             # Request the next urn
@@ -223,7 +240,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: Passage
         :returns: Previous passage at same level
         """
-        if self._prev is not None:
+        if self._prev is not False:
            _prev = self._prev
         else:
             # Request the next urn
@@ -251,11 +268,12 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :return: Tuple representing previous and next urn
         :rtype: (URN, URN)
         """
-        _prev, _next = None, None
+        _prev, _next = False, False
         resource = MyCapytain.common.utils.xmlparser(resource)
         prevnext = resource.xpath("//ti:prevnext", namespaces=MyCapytain.common.utils.NS)
 
         if len(prevnext) > 0:
+            _next, _prev = None, None
             prevnext = prevnext[0]
             _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, smart_strings=False)
             _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, smart_strings=False)

@@ -188,6 +188,14 @@ class TestAPIText(unittest.TestCase):
         )
 
     @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    def test_get_prev_next_urn(self, requests):
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        requests.return_value.text = NEXT_PREV
+        _prev, _next = text.getPrevNextUrn("1.1")
+        self.assertEqual(str(_prev.reference), "1.pr", "Endpoint should be called and URN should be parsed")
+        self.assertEqual(str(_next.reference), "1.2", "Endpoint should be called and URN should be parsed")
+
+    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
     def test_init_without_citation(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = GET_PASSAGE
@@ -253,7 +261,9 @@ class TestCTSPassage(unittest.TestCase):
         self.endpoint = CTS(self.url)
         self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
-        self.text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
+        self.text = Text(
+            "urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation
+        )
 
     def test_next_getprevnext(self):
         """ Test next property, given that next information already exists or not)
@@ -267,8 +277,13 @@ class TestCTSPassage(unittest.TestCase):
 
         # When next does not exist from the original resource
         __next = passage.next
-        self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
-        self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2")
+
+        self.endpoint.getPrevNextUrn.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
+        )
+        self.endpoint.getPassage.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2"
+        )
         self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
         self.assertIsInstance(__next, Passage)
 
@@ -323,7 +338,6 @@ class TestCTSPassage(unittest.TestCase):
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
         self.assertIsInstance(__prev, Passage)
-
 
     def test_unicode_text(self):
         """ Test text properties for pypy

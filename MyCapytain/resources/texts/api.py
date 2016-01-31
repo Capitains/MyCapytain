@@ -217,38 +217,50 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         self.__parse()
 
     @property
-    def next(self):
-        """ Following passage
-
-        :rtype: Passage
-        :returns: Following passage at same level
-        """
-        if self._next is not False:
-            _next = self._next
-        else:
-            # Request the next urn
-            _prev, _next = Passage.prevnext(
-                self.parent.resource.getPrevNextUrn(urn=str(self.urn))
-            )
-
-        return self.parent.getPassage(reference=_next)
-
-    @property
     def prev(self):
         """ Previous passage
 
         :rtype: Passage
         :returns: Previous passage at same level
         """
-        if self._prev is not False:
-           _prev = self._prev
-        else:
+        if self._prev is False:
             # Request the next urn
-            _prev, _next = Passage.prevnext(
+            self._prev, self._next = Passage.prevnext(
                 self.parent.resource.getPrevNextUrn(urn=str(self.urn))
             )
+        return self._prev
 
-        return self.parent.getPassage(reference=_prev)
+    @property
+    def next(self):
+        """ Shortcut for getting the following passage
+
+        :rtype: MyCapytain.common.reference.Reference
+        :returns: Following passage reference
+        """
+        if self._next is False:
+            # Request the next urn
+            self._prev, self._next = Passage.prevnext(
+                self.parent.resource.getPrevNextUrn(urn=str(self.urn))
+            )
+        return self._next
+
+    def getNext(self):
+        """ Shortcut for getting the following passage
+
+        :rtype: Passage
+        :returns: Following passage at same level
+        """
+        if self.next:
+            return self.parent.getPassage(reference=self.next)
+
+    def getPrev(self):
+        """ Shortcut for getting the preceding passage
+
+        :rtype: Passage
+        :returns: Previous passage at same level
+        """
+        if self.prev:
+            return self.parent.getPassage(reference=self.prev)
 
     def __parse(self):
         """ Given self.resource, split informations from the CTS API

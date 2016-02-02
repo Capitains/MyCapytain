@@ -21,6 +21,10 @@ with open("tests/testing_data/cts/getpassageplus.xml") as f:
     GET_PASSAGE_PLUS = xmlparser(f)
 with open("tests/testing_data/cts/getprevnexturn.xml") as f:
     NEXT_PREV = xmlparser(f)
+with open("tests/testing_data/cts/getFirstUrn.xml") as f:
+    Get_FIRST = xmlparser(f)
+with open("tests/testing_data/cts/getFirstUrnEmpty.xml") as f:
+    Get_FIRST_EMPTY = xmlparser(f)
 with open("tests/testing_data/cts/getlabel.xml") as f:
     GET_LABEL = xmlparser(f)
 
@@ -196,6 +200,40 @@ class TestAPIText(unittest.TestCase):
         self.assertEqual(str(_next.reference), "1.2", "Endpoint should be called and URN should be parsed")
 
     @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    def test_first_urn(self, requests):
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        requests.return_value.text = Get_FIRST
+        first = text.getFirstUrn()
+        self.assertEqual(
+            str(first), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "Endpoint should be called and URN should be parsed"
+        )
+        requests.assert_called_with(
+            "http://services.perseids.org/api/cts",
+            params={
+                "request": "GetFirstUrn",
+                "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2"
+            }
+        )
+
+    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    def test_first_urn_when_empty(self, requests):
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        requests.return_value.text = Get_FIRST_EMPTY
+        first = text.getFirstUrn()
+        self.assertEqual(
+            first, None,
+            "Endpoint should be called and none should be returned if there is none"
+        )
+        requests.assert_called_with(
+            "http://services.perseids.org/api/cts",
+            params={
+                "request": "GetFirstUrn",
+                "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2"
+            }
+        )
+
+    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
     def test_init_without_citation(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = GET_PASSAGE
@@ -261,6 +299,7 @@ class TestCTSPassage(unittest.TestCase):
         self.endpoint = CTS(self.url)
         self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
+        self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
         self.text = Text(
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation
         )
@@ -365,3 +404,50 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         self.assertIn("لا یا ایها الساقی ادر کاسا و ناولها ###", passage.text())
+
+    def test_first_urn(self):
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            resource=GET_PASSAGE,
+            parent=text
+        )
+        self.assertEqual(
+            str(passage.first), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "Endpoint should be called and URN should be parsed"
+        )
+        self.endpoint.getFirstUrn.assert_called_with(
+            "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1"
+        )
+
+    def test_get_first(self):
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            resource=GET_PASSAGE,
+            parent=self.text
+        )
+
+        # When next does not exist from the original resource
+        first = passage.getFirst()
+        self.endpoint.getFirstUrn.assert_called_with("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1")
+        self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
+        self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
+        self.assertIsInstance(first, Passage)
+
+    def test_first_urn_when_empty(self):
+
+        endpoint = CTS(self.url)
+        endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST_EMPTY)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=endpoint)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            resource=GET_PASSAGE,
+            parent=text
+        )
+        self.assertEqual(
+            passage.first, None,
+            "Endpoint should be called and none should be returned if there is none"
+        )
+        endpoint.getFirstUrn.assert_called_with(
+            "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1"
+        )

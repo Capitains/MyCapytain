@@ -167,6 +167,29 @@ class Metadatum(object):
         """
         return len(self.children)
 
+    def __getstate__(self):
+        """ Pickling method
+
+        :return:
+        """
+        return dict(
+            name=self.name,
+            langs=[(key, val) for key, val in self.children.items()],
+            default=self.default
+        )
+
+    @staticmethod
+    def __setstate__(dic):
+        """ Unpickling method
+        :param value:
+        :return:
+        """
+        self = Metadatum(name=dic["name"])
+        self.children = OrderedDict(dic["langs"])
+        self.default = dic["default"]
+        return self
+
+
 
 class Metadata(object):
     """ 
@@ -319,3 +342,23 @@ class Metadata(object):
                 if isinstance(self.metadata[k], Metadatum)
             ]
         )
+
+    def __getstate__(self):
+        """ Pickling method
+
+        :return:
+        """
+        return {
+            key: getattr(value, "__getstate__")() for key, value in self.metadata.items()
+        }
+
+    def __setstate__(self, dic):
+        """ Unpickling method
+        :param value:
+        :return:
+        """
+
+        self.metadata = {
+            key: Metadatum.__setstate__(value) for key, value in dic.items()
+        }
+        self.__keys = list(dic.keys())

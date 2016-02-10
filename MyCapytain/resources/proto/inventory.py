@@ -107,6 +107,7 @@ class Resource(object):
         """
         raise NotImplementedError()
 
+
 class Text(Resource):
     """ Represents a CTS Text
     """
@@ -147,13 +148,29 @@ class Text(Resource):
                 if self.parents[0].texts[urn].subtype == "Edition"
             ]
 
+    def __getstate__(self):
+        """ Pickling method to be called upon dumping object
+
+        :return: Dictionary Representation
+        """
+
+        return dict(
+            metadata=getattr(self.metadata, "__getstate__")(),
+            urn=str(self.urn),
+            lang=self.lang,
+            subtype=self.subtype,
+            parents=[getattr(item, "__getstate__")(children=False) for item in self.parents],
+            citations=[getattr(value, "__getstate__")() for value in self.citation]
+        )
 
 def Edition(resource=None, urn=None, parents=None):
     return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
 
+
 def Translation(resource=None, urn=None, parents=None):
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
-    
+
+
 class Work(Resource):
     """ Represents a CTS Work
     """
@@ -195,6 +212,24 @@ class Work(Resource):
         else:
             return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation"]
 
+    def __getstate__(self, children=False):
+        """ Pickling method to be called upon dumping object
+
+        :return: Dictionary Representation
+        """
+        __dict__ = dict(
+            metadata=getattr(self.metadata, "__getstate__")(),
+            urn=str(self.urn),
+            parents=[getattr(item, "__getstate__")(children=False) for item in self.parents]
+        )
+        if children:
+            __dict__["texts"] = {
+                key: getattr(value, "__getstate__")() for key, value in self.texts.items()
+            }
+
+        return __dict__
+
+
 class TextGroup(Resource):
     """ Represents a CTS Textgroup
     """
@@ -222,6 +257,20 @@ class TextGroup(Resource):
         if resource is not None:
             self.setResource(resource)
 
+    def __getstate__(self, children=True):
+        """ Pickling method to be called upon dumping object
+
+        :return:
+        """
+        __dict__ = dict(
+            metadata=getattr(self.metadata, "__getstate__")(),
+            urn=str(self.urn)
+        )
+        if children:
+            __dict__["works"] = {
+                key: getattr(value, "__getstate__")() for key, value in self.textgroups.items()
+            }
+        return __dict__
 
 class TextInventory(Resource):
     """ Represents a CTS Inventory file
@@ -239,3 +288,15 @@ class TextInventory(Resource):
         self.parents = ()
         if resource is not None:
             self.setResource(resource)
+
+    def __getstate__(self):
+        """ Pickling method to be called upon dumping object
+
+        :return:
+        """
+        return {
+            "textgroups": {
+                key: getattr(value, "__getstate__")() for key, value in self.textgroups.items()
+            },
+            "id": self.id
+        }

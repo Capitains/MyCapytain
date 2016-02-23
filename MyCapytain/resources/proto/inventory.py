@@ -14,6 +14,7 @@ from past.builtins import basestring
 from collections import defaultdict
 from copy import copy
 from lxml import etree
+from six import text_type as str
 
 
 class Resource(object):

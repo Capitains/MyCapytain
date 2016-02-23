@@ -288,6 +288,11 @@ class TextInventory(Resource):
     def __len__(self):
         """
 
-        :return: Num
+        :return: Number of texts available in the inventory
         """
-        return len(self.textgroups)
+        return len([
+            text
+                for tg in self.textgroups.values()
+                for work in tg.works.values()
+                for text in work.texts.values()
+        ])

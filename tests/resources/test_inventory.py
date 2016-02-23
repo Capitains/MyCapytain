@@ -140,6 +140,11 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def tearDown(self):
         self.getCapabilities.close()
 
+    def test_xml_TextInventoryLength(self):
+        """ Tests TextInventory parses without errors """
+        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        self.assertEqual(len(TI), 4)
+
     def test_xml_TextInventoryParsing(self):
         """ Tests TextInventory parses without errors """
         TI = TextInventory(resource=self.getCapabilities, id="TestInv")

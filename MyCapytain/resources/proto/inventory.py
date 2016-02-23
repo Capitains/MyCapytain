@@ -284,3 +284,10 @@ class TextInventory(Resource):
         self.parents = list()
         if resource is not None:
             self.setResource(resource)
+
+    def __len__(self):
+        """
+
+        :return: Num
+        """
+        return len(self.textgroups)

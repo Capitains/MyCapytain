@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 from MyCapytain.resources.proto import inventory, text
 from MyCapytain.common.reference import Citation as CitationPrototype
 from MyCapytain.common.utils import xmlparser, NS
-
+import re
 from six import text_type as str
 import collections
 
@@ -21,6 +21,9 @@ class Citation(CitationPrototype):
     """ Citation XML implementation for TextInventory
 
     """
+
+    escape = re.compile('(")')
+
     def __str__(self):
         """ Returns a string text inventory version of the object 
 
@@ -39,10 +42,10 @@ class Citation(CitationPrototype):
         if self.name is not None:
             label = self.name
 
-        return "<ti:citation label='{label}' xpath='{xpath}' scope='{scope}'>{child}</ti:citation>".format(
+        return """<ti:citation label="{label}" xpath="{xpath}" scope="{scope}">{child}</ti:citation>""".format(
             child=child,
-            xpath=self.xpath,
-            scope=self.scope,
+            xpath=re.sub(Citation.escape, "'", self.xpath),
+            scope=re.sub(Citation.escape, "'", self.scope),
             label=label
         )
 
@@ -81,6 +84,7 @@ class Citation(CitationPrototype):
             return citation
 
         return None
+
 
 def xpathDict(xml, xpath, children, parents, **kwargs):
     """ Returns a default Dict given certain informations
@@ -212,7 +216,7 @@ class Text(inventory.Text):
         elif issubclass(output, text.Text):
             complete_metadata = self.metadata
             for parent in self.parents:
-                if isinstance(parent, inventory.Resource):
+                if isinstance(parent, inventory.Resource) and hasattr(parent, "metadata"):
                     complete_metadata = complete_metadata + parent.metadata
             return output(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
 
@@ -223,7 +227,6 @@ class Text(inventory.Text):
         :param xpath: Xpath to use to retrieve the xml node
         """
         self.citation = Citation.ingest(xml, self.citation, xpath)
-
 
     def parse(self, resource):
         """ Parse a resource to feed the object
@@ -308,7 +311,6 @@ class Work(inventory.Work):
                 )
             else:
                 strings.append("<ti:work xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
-
         for tag, metadatum in self.metadata:
             for lang, value in metadatum:
                 strings.append("<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(tag=tag, lang=lang, value=value))
@@ -352,13 +354,13 @@ class Work(inventory.Work):
             xml=self.xml,
             xpath='ti:edition',
             children=Edition,
-            parents=tuple([self]) + self.parents
+            parents=[self] + self.parents
         )
         self.__translations = xpathDict(
             xml=self.xml,
             xpath='ti:translation',
             children=Translation,
-            parents=tuple([self]) + self.parents
+            parents=[self] + self.parents
         )
 
         self.texts = collections.defaultdict(Text)
@@ -429,7 +431,7 @@ class TextGroup(inventory.TextGroup):
             xml=self.xml,
             xpath='ti:work',
             children=Work,
-            parents=(self, self.parents)
+            parents=[self] + self.parents
         )
         return self.works
 
@@ -483,6 +485,6 @@ class TextInventory(inventory.TextInventory):
             xml=self.xml,
             xpath='//ti:textgroup',
             children=TextGroup,
-            parents=self
+            parents=[self]
         )
         return self.textgroups

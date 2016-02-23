@@ -17,14 +17,14 @@ from copy import copy
 
 
 class Metadatum(object):
-    """ Metadatum object represent a single field of metadata 
-        
+    """ Metadatum object represent a single field of metadata
+
     :param name: Name of the field
     :type name: basestring
     :param children: List of tuples, where first element is the key, and second the value
     :type children: List
 
-    :Example: 
+    :Example:
         >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
         >>>    print(a["lat"]) # == "Amores"
 
@@ -48,9 +48,9 @@ class Metadatum(object):
     def __getitem__(self, key):
         """ Add an iterable access method
 
-        Int typed key access to the *n* th registered key in the instance. 
+        Int typed key access to the *n* th registered key in the instance.
         If string based key does not exist, see for a default.
-        
+
         :param key: Key of wished value
         :type key: basestring, tuple, int
         :returns: An element of children whose index is key
@@ -61,7 +61,7 @@ class Metadatum(object):
             >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
             >>>    print(a["lat"]) # Amores
             >>>    print(a[("lat", "fre")]) # Amores, Les Amours
-            >>>    print(a[0]) # Amores 
+            >>>    print(a[0]) # Amores
             >>>    print(a["dut"]) # Amores
 
         """
@@ -84,7 +84,7 @@ class Metadatum(object):
 
     def __setitem__(self, key, value):
         """ Register index key and value for the instance
-        
+
         :param key: Index key(s) for the metadata
         :type key: basestring, list, tuple
         :param value: Values for the metadata
@@ -130,7 +130,7 @@ class Metadatum(object):
         :returns: Default key
         :raises: `ValueError` If key is not registered
 
-        :Example: 
+        :Example:
             >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
             >>>    a.setDefault("fre")
             >>>    print(a["eng"]) # == "Les Amours"
@@ -178,23 +178,21 @@ class Metadatum(object):
             default=self.default
         )
 
-    @staticmethod
-    def __setstate__(dic):
+    def __setstate__(self, dic):
         """ Unpickling method
         :param value:
         :return:
         """
-        self = Metadatum(name=dic["name"])
+        self.name = dic["name"]
         self.children = OrderedDict(dic["langs"])
         self.default = dic["default"]
         return self
 
 
-
 class Metadata(object):
-    """ 
+    """
         A metadatum aggregation object provided to centralize metadata
-        
+
         :param key: A metadata field name
         :type key: List.<basestring>
 
@@ -217,7 +215,7 @@ class Metadata(object):
 
     def __getitem__(self, key):
         """ Add a quick access system through getitem on the instance
-        
+
         :param key: Index key representing a set of metadatum
         :type key: basestring, int, tuple
         :returns: An element of children whose index is key
@@ -250,7 +248,7 @@ class Metadata(object):
 
     def __setitem__(self, key, value):
         """ Set a new metadata field
-        
+
         :param key: Name of metadatum field
         :type key: basestring, tuple
         :param value: Metadum dictionary
@@ -316,7 +314,8 @@ class Metadata(object):
             >>> b = Metadata(name="title")
             >>> a + b == Metadata(name=["label", "title"])
         """
-        result = copy(self)
+        from copy import deepcopy
+        result = deepcopy(self)
         for metadata_key, metadatum in other:
             if metadata_key in self.__keys:
                 for key, value in metadatum:
@@ -354,11 +353,13 @@ class Metadata(object):
 
     def __setstate__(self, dic):
         """ Unpickling method
-        :param value:
+        :param dic: Dictionary with request valied
         :return:
         """
+        self.metadata = defaultdict(Metadatum)
 
-        self.metadata = {
-            key: Metadatum.__setstate__(value) for key, value in dic.items()
-        }
-        self.__keys = list(dic.keys())
+        self.__keys = []
+        for key, value in dic.items():
+            self.__keys.append(key)
+            self.metadata[key] = getattr(Metadatum(name=value["name"]), "__setstate__")(value)
+        return self

@@ -13,7 +13,9 @@ from __future__ import unicode_literals
 from collections import defaultdict
 from past.builtins import basestring
 from six import text_type as str
-from builtins import range, object
+from builtins import \
+    range, object
+from copy import copy
 import re
 
 
@@ -801,6 +803,17 @@ class Citation(object):
                 lambda m: REF_REPLACER(m, passage),
                 self.refsDecl
             )
+
+    def __getstate__(self):
+        """ Pickling method
+
+        :return:
+        """
+        return copy(self.__dict__)
+
+    def __setstate__(self, dic):
+        self.__dict__ = dic
+        return self
 
 
 def REF_REPLACER(match, passage):

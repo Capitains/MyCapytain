@@ -26,15 +26,27 @@ REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
 
 
 class Reference(object):
-
     """ A reference object giving informations
 
     :param reference: Passage Reference part of a Urn
     :type reference: basestring
+    :ivar parent: Parent Reference
+    :type parent: Reference
+    :ivar highest: List representation of the range member which is the highest in the hierarchy (If equal, start is returned)
+    :type highest: Reference
+    :ivar start: First part of the range
+    :type start: Reference
+    :ivar end: Second part of the range
+    :type end: Reference
+    :ivar list: List representation of the range. Not available for range
+    :type list: list
+    :ivar subreference: Word and Word counter ("Achiles", 1) representing the subreference. Not available for range
+    :type subreference: (str, int)
 
     :Example:
         >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
         >>>    b = Reference(reference="1.1")
+        >>>    Reference("1.1-2.2.2").highest == ["1", "1"]
 
     Reference object supports the following magic methods : len(), str() and eq().
 
@@ -43,8 +55,8 @@ class Reference(object):
         >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
         >>>    b == Reference("1.1") && b != a
 
-    .. automethod:: parent, highest, start, end, list, subreference
-    .. exclude-members:: convert_subreference
+    .. note::
+        While Reference(...).subreference and .list are not available for range, Reference(..).start.subreference and Reference(..).end.subreference as well as .list are available
     """
 
     def __init__(self, reference=""):
@@ -91,17 +103,17 @@ class Reference(object):
 
         .. note:: By default, this property returns the start level
 
-        :rtype: list(str)
+        :rtype: Reference
         """
         if not self.end:
-            return self.list
+            return self
         elif len(self.start) < len(self.end) and len(self.start):
             return self.start
         elif len(self.start) > len(self.end) and len(self.end):
             return self.end
         elif len(self.start):
             return self.start
-        return []
+        return self
 
     @property
     def start(self):
@@ -132,7 +144,7 @@ class Reference(object):
     def subreference(self):
         """ Return the subreference of a single node reference
 
-        .. note:: Access to start and end subreferencee should be done through obj.start.subreference
+        .. note:: Access to start and end subreference should be done through obj.start.subreference
         and obj.end.subreference
 
         :rtype: (str, int)
@@ -154,7 +166,7 @@ class Reference(object):
 
         :rtype: int
         """
-        return len(self.highest)
+        return len(self.highest.list)
 
     def __str__(self):
         """ Return full reference in string format

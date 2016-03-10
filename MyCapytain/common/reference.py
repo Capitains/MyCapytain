@@ -257,8 +257,31 @@ class URN(object):
     :ivar reference: CTS Reference
     :type reference: Reference
 
+    :cvar NAMESPACE: Constant representing the URN until its namespace
+    :cvar TEXTGROUP: Constant representing the URN until its textgroup
+    :cvar WORK: Constant representing the URN until its work
+    :CVAR VERSION: Constant representing the URN until its version
+    :cvar PASSAGE: Constant representing the URN until its full passage
+    :cvar PASSAGE_START: Constant representing the URN until its passage (end excluded)
+    :cvar PASSAGE_END: Constant representing the URN until its passage (start excluded)
+    :cvar NO_PASSAGE: Constant representing the URN until its passage excluding its passage
+    :cvar COMPLETE: Constant representing the complete URN
+
     :Example:
         >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
+
+    URN object supports the following magic methods : len(), str() and eq(), gt() and lt().
+
+    :Example:
+        >>>     b = URN("urn:cts:latinLit:phi1294.phi002")
+        >>>     a != b
+        >>>     a > b # It has more member. Only member count is compared
+        >>>     b < a
+        >>>     len(a) == 5 # Reference is not counted to not induce count equivalencies with the optional version
+        >>>     len(b) == 4
+
+    .. exclude-members:: all
+    .. automethod:: upTo
     """
 
     NAMESPACE = 0
@@ -270,17 +293,6 @@ class URN(object):
     PASSAGE_END = 6
     NO_PASSAGE = 10
     COMPLETE = 100
-
-    __order = [
-        "full",
-        "urn_namespace",
-        "cts_namespace",
-        "textgroup",
-        "work",
-        "version",
-        "passage",
-        "reference"  # Reference is a more complex object
-    ]
 
     def __init__(self, urn):
         self.__urn = None
@@ -441,10 +453,10 @@ class URN(object):
     def upTo(self, key):
         """ Returns the urn up to given level using URN Constants
 
-        :param key: Identifier of the wished resource
-        :type key: int or basestring
-        :rtype: basestring or Reference
-        :returns: Part or complete URN
+        :param key: Identifier of the wished resource using URN constants
+        :type key: int
+        :returns: String representation of the partial URN requested
+        :rtype: str
 
         :Example:
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 

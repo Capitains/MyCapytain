@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
+from past.builtins import basestring
 from six import text_type as str
 
 import MyCapytain.resources.proto.text
@@ -7,6 +10,7 @@ import MyCapytain.resources.inventory
 import MyCapytain.endpoints.proto
 import MyCapytain.common.metadata
 import MyCapytain.common.utils
+import MyCapytain.common.reference
 
 
 class Text(MyCapytain.resources.proto.text.Text):
@@ -50,9 +54,9 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param reference: Subreference (optional)
+        :param reference: Passage reference
         :type reference: Reference
-        :rtype: List.basestring
+        :rtype: list(str)
         :returns: List of levels
         """
         if reference:
@@ -82,13 +86,19 @@ class Text(MyCapytain.resources.proto.text.Text):
         """ Retrieve a passage and store it in the object
 
         :param reference: Reference of the passage
-        :type reference: MyCapytain.common.reference.Reference or List of basestring
+        :type reference: MyCapytain.common.reference.Reference, or MyCapytain.common.reference.URN, or str or list(str)
         :rtype: Passage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
         """
-        if reference:
+        if isinstance(reference, MyCapytain.common.reference.URN):
+            urn = str(reference)
+        elif isinstance(reference, MyCapytain.common.reference.Reference):
+            urn = "{0}:{1}".format(self.urn, str(reference))
+        elif isinstance(reference, str):
             urn = "{0}:{1}".format(self.urn, reference)
+        elif isinstance(reference, list):
+            urn = "{0}:{1}".format(self.urn, ".".join(reference))
         else:
             urn = str(self.urn)
 
@@ -157,6 +167,49 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         return self.metadata
 
+    def getPrevNextUrn(self, reference):
+        """ Get the previous URN of a reference of the text
+
+        :param reference: Reference from which to find siblings
+        :type reference: Reference
+        :return: (Previous Passage Reference,Next Passage Reference)
+        """
+        _prev, _next = Passage.prevnext(
+            self.resource.getPrevNextUrn(
+                urn="{}:{}".format(
+                    str(
+                        MyCapytain.common.reference.URN(
+                            str(self.urn)).upTo(MyCapytain.common.reference.URN.NO_PASSAGE)
+                    ),
+                    str(reference)
+                )
+            )
+        )
+        return _prev, _next
+
+    def getFirstUrn(self, reference=None):
+        """ Get the first children URN for a given resource
+
+        :param reference: Reference from which to find child (If None, find first reference)
+        :type reference: Reference, str
+        :return: Children URN
+        :rtype: URN
+        """
+        if reference:
+            urn = "{}:{}".format(
+                str(MyCapytain.common.reference.URN(str(self.urn)).upTo(MyCapytain.common.reference.URN.NO_PASSAGE)),
+                str(reference)
+            )
+        else:
+            urn = self.urn
+
+        _first = Passage.firstUrn(
+            self.resource.getFirstUrn(
+                urn
+            )
+        )
+        return _first
+
     @property
     def reffs(self):
         """ Get all valid reffs for every part of the Text
@@ -182,29 +235,24 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         self.urn = urn
 
         # Could be set during parsing
-        self._next = None
-        self._prev = None
-        self.__first = None
-        self.__last = None
+        self.__next = False
+        self.__prev = False
+        self.__first = False
+        self.__last = False
 
         self.__parse()
 
     @property
-    def next(self):
-        """ Following passage
+    def first(self):
+        """ Children passage
 
         :rtype: Passage
-        :returns: Following passage at same level
+        :returns: Previous passage at same level
         """
-        if self._next is not None:
-            _next = self._next
-        else:
+        if self.__first is False:
             # Request the next urn
-            _prev, _next = Passage.prevnext(
-                self.parent.resource.getPrevNextUrn(urn=str(self.urn))
-            )
-
-        self.parent.resource.getPassage(urn=_next)
+            self.__first = self.parent.getFirstUrn(reference=str(self.urn.reference))
+        return self.__first
 
     @property
     def prev(self):
@@ -213,15 +261,49 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: Passage
         :returns: Previous passage at same level
         """
-        if self._prev is not None:
-           _prev = self._prev
-        else:
+        if self.__prev is False:
             # Request the next urn
-            _prev, _next = Passage.prevnext(
-                self.parent.resource.getPrevNextUrn(urn=str(self.urn))
-            )
+            self.__prev, self.__next = self.parent.getPrevNextUrn(reference=self.urn.reference)
+        return self.__prev
 
-        return self.parent.resource.getPassage(urn=_prev)
+    @property
+    def next(self):
+        """ Shortcut for getting the following passage
+
+        :rtype: MyCapytain.common.reference.Reference
+        :returns: Following passage reference
+        """
+        if self.__next is False:
+            # Request the next urn
+            self.__prev, self.__next = self.parent.getPrevNextUrn(reference=self.urn.reference)
+        return self.__next
+
+    def getNext(self):
+        """ Shortcut for getting the following passage
+
+        :rtype: Passage
+        :returns: Following passage at same level
+        """
+        if self.next:
+            return self.parent.getPassage(reference=self.next)
+
+    def getPrev(self):
+        """ Shortcut for getting the preceding passage
+
+        :rtype: Passage
+        :returns: Previous passage at same level
+        """
+        if self.prev:
+            return self.parent.getPassage(reference=self.prev)
+
+    def getFirst(self):
+        """ Shortcut for getting the first child passage
+
+        :rtype: Passage
+        :returns: Previous passage at same level
+        """
+        if self.first:
+            return self.parent.getPassage(reference=self.first)
 
     def __parse(self):
         """ Given self.resource, split informations from the CTS API
@@ -230,7 +312,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         """
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=MyCapytain.common.utils.NS)[0]
 
-        self._prev, self._next = Passage.prevnext(self.resource)
+        self.__prev, self.__next = Passage.prevnext(self.resource)
 
     @staticmethod
     def prevnext(resource):
@@ -239,22 +321,41 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :param resource: XML Resource
         :type resource: etree._Element
         :return: Tuple representing previous and next urn
-        :rtype: (str, str)
+        :rtype: (URN, URN)
         """
-        _prev, _next = None, None
+        _prev, _next = False, False
         resource = MyCapytain.common.utils.xmlparser(resource)
         prevnext = resource.xpath("//ti:prevnext", namespaces=MyCapytain.common.utils.NS)
 
         if len(prevnext) > 0:
+            _next, _prev = None, None
             prevnext = prevnext[0]
-            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
-            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS)
+            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, smart_strings=False)
+            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, smart_strings=False)
 
             if len(_next_xpath):
-               _next = _next_xpath[0]
+               _next = MyCapytain.common.reference.URN(_next_xpath[0])
 
             if len(_prev_xpath):
-                _prev = _prev_xpath[0]
+                _prev = MyCapytain.common.reference.URN(_prev_xpath[0])
 
         return _prev, _next
+
+    @staticmethod
+    def firstUrn(resource):
+        """ Parse a resource to get the first URN
+
+        :param resource: XML Resource
+        :type resource: etree._Element
+        :return: Tuple representing previous and next urn
+        :rtype: (URN, URN)
+        """
+        _child = False
+        resource = MyCapytain.common.utils.xmlparser(resource)
+        urn = resource.xpath("//ti:reply/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, magic_string=True)
+
+        if len(urn) > 0:
+            urn = str(urn[0])
+
+            return MyCapytain.common.reference.URN(urn)
 

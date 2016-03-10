@@ -6,6 +6,7 @@ import six
 from collections import defaultdict
 from MyCapytain.common.metadata import Metadata, Metadatum
 
+
 class TestMetadatum(unittest.TestCase):
     def test_init(self):
         a = Metadatum("title")

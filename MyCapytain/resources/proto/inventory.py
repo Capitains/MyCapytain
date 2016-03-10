@@ -8,10 +8,13 @@
 
 """
 
-from MyCapytain.common.reference import URN, Reference
+from MyCapytain.common.reference import URN, Reference, Citation
 from MyCapytain.common.metadata import Metadata
 from past.builtins import basestring
 from collections import defaultdict
+from copy import copy
+from lxml import etree
+from six import text_type as str
 
 
 class Resource(object):
@@ -49,8 +52,8 @@ class Resource(object):
             return False
         elif self.resource is None:
             # Not totally true
-            return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn)
-        return (hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn) and self.resource == other.resource
+            return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn
+        return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn and self.resource == other.resource
 
     def __str__(self):
         raise NotImplementedError()
@@ -78,12 +81,14 @@ class Resource(object):
             elif isinstance(self, Work):
                 children = self.texts
 
-            order = ["", "", "textgroup", "work", "text"]
-
+            order = ["", "", URN.TEXTGROUP, URN.WORK, URN.VERSION]
             while i <= len(urn) - 1:
-                children = children[urn[order[i]]]
-                if not hasattr(children, "urn") or str(children.urn) != urn[order[i]]:
-                    raise ValueError("Unrecognized urn at level " + order[i])
+                children = children[urn.upTo(order[i])]
+                if not hasattr(children, "urn") or str(children.urn) != urn.upTo(order[i]):
+                    error = "Unrecognized urn at " + [
+                        "URN namespace", "CTS Namespace", "URN Textgroup", "URN Work", "URN Version"
+                    ][i]
+                    raise ValueError(error)
                 i += 1
             return children
 
@@ -108,6 +113,34 @@ class Resource(object):
         """
         raise NotImplementedError()
 
+    def __getstate__(self, children=True):
+        """ Pickling method to be called upon dumping object
+
+        :return:
+        """
+
+        dic = copy(self.__dict__)
+        if "xml" in dic:
+            dic["xml"] = etree.tostring(dic["xml"], encoding=str)
+        if "resource" in dic:
+            del dic["resource"]
+        """ The resource is unecessary in later than parsing state
+        if "resource" in dic:
+            dic["resource"] = str(dic["resource"])
+        """
+        return dic
+
+    def __setstate__(self, dic):
+        """
+
+        :param dic:
+        :return:
+        """
+        self.__dict__ = dic
+        if "xml" in dic:
+            self.xml = etree.fromstring(dic["xml"])
+        return self
+
 
 class Text(Resource):
     """ Represents a CTS Text
@@ -124,11 +157,10 @@ class Text(Resource):
         self.lang = None
         self.urn = None
         self.docname = None
-        self.parents = ()
+        self.parents = list()
         self.subtype = subtype
         self.validate = None
         self.metadata = Metadata(keys=["label", "description", "namespaceMapping"])
-        # self.citations = ()
 
         if urn is not None:
             self.urn = URN(urn)
@@ -140,29 +172,26 @@ class Text(Resource):
         if resource is not None:
             self.setResource(resource)
 
-        if self.subtype == "Edition":
-            self.translations = lambda key=None: self.parents[0].getLang(key)
-        elif self.subtype == "Translation":
-            self.editions = lambda: [
-                self.parents[0].texts[urn] 
-                for urn in self.parents[0].texts 
+    def translations(self, key=None):
+        """ Get translations in given language
+
+        :param key: Language ISO Code to filter on
+        :return:
+        """
+        return self.parents[0].getLang(key)
+
+    def editions(self):
+        """ Get all editions of the texts
+
+        :return: List of editions
+        :rtype: [Text]
+        """
+        return [
+                self.parents[0].texts[urn]
+                for urn in self.parents[0].texts
                 if self.parents[0].texts[urn].subtype == "Edition"
             ]
 
-    def __getstate__(self):
-        """ Pickling method to be called upon dumping object
-
-        :return: Dictionary Representation
-        """
-
-        return dict(
-            metadata=getattr(self.metadata, "__getstate__")(),
-            urn=str(self.urn),
-            lang=self.lang,
-            subtype=self.subtype,
-            parents=[getattr(item, "__getstate__")(children=False) for item in self.parents],
-            citations=[getattr(value, "__getstate__")() for value in self.citation]
-        )
 
 def Edition(resource=None, urn=None, parents=None):
     return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
@@ -188,7 +217,7 @@ class Work(Resource):
         self.lang = None
         self.urn = None
         self.texts = defaultdict(Text)
-        self.parents = ()
+        self.parents = list()
         self.metadata = Metadata(keys=["title"])
 
         if urn is not None:
@@ -213,23 +242,6 @@ class Work(Resource):
         else:
             return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation"]
 
-    def __getstate__(self, children=False):
-        """ Pickling method to be called upon dumping object
-
-        :return: Dictionary Representation
-        """
-        __dict__ = dict(
-            metadata=getattr(self.metadata, "__getstate__")(),
-            urn=str(self.urn),
-            parents=[getattr(item, "__getstate__")(children=False) for item in self.parents]
-        )
-        if children:
-            __dict__["texts"] = {
-                key: getattr(value, "__getstate__")() for key, value in self.texts.items()
-            }
-
-        return __dict__
-
 
 class TextGroup(Resource):
     """ Represents a CTS Textgroup
@@ -246,32 +258,18 @@ class TextGroup(Resource):
         """
         self.urn = None
         self.works = defaultdict(Work)
-        self.parents = ()
+        self.parents = list()
         self.metadata = Metadata(keys=["groupname"])
 
         if urn is not None:
             self.urn = URN(urn)
 
         if parents:
-            self.parents = [parents]
+            self.parents = parents
 
         if resource is not None:
             self.setResource(resource)
 
-    def __getstate__(self, children=True):
-        """ Pickling method to be called upon dumping object
-
-        :return:
-        """
-        __dict__ = dict(
-            metadata=getattr(self.metadata, "__getstate__")(),
-            urn=str(self.urn)
-        )
-        if children:
-            __dict__["works"] = {
-                key: getattr(value, "__getstate__")() for key, value in self.textgroups.items()
-            }
-        return __dict__
 
 class TextInventory(Resource):
     """ Represents a CTS Inventory file
@@ -286,18 +284,18 @@ class TextInventory(Resource):
         """
         self.textgroups = defaultdict(TextGroup)
         self.id = id
-        self.parents = ()
+        self.parents = list()
         if resource is not None:
             self.setResource(resource)
 
-    def __getstate__(self):
-        """ Pickling method to be called upon dumping object
-
-        :return:
+    def __len__(self):
         """
-        return {
-            "textgroups": {
-                key: getattr(value, "__getstate__")() for key, value in self.textgroups.items()
-            },
-            "id": self.id
-        }
+
+        :return: Number of texts available in the inventory
+        """
+        return len([
+            text
+                for tg in self.textgroups.values()
+                for work in tg.works.values()
+                for text in work.texts.values()
+        ])

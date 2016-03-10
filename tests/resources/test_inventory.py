@@ -2,22 +2,109 @@
 from __future__ import unicode_literals
 
 import unittest
-from io import open
-import lxml.etree as etree
-import lxml.objectify
 import xmlunittest
+import lxml.etree as etree
+from io import open, StringIO
 from copy import deepcopy
 from six import text_type as str
+from operator import attrgetter
 
 from MyCapytain.resources.inventory import *
 import MyCapytain.resources.proto.text
 
 
+class XML_Compare(object):
+    """
+    Original https://gist.github.com/dalelane/a0514b2e283a882d9ef3
+    """
+    @staticmethod
+    def sortbyid(elem):
+        id = elem.get('urn') or elem.get("xml:lang")
+        if id:
+            try:
+                return str(id)
+            except ValueError:
+                return ""
+        return ""
+
+    @staticmethod
+    def sortbytext(elem):
+        text = elem.text
+        if text:
+            return text
+        else:
+            return ''
+
+    @staticmethod
+    def sortAttrs(item, sorteditem):
+        attrkeys = sorted(item.keys())
+        for key in attrkeys:
+            sorteditem.set(key, item.get(key))
+
+    @staticmethod
+    def sortElements(items, newroot):
+        # The intended sort order is to sort by XML element name
+        #  If more than one element has the same name, we want to
+        #   sort by their text contents.
+        #  If more than one element has the same name and they do
+        #   not contain any text contents, we want to sort by the
+        #   value of their ID attribute.
+        #  If more than one element has the same name, but has
+        #   no text contents or ID attribute, their order is left
+        #   unmodified.
+        #
+        # We do this by performing three sorts in the reverse order
+        items = sorted(items, key=XML_Compare.sortbyid)
+        items = sorted(items, key=XML_Compare.sortbytext)
+        items = sorted(items, key=attrgetter('tag'))
+
+        # Once sorted, we sort each of the items
+        for item in items:
+            # Create a new item to represent the sorted version
+            #  of the next item, and copy the tag name and contents
+            newitem = etree.Element(item.tag)
+            if item.text and item.text.isspace() == False:
+                newitem.text = item.text
+
+            # Copy the attributes (sorted by key) to the new item
+            XML_Compare.sortAttrs(item, newitem)
+
+            # Copy the children of item (sorted) to the new item
+            XML_Compare.sortElements(list(item), newitem)
+
+            # Append this sorted item to the sorted root
+            newroot.append(newitem)
+
+    @staticmethod
+    def sortString(str_xml):
+        # parse the XML file and get a pointer to the top
+        xmlroot = etree.parse(StringIO(str_xml)).getroot()
+
+        # create a new XML element that will be the top of
+        #  the sorted copy of the XML file
+        newxmlroot = etree.Element(xmlroot.tag)
+
+        # create the sorted copy of the XML file
+        XML_Compare.sortAttrs(xmlroot, newxmlroot)
+        XML_Compare.sortElements(list(xmlroot), newxmlroot)
+
+        # write the sorted XML file to the temp file
+        newtree = etree.ElementTree(newxmlroot)
+
+        return etree.tostring(newtree, encoding=str, pretty_print=True)
+
+
 def compareSTR(one, other):
-    return (one.replace("\n", ""), other.replace("\n", ""))
+    return XML_Compare.sortString(one.replace("\n", "")), XML_Compare.sortString(other.replace("\n", ""))
+
 
 def compareXML(one, other):
-    return (etree.tostring(one, encoding=str).replace("\n", ""), other.replace("\n", ""))
+    parser = etree.XMLParser(remove_blank_text=True)
+    return (
+        etree.tostring(etree.fromstring(etree.tostring(one, encoding=str).replace("\n", ""), parser), method="c14n"),
+        etree.tostring(etree.fromstring(other.replace("\n", ""), parser), method="c14n")
+    )
+
 
 class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
@@ -48,10 +135,15 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:groupname xml:lang='lat'>Martialis</ti:groupname>""" + self.wk + """</ti:textgroup>""".replace("\n", "")
 
         self.t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + self.tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
-
+        self.maxDiff = None
 
     def tearDown(self):
         self.getCapabilities.close()
+
+    def test_xml_TextInventoryLength(self):
+        """ Tests TextInventory parses without errors """
+        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        self.assertEqual(len(TI), 15)
 
     def test_xml_TextInventoryParsing(self):
         """ Tests TextInventory parses without errors """
@@ -161,6 +253,21 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 resource=5
             )
 
+    def test_Inventory_pickle(self):
+        """ Tests TextInventory parses without errors """
+        TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
+        from pickle import dumps, loads
+
+        dp = dumps(TI)
+        ti = str(loads(dp))
+
+        self.assertEqual(
+            *compareSTR(
+                ti,
+                str(TI)
+            )
+        )
+
     def test_Inventory_metadata(self):
         """ Tests TextInventory parses without errors """
         TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
@@ -183,9 +290,9 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:validate schema='tei-epidoc.rng'/>
 <ti:namespaceMapping abbreviation='tei' nsURI='http://www.tei-c.org/ns/1.0'/>
 <ti:citationMapping>
-<ti:citation label='book' xpath='/tei:div[@n="?"]' scope='/tei:TEI/tei:text/tei:body/tei:div'>
-<ti:citation label='poem' xpath='/tei:div[@n="?"]' scope='/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n="?"]'>
-<ti:citation label='line' xpath='/tei:l[@n="?"]' scope='/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n="?"]/tei:div[@n="?"]'></ti:citation>
+<ti:citation label='book' xpath="/tei:div[@n='?']" scope='/tei:TEI/tei:text/tei:body/tei:div'>
+<ti:citation label='poem' xpath="/tei:div[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+<ti:citation label='line' xpath="/tei:l[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"></ti:citation>
 </ti:citation>
 </ti:citation>
 </ti:citationMapping>
@@ -298,6 +405,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                     self.t.replace("tiid='annotsrc' ", "")
                 )
             )
+
 
 class TestCitation(unittest.TestCase):
     def test_empty(self):

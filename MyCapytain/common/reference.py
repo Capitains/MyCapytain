@@ -5,14 +5,17 @@
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
->>> from MyCapytain.common.reference import (URN, Reference, Citation)
+>>> from MyCapytain.common.reference import URN, Reference, Citation
 
 """
 from __future__ import unicode_literals
 
 from collections import defaultdict
 from past.builtins import basestring
-from builtins import range, object
+from six import text_type as str
+from builtins import \
+    range, object
+from copy import copy
 import re
 
 
@@ -23,29 +26,165 @@ REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
 
 
 class Reference(object):
-
     """ A reference object giving informations
 
     :param reference: Passage Reference part of a Urn
     :type reference: basestring
+    :ivar parent: Parent Reference
+    :type parent: Reference
+    :ivar highest: List representation of the range member which is the highest in the hierarchy (If equal, start is returned)
+    :type highest: Reference
+    :ivar start: First part of the range
+    :type start: Reference
+    :ivar end: Second part of the range
+    :type end: Reference
+    :ivar list: List representation of the range. Not available for range
+    :type list: list
+    :ivar subreference: Word and Word counter ("Achiles", 1) representing the subreference. Not available for range
+    :type subreference: (str, int)
 
     :Example:
         >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
         >>>    b = Reference(reference="1.1")
+        >>>    Reference("1.1-2.2.2").highest == ["1", "1"]
 
-    .. automethod:: __str__
-    .. automethod:: __eq__
-    .. automethod:: __getitem__
-    .. automethod:: __setitem__
+    Reference object supports the following magic methods : len(), str() and eq().
+
+    :Example:
+        >>>    len(a) == 2 && len(b) == 1
+        >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
+        >>>    b == Reference("1.1") && b != a
+
+    .. note::
+        While Reference(...).subreference and .list are not available for range, Reference(..).start.subreference and Reference(..).end.subreference as well as .list are available
     """
 
-    def __init__(self, reference):
+    def __init__(self, reference=""):
         self.reference = reference
-        self.parsed = self.__parse(reference)
+        if reference == "":
+            self.parsed = (self.__model(), self.__model())
+        else:
+            self.parsed = self.__parse(reference)
+
+    @property
+    def parent(self):
+        """ Parent of the actual URN, for example, 1.1 for 1.1.1
+
+        :rtype: Reference
+        """
+        if len(self.parsed[0][1]) == 1 and len(self.parsed[1][1]) <= 1:
+            return None
+        else:
+            if len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) == 0:
+                return Reference("{0}{1}".format(
+                    ".".join(list(self.parsed[0][1])[0:-1]),
+                    self.parsed[0][3] or ""
+                ))
+            elif len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) > 1:
+                first = list(self.parsed[0][1])[0:-1]
+                last = list(self.parsed[1][1])[0:-1]
+                if first == last and self.parsed[1][3] is None \
+                    and self.parsed[0][3] is None:
+                    return Reference(".".join(first))
+                else:
+                    return Reference("{0}{1}-{2}{3}".format(
+                        ".".join(first),
+                        self.parsed[0][3] or "",
+                        ".".join(list(self.parsed[1][1])[0:-1]),
+                        self.parsed[1][3] or ""
+                    ))
+
+    @property
+    def highest(self):
+        """ Return highest reference level
+
+        For references such as 1.1-1.2.8, with different level, it can be useful to access to the highest node in the
+        hierarchy. In this case, the highest level would be 1.1. The function would return ["1", "1"]
+
+        .. note:: By default, this property returns the start level
+
+        :rtype: Reference
+        """
+        if not self.end:
+            return self
+        elif len(self.start) < len(self.end) and len(self.start):
+            return self.start
+        elif len(self.start) > len(self.end) and len(self.end):
+            return self.end
+        elif len(self.start):
+            return self.start
+        return self
+
+    @property
+    def start(self):
+        """ Quick access property for start list
+        """
+        if self.parsed[0][0] and len(self.parsed[0][0]):
+            return Reference(self.parsed[0][0])
+
+    @property
+    def end(self):
+        """ Quick access property for reference end list
+        """
+        if self.parsed[1][0] and len(self.parsed[1][0]):
+            return Reference(self.parsed[1][0])
+
+    @property
+    def list(self):
+        """ Return a list version of the object if it is a single passage
+
+        .. note:: Access to start list and end list should be done through obj.start.list and obj.end.list
+
+        :rtype: [str]
+        """
+        if not self.end:
+            return self.parsed[0][1]
+
+    @property
+    def subreference(self):
+        """ Return the subreference of a single node reference
+
+        .. note:: Access to start and end subreference should be done through obj.start.subreference
+        and obj.end.subreference
+
+        :rtype: (str, int)
+        """
+        if not self.end:
+            return Reference.convert_subreference(*self.parsed[0][2])
+
+    def __len__(self):
+        """ Return depth of highest reference level
+
+        For references such as 1.1-1.2.8, or simple references such as 1.a, with different level, it can be useful to
+        know the depth of the reference to access the right XPath for example. This property returns the depth of the
+        highest node
+
+        :example:
+            - len(1.1) == 2
+            - len(1.2.8-1.3) == 2
+            - len(1-1.2) == 1
+
+        :rtype: int
+        """
+        return len(self.highest.list)
+
+    def __str__(self):
+        """ Return full reference in string format
+
+        :rtype: basestring
+        :returns: String representation of Reference Object
+
+        :Example:
+            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
+            >>>    b = Reference(reference="1.1")
+            >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
+            >>>    str(b) == "1.1"
+        """
+        return self.reference
 
     def __eq__(self, other):
         """ Equality checker for Reference object
-        
+
         :param other: An object to be checked against
         :rtype: boolean
         :returns: Equality between other and self
@@ -60,96 +199,15 @@ class Reference(object):
         return (isinstance(other, self.__class__)
                 and self.reference == str(other))
 
-    @property
-    def parent(self):
-        """
-
-        :return:
-        """
-        if len(self.parsed[0][1]) == 1 and len(self.parsed[1][1]) <= 1:
-            return None
-        else:
-            if len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) == 0:
-                return "{0}{1}".format(
-                    ".".join(list(self.parsed[0][1])[0:-1]),
-                    self.parsed[0][3] or ""
-                )
-            elif len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) > 1:
-                first = list(self.parsed[0][1])[0:-1]
-                last = list(self.parsed[1][1])[0:-1]
-                if first == last and self.parsed[1][3] is None \
-                    and self.parsed[0][3] is None:
-                    return ".".join(first)
-                else:
-                    return "{0}{1}-{2}{3}".format(
-                        ".".join(first),
-                        self.parsed[0][3] or "",
-                        ".".join(list(self.parsed[1][1])[0:-1]),
-                        self.parsed[1][3] or ""
-                    )
-
-    def __str__(self):
-        """ Return full reference in string format
-        
-        :rtype: basestring
-        :returns: String representation of Reference Object
-
-        :Example:
-            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    b = Reference(reference="1.1")
-            >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
-            >>>    str(b) == "1.1"
-        """
-        return self.reference
-
-    def __getitem__(self, key):
-        """ Return part of or full passage reference 
-        
-        Available keys :
-            - *1 | start* : First part of the reference
-            - *2 | start_list* : Reference start parsed into a list
-            - *3 | start_sub* : Subreference start parsed into a tuple
-            - *4 | end* : Last part of the reference
-            - *5 | end_list* : Reference start parsed into a list
-            - *6 | end_sub* : Subreference end parsed into a tuple
-            - *default* : full string reference 
-
-        :param key: Identifier of the part to return
-        :type key: basestring or int
-        :rtype: basestring or List.<int> or None or Tuple.<string>
-        :returns: Desired part of the passage reference
-
-        :Example:
-            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    print(a[1]) # "1.1@Achiles[1]"
-            >>>    print(a["start_list"]) # ("1", "1")
-            >>>    print(a[6]) # ("Zeus", "1")
-            >>>    print(a[7]) # "1.1@Achiles[1]-1.2@Zeus[1]"
-        """
-        if key == 1 or key == "start":
-            return self.parsed[0][0]
-        elif key == 4 or key == "end":
-            return self.parsed[1][0]
-        elif key == 2 or key == "start_list":
-            return self.parsed[0][1]
-        elif key == 5 or key == "end_list":
-            return self.parsed[1][1]
-        elif key == 3 or key == "start_sub":
-            return self.parsed[0][2]
-        elif key == 6 or key == "end_sub":
-            return self.parsed[1][2]
-        else:
-            return self.reference
-
     def __model(self):
         """ 3-Tuple model for references
         
-            First element is full text reference,
-            Second is list of passage identifiers
-            Third is subreference
+        First element is full text reference,
+        Second is list of passage identifiers
+        Third is subreference
 
-        :rtype: Tuple
-        :returns: An empty tuple to model data
+        :returns: An empty list to model data
+        :rtype: list
         """
         return [None, [], None, None]
 
@@ -182,40 +240,131 @@ class Reference(object):
             element[i] = tuple(element[i])
         return tuple(element)
 
+    @staticmethod
+    def convert_subreference(word, counter):
+        if len(counter) and word:
+            return str(word), int(counter)
+        elif len(counter) == 0 and word:
+            return str(word), 0
+        else:
+            return "", 0
+
 
 class URN(object):
 
     """ A URN object giving all useful sections 
 
     :param urn: A CTS URN
-    :type urn: basestring
+    :type urn: str
+    :ivar urn_namespace: Namespace of the URN
+    :type urn_namespace: str
+    :ivar namespace: CTS Namespace
+    :type namespace: str
+    :ivar textgroup: CTS Textgroup
+    :type textgroup: str
+    :ivar work: CTS Work
+    :type work: str
+    :ivar version: CTS Version
+    :type version: str
+    :ivar reference: CTS Reference
+    :type reference: Reference
+    :cvar NAMESPACE: Constant representing the URN until its namespace
+    :cvar TEXTGROUP: Constant representing the URN until its textgroup
+    :cvar WORK: Constant representing the URN until its work
+    :cvar VERSION: Constant representing the URN until its version
+    :cvar PASSAGE: Constant representing the URN until its full passage
+    :cvar PASSAGE_START: Constant representing the URN until its passage (end excluded)
+    :cvar PASSAGE_END: Constant representing the URN until its passage (start excluded)
+    :cvar NO_PASSAGE: Constant representing the URN until its passage excluding its passage
+    :cvar COMPLETE: Constant representing the complete URN
 
     :Example:
         >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
 
-    .. automethod:: __len__
-    .. automethod:: __gt__
-    .. automethod:: __lt__
-    .. automethod:: __eq__
-    .. automethod:: __str__
-    .. automethod:: __getitem__
-    """
-        
+    URN object supports the following magic methods : len(), str() and eq(), gt() and lt().
 
-    __order = [
-        "full",
-        "urn_namespace",
-        "cts_namespace",
-        "textgroup",
-        "work",
-        "text",
-        "passage",
-        "reference"  # Reference is a more complex object
-    ]
+    :Example:
+        >>>     b = URN("urn:cts:latinLit:phi1294.phi002")
+        >>>     a != b
+        >>>     a > b # It has more member. Only member count is compared
+        >>>     b < a
+        >>>     len(a) == 5 # Reference is not counted to not induce count equivalencies with the optional version
+        >>>     len(b) == 4
+
+    .. exclude-members:: all
+    .. automethod:: upTo
+    """
+
+    NAMESPACE = 0
+    TEXTGROUP = 1
+    WORK = 2
+    VERSION = 3
+    PASSAGE = 4
+    PASSAGE_START = 5
+    PASSAGE_END = 6
+    NO_PASSAGE = 10
+    COMPLETE = 100
 
     def __init__(self, urn):
-        self.urn = urn
-        self.parsed = self.__parse(self.urn)
+        self.__urn = None
+        self.__parsed = self.__parse(urn)
+
+    @property
+    def urn_namespace(self):
+        return self.__parsed["urn_namespace"]
+
+    @urn_namespace.setter
+    def urn_namespace(self, value):
+        self.__urn = None
+        self.__parsed["urn_namespace"] = value
+
+    @property
+    def namespace(self):
+        return self.__parsed["cts_namespace"]
+
+    @namespace.setter
+    def namespace(self, value):
+        self.__urn = None
+        self.__parsed["cts_namespace"] = value
+
+    @property
+    def textgroup(self):
+        return self.__parsed["textgroup"]
+
+    @textgroup.setter
+    def textgroup(self, value):
+        self.__urn = None
+        self.__parsed["textgroup"] = value
+
+    @property
+    def work(self):
+        return self.__parsed["work"]
+
+    @work.setter
+    def work(self, value):
+        self.__urn = None
+        self.__parsed["work"] = value
+
+    @property
+    def version(self):
+        return self.__parsed["version"]
+
+    @version.setter
+    def version(self, value):
+        self.__urn = None
+        self.__parsed["version"] = value
+
+    @property
+    def reference(self):
+        return self.__parsed["reference"]
+
+    @reference.setter
+    def reference(self, value):
+        self.__urn = None
+        if isinstance(value, Reference):
+            self.__parsed["reference"] = value
+        else:
+            self.__parsed["reference"] = Reference(value)
 
     def __len__(self):
         """ Returns the len of the URN
@@ -227,12 +376,14 @@ class URN(object):
 
         :Example:
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
-            >>>    print(len(a)) # 
-
-
+            >>>    print(len(a))
         """
         
-        items = [key for key in self.parsed if key not in ["passage", "reference", "full"] ]
+        items = [
+            key
+            for key, value in self.__parsed.items()
+            if key not in ["reference"] and value is not None
+        ]
         return len(items)
 
     def __gt__(self, other):
@@ -283,7 +434,7 @@ class URN(object):
             >>>    (b == a) == False # 
         """
         return (isinstance(other, self.__class__)
-                and self.parsed["full"] == other["full"])
+                and self.__str__() == str(other))
 
     def __str__(self):
         """ Return full initial urn
@@ -295,178 +446,128 @@ class URN(object):
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
             >>>    str(a) == "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         """
-        return self.urn
+        if self.__urn is None:
+            urn = "urn:" + self.__parsed["urn_namespace"]
+            if self.namespace:
+                urn += ":" + self.namespace
+                if self.textgroup:
+                    urn += ":" + self.textgroup
+                    if self.work:
+                        urn += "." + self.work
+                        if self.version:
+                            urn += "." + self.version
+                        if self.reference:
+                            urn += ":" + str(self.reference)
+            self.__urn = urn
+        return self.__urn
 
-    def __getitem__(self, key):
-        """ Returns the urn (int) level or up to (str) level. 
-        
+    def upTo(self, key):
+        """ Returns the urn up to given level using URN Constants
 
-        Available keys :
-            - *0* :  URN
-            - *full* : URN
-            - *1* :  Namespace of the urn (cts)
-            - *urn_namespace* : URN until the Namespace of the urn 
-            - *2* :  CTS Namespace of the URN (e.g. latinLit)
-            - *cts_namespace* : URN until the CTS Namespace
-            - *3* :  Textgroup of the URN
-            - *textgroup* : URN until the Textgroup
-            - *4* :  Work of the URN
-            - *work* : URN until the Work
-            - *5* :  Text of the URN
-            - *text* : URN until the Text
-            - *6* or *passage*:  Passage of URN
-
-        :param key: Identifier of the wished resource
-        :type key: int or basestring
-        :rtype: basestring or Reference
-        :returns: Part or complete URN
-        :warning: *urn:* is not counted as an element !
+        :param key: Identifier of the wished resource using URN constants
+        :type key: int
+        :returns: String representation of the partial URN requested
+        :rtype: str
 
         :Example:
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
-            >>>    a["textgroup"] == "urn:cts:latinLit:phi1294"
-            >>>    a[3] == "phi1294
+            >>>    a.upTo(URN.TEXTGROUP) == "urn:cts:latinLit:phi1294"
         """
-        if isinstance(key, int) and key < len(URN.__order):
-            return self.parsed[URN.__order[key]]
-        elif key == "urn_namespace":
-            return ":".join(["urn", self.parsed["urn_namespace"]])
-        elif key == "cts_namespace":
+        middle = [
+            component
+            for component in [self.__parsed["textgroup"], self.__parsed["work"], self.__parsed["version"]]
+            if component is not None
+        ]
+
+        if key == URN.COMPLETE:
+            return self.__str__()
+        elif key == URN.NAMESPACE:
             return ":".join([
                 "urn",
-                self.parsed["urn_namespace"],
-                self.parsed["cts_namespace"]])
-        elif key == "textgroup" and "textgroup" in self.parsed:
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"]])
+        elif key == URN.TEXTGROUP and self.__parsed["textgroup"]:
             return ":".join([
                 "urn",
-                self.parsed["urn_namespace"],
-                self.parsed["cts_namespace"],
-                self.parsed["textgroup"]
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"],
+                self.__parsed["textgroup"]
             ])
-        elif key == "work" and "work" in self.parsed:
+        elif key == URN.WORK and self.__parsed["work"]:
             return ":".join([
                 "urn",
-                self.parsed["urn_namespace"],
-                self.parsed["cts_namespace"],
-                ".".join(
-                    [
-                        self.parsed["textgroup"],
-                        self.parsed["work"]
-                    ])
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"],
+                ".".join([self.__parsed["textgroup"], self.__parsed["work"]])
             ])
-        elif key == "text" and "text" in self.parsed:
+        elif key == URN.VERSION and self.__parsed["version"]:
             return ":".join([
                 "urn",
-                self.parsed["urn_namespace"],
-                self.parsed["cts_namespace"],
-                ".".join(
-                    [
-                        self.parsed["textgroup"],
-                        self.parsed["work"],
-                        self.parsed["text"]
-                    ])
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"],
+                ".".join(middle)
             ])
-        elif key == "passage" and "passage" in self.parsed:
-            if "text" in self.parsed:
-                return ":".join([
-                    "urn",
-                    self.parsed["urn_namespace"],
-                    self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"],
-                            self.parsed["text"]
-                        ]),
-                    self.parsed["passage"]
-                ])
-            else:
-                return ":".join([
-                    "urn",
-                    self.parsed["urn_namespace"],
-                    self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"]
-                        ]),
-                    self.parsed["passage"]
-                ])
-        elif key == "start" and "passage" in self.parsed:
-            if "text" in self.parsed:
-                return ":".join([
-                    "urn",
-                    self.parsed["urn_namespace"],
-                    self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"],
-                            self.parsed["text"]
-                        ]),
-                    self.parsed["reference"]["start"]
-                ])
-            else:
-                return ":".join([
-                    "urn",
-                    self.parsed["urn_namespace"],
-                    self.parsed["cts_namespace"],
-                    ".".join(
-                        [
-                            self.parsed["textgroup"],
-                            self.parsed["work"]
-                        ]),
-                    self.parsed["reference"]["start"]
-                ])
-        elif key == "end" and "passage" in self.parsed and self.parsed["reference"]["end"] is not None:
-            if "text" in self.parsed:
-                return ":".join([
-                    "urn",
-                    self.parsed["urn_namespace"],
-                    self.parsed["cts_namespace"],
-                    ".".join([
-                        self.parsed["textgroup"],
-                        self.parsed["work"],
-                        self.parsed["text"]
-                    ]),
-                    self.parsed["reference"]["end"]
-                ])
-            else:
-                return ":".join([
-                    "urn",
-                    self.parsed["urn_namespace"],
-                    self.parsed["cts_namespace"],
-                    ".".join([
-                        self.parsed["textgroup"],
-                        self.parsed["work"]
-                    ]),
-                    self.parsed["reference"]["end"]
-                ])
-        elif key == "full":
-            return self.parsed["full"]
-        elif key == "reference" and "reference" in self.parsed:
-            return self.parsed["reference"]
+        elif key == URN.NO_PASSAGE and self.__parsed["work"]:
+            return ":".join([
+                "urn",
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"],
+                ".".join(middle)
+            ])
+        elif key == URN.PASSAGE and self.__parsed["reference"]:
+            return ":".join([
+                "urn",
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"],
+                ".".join(middle),
+                str(self.reference)
+            ])
+        elif key == URN.PASSAGE_START and self.__parsed["reference"]:
+            return ":".join([
+                "urn",
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"],
+                ".".join(middle),
+                str(self.reference.start)
+            ])
+        elif key == URN.PASSAGE_END and self.__parsed["reference"] and self.reference.end is not None:
+            return ":".join([
+                "urn",
+                self.__parsed["urn_namespace"],
+                self.__parsed["cts_namespace"],
+                ".".join(middle),
+                str(self.reference.end)
+            ])
         else:
-            return None
+            raise KeyError("Provided key is not recognized.")
+
+    @staticmethod
+    def model():
+        return {
+            "urn_namespace": None,
+            "cts_namespace": None,
+            "textgroup": None,
+            "work": None,
+            "version": None,
+            "reference": None
+        }
 
     def __parse(self, urn):
         """ Parse a URN
-        
 
         :param urn: A URN:CTS
         :type urn: basestring
         :rtype: defaultdict.basestring
         :returns: Dictionary representation
         """
-        parsed = defaultdict(str)
-        parsed["full"] = urn.split("#")[0]
-        urn = parsed["full"].split(":")
+        parsed = URN.model()
+        self.__urn = urn.split("#")[0]
+        urn = self.__urn.split(":")
         if isinstance(urn, list) and len(urn) > 2:
             parsed["urn_namespace"] = urn[1]
             parsed["cts_namespace"] = urn[2]
 
             if len(urn) == 5:
-                parsed["passage"] = urn[4]
                 parsed["reference"] = Reference(urn[4])
 
             if len(urn) >= 4:
@@ -476,7 +577,7 @@ class URN(object):
                 if len(urn) >= 2:
                     parsed["work"] = urn[1]
                 if len(urn) >= 3:
-                    parsed["text"] = urn[2]
+                    parsed["version"] = urn[2]
         else:
             raise ValueError("URN is empty")
         return parsed
@@ -495,9 +596,17 @@ class Citation(object):
     :type refsDecl: basestring
     :param child: A citation
     :type child: Citation
+    :ivar name: Name of the citation (e.g. "book")
+    :type name: basestring
+    :ivar xpath: Xpath of the citation (As described by CTS norm)
+    :type xpath: basestring
+    :ivar scope: Scope of the citation (As described by CTS norm)
+    :type xpath: basestring
+    :ivar refsDecl: refsDecl version
+    :type refsDecl: basestring
+    :ivar child: A citation
+    :type child: Citation
 
-    .. automethod:: __iter__
-    .. automethod:: __len__
     """
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
@@ -644,13 +753,27 @@ class Citation(object):
         """ Fill the xpath with given informations
 
         :param passage: Passage reference
-        :type passage: Reference or lsit
+        :type passage: Reference or list or None. Can be list of None and not None
         :param xpath: If set to True, will return the replaced self.xpath value and not the whole self.refsDecl
         :type xpath: Boolean
         :rtype: basestring
         :returns: Xpath to find the passage
+
+        .. code-block:: python
+
+            citation = Citation(name="line", scope="/TEI/text/body/div/div[@n=\"?\"]",xpath="//l[@n=\"?\"]")
+            print(citation.fill(["1", None]))
+            # /TEI/text/body/div/div[@n='1']//l[@n]
+            print(citation.fill(None))
+            # /TEI/text/body/div/div[@n]//l[@n]
+            print(citation.fill(Reference("1.1"))
+            # /TEI/text/body/div/div[@n='1']//l[@n='1']
+            print(citation.fill("1", xpath=True)
+            # //l[@n='1']
+
+
         """
-        if xpath is True: # Then passage is a string or None
+        if xpath is True:  # Then passage is a string or None
             xpath = self.xpath
 
             if passage is None:
@@ -661,12 +784,29 @@ class Citation(object):
             return REFERENCE_REPLACER.sub(replacement, xpath)
         else:        
             if isinstance(passage, Reference):
-                passage = passage[2]
-            passage = iter(passage)    
+                passage = passage.list or passage.start.list
+            elif passage is None:
+                return REFERENCE_REPLACER.sub(
+                    r"\1",
+                    self.refsDecl
+                )
+            passage = iter(passage)
             return REFERENCE_REPLACER.sub(
                 lambda m: REF_REPLACER(m, passage),
                 self.refsDecl
             )
+
+    def __getstate__(self):
+        """ Pickling method
+
+        :return:
+        """
+        return copy(self.__dict__)
+
+    def __setstate__(self, dic):
+        self.__dict__ = dic
+        return self
+
 
 def REF_REPLACER(match, passage):
     """ Helper to replace xpath/scope/refsDecl on iteration with passage value

@@ -71,6 +71,7 @@ class CTS(MyCapytain.endpoints.proto.CTS):
         :type inventory: text
         :param level: Depth of references expected
         :type level: int
+        :return: XML Response from the API as string
         :rtype: str
         """
         return self.call({

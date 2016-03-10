@@ -1,0 +1,8 @@
+<CTS:GetFirstUrn xmlns:tei="http://www.tei-c.org/ns/1.0" xmlns:CTS="http://chs.harvard.edu/xmlns/cts">
+    <CTS:request elapsed-time="111">
+        <CTS:requestName>GetFirstUrn</CTS:requestName>
+    </CTS:request>
+    <CTS:reply>
+        <CTS:urn />
+    </CTS:reply>
+</CTS:GetFirstUrn>

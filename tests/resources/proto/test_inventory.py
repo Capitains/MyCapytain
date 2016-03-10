@@ -58,7 +58,7 @@ class TestRepoProto(unittest.TestCase):
 
         self.assertEqual(a["urn:cts:greekLit:tg"], a)
 
-        with six.assertRaisesRegex(self, ValueError, "Unrecognized urn at level"):
+        with six.assertRaisesRegex(self, ValueError, "Unrecognized urn at URN Textgroup"):
             b["urn:cts:greekLit:tg2"]
         
     def test_edit_trans(self):

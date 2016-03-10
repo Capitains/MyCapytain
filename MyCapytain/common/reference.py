@@ -36,10 +36,14 @@ class Reference(object):
         >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
         >>>    b = Reference(reference="1.1")
 
-    .. automethod:: __str__
-    .. automethod:: __eq__
-    .. automethod:: __getitem__
-    .. automethod:: __setitem__
+    Reference object supports the following magic methods : len(), str() and eq().
+
+    :Example:
+        >>>    len(a) == 2 && len(b) == 1
+        >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
+        >>>    b == Reference("1.1") && b != a
+
+    .. automethod:: parent, highest, start, end, list, subreference
     """
 
     def __init__(self, reference=""):
@@ -181,57 +185,6 @@ class Reference(object):
         """
         return (isinstance(other, self.__class__)
                 and self.reference == str(other))
-
-    def __getitem__(self, key):
-        """ Return part of or full passage reference
-
-        :param key: Identifier of the part to return
-        :type key: basestring or int
-        :rtype: basestring or List.<int> or None or Tuple.<string>
-        :returns: Desired part of the passage reference
-
-        +-----------+--------------+-----------------------------------------------------------------+
-        | Int Index | String Index | Identified part (examples uses 1.1@Achiles[1]-1.2@Zeus[1])      |
-        +===========+==============+=================================================================+
-        | 0         |              | Full object                                                     |
-        +-----------+--------------+-----------------------------------------------------------------+
-        | 1         | start        | First part of the reference. *Ex.* `1.1@Achiles[1]`             |
-        +-----------+--------------+-----------------------------------------------------------------+
-        | 2         | start_list   | Reference start parsed into a list. *Ex.* `['1', '1']`          |
-        +-----------+--------------+-----------------------------------------------------------------+
-        | 3         | start_sub    | Subreference start parsed into a tuple  *Ex.* `('Achiles', 1')` |
-        +-----------+--------------+-----------------------------------------------------------------+
-        | 4         | end          | First part of the reference. *Ex.* `1.2@Zeus[1]`                |
-        +-----------+--------------+-----------------------------------------------------------------+
-        | 5         | end_list     | Reference end parsed into a list. *Ex.* `['1', '2']`            |
-        +-----------+--------------+-----------------------------------------------------------------+
-        | 6         | end_sub      | Subreference end parsed into a tuple *Ex.* `('Zeus', 1')`       |
-        +-----------+--------------+-----------------------------------------------------------------+
-
-        .. deprecated:: 0.1.0
-            Use .start, .end, .list and .subreference instead
-
-        :example:
-            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    print(a[1]) # "1.1@Achiles[1]"
-            >>>    print(a["start_list"]) # ("1", "1")
-            >>>    print(a[6]) # ("Zeus", "1")
-            >>>    print(a[7]) # "1.1@Achiles[1]-1.2@Zeus[1]"
-        """
-        if key == 1 or key == "start":
-            return self.parsed[0][0]
-        elif key == 4 or key == "end":
-            return self.parsed[1][0]
-        elif key == 2 or key == "start_list":
-            return self.parsed[0][1]
-        elif key == 5 or key == "end_list":
-            return self.parsed[1][1]
-        elif key == 3 or key == "start_sub":
-            return self.parsed[0][2]
-        elif key == 6 or key == "end_sub":
-            return self.parsed[1][2]
-        else:
-            return self.reference
 
     def __model(self):
         """ 3-Tuple model for references

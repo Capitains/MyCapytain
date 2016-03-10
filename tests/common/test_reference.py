@@ -20,20 +20,7 @@ class TestReferenceImplementation(unittest.TestCase):
         a = Reference("1.1.1")
         self.assertEqual(len(a), 3)
 
-    def test_str_getitem(self):
-        """
-        .. deprecated:: 0.1.0
-        """
-        a = Reference("1.1@Achilles[0]-1.10@Atreus[3]")
-        self.assertEqual(a["start"], "1.1@Achilles[0]")
-        self.assertEqual(a["start_list"], ["1", "1"])
-        self.assertEqual(a["start_sub"][0], "Achilles")
-        self.assertEqual(a["end"], "1.10@Atreus[3]")
-        self.assertEqual(a["end_list"], ["1", "10"])
-        self.assertEqual(a["end_sub"][1], "3")
-        self.assertEqual(a["end_sub"], ("Atreus", "3"))
-
-    def test_int_getItem(self):
+    def test_properties(self):
         a = Reference("1.1@Achilles-1.10@Atreus[3]")
         self.assertEqual(str(a.start), "1.1@Achilles")
         self.assertEqual(a.start.list, ["1", "1"])

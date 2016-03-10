@@ -44,6 +44,7 @@ class Reference(object):
         >>>    b == Reference("1.1") && b != a
 
     .. automethod:: parent, highest, start, end, list, subreference
+    .. exclude-members:: convert_subreference
     """
 
     def __init__(self, reference=""):
@@ -242,16 +243,22 @@ class URN(object):
     """ A URN object giving all useful sections 
 
     :param urn: A CTS URN
-    :type urn: basestring
+    :type urn: str
+    :ivar urn_namespace: Namespace of the URN
+    :type urn_namespace: str
+    :ivar namespace: CTS Namespace
+    :type namespace: str
+    :ivar textgroup: CTS Textgroup
+    :type textgroup: str
+    :ivar work: CTS Work
+    :type work: str
+    :ivar version: CTS Version
+    :type version: str
+    :ivar reference: CTS Reference
+    :type reference: Reference
 
     :Example:
         >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
-
-    .. automethod:: __len__
-    .. automethod:: __gt__
-    .. automethod:: __lt__
-    .. automethod:: __eq__
-    .. automethod:: __str__
     """
 
     NAMESPACE = 0

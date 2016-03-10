@@ -596,9 +596,21 @@ class Citation(object):
     :type refsDecl: basestring
     :param child: A citation
     :type child: Citation
-
+    :ivar name: Name of the citation (e.g. "book")
+    :type name: basestring
+    :ivar xpath: Xpath of the citation (As described by CTS norm)
+    :type xpath: basestring
+    :ivar scope: Scope of the citation (As described by CTS norm)
+    :type xpath: basestring
+    :ivar refsDecl: refsDecl version
+    :type refsDecl: basestring
+    :ivar child: A citation
+    :type child: Citation
+    
+    .. automethod:: fill
     .. automethod:: __iter__
     .. automethod:: __len__
+
     """
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):

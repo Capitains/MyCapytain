@@ -244,7 +244,6 @@ class URN(object):
 
     :param urn: A CTS URN
     :type urn: str
-
     :ivar urn_namespace: Namespace of the URN
     :type urn_namespace: str
     :ivar namespace: CTS Namespace
@@ -257,7 +256,6 @@ class URN(object):
     :type version: str
     :ivar reference: CTS Reference
     :type reference: Reference
-
     :cvar NAMESPACE: Constant representing the URN until its namespace
     :cvar TEXTGROUP: Constant representing the URN until its textgroup
     :cvar WORK: Constant representing the URN until its work
@@ -283,8 +281,6 @@ class URN(object):
 
     .. exclude-members:: all
     .. automethod:: upTo
-   .. autoattribute:: 
-      :annotation:
     """
 
     NAMESPACE = 0

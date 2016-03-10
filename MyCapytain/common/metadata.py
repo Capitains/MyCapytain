@@ -13,7 +13,6 @@ from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 from past.builtins import basestring
 from builtins import range, object
-from copy import copy
 
 
 class Metadatum(object):

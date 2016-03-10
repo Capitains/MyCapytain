@@ -81,11 +81,14 @@ class Resource(object):
             elif isinstance(self, Work):
                 children = self.texts
 
-            order = ["", "", "textgroup", "work", "text"]
+            order = ["", "", URN.TEXTGROUP, URN.WORK, URN.VERSION]
             while i <= len(urn) - 1:
-                children = children[urn[order[i]]]
-                if not hasattr(children, "urn") or str(children.urn) != urn[order[i]]:
-                    raise ValueError("Unrecognized urn at level " + order[i])
+                children = children[urn.upTo(order[i])]
+                if not hasattr(children, "urn") or str(children.urn) != urn.upTo(order[i]):
+                    error = "Unrecognized urn at " + [
+                        "URN namespace", "CTS Namespace", "URN Textgroup", "URN Work", "URN Version"
+                    ][i]
+                    raise ValueError(error)
                 i += 1
             return children
 

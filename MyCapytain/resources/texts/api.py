@@ -177,14 +177,17 @@ class Text(MyCapytain.resources.proto.text.Text):
         _prev, _next = Passage.prevnext(
             self.resource.getPrevNextUrn(
                 urn="{}:{}".format(
-                    str(MyCapytain.common.reference.URN(str(self.urn))["text"]),
+                    str(
+                        MyCapytain.common.reference.URN(
+                            str(self.urn)).upTo(MyCapytain.common.reference.URN.NO_PASSAGE)
+                    ),
                     str(reference)
                 )
             )
         )
         return _prev, _next
 
-    def getFirstUrn(self, urn=None):
+    def getFirstUrn(self, reference=None):
         """ Get the first children URN for a given resource
 
         :param reference: Reference from which to find child (If None, find first reference)
@@ -192,10 +195,10 @@ class Text(MyCapytain.resources.proto.text.Text):
         :return: Children URN
         :rtype: URN
         """
-        if urn:
+        if reference:
             urn = "{}:{}".format(
-                str(MyCapytain.common.reference.URN(str(self.urn))["text"]),
-                str(urn)
+                str(MyCapytain.common.reference.URN(str(self.urn)).upTo(MyCapytain.common.reference.URN.NO_PASSAGE)),
+                str(reference)
             )
         else:
             urn = self.urn
@@ -248,7 +251,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         """
         if self.__first is False:
             # Request the next urn
-            self.__first = self.parent.getFirstUrn(urn=str(self.urn.reference))
+            self.__first = self.parent.getFirstUrn(reference=str(self.urn.reference))
         return self.__first
 
     @property

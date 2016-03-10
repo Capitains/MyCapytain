@@ -345,7 +345,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
             self.__reference = _value
             if self._URN and len(self._URN):
                 if len(value):
-                    self._URN = URN("{}:{}".format(self._URN["text"], str(_value)))
+                    self._URN = URN("{}:{}".format(self._URN.upTo(URN.NO_PASSAGE), str(_value)))
                 else:
                     self._URN = URN(self._URN["text"])
 
@@ -575,7 +575,7 @@ class ContextPassage(Passage):
 
         if isinstance(resource, etree._Element):
             if urn:
-                self.resource = Text(resource=resource, urn=urn["text"], citation=parent.citation)
+                self.resource = Text(resource=resource, urn=urn.upTo(URN.NO_PASSAGE), citation=parent.citation)
             else:
                 self.resource = Text(resource=resource, citation=parent.citation)
         else:

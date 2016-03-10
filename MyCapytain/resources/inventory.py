@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 
 from MyCapytain.resources.proto import inventory, text
-from MyCapytain.common.reference import Citation as CitationPrototype
+from MyCapytain.common.reference import Citation as CitationPrototype, URN
 from MyCapytain.common.utils import xmlparser, NS
 import re
 from six import text_type as str
@@ -142,7 +142,7 @@ class Text(inventory.Text):
                 "<ti:{0} urn='{1}' workUrn='{2}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
                     tag_start,
                     self.urn,
-                    self.urn["work"]
+                    self.urn.upTo(URN.WORK)
                 )
             )
         else:
@@ -302,7 +302,7 @@ class Work(inventory.Work):
         if self.urn is not None:
             strings.append(
                 "<ti:work urn='{0}' groupUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
-                    self.urn, self.urn["textgroup"])
+                    self.urn, self.urn.upTo(URN.TEXTGROUP))
             )
         else:
             if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:

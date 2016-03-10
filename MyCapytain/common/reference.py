@@ -607,10 +607,6 @@ class Citation(object):
     :ivar child: A citation
     :type child: Citation
 
-    .. automethod:: fill
-    .. automethod:: __iter__
-    .. automethod:: __len__
-
     """
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):

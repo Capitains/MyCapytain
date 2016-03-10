@@ -11,7 +11,9 @@ URN, References and Citations
 
 .. autoclass:: MyCapytain.common.reference.URN
 .. autoclass:: MyCapytain.common.reference.Reference
+
 .. autoclass:: MyCapytain.common.reference.Citation
+    :members: fill, __iter__, __len__
 
 Metadata containters
 ********************

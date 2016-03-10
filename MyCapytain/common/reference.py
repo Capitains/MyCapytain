@@ -606,7 +606,7 @@ class Citation(object):
     :type refsDecl: basestring
     :ivar child: A citation
     :type child: Citation
-    
+
     .. automethod:: fill
     .. automethod:: __iter__
     .. automethod:: __len__

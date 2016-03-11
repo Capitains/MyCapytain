@@ -299,18 +299,22 @@ class Work(inventory.Work):
         :returns: XML representation of the work
         """
         strings = []
+        __lang = ""
+        if self.lang:
+            __lang = """xml:lang="{}" """.format(self.lang)
+
         if self.urn is not None:
             strings.append(
-                "<ti:work urn='{0}' groupUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
-                    self.urn, self.urn.upTo(URN.TEXTGROUP))
+                "<ti:work {2}urn='{0}' groupUrn='{1}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
+                    self.urn, self.urn.upTo(URN.TEXTGROUP), __lang)
             )
         else:
             if len(self.parents) > 0 and hasattr(self.parents[0], "urn") is True:
-                strings.append("<ti:work groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
-                    self.parents[0].urn)
+                strings.append("<ti:work {1}groupUrn='{0}' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(
+                    self.parents[0].urn, __lang)
                 )
             else:
-                strings.append("<ti:work xmlns:ti='http://chs.harvard.edu/xmlns/cts'>")
+                strings.append("<ti:work {}xmlns:ti='http://chs.harvard.edu/xmlns/cts'>".format(__lang))
         for tag, metadatum in self.metadata:
             for lang, value in metadatum:
                 strings.append("<ti:{tag} xml:lang='{lang}'>{value}</ti:{tag}>".format(tag=tag, lang=lang, value=value))

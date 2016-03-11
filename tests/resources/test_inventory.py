@@ -126,7 +126,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:online></ti:online>
 </ti:translation>""".replace("\n", "")
 
-        self.wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+        self.wk = """<ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
 <ti:title xml:lang='eng'>Epigrammata</ti:title>
 <ti:title xml:lang='fre'>Epigrammes</ti:title>""" + self.tr + self.ed + """</ti:work>""".replace("\n", "")
 
@@ -158,6 +158,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].urn), "urn:cts:latinLit:phi1294.phi002")
         self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], Text)
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].lang, "lat")
+        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].lang, "lat")
 
     def test_xml_Work_GetItem(self):
         """ Test access through getItem obj[urn] """
@@ -171,7 +173,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def test_xml_work_getLang(self):
         """ Test access to translation """
         xml = """
-            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002">
+            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002" xml:lang="lat">
                 <ti:title xml:lang="eng">Epigrammata</ti:title>
                 <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
                 </ti:edition>
@@ -187,10 +189,11 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(len(W.getLang("eng")), 2)
         self.assertEqual(len(W.getLang()), 3)
 
+
     def test_xml_Text_others(self):
         """ Test access to translation """
         xml = """
-            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002">
+            <ti:work xmlns:ti="http://chs.harvard.edu/xmlns/cts" urn="urn:cts:latinLit:phi1294.phi002" xml:lang="lat">
                 <ti:title xml:lang="eng">Epigrammata</ti:title>
                 <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">
                 </ti:edition>
@@ -206,6 +209,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         E = W["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
         T = W["urn:cts:latinLit:phi1294.phi002.perseus-fre1"]
 
+        self.assertEqual(E.lang, "lat")
         self.assertEqual(E.translations("fre"), [T])
         self.assertEqual(T.editions(), [E])
 
@@ -305,7 +309,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:online></ti:online>
 </ti:translation>""".replace("\n", "")
 
-        wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+        wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts' xml:lang='lat'>
 <ti:title xml:lang='eng'>Epigrammata</ti:title>
 <ti:title xml:lang='fre'>Epigrammes</ti:title>""" + tr + ed + """</ti:work>""".replace("\n", "")
 
@@ -330,6 +334,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002"].export(), wk))
         self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
         self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
+        self.assertEqual(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].lang, "lat")
+        self.assertEqual(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].lang, "eng")
 
     def test_export_to_text(self):
         """ Test export to Text object """

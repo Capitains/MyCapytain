@@ -243,7 +243,7 @@
             <ti:textgroup urn="urn:cts:latinLit:phi1294">
                 <ti:groupname xml:lang="eng">Martial</ti:groupname>
                 <ti:groupname xml:lang="lat">Martialis</ti:groupname>
-                <ti:work urn="urn:cts:latinLit:phi1294.phi002">
+                <ti:work urn="urn:cts:latinLit:phi1294.phi002" xml:lang="lat">
                     <ti:title xml:lang="eng">Epigrammata</ti:title>
                     <ti:title xml:lang="fre">Epigrammes</ti:title>
                     <ti:edition workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2">

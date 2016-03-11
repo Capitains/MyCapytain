@@ -10,7 +10,8 @@
    :target: http://mycapytain.readthedocs.org
 .. image:: https://zenodo.org/badge/3923/Capitains/MyCapytain.svg
    :target: https://zenodo.org/badge/latestdoi/3923/Capitains/MyCapytain
-
+.. image:: https://img.shields.io/pypi/dm/MyCapytain.svg
+   :target: https://pypi.python.org/pypi/MyCapytain
 MyCapytain is a python package which provides a large set of tools to deal with CTS and Capitains Guidelines in Python.
 
 Installation and Requirements

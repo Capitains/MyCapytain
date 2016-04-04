@@ -8,8 +8,9 @@
 
 """
 from __future__ import unicode_literals
+from functools import reduce
 
-
+from collections import defaultdict
 from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
@@ -250,3 +251,27 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
                 passageLoop(result_2, child_2, queue_2, None, preceding_siblings=True)
 
     return new_tree
+
+
+nested_dictionary = lambda: defaultdict(nested_dictionary)
+
+
+def nested_get(dictionary, keys):
+    """ Get value in dictionary for dictionary[keys[0]][keys[1]][keys[..n]]
+
+    :param dictionary: An input dictionary
+    :param keys: Keys where to store data
+    :return:
+    """
+    return reduce(lambda d, k: d[k], keys, dictionary)
+
+
+def nested_set(dictionary,  keys, value):
+    """ Set value in dictionary for dictionary[keys[0]][keys[1]][keys[..n]]
+
+    :param dictionary: An input dictionary
+    :param keys: Keys where to store data
+    :param value: Value to set at keys** target
+    :return: None
+    """
+    nested_get(dictionary, keys[:-1])[keys[-1]] = value

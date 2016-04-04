@@ -15,7 +15,8 @@ from past.builtins import basestring
 import warnings
 
 from MyCapytain.errors import DuplicateReference, RefsDeclError
-from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize
+from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize, \
+    nested_set, nested_get, nested_dictionary
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 from MyCapytain.errors import InvalidSiblingRequest
@@ -105,6 +106,21 @@ class Text(text.Text):
                 refsDecl=value.refsDecl,
                 child=value.child
             )
+
+    def nested_dict(self, exclude=None):
+        """ Nested Dict Representation of the text passages
+
+        :param exclude: Remove some nodes from text according to `MyCapytain.resources.texts.tei.Passage.text`
+        :type exclude: List
+        :rtype: dict
+        :returns: Dictionary
+        """
+        reffs = self.getValidReff(level=len(self.citation))
+        text = nested_dictionary()
+        for reff in reffs:
+            _r = reff.split(".")
+            nested_set(text, _r, self.getPassage(_r, hypercontext=False).text(exclude=exclude))
+        return text
 
     def getPassage(self, reference, hypercontext=True):
         """ Finds a passage in the current text

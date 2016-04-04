@@ -138,6 +138,10 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
                          "Check that different fist level works as well")
         self.assertEqual(nested["1"]["3"]["8"], "Ibis ab excusso missus in astra sago. ",
                          "Check that notes are removed ")
+        self.assertEqual(
+            [list(nested.keys()), list(nested["1"].keys())[:3], list(nested["2"]["pr"].keys())[:3]],
+            [["1", "2"], ["pr", "1", "2"], ["sa", "1", "2"]],
+            "Ensure that text keeps its order")
 
     def test_warning(self):
         with open("tests/testing_data/texts/duplicate_references.xml") as xml:

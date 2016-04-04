@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 from functools import reduce
 
-from collections import defaultdict
+from collections import OrderedDict
 from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
@@ -253,7 +253,20 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
     return new_tree
 
 
-nested_dictionary = lambda: defaultdict(nested_dictionary)
+class OrderedDefaultDict(OrderedDict):
+    def __init__(self, default_factory=None, *args, **kwargs):
+        super(OrderedDefaultDict, self).__init__(*args, **kwargs)
+        self.default_factory = default_factory
+
+    def __missing__(self, key):
+        if self.default_factory is None:
+            raise KeyError(key)
+        val = self[key] = self.default_factory()
+        return val
+
+
+def nested_ordered_dictionary():
+    return OrderedDefaultDict(nested_ordered_dictionary)
 
 
 def nested_get(dictionary, keys):

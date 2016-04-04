@@ -127,6 +127,18 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             self.assertEqual(
                 self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.hellno"), level=3), [])
 
+    def test_nested_dict(self):
+        """ Check the nested dict export of a local.Text object """
+        nested = self.TEI.nested_dict(exclude=["tei:note"])
+        self.assertEqual(nested["1"]["pr"]["1"], "Spero me secutum in libellis meis tale temperamen-",
+                         "Check that dictionary path is well done")
+        self.assertEqual(nested["1"]["12"]["1"], "Itur ad Herculeas gelidi qua Tiburis arces ",
+                         "Check that dictionary path works on more than one passage")
+        self.assertEqual(nested["2"]["pr"]["1"], "'Quid nobis' inquis 'cum epistula? parum enim tibi ",
+                         "Check that different fist level works as well")
+        self.assertEqual(nested["1"]["3"]["8"], "Ibis ab excusso missus in astra sago. ",
+                         "Check that notes are removed ")
+
     def test_warning(self):
         with open("tests/testing_data/texts/duplicate_references.xml") as xml:
             text = MyCapytain.resources.texts.local.Text(resource=xml)

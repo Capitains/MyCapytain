@@ -16,7 +16,7 @@ import warnings
 
 from MyCapytain.errors import DuplicateReference, RefsDeclError
 from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize, \
-    nested_set, nested_get, nested_dictionary
+    nested_set, nested_ordered_dictionary
 from MyCapytain.common.reference import URN, Citation, Reference
 from MyCapytain.resources.proto import text
 from MyCapytain.errors import InvalidSiblingRequest
@@ -116,7 +116,7 @@ class Text(text.Text):
         :returns: Dictionary
         """
         reffs = self.getValidReff(level=len(self.citation))
-        text = nested_dictionary()
+        text = nested_ordered_dictionary()
         for reff in reffs:
             _r = reff.split(".")
             nested_set(text, _r, self.getPassage(_r, hypercontext=False).text(exclude=exclude))

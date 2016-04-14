@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.endpoints.ahab
+.. module:: MyCapytain.retrievers.ahab
    :synopsis: Ahab endpoint implementation
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
 
 """
-import MyCapytain.endpoints.proto
+import MyCapytain.retrievers.proto
 import requests
 
 

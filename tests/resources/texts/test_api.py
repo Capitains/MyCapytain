@@ -8,7 +8,7 @@ from io import open
 from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.resources.texts.api import *
 from MyCapytain.resources.texts.tei import Citation
-from MyCapytain.endpoints.cts5 import CTS
+from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, URN
 from lxml import etree
 import mock
@@ -62,7 +62,7 @@ class TestAPIText(unittest.TestCase):
         )
         self.assertIsInstance(text.metadata["testing"], MyCapytain.common.metadata.Metadatum)
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getvalidreff(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
         requests.return_value.text = GET_VALID_REFF
@@ -125,7 +125,7 @@ class TestAPIText(unittest.TestCase):
         # Test the parsing
         self.assertEqual(reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getpassage(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
         requests.return_value.text = GET_PASSAGE
@@ -157,7 +157,7 @@ class TestAPIText(unittest.TestCase):
             }
         )
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getpassageplus(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint)
         requests.return_value.text = GET_PASSAGE_PLUS
@@ -191,7 +191,7 @@ class TestAPIText(unittest.TestCase):
             }
         )
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_get_prev_next_urn(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = NEXT_PREV
@@ -199,7 +199,7 @@ class TestAPIText(unittest.TestCase):
         self.assertEqual(str(_prev.reference), "1.pr", "Endpoint should be called and URN should be parsed")
         self.assertEqual(str(_next.reference), "1.2", "Endpoint should be called and URN should be parsed")
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_first_urn(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = Get_FIRST
@@ -216,7 +216,7 @@ class TestAPIText(unittest.TestCase):
             }
         )
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_first_urn_when_empty(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = Get_FIRST_EMPTY
@@ -233,7 +233,7 @@ class TestAPIText(unittest.TestCase):
             }
         )
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_init_without_citation(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = GET_PASSAGE
@@ -249,7 +249,7 @@ class TestAPIText(unittest.TestCase):
         )
         self.assertEqual(text.citation.name, "book")
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getLabel(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = GET_LABEL
@@ -257,7 +257,7 @@ class TestAPIText(unittest.TestCase):
         label = text.getLabel()
         self.assertEqual(label["title"]["eng"], "Epigrammata")
 
-    @mock.patch("MyCapytain.endpoints.cts5.requests.get", create=True)
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", citation=self.citation, resource=self.endpoint)
         requests.return_value.text = GET_VALID_REFF

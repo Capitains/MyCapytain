@@ -1,6 +1,6 @@
 import unittest
 from mock import patch
-from MyCapytain.endpoints.cts5 import *
+from MyCapytain.retrievers.cts5 import *
 
 
 class TestEndpointsCTS5(unittest.TestCase):

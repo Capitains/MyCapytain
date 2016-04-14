@@ -5,7 +5,7 @@ import MyCapytain
 setup(
   name='MyCapytain',
   version=MyCapytain.__version__,
-  description='Abstraction of CTS API for Python',
+  description='Library for CTS APIs and CapiTainS guidelines in Python',
   url='http://github.com/Capitains/MyCapytain',
   author='Thibault Clerice',
   author_email='leponteineptique@gmail.com',

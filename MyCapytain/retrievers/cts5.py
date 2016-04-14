@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.endpoints.cts5
+.. module:: MyCapytain.retrievers.cts5
    :synopsis: CTS5 endpoint implementation
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
 
 """
-import MyCapytain.endpoints.proto
+import MyCapytain.retrievers.proto
 import requests
 
 
-class CTS(MyCapytain.endpoints.proto.CTS):
+class CTS(MyCapytain.retrievers.proto.CTS):
 
     """ 
-        Basic integration of the MyCapytain.endpoints.proto.CTS abstraction
+        Basic integration of the MyCapytain.retrievers.proto.CTS abstraction
     """
 
     def __init__(self, endpoint, inventory=None):

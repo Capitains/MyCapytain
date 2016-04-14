@@ -31,15 +31,15 @@ Utilities
     :undoc-members:
     :show-inheritance:
 
-API Endpoints
-#############
+API Retrievers
+##############
 
-Module endpoints contains prototypes and implementation of endpoints calls in MyCapytain
+Module endpoints contains prototypes and implementation of retrievers in MyCapytain
 
 Ahab
 ****
 
-.. automodule:: MyCapytain.endpoints.ahab
+.. automodule:: MyCapytain.retrievers.ahab
     :members:
     :undoc-members:
     :show-inheritance:
@@ -47,7 +47,7 @@ Ahab
 CTS 5 API
 *********
 
-.. automodule:: MyCapytain.endpoints.cts5
+.. automodule:: MyCapytain.retrievers.cts5
     :members:
     :undoc-members:
     :show-inheritance:
@@ -55,7 +55,7 @@ CTS 5 API
 Prototypes
 **********
 
-.. automodule:: MyCapytain.endpoints.proto
+.. automodule:: MyCapytain.retrievers.proto
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,11 +1,11 @@
 import unittest
 
-from MyCapytain.endpoints.proto import *
+from MyCapytain.retrievers.proto import *
 
 
 class TestEndpointsProto(unittest.TestCase):
 
-    """ Testing prototypes endpoints """
+    """ Testing prototypes retrievers """
 
     def setUp(self):
         self.ahab = Ahab("http://ahab.com")

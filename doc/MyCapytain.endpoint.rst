@@ -7,12 +7,12 @@ Introduction
 A first important point for MyCapytains endpoint is that the resources are not parsed into object but should only
 provide the request by default.
 
-Getting Passage from an Endpoint
-################################
+Getting Passage from an endpoint using a Retriever
+##################################################
 
 .. code-block:: python
 
-    from MyCapytain.endpoints import cts5
+    from MyCapytain.retrievers import cts5
     from MyCapytain.resources.texts.api import Text
 
     # We set the variable up, as if we were in a function

@@ -6,13 +6,15 @@ If you are using MyCapytain and wish to appear here, please feel free to open an
 Extensions
 ##########
 
-Softwares and software extensions
+Nautilus
+********
+`Nautilus <https://github.com/Capitains/Nautilus/>`_ provides a local retriever to build inventory based on a set of folders available locally.
 
 Flask Capitains Nemo
 ********************
 
 `Flask Capitains Nemo <https://github.com/Capitains/flask-capitains-nemo/>`_ is an extension for Flask to build a browsing interface
-using both endpoints and resources modules. You will find example of use in a web based environment.
+using both retrievers and resources modules. You will find example of use in a web based environment.
 
 HookTest
 ********

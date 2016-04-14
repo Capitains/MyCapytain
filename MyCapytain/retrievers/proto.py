@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.endpoints.proto
+.. module:: MyCapytain.retrievers.proto
    :synopsis: Prototypes of APIs endpoint
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>

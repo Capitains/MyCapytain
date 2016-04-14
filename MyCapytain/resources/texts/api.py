@@ -7,7 +7,7 @@ from six import text_type as str
 import MyCapytain.resources.proto.text
 import MyCapytain.resources.texts.tei
 import MyCapytain.resources.inventory
-import MyCapytain.endpoints.proto
+import MyCapytain.retrievers.proto
 import MyCapytain.common.metadata
 import MyCapytain.common.utils
 import MyCapytain.common.reference
@@ -19,7 +19,7 @@ class Text(MyCapytain.resources.proto.text.Text):
     :param urn: A URN identifier
     :type urn: MyCapytain.common.reference.URN
     :param resource: An API endpoint
-    :type resource: MyCapytain.endpoints.proto.CTS
+    :type resource: MyCapytain.retrievers.proto.CTS
     :param citation: Citation for children level
     :type citation: MyCapytain.resources.texts.tei.Citation
     :param id: Identifier of the subreference without URN informations

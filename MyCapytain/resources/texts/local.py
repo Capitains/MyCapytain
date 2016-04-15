@@ -194,17 +194,17 @@ class Text(text.Text):
             resource=root, parent=self, citation=self.citation
         )
 
-    def getValidReff(self, level=1, reference=None):
+    def getValidReff(self, level=None, reference=None, _debug=False):
         """ Retrieve valid passages directly
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: int
         :param reference: Passage Reference
         :type reference: Reference
+        :param _debug: Check on passages duplicates
+        :type _debug: bool
         :returns: List of levels
         :rtype: list(basestring, str)
-
-        :
 
         .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid
         informations. Maybe something is more powerfull ?
@@ -212,29 +212,38 @@ class Text(text.Text):
         """
         depth = 0
         xml = self.xml
-        _range = False
         if reference:
             if isinstance(reference, Reference):
                 if reference.end is None:
                     passages = [reference.list]
+                    depth = len(passages[0])
                 else:
                     xml = self.getPassage(reference=reference)
-                    a, b = reference.start.list, reference.end.list
-                    passages = [[]]
+                    common = []
+                    for index in range(0, len(reference.start.list)):
+                        if index == (len(common) - 1):
+                            common.append(reference.start.list[index])
+                        else:
+                            break
+
+                    passages = [common]
+                    depth = len(common)
+                    if not level:
+                        level = len(reference.start.list) + 1
 
             else:
                 raise TypeError()
-
-            depth = len(passages[0])
         else:
             passages = [[]]
 
+        if not level:
+            level = 1
         if level <= len(passages[0]) and reference is not None:
             level = len(passages[0]) + 1
         if level > len(self.citation):
             return []
 
-        nodes = [None for i in range(depth, level)]
+        nodes = [None] * (level - depth)
 
         citations = [citation for citation in self.citation]
 
@@ -261,11 +270,13 @@ class Text(text.Text):
                 raise KeyError(msg)
 
         passages = [".".join(passage) for passage in passages]
-        duplicates = set([n for n in passages if passages.count(n) > 1])
-        if len(duplicates) > 0:
-            message = ", ".join(duplicates)
-            warnings.warn(message, DuplicateReference)
-        del duplicates
+
+        if _debug:
+            duplicates = set([n for n in passages if passages.count(n) > 1])
+            if len(duplicates) > 0:
+                message = ", ".join(duplicates)
+                warnings.warn(message, DuplicateReference)
+            del duplicates
 
         return passages
 
@@ -706,7 +717,7 @@ class ContextPassage(Passage):
         :Example:
             >>>    P = Passage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
             >>>    P.text == "Ibis hello b ab excusso missus in astra sago. "
-            >>>    P.text(exclude=["note"]) == "Ibis hello b ab excusso missus in astra sago. "
+            >>>    P.text(exclude=["note"]) == "Ibis ab excusso missus in astra sago. "
 
 
         """

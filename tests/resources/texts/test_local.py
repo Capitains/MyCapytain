@@ -119,13 +119,39 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             "Level should be autocorrected to len(citation) + 1 even if level == len(citation)"
         )
 
+        self.assertEqual(
+            self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1-2.2")),
+            [
+                '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9', '2.1.10', '2.1.11',
+                '2.1.12', '2.2.1', '2.2.2', '2.2.3', '2.2.4', '2.2.5', '2.2.6'
+             ],
+            "It could be possible to ask for range reffs children")
+
+        self.assertEqual(
+            self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1-2.2"), level=2),
+            ['2.1', '2.2'],
+            "It could be possible to ask for range References reference at the same level in between milestone")
+
+        self.assertEqual(
+            self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("1.38-2.2"), level=2),
+            ['1.38', '1.39', '2.pr', '2.1', '2.2'],
+            "It could be possible to ask for range References reference at the same level in between milestone across higher levels")
+
+        self.assertEqual(
+            self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("1.1.1-1.1.4"), level=3),
+            ['1.1.1', '1.1.2', '1.1.3', '1.1.4'],
+            "It could be possible to ask for range reffs in between at the same level cross higher level")
+
         # Test when already too deep
-        self.assertEqual(self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1.1"), level=3), [])
+        self.assertEqual(
+            self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.1.1"), level=3),
+            [],
+            "Asking for a level too deep should return nothing"
+        )
 
         # Test wrong citation
         with self.assertRaises(KeyError):
-            self.assertEqual(
-                self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.hellno"), level=3), [])
+            self.TEI.getValidReff(reference=MyCapytain.common.reference.Reference("2.hellno"), level=3)
 
     def test_nested_dict(self):
         """ Check the nested dict export of a local.Text object """
@@ -150,7 +176,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             # Cause all warnings to always be triggered.
             warnings.simplefilter("always")
             for i in [1, 2, 3]:
-                text.getValidReff(level=i)
+                text.getValidReff(level=i, _debug=True)
 
         self.assertEqual(len(w), 3, "There should be warning on each level")
         self.assertEqual(issubclass(w[-1].category, MyCapytain.errors.DuplicateReference), True,

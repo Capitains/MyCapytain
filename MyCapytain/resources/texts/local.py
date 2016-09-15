@@ -173,11 +173,7 @@ class Text(text.Text):
 
         citation_start = [citation for citation in self.citation][len(start)-1]
         citation_end = [citation for citation in self.citation][len(end)-1]
-
         start, end = citation_start.fill(passage=start), citation_end.fill(passage=end)
-
-        nodes = etree._ElementTree()
-
         start, end = normalizeXpath(start.split("/")[2:]), normalizeXpath(end.split("/")[2:])
 
         if isinstance(self.xml, etree._Element):
@@ -185,7 +181,6 @@ class Text(text.Text):
         else:
             root = copyNode(self.xml.getroot())
 
-        nodes._setroot(root)
         root = passageLoop(self.xml, root, start, end)
 
         if self.urn:

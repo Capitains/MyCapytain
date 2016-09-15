@@ -52,7 +52,6 @@ class Text(text.Text):
         if resource is not None:
             self.resource = resource
             self.xml = xmlparser(resource)
-
             self.__findCRefPattern(self.xml)
 
             if autoreffs is True:
@@ -181,7 +180,11 @@ class Text(text.Text):
 
         start, end = normalizeXpath(start.split("/")[2:]), normalizeXpath(end.split("/")[2:])
 
-        root = copyNode(self.xml)
+        if isinstance(self.xml, etree._Element):
+            root = copyNode(self.xml)
+        else:
+            root = copyNode(self.xml.getroot())
+
         nodes._setroot(root)
         root = passageLoop(self.xml, root, start, end)
 

@@ -175,6 +175,7 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
     :param following_siblings: Append following siblings of XPath 1/2 match to the tree
     :return: Newly incremented tree
     """
+    print(xpath1, xpath2)
 
     current_1, queue_1 = formatXpath(xpath1)
     if xpath2 is None:  # In case we need what is following or preceding our node

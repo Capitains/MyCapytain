@@ -15,7 +15,7 @@ from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
 import re
-from copy import deepcopy as copy
+from copy import copy
 from lxml.objectify import StringElement, ObjectifiedElement
 
 

@@ -10,13 +10,15 @@ URN, References and Citations
 *****************************
 
 .. autoclass:: MyCapytain.common.reference.URN
+    :members:
 .. autoclass:: MyCapytain.common.reference.Reference
+    :members:
 
 .. autoclass:: MyCapytain.common.reference.Citation
     :members: fill, __iter__, __len__
 
-Metadata containters
-********************
+Metadata containers
+*******************
 
 .. automodule:: MyCapytain.common.metadata
     :members:

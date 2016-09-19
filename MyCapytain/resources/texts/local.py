@@ -52,7 +52,6 @@ class Text(text.Text):
         if resource is not None:
             self.resource = resource
             self.xml = xmlparser(resource)
-
             self.__findCRefPattern(self.xml)
 
             if autoreffs is True:
@@ -174,15 +173,14 @@ class Text(text.Text):
 
         citation_start = [citation for citation in self.citation][len(start)-1]
         citation_end = [citation for citation in self.citation][len(end)-1]
-
         start, end = citation_start.fill(passage=start), citation_end.fill(passage=end)
-
-        nodes = etree._ElementTree()
-
         start, end = normalizeXpath(start.split("/")[2:]), normalizeXpath(end.split("/")[2:])
 
-        root = copyNode(self.xml)
-        nodes._setroot(root)
+        if isinstance(self.xml, etree._Element):
+            root = copyNode(self.xml)
+        else:
+            root = copyNode(self.xml.getroot())
+
         root = passageLoop(self.xml, root, start, end)
 
         if self.urn:

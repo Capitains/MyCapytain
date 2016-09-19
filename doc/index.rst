@@ -20,6 +20,7 @@ Contents
    MyCapytain.endpoint
    MyCapytain.workarounds
    MyCapytain.api
+   MyCapytain.benchmark
 
 
 Indices and tables

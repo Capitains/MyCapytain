@@ -14,7 +14,7 @@ setup(
   install_requires=[
     "requests>=2.8.1",
     "six>=1.10.0",
-    "lxml==3.4.4",
+    "lxml==3.6.4",
     "future==0.15.2"
   ],
   tests_require=[

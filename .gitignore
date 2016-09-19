@@ -1,3 +1,4 @@
+*.pkl
 # Compiled python modules.
 *.pyc
 .idea

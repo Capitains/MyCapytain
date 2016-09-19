@@ -16,8 +16,23 @@ from io import IOBase, StringIO
 from past.builtins import basestring
 import re
 from copy import copy
+from lxml.objectify import ObjectifiedElement
+
 
 __strip = re.compile("([ ]{2,})+")
+__parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
+
+
+def xmliter(node):
+    """ Provides a simple XML Iter method which complies with either _Element or _ObjectifiedElement
+
+    :param node: XML Node
+    :return: Iterator for iterating over children of said node.
+    """
+    if hasattr(node, "iterchildren"):
+        return node.iterchildren()
+    else:
+        return node
 
 
 def normalize(string):
@@ -50,7 +65,7 @@ def xmlparser(xml):
 
     """
     doclose = None
-    if isinstance(xml, etree._Element):
+    if isinstance(xml, (etree._Element, ObjectifiedElement, etree._ElementTree)):
         return xml
     elif isinstance(xml, IOBase):
         pass
@@ -84,11 +99,11 @@ def formatXpath(xpath):
 
 
 def performXpath(parent, xpath):
-    """
+    """ Perform an XPath on an element and indicate if we need to loop over it to find something
 
-    :param parent:
-    :param xpath:
-    :return: (Result, Loop Indicator)
+    :param parent: XML Node on which to perform XPath
+    :param xpath: XPath to run
+    :return: (Result, Need to loop Indicator)
     """
     loop = False
     if xpath.startswith(".//"):
@@ -133,13 +148,13 @@ def copyNode(node, children=False, parent=False):
         )
     if children:
         element.text = node.text
-        for child in node:
+        for child in xmliter(node):
             element.append(copy(child))
     return element
 
 
 def normalizeXpath(xpath):
-    """ Normalize XPATH splitted around slashes
+    """ Normalize XPATH split around slashes
 
     :param xpath: List of xpath elements
     :type xpath: [str]
@@ -156,51 +171,53 @@ def normalizeXpath(xpath):
 
 
 def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False, following_siblings=False):
-    """
+    """ Loop over passages to construct and increment new tree given a parent and XPaths
 
     :param parent: Parent on which to perform xpath
     :param new_tree: Parent on which to add nodes
-    :param xpath: List of xpath elements
-    :type xpath: [str]
-    :return:
+    :param xpath1: List of xpath elements
+    :type xpath1: [str]
+    :param xpath2: List of xpath elements
+    :type xpath2: [str]
+    :param preceding_siblings: Append preceding siblings of XPath 1/2 match to the tree
+    :param following_siblings: Append following siblings of XPath 1/2 match to the tree
+    :return: Newly incremented tree
     """
-
     current_1, queue_1 = formatXpath(xpath1)
     if xpath2 is None:  # In case we need what is following or preceding our node
         result_1, loop = performXpath(parent, current_1)
         if loop is True:
             queue_1 = xpath1
-        siblings = list(parent)
-        index_1 = siblings.index(result_1)
-        children = len(queue_1) == 0
 
-        # We fill the gaps using the list option of LXML
-        if preceding_siblings:
-            [
-                copyNode(child, parent=new_tree, children=True)
-                for child in siblings
-                if index_1 > siblings.index(child)
-            ]
-            child = copyNode(result_1, children=children, parent=new_tree)
-        elif following_siblings:
-            child = copyNode(result_1, children=children, parent=new_tree)
-            [
-                copyNode(child, parent=new_tree, children=True)
-                for child in siblings
-                if index_1 < siblings.index(child)
-            ]
-
-        if not children:
-            child = passageLoop(
-                result_1,
-                child,
-                queue_1,
-                None,
-                preceding_siblings=preceding_siblings,
-                following_siblings=following_siblings
-            )
+        central = None
+        has_no_queue = len(queue_1) == 0
+        # For each sibling, when we need them in the context of a range
+        if preceding_siblings or following_siblings:
+            for sibling in xmliter(parent):
+                if sibling == result_1:
+                    central = True
+                    # We copy the node we looked for (Result_1)
+                    child = copyNode(result_1, children=has_no_queue, parent=new_tree)
+                    # if we don't have children
+                    # we loop over the passage child
+                    if not has_no_queue:
+                        passageLoop(
+                            result_1,
+                            child,
+                            queue_1,
+                            None,
+                            preceding_siblings=preceding_siblings,
+                            following_siblings=following_siblings
+                        )
+                    # If we were waiting for preceding_siblings, we break it off
+                    # As we don't need to go further
+                    if preceding_siblings:
+                        break
+                elif not central and preceding_siblings:
+                    copyNode(sibling, parent=new_tree, children=True)
+                elif central and following_siblings:
+                    copyNode(sibling, parent=new_tree, children=True)
     else:
-
         result_1, loop = performXpath(parent, current_1)
         if loop is True:
             queue_1 = xpath1
@@ -219,36 +236,41 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
             result_2 = result_1
 
         if result_1 == result_2:
-            children = len(queue_1) == 0
-            child = copyNode(result_1, children=children, parent=new_tree)
-            if not children:
-                child = passageLoop(
+            has_no_queue = len(queue_1) == 0
+            child = copyNode(result_1, children=has_no_queue, parent=new_tree)
+            if not has_no_queue:
+                passageLoop(
                     result_1,
                     child,
                     queue_1,
                     queue_2
                 )
         else:
-            children = list(parent)
-            index_1 = children.index(result_1)
-            index_2 = children.index(result_2)
-            # Appends the starting passage
-            children_1 = len(queue_1) == 0
-            child_1 = copyNode(result_1, children=children_1, parent=new_tree)
-            if not children_1:
-                passageLoop(result_1, child_1, queue_1, None, following_siblings=True)
-            # Appends what's in between
-            nodes = [
-                copyNode(child, parent=new_tree, children=True)
-                for child in children
-                if index_1 < children.index(child) < index_2
-            ]
-            # Appends the Ending passage
-            children_2 = len(queue_2) == 0
-            child_2 = copyNode(result_2, children=children_2, parent=new_tree)
+            start = False
+            # For each sibling
+            for sibling in xmliter(parent):
+                # If we have found start
+                # We copy the node because we are between start and end
+                if start:
+                    # If we are at the end
+                    # We break the copy
+                    if sibling == result_2:
+                        break
+                    else:
+                        copyNode(sibling, parent=new_tree, children=True)
+                # If this is start
+                # Then we copy it and initiate star
+                elif sibling == result_1:
+                    start = True
+                    has_no_queue_1 = len(queue_1) == 0
+                    node = copyNode(sibling, children=has_no_queue_1, parent=new_tree)
+                    if not has_no_queue_1:
+                        passageLoop(sibling, node, queue_1, None, following_siblings=True)
 
-            if not children_2:
-                passageLoop(result_2, child_2, queue_2, None, preceding_siblings=True)
+            continue_loop = len(queue_2) == 0
+            node = copyNode(result_2, children=continue_loop, parent=new_tree)
+            if not continue_loop:
+                passageLoop(result_2, node, queue_2, None, preceding_siblings=True)
 
     return new_tree
 

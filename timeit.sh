@@ -18,7 +18,7 @@ python -m timeit -n $1 -s \
 "from MyCapytain.resources.texts.local import Text" \
 "import lxml.objectify" \
 "from lxml.etree import XMLParser" \
-"X = XMLParser()" \
+"X = lxml.objectify.makeparser()" \
 "f = open('/home/thibault/dev/canonicals/canonical-latinLit/data/phi1017/phi004/phi1017.phi004.perseus-lat2.xml')" \
 "r = lxml.objectify.parse(f, X)" \
 "t = Text(resource=r)" \
@@ -48,7 +48,7 @@ python -m timeit -n $1 -s \
 "from MyCapytain.resources.texts.local import Text" \
 "import lxml.objectify" \
 "from lxml.etree import XMLParser" \
-"X = XMLParser()" \
+"X = lxml.objectify.makeparser()" \
 "f = open('/home/thibault/dev/canonicals/canonical-latinLit/data/phi1017/phi004/phi1017.phi004.perseus-lat2.xml')" \
 "r = lxml.objectify.parse(f, X)" \
 "t = Text(resource=r)" \
@@ -77,7 +77,7 @@ python -m timeit -n $1 -s \
 "from MyCapytain.resources.texts.local import Text" \
 "import lxml.objectify" \
 "from lxml.etree import XMLParser" \
-"X = XMLParser()" \
+"X = lxml.objectify.makeparser()" \
 "f = open('/home/thibault/dev/canonicals/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml')"  \
 "r = lxml.objectify.parse(f, X)" \
 "t = Text(resource=r)" \
@@ -104,7 +104,7 @@ python -m timeit -n $1 -s \
 "from MyCapytain.resources.texts.local import Text" \
 "import lxml.objectify" \
 "from lxml.etree import XMLParser" \
-"X = XMLParser()" \
+"X = lxml.objectify.makeparser()" \
 "f = open('/home/thibault/dev/canonicals/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml')"  \
 "r = lxml.objectify.parse(f, X)" \
 "t = Text(resource=r)" \
@@ -133,7 +133,7 @@ python -m timeit -n $1 -s \
 "from MyCapytain.common.reference import Reference" \
 "import lxml.objectify" \
 "from lxml.etree import XMLParser" \
-"X = XMLParser()" \
+"X = lxml.objectify.makeparser()" \
 "f = open('/home/thibault/dev/canonicals/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml')"  \
 "r = lxml.objectify.parse(f, X)" \
 "t = Text(resource=r)" \
@@ -164,7 +164,7 @@ python -m timeit -n $1 -s \
 "from MyCapytain.common.reference import Reference" \
 "import lxml.objectify" \
 "from lxml.etree import XMLParser" \
-"X = XMLParser()" \
+"X = lxml.objectify.makeparser()" \
 "f = open('/home/thibault/dev/canonicals/canonical-latinLit/data/stoa0045/stoa001/stoa0045.stoa001.perseus-lat2.xml')"  \
 "r = lxml.objectify.parse(f, X)" \
 "t = Text(resource=r)" \

@@ -15,12 +15,24 @@ from lxml import etree
 from io import IOBase, StringIO
 from past.builtins import basestring
 import re
-from copy import copy
+from copy import deepcopy as copy
 from lxml.objectify import StringElement, ObjectifiedElement
 
 
 __strip = re.compile("([ ]{2,})+")
 __parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
+
+
+def xmliter(node):
+    """ Provides a simple XML Iter method which complies with either _Element or _ObjectifiedElement
+
+    :param node: XML Node
+    :return: Iterator for iterating over children of said node.
+    """
+    if hasattr(node, "iterchildren"):
+        return node.iterchildren()
+    else:
+        return node
 
 
 def normalize(string):
@@ -140,13 +152,13 @@ def copyNode(node, children=False, parent=False):
         )
     if children:
         element.text = node.text
-        for child in node:
+        for child in xmliter(node):
             element.append(copy(child))
     return element
 
 
 def normalizeXpath(xpath):
-    """ Normalize XPATH splitted around slashes
+    """ Normalize XPATH split around slashes
 
     :param xpath: List of xpath elements
     :type xpath: [str]
@@ -175,8 +187,6 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
     :param following_siblings: Append following siblings of XPath 1/2 match to the tree
     :return: Newly incremented tree
     """
-    print(xpath1, xpath2)
-
     current_1, queue_1 = formatXpath(xpath1)
     if xpath2 is None:  # In case we need what is following or preceding our node
         result_1, loop = performXpath(parent, current_1)
@@ -187,8 +197,8 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
         has_no_queue = len(queue_1) == 0
         # For each sibling, when we need them in the context of a range
         if preceding_siblings or following_siblings:
-            for sibling in parent:
-                if sibling is result_1:
+            for sibling in xmliter(parent):
+                if sibling == result_1:
                     central = True
                     # We copy the node we looked for (Result_1)
                     child = copyNode(result_1, children=has_no_queue, parent=new_tree)
@@ -242,19 +252,19 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
         else:
             start = False
             # For each sibling
-            for sibling in parent:
+            for sibling in xmliter(parent):
                 # If we have found start
                 # We copy the node because we are between start and end
                 if start:
                     # If we are at the end
                     # We break the copy
-                    if sibling is result_2:
+                    if sibling == result_2:
                         break
                     else:
                         copyNode(sibling, parent=new_tree, children=True)
                 # If this is start
                 # Then we copy it and initiate star
-                elif sibling is result_1:
+                elif sibling == result_1:
                     start = True
                     has_no_queue_1 = len(queue_1) == 0
                     node = copyNode(sibling, children=has_no_queue_1, parent=new_tree)

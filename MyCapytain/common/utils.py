@@ -16,7 +16,7 @@ from io import IOBase, StringIO
 from past.builtins import basestring
 import re
 from copy import copy
-from lxml.objectify import StringElement, ObjectifiedElement
+from lxml.objectify import ObjectifiedElement
 
 
 __strip = re.compile("([ ]{2,})+")
@@ -52,10 +52,6 @@ NS = {
     "ti": "http://chs.harvard.edu/xmlns/cts",
     "xml": "http://www.w3.org/XML/1998/namespace"
 }
-
-
-def streamparser(xml):
-    return __parser__.feed(xml)
 
 
 def xmlparser(xml):

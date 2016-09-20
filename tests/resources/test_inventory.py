@@ -6,7 +6,6 @@ import xmlunittest
 import lxml.etree as etree
 from io import open, StringIO
 from copy import deepcopy
-from six import text_type as str
 from operator import attrgetter
 
 from MyCapytain.resources.inventory import *
@@ -358,59 +357,163 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         e.urn = None
         self.assertXmlEquivalentOutputs(
             *compareSTR(
-                    str(e), 
-                    self.ed.replace("urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", "")
-                )
+                str(e),
+                self.ed.replace("urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", "")
             )
+        )
         e.parents = ()
         self.assertXmlEquivalentOutputs(
             *compareSTR(
-                    str(e), 
-                    self.ed.replace(
-                        "urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", ""
-                    ).replace(
-                        "workUrn='urn:cts:latinLit:phi1294.phi002' ", ""
-                    )
+                str(e),
+                self.ed.replace(
+                    "urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", ""
+                ).replace(
+                    "workUrn='urn:cts:latinLit:phi1294.phi002' ", ""
                 )
             )
+        )
 
         wk = deepcopy(ti["urn='urn:cts:latinLit:phi1294.phi002"])
         wk.urn = None
         self.assertXmlEquivalentOutputs(
             *compareSTR(
-                    str(wk), 
-                    self.wk.replace("urn='urn:cts:latinLit:phi1294.phi002' ", "")
-                )
+                str(wk),
+                self.wk.replace("urn='urn:cts:latinLit:phi1294.phi002' ", "")
             )
+        )
         wk.parents = ()
         self.assertXmlEquivalentOutputs(
             *compareSTR(
-                    str(wk), 
-                    self.wk.replace(
-                        "urn='urn:cts:latinLit:phi1294.phi002' ", ""
-                    ).replace(
-                        "groupUrn='urn:cts:latinLit:phi1294' ", ""
-                    )
+                str(wk),
+                self.wk.replace(
+                    "urn='urn:cts:latinLit:phi1294.phi002' ", ""
+                ).replace(
+                    "groupUrn='urn:cts:latinLit:phi1294' ", ""
                 )
             )
+        )
 
         tg = deepcopy(ti["urn='urn:cts:latinLit:phi1294"])
         tg.urn = None
         self.assertXmlEquivalentOutputs(
             *compareSTR(
-                    str(tg), 
-                    self.tg.replace("urn='urn:cts:latinLit:phi1294' ", "")
-                )
+                str(tg),
+                self.tg.replace("urn='urn:cts:latinLit:phi1294' ", "")
             )
+        )
 
         ti = deepcopy(ti)
         ti.id = None
         self.assertXmlEquivalentOutputs(
             *compareSTR(
-                    str(ti), 
-                    self.t.replace("tiid='annotsrc' ", "")
-                )
+                str(ti),
+                self.t.replace("tiid='annotsrc' ", "")
             )
+        )
+
+    def test_addition_work(self):
+        """ Test merging two Works together
+        """
+        tg = """<ti:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:groupname xml:lang='eng'>Martial</ti:groupname>
+<ti:groupname xml:lang='lat'>Martialis</ti:groupname>
+<ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:title xml:lang='eng'>Epigrammata</ti:title>
+<ti:title xml:lang='ger'>Epigrammen</ti:title>
+<ti:edition urn='urn:cts:latinLit:phi1294.phi002.opp-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:label xml:lang='eng'>Epigrammata Label</ti:label>
+<ti:label xml:lang='fre'>Epigrammes Label</ti:label>
+<ti:description xml:lang='eng'>W. Heraeus</ti:description>
+<ti:description xml:lang='fre'>G. Heraeus</ti:description>
+<ti:online></ti:online>
+</ti:edition>
+</ti:work>
+<ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi001' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+<ti:title xml:lang='eng'>On the Spectacles</ti:title>
+<ti:title xml:lang='ger'>De spectaculis</ti:title>
+</ti:work>
+</ti:textgroup>""".replace("\n", "")
+        TG1 = TextGroup(resource=self.tg)
+        TG2 = TextGroup(resource=tg)
+        self.assertEqual(
+            len(TG1), 2,
+            "There is two edition/translations in TG1"
+        )
+        self.assertEqual(
+            len(TG2), 1,
+            "There is one edition in TG1"
+        )
+        TG3 = TG1.update(TG2)
+        self.assertEqual(
+            len(TG3), 3,
+            "There is three texts in merged objects"
+        )
+        self.assertEqual(str(TG3), str(TG1), "Addition in equal or incremental should have same result")
+        self.assertEqual(
+            TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].parents,
+            TG1["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].parents,
+            "Edition OPP should be added to textgroup and original kept"
+        )
+        self.assertListEqual(
+            sorted(TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].editions(), key=lambda x: str(x.urn)),
+            sorted([
+                TG3["urn:cts:latinLit:phi1294.phi002.perseus-lat2"],
+                TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"]
+            ], key=lambda x: str(x.urn)),
+            "New text gets access to siblings"
+        )
+        self.assertEqual(
+            (
+                TG3["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["ger"],
+                TG3["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["eng"],
+                TG3["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["fre"]
+            ),
+            ("Epigrammen", "Epigrammata", "Epigrammes"),
+            "Metadata are shared"
+        )
+        self.assertEqual(
+            len(TG3["urn:cts:latinLit:phi1294.phi002"]), 3,
+            "There should be 3 texts in work"
+        )
+        self.assertEqual(
+            len(TG3["urn:cts:latinLit:phi1294.phi001"]), 0,
+            "There should be no text in empty textgroup"
+        )
+        self.assertEqual(
+            (
+                TG3["urn:cts:latinLit:phi1294.phi001"].metadata["title"]["ger"],
+                TG3["urn:cts:latinLit:phi1294.phi001"].metadata["title"]["eng"]
+            ),
+            ("De spectaculis", "On the Spectacles"),
+            "Metadata are shared"
+        )
+
+    def test_wrong_urn_addition_work_textgroup(self):
+        """ Checks that we cannot add work or textgroup with different URN"""
+        from MyCapytain.errors import InvalidURN
+        self.assertRaises(
+            InvalidURN,
+            lambda x: Work(urn="urn:cts:latinLit:phi1294.phi002").update(Work(urn="urn:cts:latinLit:phi1297.phi002")),
+            "Addition of different work with different URN should fail"
+        )
+        self.assertRaises(
+            InvalidURN,
+            lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(TextGroup(urn="urn:cts:latinLit:phi1297")),
+            "Addition of different work with different URN should fail"
+        )
+
+    def test_wrong_type_addition_work_textgroup(self):
+        """ Checks that we cannot add work or textgroup with different URN"""
+        self.assertRaises(
+            TypeError,
+            lambda x: Work(urn="urn:cts:latinLit:phi1294.phi002").update(TextGroup(urn="urn:cts:latinLit:phi1297")),
+            "Addition of different type should fail for Work"
+        )
+        self.assertRaises(
+            TypeError,
+            lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(Work(urn="urn:cts:latinLit:phi1297.phi002")),
+            "Addition of different type should fail for TextGroup"
+        )
 
 
 class TestCitation(unittest.TestCase):

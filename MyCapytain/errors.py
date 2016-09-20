@@ -15,3 +15,8 @@ class InvalidSiblingRequest(Exception):
     depth, ex. : 1-2.25
     """
     pass
+
+
+class InvalidURN(Exception):
+    """ This error is thrown when URN are not valid
+    """

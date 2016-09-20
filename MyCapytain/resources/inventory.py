@@ -236,6 +236,7 @@ class Text(inventory.Text):
         :returns: None
         """
         self.xml = xmlparser(resource)
+        self.urn = URN(self.xml.get("urn"))
 
         if self.subtype == "Translation":
             lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
@@ -344,6 +345,7 @@ class Work(inventory.Work):
         :param type: basestring, etree._Element
         """
         self.xml = xmlparser(resource)
+        self.urn = URN(self.xml.get("urn"))
 
         lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
         if lang is not None:
@@ -421,10 +423,12 @@ class TextGroup(inventory.TextGroup):
     def parse(self, resource):
         """ Parse a resource 
 
-        :param resource: Element rerpresenting the textgroup
-        :param type: basestring, etree._Element
+        :param resource: Element representing the textgroup
+        :param type: basestring or etree._Element
         """
         self.xml = xmlparser(resource)
+
+        self.urn = URN(self.xml.get("urn"))
 
         for child in self.xml.xpath("ti:groupname", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")

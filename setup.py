@@ -21,8 +21,8 @@ setup(
     "mock==1.3.0",
     "xmlunittest>=0.3.2"
   ],
-  extras_require = {
-    "DOC" : ["Sphinx==1.3.1"]
+  extras_require={
+    "DOC": ["Sphinx==1.3.1"]
   },
   test_suite="tests",
   zip_safe=False

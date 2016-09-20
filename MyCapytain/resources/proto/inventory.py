@@ -10,21 +10,22 @@
 
 from MyCapytain.common.reference import URN, Reference, Citation
 from MyCapytain.common.metadata import Metadata
+from MyCapytain.errors import InvalidURN
 from past.builtins import basestring
 from collections import defaultdict
-from copy import copy
+from copy import copy, deepcopy
 from lxml import etree
+from builtins import object
 from six import text_type as str
 
 
 class Resource(object):
-    """ Resource represents any resource from the inventory """
-    def __init__(self, resource=None):
-        """ Initiate a TextInventory resource
+    """ Resource represents any resource from the inventory
 
-        :param resource: Resource representing the TextInventory 
-        :type resource: Any
-        """
+    :param resource: Resource representing the TextInventory
+    :type resource: Any
+    """
+    def __init__(self, resource=None):
         self.metadata = Metadata()
         self.resource = None
         if resource is not None:
@@ -43,7 +44,7 @@ class Resource(object):
         elif isinstance(key, basestring):
             return self.__urnitem__(key)
         else:
-            None
+            return None
 
     def __eq__(self, other):
         if self is other:
@@ -144,15 +145,14 @@ class Resource(object):
 
 class Text(Resource):
     """ Represents a CTS Text
+
+    :param resource: Resource representing the TextInventory
+    :type resource: Any
+    :param urn: Identifier of the Text
+    :type urn: str
     """
     def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
-        """ Initiate a Work resource
-
-        :param resource: Resource representing the TextInventory 
-        :type resource: Any
-        :param urn: Identifier of the Text
-        :type urn: str
-        """
+        self.resource = None
         self.citation = None
         self.lang = None
         self.urn = None
@@ -203,17 +203,19 @@ def Translation(resource=None, urn=None, parents=None):
 
 class Work(Resource):
     """ Represents a CTS Work
+
+    CTS Work can be added to each other which would most likely happen if you take your data from multiple API or \
+    Textual repository. This works close to dictionary update in Python. See update
+
+    :param resource: Resource representing the TextInventory
+    :type resource: Any
+    :param urn: Identifier of the Work
+    :type urn: str
+    :param parents: List of parents for current object
+    :type parents: Tuple.<TextInventory>
     """
     def __init__(self, resource=None, urn=None, parents=None):
-        """ Initiate a Work resource
-
-        :param resource: Resource representing the TextInventory 
-        :type resource: Any
-        :param urn: Identifier of the Work
-        :type urn: str
-        :param parents: List of parents for current object
-        :type parents: Tuple.<TextInventory> 
-        """
+        self.resource = None
         self.lang = None
         self.urn = None
         self.texts = defaultdict(Text)
@@ -229,6 +231,34 @@ class Work(Resource):
         if resource is not None:
             self.setResource(resource)
 
+    def update(self, other):
+        """ Merge two Work Objects.
+
+        - Original (left Object) keeps his parent.
+        - Added document overwrite text if it already exists
+
+        :param other: Work object
+        :type other: Work
+        :return: Work Object
+        :rtype Work:
+        """
+        if not isinstance(other, Work):
+            raise TypeError("Cannot add %s to Work" % type(other))
+        elif self.urn != other.urn:
+            raise InvalidURN("Cannot add Work %s to Work %s " % (self.urn, other.urn))
+
+        self.metadata += other.metadata
+        parents = [self] + self.parents
+        for urn, text in other.texts.items():
+            if urn in self.texts:
+                self.texts[urn] = deepcopy(text)
+            else:
+                self.texts[urn] = deepcopy(text)
+            self.texts[urn].parents = parents
+            self.texts[urn].resource = None
+
+        return self
+
     def getLang(self, key=None):
         """ Find a translation with given language
 
@@ -242,20 +272,29 @@ class Work(Resource):
         else:
             return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation"]
 
+    def __len__(self):
+        """ Get the number of text in the Work
+
+        :return: Number of texts available in the inventory
+        """
+        return len(self.texts)
+
 
 class TextGroup(Resource):
     """ Represents a CTS Textgroup
+
+    CTS TextGroup can be added to each other which would most likely happen if you take your data from multiple API or \
+    Textual repository. This works close to dictionary update in Python. See update
+
+    :param resource: Resource representing the TextInventory
+    :type resource: Any
+    :param urn: Identifier of the TextGroup
+    :type urn: str
+    :param parents: List of parents for current object
+    :type parents: Tuple.<TextInventory>
     """
     def __init__(self, resource=None, urn=None, parents=None):
-        """ Initiate a TextGroup resource
-
-        :param resource: Resource representing the TextInventory 
-        :type resource: Any
-        :param urn: Identifier of the TextGroup
-        :type urn: str
-        :param parents: List of parents for current object
-        :type parents: Tuple.<TextInventory> 
-        """
+        self.resource = None
         self.urn = None
         self.works = defaultdict(Work)
         self.parents = list()
@@ -270,18 +309,56 @@ class TextGroup(Resource):
         if resource is not None:
             self.setResource(resource)
 
+    def update(self, other):
+        """ Merge two Textgroup Objects.
+
+        - Original (left Object) keeps his parent.
+        - Added document merges with work if it already exists
+
+        :param other: Textgroup object
+        :type other: TextGroup
+        :return: Textgroup Object
+        :rtype: TextGroup
+        """
+        if not isinstance(other, TextGroup):
+            raise TypeError("Cannot add %s to TextGroup" % type(other))
+        elif str(self.urn) != str(other.urn):
+            raise InvalidURN("Cannot add TextGroup %s to TextGroup %s " % (self.urn, other.urn))
+
+        self.metadata += other.metadata
+        parents = [self] + self.parents
+        for urn, work in other.works.items():
+            if urn in self.works:
+                self.works[urn].update(deepcopy(work))
+            else:
+                self.works[urn] = deepcopy(work)
+            self.works[urn].parents = parents
+            self.works[urn].resource = None
+
+        return self
+
+    def __len__(self):
+        """ Get the number of text in the Textgroup
+
+        :return: Number of texts available in the inventory
+        """
+        return len([
+            text
+            for work in self.works.values()
+            for text in work.texts.values()
+        ])
+
 
 class TextInventory(Resource):
-    """ Represents a CTS Inventory file
+    """ Initiate a TextInventory resource
+
+    :param resource: Resource representing the TextInventory
+    :type resource: Any
+    :param id: Identifier of the TextInventory
+    :type id: str
     """
     def __init__(self, resource=None, id=None):
-        """ Initiate a TextInventory resource
-
-        :param resource: Resource representing the TextInventory 
-        :type resource: Any
-        :param id: Identifier of the TextInventory
-        :type id: str
-        """
+        self.resource = None
         self.textgroups = defaultdict(TextGroup)
         self.id = id
         self.parents = list()
@@ -289,13 +366,13 @@ class TextInventory(Resource):
             self.setResource(resource)
 
     def __len__(self):
-        """
+        """ Get the number of text in the Inventory
 
         :return: Number of texts available in the inventory
         """
         return len([
             text
-                for tg in self.textgroups.values()
-                for work in tg.works.values()
-                for text in work.texts.values()
+            for tg in self.textgroups.values()
+            for work in tg.works.values()
+            for text in work.texts.values()
         ])

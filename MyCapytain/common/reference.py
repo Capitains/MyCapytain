@@ -10,11 +10,9 @@
 """
 from __future__ import unicode_literals
 
-from collections import defaultdict
 from past.builtins import basestring
 from six import text_type as str
-from builtins import \
-    range, object
+from builtins import range, object
 from copy import copy
 import re
 
@@ -196,8 +194,17 @@ class Reference(object):
             >>>    (a == b) == False
             >>>    (c == b) == True
         """
-        return (isinstance(other, self.__class__)
+        return (isinstance(other, type(self))
                 and self.reference == str(other))
+
+    def __ne__(self, other):
+        """ Inequality checker for Reference object
+
+        :param other: An object to be checked against
+        :rtype: boolean
+        :returns: Equality between other and self
+        """
+        return not self.__eq__(other)
 
     def __model(self):
         """ 3-Tuple model for references
@@ -431,10 +438,18 @@ class URN(object):
         :Example:
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
             >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1") 
-            >>>    (b == a) == False # 
+            >>>    (b == a) == False
         """
-        return (isinstance(other, self.__class__)
-                and self.__str__() == str(other))
+        return isinstance(other, type(self)) and str(self) == str(other)
+
+    def __ne__(self, other):
+        """ Inequality checker for Reference object
+
+        :param other: An object to be checked against
+        :rtype: boolean
+        :returns: Equality between other and self
+        """
+        return not self.__eq__(other)
 
     def __str__(self):
         """ Return full initial urn

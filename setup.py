@@ -25,5 +25,16 @@ setup(
     "DOC": ["Sphinx==1.3.1"]
   },
   test_suite="tests",
-  zip_safe=False
+  zip_safe=False,
+  classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Text Processing :: Markup :: XML",
+    "Topic :: Text Processing :: General"
+  ]
 )

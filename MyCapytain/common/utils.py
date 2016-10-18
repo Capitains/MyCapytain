@@ -310,3 +310,18 @@ def nested_set(dictionary,  keys, value):
     :return: None
     """
     nested_get(dictionary, keys[:-1])[keys[-1]] = value
+
+
+class Mimetypes:
+    """ Mimetypes that can be used by different classes to refer to the same items
+
+    :cvar JSON: JSON Resource mimetype
+    :cvar XML: XML Resource mimetype
+    :cvar CTS_XML: XML Resource mimetype
+    :cvar MY_CAPYTAIN: MyCapytain Object Resource (Native Python CapiTainS Object)
+
+    """
+    JSON = "application/text"
+    XML = "text/xml"
+    CTS_XML = "text/xml:CTS"
+    MY_CAPYTAIN = "MyCapytain"

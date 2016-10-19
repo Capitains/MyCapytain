@@ -13,6 +13,7 @@ from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 from past.builtins import basestring
 from builtins import range, object
+from MyCapytain.common.utils import Mimetypes, NS, RDF_PREFIX
 
 
 class Metadatum(object):
@@ -208,6 +209,7 @@ class Metadata(object):
         """
         self.metadata = defaultdict(Metadatum)
         self.__keys = []
+
         if keys is not None:
             for key in keys:
                 self[key] = Metadatum(name=key)
@@ -362,3 +364,56 @@ class Metadata(object):
             self.__keys.append(key)
             self.metadata[key] = getattr(Metadatum(name=value["name"]), "__setstate__")(value)
         return self
+
+    def keys(self):
+        """ List of keys available
+
+        :return: List of metadatum keys
+        """
+        return self.__keys
+
+    def export(self, mime=Mimetypes.JSON):
+        if mime == Mimetypes.JSON:
+            return {
+                key: getattr(value, "__getstate__")() for key, value in self.metadata.items()
+            }
+        elif mime == Mimetypes.JSON_DTS:
+            descs = {
+
+            }
+            for key in sorted(self.metadata.keys()):
+                metadatum = self.metadata[key]
+                ks = key.split(":")
+                if len(ks) == 2:
+                    ns, k = tuple(ks)
+                else:
+                    ns, k = RDF_PREFIX["cts"], key
+                if ns in RDF_PREFIX:
+                    ns = RDF_PREFIX[ns]
+
+                for lang, value in metadatum:
+                    if not lang in descs:
+                        descs[lang] = {"@language": lang}
+                    descs[lang][ns+k] = value
+            return [value for value in descs.values()]
+
+        elif mime == Mimetypes.RDFXML:
+            out = ""
+            for key in sorted(self.metadata.keys()):
+                metadatum = self.metadata[key]
+                ks = key.split(":")
+                if len(ks) == 2:
+                    ns, k = tuple(ks)
+                    if ns in RDF_PREFIX:
+                        ns = RDF_PREFIX[ns]
+                else:
+                    ns, k = NS["ti"], key
+                out += "".join([
+                    "<{1} xmlns=\"{0}/\" xml:lang=\"{2}\">{3}</{1}>".format(ns, k, lang, value)
+                    for lang, value in metadatum
+                   ])
+            return """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description>
+    """+out+"""
+  </rdf:Description>
+</rdf:RDF>"""

@@ -10,12 +10,12 @@
 
 from MyCapytain.common.reference import URN, Reference, Citation
 from MyCapytain.common.metadata import Metadata
+from MyCapytain.common.utils import RDF_PREFIX, Mimetypes
 from MyCapytain.errors import InvalidURN
 from past.builtins import basestring
 from collections import defaultdict
 from copy import copy, deepcopy
 from lxml import etree
-from builtins import object
 from six import text_type as str
 
 
@@ -25,8 +25,24 @@ class Resource(object):
     :param resource: Resource representing the TextInventory
     :type resource: Any
     """
+    DC_TITLE_KEY = None
+
+    @property
+    def title(self):
+        if hasattr(type(self), "DC_TITLE_KEY") and self.DC_TITLE_KEY:
+            __title = Metadata(keys="dc:title")
+            __title["dc:title"] = deepcopy(self.metadata[type(self).DC_TITLE_KEY])
+            return __title
+
     def __init__(self, resource=None):
-        self.metadata = Metadata()
+        self.metadata = Metadata()#
+        self.__id__ = None
+        self.properties = {
+            RDF_PREFIX["dts"]+":model": "http://w3id.org/dts-ontology/collection"
+        }
+        if hasattr(type(self), "CTSMODEL"):
+            self.properties[RDF_PREFIX["cts"]+"model"] = RDF_PREFIX["cts"] + type(self).CTSMODEL
+
         self.resource = None
         if resource is not None:
             self.setResource(resource)
@@ -57,9 +73,6 @@ class Resource(object):
         return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn and self.resource == other.resource
 
     def __str__(self):
-        raise NotImplementedError()
-
-    def export(self, format=None):
         raise NotImplementedError()
 
     def __urnitem__(self, key):
@@ -142,6 +155,38 @@ class Resource(object):
             self.xml = etree.fromstring(dic["xml"])
         return self
 
+    @property
+    def id(self):
+        return self.__id__
+
+    @id.setter
+    def id(self, value):
+        self.__id__ = value
+
+    @property
+    def members(self):
+        return []
+
+    def default_export(self, output=Mimetypes.JSON_DTS, domain=""):
+        if output == Mimetypes.JSON_DTS:
+            if self.title:
+                m = self.metadata + self.title
+            else:
+                m = self.metadata
+            o = {
+                "@id": domain+self.id,
+                RDF_PREFIX["dts"] + "description": m.export(Mimetypes.JSON_DTS),
+                RDF_PREFIX["dts"] + "properties" : self.properties
+            }
+            if len(self.members):
+                o[RDF_PREFIX["dts"] + "members"] = [
+                    member.export(Mimetypes.JSON_DTS, domain) for member in self.members
+                ]
+            return o
+
+    def export(self, output=None, domain=""):
+        return self.default_export(output, domain)
+
 
 class Text(Resource):
     """ Represents a CTS Text
@@ -151,7 +196,11 @@ class Text(Resource):
     :param urn: Identifier of the Text
     :type urn: str
     """
+
+    DC_TITLE = "label"
+
     def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
+        super(Text, self).__init__()
         self.resource = None
         self.citation = None
         self.lang = None
@@ -164,6 +213,7 @@ class Text(Resource):
 
         if urn is not None:
             self.urn = URN(urn)
+            self.id = str(self.urn)
 
         if parents is not None:
             self.parents = parents
@@ -214,7 +264,11 @@ class Work(Resource):
     :param parents: List of parents for current object
     :type parents: Tuple.<TextInventory>
     """
+
+    DC_TITLE_KEY = "title"
+
     def __init__(self, resource=None, urn=None, parents=None):
+        super(Work, self).__init__()
         self.resource = None
         self.lang = None
         self.urn = None
@@ -224,6 +278,7 @@ class Work(Resource):
 
         if urn is not None:
             self.urn = URN(urn)
+            self.id = str(self.urn)
 
         if parents is not None:
             self.parents = parents
@@ -279,6 +334,10 @@ class Work(Resource):
         """
         return len(self.texts)
 
+    @property
+    def members(self):
+        return self.texts.values()
+
 
 class TextGroup(Resource):
     """ Represents a CTS Textgroup
@@ -293,7 +352,14 @@ class TextGroup(Resource):
     :param parents: List of parents for current object
     :type parents: Tuple.<TextInventory>
     """
+    DC_TITLE_KEY = "groupname"
+
+    @property
+    def members(self):
+        return self.works.values()
+
     def __init__(self, resource=None, urn=None, parents=None):
+        super(TextGroup, self).__init__()
         self.resource = None
         self.urn = None
         self.works = defaultdict(Work)
@@ -302,6 +368,7 @@ class TextGroup(Resource):
 
         if urn is not None:
             self.urn = URN(urn)
+            self.id = str(self.urn)
 
         if parents:
             self.parents = parents
@@ -357,10 +424,16 @@ class TextInventory(Resource):
     :param id: Identifier of the TextInventory
     :type id: str
     """
-    def __init__(self, resource=None, id=None):
+
+    @property
+    def members(self):
+        return self.textgroups.values()
+
+    def __init__(self, resource=None, name=None):
+        super(TextInventory, self).__init__()
         self.resource = None
         self.textgroups = defaultdict(TextGroup)
-        self.id = id
+        self.__id__ = name
         self.parents = list()
         if resource is not None:
             self.setResource(resource)

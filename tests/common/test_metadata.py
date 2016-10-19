@@ -5,7 +5,7 @@ import unittest
 import six
 from collections import defaultdict
 from MyCapytain.common.metadata import Metadata, Metadatum
-
+from MyCapytain.common.utils import Mimetypes
 
 class TestMetadatum(unittest.TestCase):
     def test_init(self):
@@ -210,4 +210,46 @@ class TestMetadata(unittest.TestCase):
         c = a + b
         self.assertEqual(len(c), 3)
         self.assertEqual(len(c["desc"]), 2)
+
+    def test_export_jsonld(self):
+        b = Metadata()
+        m3 = Metadatum("desc", [("fre", "Omelette")])
+        m4 = Metadatum("title", [("eng", "ttl"), ("fre", "titre")])
+        m5 = Metadatum("dc:editor", [("eng", "Captain Hook"), ("fre", "Capitaine Crochet")])
+        b[("desc", "title", "dc:editor")] = (m3, m4, m5)
+
+        six.assertCountEqual(
+            self,
+            b.export(Mimetypes.JSON_DTS),
+            [
+                {
+                    'http://chs.harvard.edu/xmlns/cts/desc': 'Omelette',
+                    'http://chs.harvard.edu/xmlns/cts/title': 'titre',
+                    'http://purl.org/dc/elements/1.1/editor': "Capitaine Crochet",
+                    '@language': 'fre'
+                },
+                {
+                    'http://chs.harvard.edu/xmlns/cts/title': 'ttl',
+                    'http://purl.org/dc/elements/1.1/editor': "Captain Hook",
+                    '@language': 'eng'
+                }
+            ],
+            "JSON LD Expression should take into account prefixes"
+        )
+
+    def test_export_xmlRDF(self):
+        b = Metadata()
+        m3 = Metadatum("desc", [("fre", "Omelette")])
+        m4 = Metadatum("title", [("eng", "ttl"), ("fre", "titre")])
+        m5 = Metadatum("dc:editor", [("eng", "Captain Hook"), ("fre", "Capitaine Crochet")])
+        b[("desc", "title", "dc:editor")] = (m3, m4, m5)
+        self.assertEqual(
+            b.export(Mimetypes.RDFXML),
+            """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description>
+    <editor xmlns="http://purl.org/dc/elements/1.1//" xml:lang="eng">Captain Hook</editor><editor xmlns="http://purl.org/dc/elements/1.1//" xml:lang="fre">Capitaine Crochet</editor><desc xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">Omelette</desc><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="eng">ttl</title><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">titre</title>
+  </rdf:Description>
+</rdf:RDF>""",
+            "XML/RDF Expression should take into account prefixes"
+        )
 

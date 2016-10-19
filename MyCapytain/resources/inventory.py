@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 
 from MyCapytain.resources.proto import inventory, text
 from MyCapytain.common.reference import Citation as CitationPrototype, URN
-from MyCapytain.common.utils import xmlparser, NS
+from MyCapytain.common.utils import xmlparser, NS, Mimetypes
 import re
 from six import text_type as str
 import collections
@@ -203,22 +203,25 @@ class Text(inventory.Text):
         strings.append("</ti:{0}>".format(tag_end))
         return "".join(strings)
 
-    def export(self, output="xml", **kwargs):
+    def export(self, output=Mimetypes.ETREE, domain="", **kwargs):
         """ Create a {format} version of the Work
         
         :param output: Format to be chosen (Only XML for now)
         :type output: basestring, citation
+        :param domain: Domain to prefix IDs
+        :type domain: str
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        if output == "xml":
+        if output == Mimetypes.ETREE:
             return xmlparser(str(self))
-        elif issubclass(output, text.Text):
+        elif output == Mimetypes.MyCapytainText:
             complete_metadata = self.metadata
             for parent in self.parents:
                 if isinstance(parent, inventory.Resource) and hasattr(parent, "metadata"):
                     complete_metadata = complete_metadata + parent.metadata
-            return output(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
+            return text.Text(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
+        return self.default_export(output, domain)
 
     def __findCitations(self, xml, xpath="ti:citation"):
         """ Find citation in current xml. Used as a loop for self.xmlparser()
@@ -237,6 +240,7 @@ class Text(inventory.Text):
         """
         self.xml = xmlparser(resource)
         self.urn = URN(self.xml.get("urn"))
+        self.id = str(self.urn)
 
         if self.subtype == "Translation":
             lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
@@ -328,15 +332,19 @@ class Work(inventory.Work):
         strings.append("</ti:work>")
         return "".join(strings)
 
-    def export(self, output="xml"):
+    def export(self, output=Mimetypes.ETREE, domain=""):
         """ Create a {format} version of the Work
         
         :param output: Format to be chosen (Only XML for now)
         :type output: basestring
+        :param domain: Domain to prefix IDs
+        :type domain: str
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return xmlparser(str(self))
+        if output == Mimetypes.ETREE:
+            return xmlparser(str(self))
+        return self.default_export(output, domain)
 
     def parse(self, resource):
         """ Parse a resource 
@@ -346,6 +354,7 @@ class Work(inventory.Work):
         """
         self.xml = xmlparser(resource)
         self.urn = URN(self.xml.get("urn"))
+        self.id = str(self.urn)
 
         lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
         if lang is not None:
@@ -410,15 +419,19 @@ class TextGroup(inventory.TextGroup):
         strings.append("</ti:textgroup>")
         return "".join(strings)
 
-    def export(self, output="xml"):
-        """ Create a {format} version of the TextInventory
-        
+    def export(self, output=Mimetypes.ETREE, domain=""):
+        """ Create a {format} version of the Work
+
         :param output: Format to be chosen (Only XML for now)
         :type output: basestring
+        :param domain: Domain to prefix IDs
+        :type domain: str
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return xmlparser(str(self))
+        if output == Mimetypes.ETREE:
+            return xmlparser(str(self))
+        return self.default_export(output, domain)
 
     def parse(self, resource):
         """ Parse a resource 
@@ -429,6 +442,7 @@ class TextGroup(inventory.TextGroup):
         self.xml = xmlparser(resource)
 
         self.urn = URN(self.xml.get("urn"))
+        self.id = str(self.urn)
 
         for child in self.xml.xpath("ti:groupname", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
@@ -451,6 +465,20 @@ class TextInventory(inventory.TextInventory):
     .. automethod:: __str__
     """
 
+    def export(self, output=Mimetypes.ETREE, domain=""):
+        """ Create a {format} version of the Work
+
+        :param output: Format to be chosen (Only XML for now)
+        :type output: basestring
+        :param domain: Domain to prefix IDs
+        :type domain: str
+        :rtype: lxml.etree._Element
+        :returns: XML representation of the object
+        """
+        if output == Mimetypes.ETREE:
+            return xmlparser(str(self))
+        return self.default_export(output, domain)
+
     def __init__(self, **kwargs):
         super(TextInventory, self).__init__(**kwargs)
 
@@ -471,15 +499,19 @@ class TextInventory(inventory.TextInventory):
         strings.append("</ti:TextInventory>")
         return "".join(strings)
 
-    def export(self, output="xml"):
-        """ Create a {output} version of the TextInventory
-        
-        :param output: output to be chosen (Only XML for now)
+    def export(self, output=Mimetypes.ETREE, domain=""):
+        """ Create a {format} version of the Work
+
+        :param output: Format to be chosen (Only XML for now)
         :type output: basestring
+        :param domain: Domain to prefix IDs
+        :type domain: str
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        return xmlparser(str(self))
+        if output == Mimetypes.ETREE:
+            return xmlparser(str(self))
+        return self.default_export(output, domain)
 
     def parse(self, resource):
         """ Parse a resource 

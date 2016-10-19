@@ -45,12 +45,65 @@ def normalize(string):
     """
     return __strip.sub(" ", string)
 
-#: Dictionary of namespace that can be useful
+""" Dictionary of namespace that can be useful """
 NS = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ahab": "http://localhost.local",
     "ti": "http://chs.harvard.edu/xmlns/cts",
     "xml": "http://www.w3.org/XML/1998/namespace"
+}
+
+""" Dictionary of RDF Prefixes """
+RDF_PREFIX = {
+  "foaf": "http://xmlns.com/foaf/0.1/",
+  "dc": "http://purl.org/dc/elements/1.1/",
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+  "owl": "http://www.w3.org/2002/07/owl#",
+  "geonames": "http://www.geonames.org/ontology#",
+  "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
+  "skos": "http://www.w3.org/2004/02/skos/core#",
+  "dbp": "http://dbpedia.org/property/",
+  "swrc": "http://swrc.ontoware.org/ontology#",
+  "sioc": "http://rdfs.org/sioc/ns#",
+  "xsd": "http://www.w3.org/2001/XMLSchema#",
+  "dbo": "http://dbpedia.org/ontology/",
+  "dc11": "http://purl.org/dc/elements/1.1/",
+  "doap": "http://usefulinc.com/ns/doap#",
+  "dts": "http://w3id.org/dts-ontology/",
+  "dbpprop": "http://dbpedia.org/property/",
+  "content": "http://purl.org/rss/1.0/modules/content/",
+  "wot": "http://xmlns.com/wot/0.1/",
+  "rss": "http://purl.org/rss/1.0/",
+  "gen": "http://purl.org/gen/0.1#",
+  "dbpedia": "http://dbpedia.org/resource/",
+
+  "tei": "http://www.tei-c.org/ns/1.0/",
+  "cts": "http://chs.harvard.edu/xmlns/cts/"
+}
+
+RDF_MAPPING = {
+    'http://chs.harvard.edu/xmlns/cts/': 'cts',
+    'http://dbpedia.org/ontology/': 'dbo',
+    'http://dbpedia.org/property/': 'dbp',
+    'http://dbpedia.org/resource/': 'dbpedia',
+    'http://purl.org/dc/elements/1.1/': 'dc11',
+    'http://purl.org/gen/0.1#': 'gen',
+    'http://purl.org/rss/1.0/': 'rss',
+    'http://purl.org/rss/1.0/modules/content/': 'content',
+    'http://rdfs.org/sioc/ns#': 'sioc',
+    'http://swrc.ontoware.org/ontology#': 'swrc',
+    'http://usefulinc.com/ns/doap#': 'doap',
+    'http://www.geonames.org/ontology#': 'geonames',
+    'http://www.tei-c.org/ns/1.0/': 'tei',
+    'http://www.w3.org/1999/02/22-rdf-syntax-ns#': 'rdf',
+    'http://www.w3.org/2000/01/rdf-schema#': 'rdfs',
+    'http://www.w3.org/2001/XMLSchema#': 'xsd',
+    'http://www.w3.org/2002/07/owl#': 'owl',
+    'http://www.w3.org/2003/01/geo/wgs84_pos#': 'geo',
+    'http://www.w3.org/2004/02/skos/core#': 'skos',
+    'http://xmlns.com/foaf/0.1/': 'foaf',
+    'http://xmlns.com/wot/0.1/': 'wot'
 }
 
 
@@ -322,6 +375,11 @@ class Mimetypes:
 
     """
     JSON = "application/text"
+    JSON_CTS = "application/ld+json:CTS"
+    JSON_DTS = "application/ld+json:DTS"
     XML = "text/xml"
+    RDFXML = "application/rdf+xml"
     CTS_XML = "text/xml:CTS"
     MY_CAPYTAIN = "MyCapytain"
+    ETREE = "xml"
+    MyCapytainText = "MyCapytain/Text"

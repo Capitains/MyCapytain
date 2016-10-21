@@ -25,3 +25,4 @@ branches:
   only:
     - master
     - 0.1.0dev
+    - dts-dev

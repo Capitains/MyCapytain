@@ -57,7 +57,51 @@ class Ahab(API):
         raise NotImplementedError()
 
 
-class CTS(API):
+class CitableTextServiceRetriever(API):
+    """ Citable Text Service retrievers should have at least have some of the following properties
+
+    """
+
+    def getMetadata(self, textId=None, **filters):
+        """ Request metadata about a text or a collection
+
+        :param textId: Text Identifier
+        :param filters: Kwargs parameters. URN and Inv are available
+        :return: Metadata of text from an API or the likes as bytes
+        """
+        raise NotImplementedError
+
+    def getText(self, textId, reference=None, prevnext=False, metadata=False):
+        """ Retrieve a text node from the API
+
+        :param textId: Text Identifier
+        :param reference: Passage Reference
+        :param prevnext: Retrieve graph representing previous and next passage
+        :param metadata: Retrieve metadata about the passage and the text
+        :return: Text of a Passage from an API or the likes as bytes
+        """
+        raise NotImplementedError
+
+    def getSiblings(self, textId, reference):
+        """ Retrieve the siblings of a textual node
+
+        :param textId: Text Identifier
+        :param reference: Passage Reference
+        :return: Siblings references from an API or the likes as bytes
+        """
+        raise NotImplementedError
+
+    def getChildren(self, textId, reference=None, depth=None):
+        """ Retrieve the siblings of a textual node
+
+        :param textId: Text Identifier
+        :param reference: Passage Reference
+        :return: Children references from an API or the likes as bytes
+        """
+        raise NotImplementedError
+
+
+class CTS(CitableTextServiceRetriever):
     """
     CTS API Endpoint Prototype 
     """

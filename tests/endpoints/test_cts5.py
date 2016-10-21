@@ -135,3 +135,82 @@ class TestEndpointsCTS5(unittest.TestCase):
                     "urn": "urn"
                 }
             )
+
+    def test_get_siblings(self):
+        """ Ensure Citable Text Service getMetadata is correctly routed """
+        with patch('requests.get') as patched_get:
+            self.cts.getSiblings("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetPrevNextUrn",
+                    "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
+                }
+            )
+
+    def test_get_children(self):
+        """ Ensure Citable Text Service getMetadata is correctly routed """
+        with patch('requests.get') as patched_get:
+            self.cts.getChildren("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetValidReff",
+                    "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2",
+                    "level": "1"
+                }
+            )
+        with patch('requests.get') as patched_get:
+            self.cts.getChildren("urn:cts:latinLit:phi1294.phi002.perseus-lat2", reference="1.1")
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetValidReff",
+                    "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+                    "level": "3"
+                }
+            )
+
+        with patch('requests.get') as patched_get:
+            self.cts.getChildren("urn:cts:latinLit:phi1294.phi002.perseus-lat2", reference="1", depth=2)
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetValidReff",
+                    "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+                    "level": "3"
+                }
+            )
+
+    def test_get_metadata(self):
+        """ Ensure Citable Text Service getMetadata is correctly routed """
+        with patch('requests.get') as patched_get:
+            self.cts.getMetadata()
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetCapabilities"
+                }
+            )
+        with patch('requests.get') as patched_get:
+            self.cts.getMetadata(textId="urn")
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetCapabilities",
+                    "urn": "urn"
+                }
+            )
+
+    def test_get_text(self):
+        """ Ensure Citable Text Service getText is correctly routed """
+        with patch('requests.get') as patched_get:
+            self.cts.getText(textId="urn", metadata=True)
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetPassagePlus",
+                    "urn": "urn"
+                }
+            )
+        with patch('requests.get') as patched_get:
+            self.cts.getText(textId="urn", reference="1.1")
+            patched_get.assert_called_once_with(
+                "http://domainname.com/rest/cts", params={
+                    "request": "GetPassage",
+                    "urn": "urn:1.1"
+                }
+            )

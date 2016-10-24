@@ -9,13 +9,12 @@
 """
 from __future__ import unicode_literals
 
-from MyCapytain.resources.proto import text
-from MyCapytain.resources.proto.cts import inventory as cts
+from MyCapytain.resources.prototypes import text
+from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype, URN
 from MyCapytain.common.utils import xmlparser, NS, Mimetypes
 import re
 from six import text_type as str
-import MyCapytain.resources.collections
 from collections import defaultdict
 
 

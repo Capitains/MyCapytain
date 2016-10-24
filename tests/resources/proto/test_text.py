@@ -2,11 +2,8 @@
 from __future__ import unicode_literals
 
 import unittest
-import six
 
-from io import open
-from collections import defaultdict
-from MyCapytain.resources.proto.text import *
+from MyCapytain.resources.prototypes.text import *
 import MyCapytain.common.reference
 import MyCapytain.common.metadata
 

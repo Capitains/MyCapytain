@@ -6,7 +6,7 @@ import six
 
 from io import open
 from collections import defaultdict
-from MyCapytain.resources.proto.cts import inventory as cts
+from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import URN
 
 class Resource(cts.CTSCollection):

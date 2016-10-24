@@ -8,7 +8,7 @@
 
 """
 
-from MyCapytain.resources.proto.metadata import Collection
+from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.common.reference import URN, Reference, Citation
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import RDF_PREFIX, Mimetypes

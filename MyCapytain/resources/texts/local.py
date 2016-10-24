@@ -18,7 +18,7 @@ from MyCapytain.errors import DuplicateReference, RefsDeclError
 from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize, \
     nested_set, nested_ordered_dictionary
 from MyCapytain.common.reference import URN, Citation, Reference
-from MyCapytain.resources.proto import text
+from MyCapytain.resources.prototypes import text
 from MyCapytain.errors import InvalidSiblingRequest
 import MyCapytain.resources.texts.tei
 from lxml import etree

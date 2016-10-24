@@ -9,7 +9,7 @@ Shared elements for TEI Citation
 
 import MyCapytain.common.reference
 import MyCapytain.common.utils
-import MyCapytain.resources.proto.text
+import MyCapytain.resources.prototypes.text
 
 from lxml.etree import _Element, tostring
 from builtins import range, object
@@ -86,7 +86,7 @@ class Citation(MyCapytain.common.reference.Citation):
         return resources[-1]
 
 
-class Passage(MyCapytain.resources.proto.text.Passage):
+class Passage(MyCapytain.resources.prototypes.text.Passage):
     def __str__(self):
         """ Text based representation of the passage
     

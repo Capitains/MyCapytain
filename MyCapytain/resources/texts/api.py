@@ -8,12 +8,12 @@ import MyCapytain.common.metadata
 import MyCapytain.common.reference
 import MyCapytain.common.utils
 import MyCapytain.resources.collections.cts
-import MyCapytain.resources.proto.text
+import MyCapytain.resources.prototypes.text
 import MyCapytain.resources.texts.tei
 import MyCapytain.retrievers.prototypes
 
 
-class Text(MyCapytain.resources.proto.text.Text):
+class Text(MyCapytain.resources.prototypes.text.Text):
     """ Passage representing object prototype
 
     :param urn: A URN identifier

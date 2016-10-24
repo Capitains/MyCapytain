@@ -9,14 +9,17 @@ from collections import defaultdict
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import URN
 
+
 class Resource(cts.CTSCollection):
     def parse(self, resource):
         return resource
+
 
 class TIV(cts.TextInventory):
     def parse(self, resource):
         self.textgroups = defaultdict(cts.TextGroup)
         return resource
+
 
 class TestRepoProto(unittest.TestCase):
     def test_resource_proto(self):

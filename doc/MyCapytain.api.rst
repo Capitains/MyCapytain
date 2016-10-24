@@ -57,7 +57,7 @@ CTS 5 API
 Prototypes
 **********
 
-.. automodule:: MyCapytain.retrievers.proto
+.. automodule:: MyCapytain.retrievers.prototypes
     :members:
     :undoc-members:
     :show-inheritance:
@@ -112,23 +112,39 @@ API's Text results
     :undoc-members:
     :show-inheritance:
 
-Inventories
+Collections
 ***********
 
-.. automodule:: MyCapytain.resources.inventory
+Metadata
+++++++++
+
+.. automodule:: MyCapytain.resources.prototypes.metadata
     :members:
     :undoc-members:
     :show-inheritance:
 
-Prototypes
-**********
+CTS inventory
++++++++++++++
 
-.. automodule:: MyCapytain.resources.proto.text
+Formerly MyCapytain.resources.inventory (< 2.0.0)
+
+.. automodule:: MyCapytain.resources.collections.cts
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: MyCapytain.resources.proto.inventory
+CTS Inventory Prototypes
+++++++++++++++++++++++++
+
+.. automodule:: MyCapytain.resources.prototypes.cts.inventory
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Text Prototypes
++++++++++++++++
+
+.. automodule:: MyCapytain.resources.prototypes.text
     :members:
     :undoc-members:
     :show-inheritance:

@@ -8,6 +8,7 @@
 
 """
 
+from MyCapytain.resources.proto.metadata import Collection
 from MyCapytain.common.reference import URN, Reference, Citation
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import RDF_PREFIX, Mimetypes
@@ -19,27 +20,15 @@ from lxml import etree
 from six import text_type as str
 
 
-class Resource(object):
+class Resource(Collection):
     """ Resource represents any resource from the inventory
 
     :param resource: Resource representing the TextInventory
     :type resource: Any
     """
-    DC_TITLE_KEY = None
-
-    @property
-    def title(self):
-        if hasattr(type(self), "DC_TITLE_KEY") and self.DC_TITLE_KEY:
-            __title = Metadata(keys="dc:title")
-            __title["dc:title"] = deepcopy(self.metadata[type(self).DC_TITLE_KEY])
-            return __title
-
     def __init__(self, resource=None):
-        self.metadata = Metadata()#
-        self.__id__ = None
-        self.properties = {
-            RDF_PREFIX["dts"]+":model": "http://w3id.org/dts-ontology/collection"
-        }
+        super(Resource, self).__init__()
+
         if hasattr(type(self), "CTSMODEL"):
             self.properties[RDF_PREFIX["cts"]+"model"] = RDF_PREFIX["cts"] + type(self).CTSMODEL
 
@@ -154,38 +143,6 @@ class Resource(object):
         if "xml" in dic:
             self.xml = etree.fromstring(dic["xml"])
         return self
-
-    @property
-    def id(self):
-        return self.__id__
-
-    @id.setter
-    def id(self, value):
-        self.__id__ = value
-
-    @property
-    def members(self):
-        return []
-
-    def default_export(self, output=Mimetypes.JSON_DTS, domain=""):
-        if output == Mimetypes.JSON_DTS:
-            if self.title:
-                m = self.metadata + self.title
-            else:
-                m = self.metadata
-            o = {
-                "@id": domain+self.id,
-                RDF_PREFIX["dts"] + "description": m.export(Mimetypes.JSON_DTS),
-                RDF_PREFIX["dts"] + "properties" : self.properties
-            }
-            if len(self.members):
-                o[RDF_PREFIX["dts"] + "members"] = [
-                    member.export(Mimetypes.JSON_DTS, domain) for member in self.members
-                ]
-            return o
-
-    def export(self, output=None, domain=""):
-        return self.default_export(output, domain)
 
 
 class Text(Resource):

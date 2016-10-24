@@ -1,6 +1,6 @@
 import unittest
 
-from MyCapytain.retrievers.proto import *
+from MyCapytain.retrievers.prototypes import *
 
 
 class TestEndpointsProto(unittest.TestCase):

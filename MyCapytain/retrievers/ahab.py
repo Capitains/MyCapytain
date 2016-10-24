@@ -7,7 +7,7 @@
 
 
 """
-import MyCapytain.retrievers.proto
+import MyCapytain.retrievers.prototypes
 import requests
 
 

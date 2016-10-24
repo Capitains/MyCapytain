@@ -2,16 +2,16 @@
 from __future__ import unicode_literals
 
 import unittest
-import six
-import xmlunittest
-import lxml.etree as etree
-from io import open, StringIO
 from copy import deepcopy
+from io import open, StringIO
 from operator import attrgetter
 
-from MyCapytain.resources.inventory import *
+import lxml.etree as etree
+import six
+import xmlunittest
+
 from MyCapytain.common.utils import Mimetypes
-import MyCapytain.resources.proto.text
+from MyCapytain.resources.collections.cts import *
 
 
 class XML_Compare(object):

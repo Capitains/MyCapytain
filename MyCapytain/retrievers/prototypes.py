@@ -62,10 +62,10 @@ class CitableTextServiceRetriever(API):
 
     """
 
-    def getMetadata(self, textId=None, **filters):
+    def getMetadata(self, objectId=None, **filters):
         """ Request metadata about a text or a collection
 
-        :param textId: Text Identifier
+        :param objectId: Text Identifier
         :param filters: Kwargs parameters. URN and Inv are available
         :return: Metadata of text from an API or the likes as bytes
         """

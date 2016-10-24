@@ -1,14 +1,11 @@
-from MyCapytain.retrievers.proto import CitableTextServiceRetriever
 
 
-class Resolver(CitableTextServiceRetriever):
-    def __init__(self, endpoint):
-        super(Resolver, self).__init__(endpoint)
 
-    def getMetadata(self, textId=None, **filters):
+class Resolver(object):
+    def getMetadata(self, objectId=None, **filters):
         """ Request metadata about a text or a collection
 
-        :param textId: Text Identifier
+        :param textId: Object Identifier to filter on
         :param filters: Kwargs parameters. URN and Inv are available
         :return: Collection
         """
@@ -30,7 +27,7 @@ class Resolver(CitableTextServiceRetriever):
 
         :param textId: Text Identifier
         :param reference: Passage Reference
-        :return: Siblings references from an API or the likes as bytes
+        :return: Graph
         """
         raise NotImplementedError
 
@@ -39,6 +36,6 @@ class Resolver(CitableTextServiceRetriever):
 
         :param textId: Text Identifier
         :param reference: Passage Reference
-        :return: Children references from an API or the likes as bytes
+        :return: Graph
         """
         raise NotImplementedError

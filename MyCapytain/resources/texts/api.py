@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from past.builtins import basestring
+
 from six import text_type as str
 
+import MyCapytain.common.metadata
+import MyCapytain.common.reference
+import MyCapytain.common.utils
+import MyCapytain.resources.collections.cts
 import MyCapytain.resources.proto.text
 import MyCapytain.resources.texts.tei
-import MyCapytain.resources.inventory
-import MyCapytain.retrievers.proto
-import MyCapytain.common.metadata
-import MyCapytain.common.utils
-import MyCapytain.common.reference
+import MyCapytain.retrievers.prototypes
 
 
 class Text(MyCapytain.resources.proto.text.Text):
@@ -148,7 +148,7 @@ class Text(MyCapytain.resources.proto.text.Text):
 
         # Need to code that p
         if self.citation is None:
-            self.citation = MyCapytain.resources.inventory.Citation.ingest(
+            self.citation = MyCapytain.resources.collections.cts.Citation.ingest(
                 xml,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
             )

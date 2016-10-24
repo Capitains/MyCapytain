@@ -9,12 +9,14 @@
 """
 from __future__ import unicode_literals
 
-from MyCapytain.resources.proto import inventory, text
+from MyCapytain.resources.proto import text
+from MyCapytain.resources.proto.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype, URN
 from MyCapytain.common.utils import xmlparser, NS, Mimetypes
 import re
 from six import text_type as str
-import collections
+import MyCapytain.resources.collections
+from collections import defaultdict
 
 
 class Citation(CitationPrototype):
@@ -101,7 +103,7 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
     :rtype: collections.defaultdict.<basestring, inventory.Resource>
     :returns: Dictionary of children
     """
-    return collections.defaultdict(children, **dict(
+    return defaultdict(children, **dict(
         (
             child.get("urn"),
             children(
@@ -111,10 +113,10 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
                 **kwargs
             )
         ) for child in xml.xpath(xpath, namespaces=NS))
-    )
+                                                        )
 
 
-class Text(inventory.Text):
+class Text(cts.Text):
     """ Represents a CTS Text
         
         ..automethod:: __str__
@@ -218,7 +220,7 @@ class Text(inventory.Text):
         elif output == Mimetypes.MyCapytainText:
             complete_metadata = self.metadata
             for parent in self.parents:
-                if isinstance(parent, inventory.Resource) and hasattr(parent, "metadata"):
+                if isinstance(parent, cts.CTSCollection) and hasattr(parent, "metadata"):
                     complete_metadata = complete_metadata + parent.metadata
             return text.Text(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
         return self.default_export(output, domain)
@@ -286,7 +288,7 @@ def Translation(resource=None, urn=None, parents=None):
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
 
 
-class Work(inventory.Work):
+class Work(cts.Work):
 
     """ Represents a CTS Textgroup in XML
 
@@ -378,7 +380,7 @@ class Work(inventory.Work):
             parents=[self] + self.parents
         )
 
-        self.texts = collections.defaultdict(Text)
+        self.texts = defaultdict(Text)
         for urn in self.__editions:
             self.texts[urn] = self.__editions[urn]
         for urn in self.__translations:
@@ -387,7 +389,7 @@ class Work(inventory.Work):
         return self.texts
 
 
-class TextGroup(inventory.TextGroup):
+class TextGroup(cts.TextGroup):
 
     """ Represents a CTS Textgroup in XML
         
@@ -458,7 +460,7 @@ class TextGroup(inventory.TextGroup):
         return self.works
 
 
-class TextInventory(inventory.TextInventory):
+class TextInventory(cts.TextInventory):
 
     """ Represents a CTS Inventory file
         

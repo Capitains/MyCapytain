@@ -7,12 +7,12 @@
 
 
 """
-import MyCapytain.retrievers.proto
+import MyCapytain.retrievers.prototypes
 from MyCapytain.common.reference import Reference
 import requests
 
 
-class CTS(MyCapytain.retrievers.proto.CTS):
+class CTS(MyCapytain.retrievers.prototypes.CTS):
 
     """ 
         Basic integration of the MyCapytain.retrievers.proto.CTS abstraction
@@ -168,14 +168,14 @@ class CTS(MyCapytain.retrievers.proto.CTS):
     # Common methods
     #
 
-    def getMetadata(self, textId=None, **filters):
+    def getMetadata(self, objectId=None, **filters):
         """ Request metadata about a text or a collection
 
-        :param textId: Filter for text identifier
+        :param objectId: Filter for some object identifier
         :param filters: Kwargs parameters. URN and Inv are available
         :return: GetCapabilities CTS API request response
         """
-        filters.update({"urn": textId})
+        filters.update({"urn": objectId})
         return self.getCapabilities(**filters)
 
     def getText(self, textId, reference=None, prevnext=False, metadata=False):

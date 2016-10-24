@@ -20,14 +20,14 @@ from lxml import etree
 from six import text_type as str
 
 
-class Resource(Collection):
+class CTSCollection(Collection):
     """ Resource represents any resource from the inventory
 
     :param resource: Resource representing the TextInventory
     :type resource: Any
     """
     def __init__(self, resource=None):
-        super(Resource, self).__init__()
+        super(CTSCollection, self).__init__()
 
         if hasattr(type(self), "CTSMODEL"):
             self.properties[RDF_PREFIX["cts"]+"model"] = RDF_PREFIX["cts"] + type(self).CTSMODEL
@@ -98,7 +98,7 @@ class Resource(Collection):
     def setResource(self, resource):
         """ Set the object property resource
 
-        :param resource: Resource representing the TextInventory 
+        :param resource: Resource representing the TextInventory
         :type resource: Any
         :rtype: Any
         :returns: Input resource
@@ -108,9 +108,9 @@ class Resource(Collection):
         return self.resource
 
     def parse(self, resource):
-        """ Parse the object resource 
+        """ Parse the object resource
 
-        :param resource: Resource representing the TextInventory 
+        :param resource: Resource representing the TextInventory
         :type resource: Any
         :rtype: List
         """
@@ -145,7 +145,7 @@ class Resource(Collection):
         return self
 
 
-class Text(Resource):
+class Text(CTSCollection):
     """ Represents a CTS Text
 
     :param resource: Resource representing the TextInventory
@@ -208,7 +208,7 @@ def Translation(resource=None, urn=None, parents=None):
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
 
 
-class Work(Resource):
+class Work(CTSCollection):
     """ Represents a CTS Work
 
     CTS Work can be added to each other which would most likely happen if you take your data from multiple API or \
@@ -296,7 +296,7 @@ class Work(Resource):
         return self.texts.values()
 
 
-class TextGroup(Resource):
+class TextGroup(CTSCollection):
     """ Represents a CTS Textgroup
 
     CTS TextGroup can be added to each other which would most likely happen if you take your data from multiple API or \
@@ -373,7 +373,7 @@ class TextGroup(Resource):
         ])
 
 
-class TextInventory(Resource):
+class TextInventory(CTSCollection):
     """ Initiate a TextInventory resource
 
     :param resource: Resource representing the TextInventory

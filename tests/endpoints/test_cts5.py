@@ -188,7 +188,7 @@ class TestEndpointsCTS5(unittest.TestCase):
                 }
             )
         with patch('requests.get') as patched_get:
-            self.cts.getMetadata(textId="urn")
+            self.cts.getMetadata(objectId="urn")
             patched_get.assert_called_once_with(
                 "http://domainname.com/rest/cts", params={
                     "request": "GetCapabilities",

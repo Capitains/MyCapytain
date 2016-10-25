@@ -6,7 +6,7 @@ from six import text_type as str
 from io import open
 
 from MyCapytain.common.utils import xmlparser, NS
-from MyCapytain.resources.texts.api import *
+from MyCapytain.resources.texts.api.cts import *
 from MyCapytain.resources.texts.tei import Citation
 from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, URN

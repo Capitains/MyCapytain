@@ -99,15 +99,17 @@ Locally read text
     :undoc-members:
     :show-inheritance:
 
-API's Text results
-++++++++++++++++++
+CTS API Texts
++++++++++++++
 
-.. autoclass:: MyCapytain.resources.texts.api.Text
+Formerly MyCapytain.resources.texts.api (< 2.0.0)
+
+.. autoclass:: MyCapytain.resources.texts.api.cts.Text
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. autoclass:: MyCapytain.resources.texts.api.Passage
+.. autoclass:: MyCapytain.resources.texts.api.cts.Passage
     :members:
     :undoc-members:
     :show-inheritance:

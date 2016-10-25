@@ -7,7 +7,7 @@ from io import open
 
 from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.resources.texts.api.cts import *
-from MyCapytain.resources.texts.tei import Citation
+from MyCapytain.common.reference import Citation
 from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, URN
 from lxml import etree

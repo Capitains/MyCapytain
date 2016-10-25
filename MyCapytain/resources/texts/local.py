@@ -32,7 +32,7 @@ class Text(text.Text):
     :param resource: A resource
     :type resource: lxml.etree._Element
     :param citation: Highest Citation level
-    :type citation: MyCapytain.common.reference.Citation
+    :type citation: Citation
     :param autoreffs: Parse references on load (default : True)
     :type autoreffs: bool
     :ivar resource: lxml
@@ -43,7 +43,6 @@ class Text(text.Text):
         self._passages = Passage()
         self._orphan = defaultdict(Reference)  # Represents passage we got without asking for all. Storing convenience ?
 
-        self._cRefPattern = MyCapytain.resources.texts.tei.Citation()
         self.xml = None
 
         if citation is not None:
@@ -62,7 +61,7 @@ class Text(text.Text):
         :param xml: Xml Resource
         :return: None
         """
-        self.citation = MyCapytain.resources.texts.tei.Citation.ingest(
+        self.citation = Citation.ingest(
             resource=xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
             xpath=".//tei:cRefPattern"
         )
@@ -79,32 +78,6 @@ class Text(text.Text):
             raise E
 
         self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, reference=None)
-
-    @property
-    def citation(self):
-        """ Get the lowest cRefPattern in the hierarchy
-
-        :rtype: Citation
-        """
-        return self._cRefPattern
-
-    @citation.setter
-    def citation(self, value):
-        """ Set the cRefPattern
-
-        :param value: Citation to be saved
-        :type value: Citation
-        :raises: TypeError when value is not a TEI Citation or a Citation
-        """
-        if isinstance(value, MyCapytain.resources.texts.tei.Citation):
-            self._cRefPattern = value
-        elif isinstance(value, Citation):
-            # .. todo:: Should support conversion between Citation...
-            self._cRefPattern = MyCapytain.resources.texts.tei.Citation(
-                name=value.name,
-                refsDecl=value.refsDecl,
-                child=value.child
-            )
 
     def nested_dict(self, exclude=None):
         """ Nested Dict Representation of the text passages
@@ -327,13 +300,13 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         self.__next = False
         self.__prev = False
 
-        self.citation = None
-        if isinstance(citation, Citation):
+        if citation:
             self.citation = citation
 
         self.__reference = Reference("")
         if urn:
             self.urn = urn
+
         if reference:
             self.reference = reference
 
@@ -435,9 +408,9 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
     def __parse(self):
         """ Private method for parsing children
         """
-        if self.citation is None:
+        if self.citation is None or self.citation.isEmpty():
             self.__parsed = True
-            return []
+            return None
 
         elements = self.resource.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
         ids = [self.reference.list+[element.get("n")] for element in elements]

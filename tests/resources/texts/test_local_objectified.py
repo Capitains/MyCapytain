@@ -72,11 +72,11 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         self.assertEqual(len(self.text_complex.citation), 2)
 
     def testCitationSetters(self):
-        d = MyCapytain.resources.texts.tei.Citation()
+        d = MyCapytain.common.reference.Citation()
         c = MyCapytain.common.reference.Citation(name="ahah",
                                                  refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']",
                                                  child=None)
-        b = MyCapytain.resources.texts.tei.Citation()
+        b = MyCapytain.common.reference.Citation()
         a = MyCapytain.resources.texts.local.Text(citation=b)
         """ Test original setting """
         self.assertIs(a.citation, b)
@@ -535,7 +535,6 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         # Normal children checking
         with open("tests/testing_data/texts/sample.xml", "rb") as text:
             self.TEI = MyCapytain.resources.texts.local.Text(resource=text, autoreffs=True)
-
             p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
             self.assertEqual(str(p.children["1.pr.1"].reference), "1.pr.1")
 

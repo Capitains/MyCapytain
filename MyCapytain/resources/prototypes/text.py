@@ -8,38 +8,89 @@
 
 """
 from past.builtins import basestring
-
-import MyCapytain.common.reference
-import MyCapytain.common.metadata
-from collections import namedtuple
-
-PassagePlus = namedtuple("PassagePlus", ["passage", "prev", "next"])
+from MyCapytain.common.reference import URN, Reference, Citation, Node
+from MyCapytain.common.metadata import Metadata
+from MyCapytain.common.utils import Mimetypes
 
 
-class Resource(object):
+class TextualNode(object):
+    def __init__(self, textId=None, graph=None, citation=None):
+        self.__id__ = textId
+        self.__graph__ = graph or Node()
+        self.__citation__ = citation or Citation()
+        self.__text__ = ""
+
+    @property
+    def citation(self):
+        return self.__citation__
+
+    @citation.setter
+    def citation(self, value):
+        if not isinstance(value, Citation):
+            raise TypeError("Citation property can only be a Citation object")
+        self.__citation__ = value
+
+    def text(self):
+        return self.__text__
+
+    @property
+    def id(self):
+        return self.__id__
+
+    @id.setter
+    def id(self, value):
+        self.__id__ = value
+
+    @property
+    def graph(self):
+        return self.__graph__
+
+    @graph.setter
+    def graph(self, value):
+        if not isinstance(value, Node):
+            raise TypeError("Graph property can only be a Node object")
+        self.__graph__ = value
+
+    def default_export(self, output=Mimetypes.JSON_DTS, domain=""):
+        """ Export the textual node item in the Mimetype required
+
+        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
+        :type output: str
+        :return: Object using a different representation
+        """
+        raise NotImplementedError()
+
+    def export(self, output=None):
+        """ Export the collection item in the Mimetype required.
+
+        ..note:: If current implementation does not have special mimetypes, reuses default_export method
+
+        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
+        :type output: str
+        :return: Object using a different representation
+        """
+        return self.default_export(output)
+
+
+class CTSNode(TextualNode):
     """ Initiate a Resource object
     
     :param urn: A URN identifier
-    :type urn: MyCapytain.common.reference.URN
-    :param resource: A resource
-    :type resource: Any
+    :type urn: URN
     """
 
-    def __init__(self, urn=None, resource=None):
-        self.resource = None
+    def __init__(self, urn=None, graph=None, citation=None):
+        super(CTSNode, self).__init__(textId=str(urn), citation=citation, graph=graph)
         self._URN = None
 
         if urn is not None:
-            self._URN = urn
-
-        if resource is not None:
-            self.resource = resource
+            self.urn = urn
 
     @property
     def urn(self):
         """ URN Identifier of the object
 
-        :rtype: MyCapytain.common.reference.URN
+        :rtype: URN
 
         """
         return self._URN
@@ -49,26 +100,37 @@ class Resource(object):
         """ Set the urn
 
         :param value: URN to be saved
-        :type value:  MyCapytain.common.reference.URN
+        :type value:  URN
         :raises: *TypeError* when the value is not URN compatible
 
         """
         if isinstance(value, basestring):
-            value = MyCapytain.common.reference.URN(value)
-        elif not isinstance(value, MyCapytain.common.reference.URN):
+            value = URN(value)
+        elif not isinstance(value, URN):
             raise TypeError()
         self._URN = value
 
 
-class Passage(Resource):
+class ParsedCTSNode(CTSNode):
+    """
+
+    :param resource: A resource
+    :type resource: Any
+    """
+    def __init__(self, resource=None, *args, **kwargs):
+        super(ParsedCTSNode, self).__init__(**kwargs)
+        self.resource = resource
+
+
+class Passage(ParsedCTSNode):
     """ Passage representing object prototype
     
     :param urn: A URN identifier
-    :type urn: MyCapytain.common.reference.URN
+    :type urn: URN
     :param resource: A resource
     :type resource: lxml.etree._Element
     :param parent: Parent of the current passage
-    :type parent: MyCapytain.resources.texts.tei.Passage
+    :type parent: Passage
     :param citation: Citation for children level
     :type citation: MyCapytain.resources.texts.tei.Citation
     :param id: Identifier of the subreference without URN informations
@@ -130,19 +192,19 @@ class Passage(Resource):
         raise NotImplementedError()
 
 
-class Text(Resource):
+class Text(ParsedCTSNode):
     """ A CTS Text """
     def __init__(self, citation=None, metadata=None, **kwargs):
         super(Text, self).__init__(**kwargs)
 
-        self._cRefPattern = MyCapytain.common.reference.Citation()
+        self._cRefPattern = Citation()
         if citation is not None:
             self.citation = citation
 
         if metadata is not None:
             self.metadata = metadata
         else:
-            self.metadata = MyCapytain.common.metadata.Metadata()
+            self.metadata = Metadata()
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, Text will compute valid reffs 
@@ -156,6 +218,18 @@ class Text(Resource):
         """
         raise NotImplementedError()
 
+    def getChildren(self, reference=None, depth=None):
+        """ Given a resource, Text will compute valid reffs
+
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
+        :type passage: Reference
+        :rtype: List.basestring
+        :returns: Node
+        """
+        raise NotImplementedError()
+
     def getPassage(self, reference):
         """ Retrieve a passage and store it in the object
         
@@ -163,6 +237,8 @@ class Text(Resource):
         :type reference: MyCapytain.common.reference.Reference or List of basestring
         :rtype: Passage
         :returns: Object representing the passage
+        :rtype: Passage
+
         :raises: *TypeError* when reference is not a list or a Reference
         """
 
@@ -199,5 +275,5 @@ class Text(Resource):
         :param value: Citation to be saved
         :type value:  MyCapytain.common.reference.Citation
         """
-        if isinstance(value, MyCapytain.common.reference.Citation):
+        if isinstance(value, Citation):
             self._cRefPattern = value

@@ -15,12 +15,25 @@ from six import text_type as str
 from builtins import range, object
 from copy import copy
 import re
-
+from lxml.etree import _Element
+from MyCapytain.common.utils import NS
 
 REFSDECL_SPLITTER = re.compile("/+[\*()|\sa-zA-Z0-9:\[\]@=\\\{\$'\"\.\s]+")
 REFSDECL_REPLACER = re.compile("\$[0-9]+")
 SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
 REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
+
+
+def __childOrNone__(liste):
+    """ Used to parse resources in Citation
+
+    :param liste:
+    :return:
+    """
+    if len(liste) > 0:
+        return liste[-1]
+    else:
+        return None
 
 
 class Reference(object):
@@ -622,6 +635,9 @@ class Citation(object):
     :ivar child: A citation
     :type child: Citation
 
+    .. automethod:: __str__
+
+
     """
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
@@ -822,6 +838,73 @@ class Citation(object):
         self.__dict__ = dic
         return self
 
+    """ Implementation of Citation for TEI markup
+    """
+
+    def isEmpty(self):
+        """ Check if the citation has not been set
+
+        :return: True if nothing was setup
+        :rtype: bool
+        """
+        return self.refsDecl is None and self.scope is None and self.xpath is None
+
+    def __str__(self):
+        """ Returns a string refsDecl version of the object
+
+        :Example:
+            >>>    a = Citation(name="book", xpath="/tei:TEI/tei:body/tei:text/tei:div", scope="/tei:div[@n=\"1\"]")
+            >>>    str(a) == "<tei:refsDecl n='book' xpath='/tei:TEI/tei:body/tei:text/tei:div' scope='/tei:div[@n=\"1\"]'>"
+            >>>         "<tei:p>This Citation extracts Book from the text</tei:p>"
+            >>>    "</tei:refsDecl>"
+        """
+        if self.refsDecl is None:
+            return ""
+
+        label = ""
+        if self.name is not None:
+            label = self.name
+
+        return "<tei:cRefPattern n=\"{label}\" matchPattern=\"{regexp}\" replacementPattern=\"#xpath({refsDecl})\">" \
+               "<tei:p>This pointer pattern extracts {label}</tei:p></tei:cRefPattern>".format(
+                   refsDecl=self.refsDecl,
+                   label=label,
+                   regexp="\.".join(["(\w+)" for i in range(0, self.refsDecl.count("$"))])
+               )
+
+    @staticmethod
+    def ingest(resource, xpath=".//tei:cRefPattern"):
+        """ Ingest a resource and store data in its instance
+
+        :param resource: XML node cRefPattern or list of them in ASC hierarchy order (deepest to highest, eg. lines to poem to book)
+        :type resource: lxml.etree._Element
+        :param xpath: XPath to use to retrieve citation
+        :type xpath: str
+
+        :returns: A citation object
+        :rtype: Citation
+        """
+        if len(resource) == 0 and isinstance(resource, list):
+            return None
+        elif isinstance(resource, list):
+            resource = resource[0]
+        elif not isinstance(resource, _Element):
+            return None
+
+        resource = resource.xpath(xpath, namespaces=NS)
+        resources = []
+
+        for x in range(0, len(resource)):
+            resources.append(
+                Citation(
+                    name=resource[x].get("n"),
+                    refsDecl=resource[x].get("replacementPattern")[7:-1],
+                    child=__childOrNone__(resources)
+                )
+            )
+
+        return resources[-1]
+
 
 def REF_REPLACER(match, passage):
     """ Helper to replace xpath/scope/refsDecl on iteration with passage value
@@ -840,3 +923,81 @@ def REF_REPLACER(match, passage):
         return groups[0]
     else:
         return "{1}='{0}'".format(ref, groups[0])
+
+
+class Node(object):
+    """ Graph Object represent identifiers relationships in Tree object. Each property of the gram
+
+    :param identifier: Current object identifier
+    :type identifier: str
+    :param children: Children of the current node
+    :type children: [Node or str]
+    :param parent: Parent of the current node
+    :type parent: Node or str
+    :param siblings: Previous and next node of the current node
+    :type siblings: Node or str
+    :param depth: Depth of the node in the global hierarchy of the text tree
+    :type depth: int
+    """
+    def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=1):
+        self.__children__ = children or []
+        self.__parent__ = parent
+        self.__prev__, self.__next__ = siblings
+        self.__identifier__ = identifier
+        self.__depth__ = depth
+
+    @property
+    def depth(self):
+        """ Depth of the node in the global hierarchy of the text tree
+
+        :rtype: [Node]
+        """
+        return self.__depth__
+
+    @property
+    def children(self):
+        """ Siblings Node
+
+        :rtype: [Node]
+        """
+        return self.__children__
+
+    @property
+    def parent(self):
+        """ Parent Node
+
+        :rtype: (Node, Node)
+        """
+        return self.__parent__
+
+    @property
+    def siblings(self):
+        """ Siblings Node
+
+        :rtype: (Node, Node)
+        """
+        return self.__prev__, self.__next__
+
+    @property
+    def prev(self):
+        """ Previous Node (Sibling)
+
+        :rtype: Node
+        """
+        return self.__prev__
+
+    @property
+    def next(self):
+        """ Next Node (Sibling)
+
+        :rtype: Node
+        """
+        return self.__next__
+
+    @property
+    def id(self):
+        """Current object identifier
+
+        :rtype: Node
+        """
+        return self.__identifier__

@@ -6,7 +6,7 @@ from six import text_type as str
 
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.resources.texts.tei import *
-from MyCapytain.common.reference import Reference
+from MyCapytain.common.reference import Reference, Citation
 
 
 class TestTEICitation(unittest.TestCase):

@@ -10,18 +10,18 @@ import MyCapytain.common.metadata
 class TestProtoResource(unittest.TestCase):
     """ Test for resource, mother class of Text and Passage """
     def test_init(self):
-        a = Resource()
-        self.assertEqual(a.resource, None)
+        a = CTSNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.assertEqual(a.id, "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.assertEqual(a.urn, URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2"))
+        self.assertIsInstance(a.citation, Citation)
 
-        a = Resource(resource=False)
-        self.assertEqual(a.resource, False)
-        
+
         a.resource = True
         self.assertEqual(a.resource, True)
 
     def test_urn(self):
         """ Test setters and getters for urn """
-        a = Resource()
+        a = CTSNode()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
         self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)

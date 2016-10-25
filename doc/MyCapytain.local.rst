@@ -25,7 +25,7 @@ Getting all passages from a text
     # Text objects have a citation property
     # len(Citation(...)) gives the depth of the citation scheme
     # in the case of this sample, this would be 3 (Book, Poem, Line)
-    for ref in text.getValidReff(level=len(text.citation)):
+    for ref in text.getChildren(level=len(text.citation)):
         # We retrieve a Passage object for each reference that we find
         # We can pass the reference many way, including in the form of a list of strings
         psg = text.getPassage(ref.split("."), hypercontext=False)

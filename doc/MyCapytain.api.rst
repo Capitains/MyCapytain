@@ -9,8 +9,12 @@ Module common contains tools such as a namespace dictionary as well as cross-imp
 URN, References and Citations
 *****************************
 
+.. autoclass:: MyCapytain.common.reference.Node
+    :members:
+
 .. autoclass:: MyCapytain.common.reference.URN
     :members:
+
 .. autoclass:: MyCapytain.common.reference.Reference
     :members:
 

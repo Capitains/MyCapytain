@@ -5,12 +5,12 @@ from __future__ import unicode_literals
 from six import text_type as str
 
 import MyCapytain.common.metadata
-import MyCapytain.common.reference
 import MyCapytain.common.utils
 import MyCapytain.resources.collections.cts
 import MyCapytain.resources.prototypes.text
 import MyCapytain.resources.texts.tei
 import MyCapytain.retrievers.prototypes
+from MyCapytain.common.reference import URN, Reference, Node
 
 
 class Text(MyCapytain.resources.prototypes.text.Text):
@@ -227,6 +227,18 @@ class Text(MyCapytain.resources.prototypes.text.Text):
             ]
 
 
+class CTSAPINode(Node):
+
+    def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=1, api=None):
+        self.
+
+    @property
+    def children(self):
+        if not self.__children__:
+
+        return self.__children__
+
+
 class Passage(MyCapytain.resources.texts.tei.Passage):
 
     def __init__(self, urn, resource, *args, **kwargs):
@@ -235,24 +247,29 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         self.urn = urn
 
         # Could be set during parsing
-        self.__next = False
-        self.__prev = False
-        self.__first = False
-        self.__last = False
+        self.__next__ = False
+        self.__prev__ = False
+        self.__first__ = False
+        self.__last__ = False
 
-        self.__parse()
+        self.__parse__()
 
     @property
     def first(self):
         """ Children passage
 
-        :rtype: Passage
-        :returns: Previous passage at same level
+        :rtype: Node
+        :returns: First children of the graph. Shortcut to self.graph.children[0]
         """
-        if self.__first is False:
+        if self.__first__ is False:
             # Request the next urn
-            self.__first = self.parent.getFirstUrn(reference=str(self.urn.reference))
-        return self.__first
+            self.__first__ = Node(
+                identifier=self.parent.getFirstUrn(reference=str(self.urn.reference)),
+                depth=len(self.urn.reference.start)+1
+            )
+            if len(self.graph.children) == 0:
+                self.graph.children.append(self.__first__)
+        return self.__first__
 
     @property
     def prev(self):
@@ -261,10 +278,11 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: Passage
         :returns: Previous passage at same level
         """
-        if self.__prev is False:
+        if self.__prev__ is False:
             # Request the next urn
-            self.__prev, self.__next = self.parent.getPrevNextUrn(reference=self.urn.reference)
-        return self.__prev
+            self.__prev__, self.__next__ = self.parent.getPrevNextUrn(reference=self.urn.reference)
+            self.graph.prev = Node(identifier=self.__prev__)
+        return self.__prev__
 
     @property
     def next(self):
@@ -273,10 +291,10 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :rtype: MyCapytain.common.reference.Reference
         :returns: Following passage reference
         """
-        if self.__next is False:
+        if self.__next__ is False:
             # Request the next urn
-            self.__prev, self.__next = self.parent.getPrevNextUrn(reference=self.urn.reference)
-        return self.__next
+            self.__prev__, self.__next__ = self.parent.getPrevNextUrn(reference=self.urn.reference)
+        return self.__next__
 
     def getNext(self):
         """ Shortcut for getting the following passage
@@ -305,14 +323,14 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if self.first:
             return self.parent.getPassage(reference=self.first)
 
-    def __parse(self):
+    def __parse__(self):
         """ Given self.resource, split informations from the CTS API
 
         :return: None
         """
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=MyCapytain.common.utils.NS)[0]
 
-        self.__prev, self.__next = Passage.prevnext(self.resource)
+        self.__prev__, self.__next__ = Passage.prevnext(self.resource)
 
     @staticmethod
     def prevnext(resource):
@@ -334,10 +352,10 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
             _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=MyCapytain.common.utils.NS, smart_strings=False)
 
             if len(_next_xpath):
-               _next = MyCapytain.common.reference.URN(_next_xpath[0])
+               _next = URN(_next_xpath[0])
 
             if len(_prev_xpath):
-                _prev = MyCapytain.common.reference.URN(_prev_xpath[0])
+                _prev = URN(_prev_xpath[0])
 
         return _prev, _next
 
@@ -348,7 +366,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         :param resource: XML Resource
         :type resource: etree._Element
         :return: Tuple representing previous and next urn
-        :rtype: (URN, URN)
+        :rtype: URN
         """
         _child = False
         resource = MyCapytain.common.utils.xmlparser(resource)
@@ -357,5 +375,5 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if len(urn) > 0:
             urn = str(urn[0])
 
-            return MyCapytain.common.reference.URN(urn)
+            return URN(urn)
 

@@ -8,7 +8,7 @@ Shared elements for TEI Citation
 """
 
 import MyCapytain.common.reference
-import MyCapytain.common.utils
+from MyCapytain.common.utils import NS, Mimetypes, normalize
 import MyCapytain.resources.prototypes.text
 
 from lxml.etree import tostring
@@ -22,46 +22,53 @@ class Passage(MyCapytain.resources.prototypes.text.Passage):
         :rtype: basestring
         :returns: XML of the passage in string form 
         """
-        return tostring(self.resource, encoding=str)
+        return self.export(output=Mimetypes.XML)
 
-    def text(self, exclude=None):
+    def export(self, output=Mimetypes.PLAINTEXT, exclude=None):
         """ Text content of the passage
 
+        :param output: Mimetype (From MyCapytian.common.utils.Mimetypes) to output
+        :type output: str
         :param exclude: Remove some nodes from text
         :type exclude: List
         :rtype: basestring
         :returns: Text of the xml node
+
         :Example:
             >>>    P = Passage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
-            >>>    P.text == "Ibis hello b ab excusso missus in astra sago. "
-            >>>    P.text(exclude=["note"]) == "Ibis hello b ab excusso missus in astra sago. "
+            >>>    P.export(output=Mimetypes.PLAINTEXT) == "Ibis hello b ab excusso missus in astra sago. "
+            >>>    P.export(output=Mimetypes.PLAINTEXT, exclude=[]) == "Ibis hello b ab excusso missus in astra sago. "
 
 
         """
-
-        if exclude is None:
-            exclude = ""
-        else:
-            exclude = "[{0}]".format(
-                " and ".join(
-                    "not(./ancestor-or-self::{0})".format(excluded)
-                    for excluded in exclude
+        if output == Mimetypes.ETREE:
+            return self.resource
+        elif output == Mimetypes.XML:
+            return tostring(self.resource, encoding=str)
+        elif output == Mimetypes.PLAINTEXT:
+            if exclude is None:
+                exclude = self.default_exclude
+            else:
+                exclude = "[{0}]".format(
+                    " and ".join(
+                        "not(./ancestor-or-self::{0})".format(excluded)
+                        for excluded in exclude
+                    )
                 )
-            )
 
-        return MyCapytain.common.utils.normalize(
-            " ".join(
-                [
-                    element
-                    for element
-                    in self.resource.xpath(
+            return MyCapytain.common.utils.normalize(
+                " ".join(
+                    [
+                        element
+                        for element
+                        in self.resource.xpath(
                         ".//descendant-or-self::text()" + exclude,
-                        namespaces=MyCapytain.common.utils.NS,
+                        namespaces=NS,
                         smart_strings=False
                     )
-                ]
+                        ]
+                )
             )
-        )
 
     @property
     def xml(self):

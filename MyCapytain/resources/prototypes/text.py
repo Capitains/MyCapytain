@@ -8,68 +8,56 @@
 
 """
 from past.builtins import basestring
-from MyCapytain.common.reference import URN, Reference, Citation, Node
+from MyCapytain.common.reference import URN, Reference, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import Mimetypes
 from MyCapytain.resources.prototypes.metadata import Collection
 
 
-class TextualNode(object):
+class TextualElement(object):
     """ Node representing a text passage.
 
-    :param textId: Identifier of the text
-    :type textId: str
-    :param graph: Graph giving the information about the node position in a text tree
-    :type graph: Node
-    :param citation: Citation system of the text
-    :type citation: Citation
+    :param identifier: Identifier of the text
+    :type identifier: str
+    :param metadata: Collection Information about the Item
+    :type metadata: Collection
 
     :cvar default_exclude: Default exclude for exports
     """
 
     default_exclude = []
 
-    def __init__(self, textId=None, graph=None, citation=None):
-        self.__id__ = textId
-        self.__graph__ = graph or Node()
-        self.__citation__ = citation or Citation()
-        self.__text__ = ""
+    def __init__(self, identifier=None, metadata=None):
         self.__metadata__ = None
+        self.__identifier__ = identifier
 
     @property
-    def citation(self):
-        """
-
-        :rtype: Citation
-        """
-        return self.__citation__
-
-    @citation.setter
-    def citation(self, value):
-        if not isinstance(value, Citation):
-            raise TypeError("Citation property can only be a Citation object")
-        self.__citation__ = value
-
     def text(self):
         return self.export(output=Mimetypes.PLAINTEXT, exclude=self.default_exclude)
 
     @property
     def id(self):
-        return self.__id__
-
-    @id.setter
-    def id(self, value):
-        self.__id__ = value
+        return self.__identifier__
 
     @property
-    def graph(self):
-        return self.__graph__
+    def metadata(self):
+        """ Metadata information about the text
 
-    @graph.setter
-    def graph(self, value):
-        if not isinstance(value, Node):
-            raise TypeError("Graph property can only be a Node object")
-        self.__graph__ = value
+        :return: Collection object with metadata about the text
+        """
+        return self.__metadata__
+
+    @metadata.setter
+    def metadata(self, value):
+        """ Set the metadata collection attribute
+
+        :param value: Collection of metadata
+        :type value: Collection
+        """
+        if isinstance(value, Collection):
+            self.__metadata__ = value
+        else:
+            raise TypeError("Metadata should be collection based")
 
     def default_export(self, output=Mimetypes.JSON_DTS, exclude=None):
         """ Export the textual node item in the Mimetype required
@@ -97,25 +85,68 @@ class TextualNode(object):
             exclude = self.default_exclude
         return self.default_export(output, exclude)
 
+
+class TextualNode(TextualElement, NodeId):
+    """ Node representing a text passage.
+
+    :param identifier: Identifier of the text
+    :type identifier: str
+    :param metadata: Collection Information about the Item
+    :type metadata: Collection
+    :param citation: Citation system of the text
+    :type citation: Citation
+    :param children: Current node Children's Identifier
+    :type children: [str]
+    :param parent: Parent of the current node
+    :type parent: str
+    :param siblings: Previous and next node of the current node
+    :type siblings: str
+    :param depth: Depth of the node in the global hierarchy of the text tree
+    :type depth: int
+
+    :cvar default_exclude: Default exclude for exports
+    """
+
+    def __init__(self, identifier=None, citation=None, **kwargs):
+        super(TextualNode, self).__init__(identifier=identifier, **kwargs)
+        self.__citation__ = citation or Citation()
+        self.__text__ = ""
+
     @property
-    def metadata(self):
-        """ Metadata information about the text
-
-        :return: Collection object with metadata about the text
+    def citation(self):
         """
-        return self.__metadata__
-
-    @metadata.setter
-    def metadata(self, value):
-        """ Set the metadata collection attribute
-
-        :param value: Collection of metadata
-        :type value: Collection
+        :rtype: Citation
         """
-        if isinstance(value, Collection):
-            self.__metadata__ = value
-        else:
-            raise TypeError("Metadata should be collection based")
+        return self.__citation__
+
+    @citation.setter
+    def citation(self, value):
+        if not isinstance(value, Citation):
+            raise TypeError("Citation property can only be a Citation object")
+        self.__citation__ = value
+
+
+class InteractiveTextualNode(TextualNode):
+    """ Node representing a text passage.
+
+    :param identifier: Identifier of the text
+    :type identifier: str
+    :param metadata: Collection Information about the Item
+    :type metadata: Collection
+    :param citation: Citation system of the text
+    :type citation: Citation
+    :param children: Current node Children's Identifier
+    :type children: [str]
+    :param parent: Parent of the current node
+    :type parent: str
+    :param siblings: Previous and next node of the current node
+    :type siblings: str
+    :param depth: Depth of the node in the global hierarchy of the text tree
+    :type depth: int
+    :param resource: Resource used to navigate through the textual graph
+
+    :cvar default_exclude: Default exclude for exports
+    """
 
     def getPassage(self, reference):
         """ Retrieve a passage and store it in the object
@@ -130,22 +161,64 @@ class TextualNode(object):
 
         raise NotImplementedError()
 
+    @property
+    def prev(self):
+        """ Get Previous Passage
+
+        :rtype: Passage
+        """
+        return self.getPassage(self.prevId)
+
+    @property
+    def next(self):
+        """ Get Next Passage
+
+        :rtype: Passage
+        """
+        return self.getPassage(self.nextId)
+
+    @property
+    def children(self):
+        """ Children Passages
+
+        :rtype: iterator(Passage)
+        """
+        for ID in self.childIds:
+            yield self.getPassage(ID)
+
+    @property
+    def parent(self):
+        """ Parent Passage
+
+        :rtype: Passage
+        """
+        return self.getPassage(self.parentId)
+
 
 class CTSNode(TextualNode):
     """ Initiate a Resource object
     
     :param urn: A URN identifier
     :type urn: URN
-    :param graph: Graph giving the information about the node position in a text tree
-    :type graph: Node
+    :param metadata: Collection Information about the Item
+    :type metadata: Collection
     :param citation: Citation system of the text
     :type citation: Citation
+    :param children: Current node Children's Identifier
+    :type children: [str]
+    :param parent: Parent of the current node
+    :type parent: str
+    :param siblings: Previous and next node of the current node
+    :type siblings: str
+    :param depth: Depth of the node in the global hierarchy of the text tree
+    :type depth: int
+    :param resource: Resource used to navigate through the textual graph
 
     :cvar default_exclude: Default exclude for exports
     """
 
-    def __init__(self, urn=None, graph=None, citation=None):
-        super(CTSNode, self).__init__(textId=str(urn), citation=citation, graph=graph)
+    def __init__(self, urn=None, **kwargs):
+        super(CTSNode, self).__init__(identifier=str(urn), **kwargs)
         self.__urn__ = None
 
         if urn is not None:
@@ -176,49 +249,32 @@ class CTSNode(TextualNode):
 
 
 class Passage(CTSNode):
-    """ Passage representing object prototype
-    
+    """ Initiate a Resource object
+
     :param urn: A URN identifier
     :type urn: URN
-    :param resource: A resource
-    :type resource: lxml.etree._Element
-    :param parent: Parent of the current passage
-    :type parent: Passage
-    :param citation: Citation for children level
-    :type citation: MyCapytain.resources.texts.tei.Citation
-    :param id: Identifier of the subreference without URN informations
-    :type id: List
-    
+    :param metadata: Collection Information about the Item
+    :type metadata: Collection
+    :param citation: Citation system of the text
+    :type citation: Citation
+    :param children: Current node Children's Identifier
+    :type children: [str]
+    :param parent: Parent of the current node
+    :type parent: str
+    :param siblings: Previous and next node of the current node
+    :type siblings: str
+    :param depth: Depth of the node in the global hierarchy of the text tree
+    :type depth: int
+    :param resource: Resource used to navigate through the textual graph
+
+    :cvar default_exclude: Default exclude for exports
     """
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, **kwargs):
         super(Passage, self).__init__(**kwargs)
-        self.parent = None
-        if parent is not None and isinstance(parent, Passage):
-            self.parent = parent
-        elif isinstance(parent, Text):
-            self.parent = parent
 
     @property
-    def prev(self):
-        """ Previous passage 
-
-        :rtype: Passage
-        :returns: Previous passage at same level
-        """
-        return self.graph.prev
-
-    @property
-    def next(self):
-        """ Following passage 
-
-        :rtype: Passage
-        :returns: Following passage at same level
-        """
-        return self.graph.next
-
-    @property
-    def first(self):
+    def firstId(self):
         """ First child of current Passage 
         
         :rtype: Node
@@ -230,7 +286,7 @@ class Passage(CTSNode):
             raise NotImplementedError
 
     @property
-    def last(self):
+    def lastId(self):
         """ Last child of current Passage 
         
         :rtype: Node
@@ -240,15 +296,6 @@ class Passage(CTSNode):
             return self.graph.children[-1]
         else:
             raise NotImplementedError
-
-    @property
-    def children(self):
-        """ Children of the passage
-
-        :rtype: [Node]
-        :returns: List of childrens according to .graph
-        """
-        return self.graph.children
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, Text will compute valid reffs

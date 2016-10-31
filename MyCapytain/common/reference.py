@@ -773,12 +773,12 @@ class Citation(object):
                 break
 
     def __len__(self):
-       """ Length method
+        """ Length method
 
-       :rtype: int
-       :returns: Number of nested citations
-       """
-       return len([item for item in self])
+        :rtype: int
+        :returns: Number of nested citations
+        """
+        return len([item for item in self])
 
     def fill(self, passage=None, xpath=None):
         """ Fill the xpath with given informations
@@ -925,17 +925,17 @@ def REF_REPLACER(match, passage):
         return "{1}='{0}'".format(ref, groups[0])
 
 
-class Node(object):
-    """ Graph Object represent identifiers relationships in Tree object. Each property of the gram
+class NodeId(object):
+    """ Collection of directional references for a Tree
 
     :param identifier: Current object identifier
     :type identifier: str
-    :param children: Children of the current node
-    :type children: [Node or str]
+    :param children: Current node Children's Identifier
+    :type children: [str]
     :param parent: Parent of the current node
-    :type parent: Node or str
+    :type parent: str
     :param siblings: Previous and next node of the current node
-    :type siblings: Node or str
+    :type siblings: str
     :param depth: Depth of the node in the global hierarchy of the text tree
     :type depth: int
     """
@@ -950,47 +950,47 @@ class Node(object):
     def depth(self):
         """ Depth of the node in the global hierarchy of the text tree
 
-        :rtype: [Node]
+        :rtype: [str]
         """
         return self.__depth__
 
     @property
-    def children(self):
+    def childIds(self):
         """ Siblings Node
 
-        :rtype: [Node]
+        :rtype: [str]
         """
         return self.__children__
 
     @property
-    def parent(self):
+    def parentId(self):
         """ Parent Node
 
-        :rtype: (Node, Node)
+        :rtype: str
         """
         return self.__parent__
 
     @property
-    def siblings(self):
+    def siblingsId(self):
         """ Siblings Node
 
-        :rtype: (Node, Node)
+        :rtype: (str, str)
         """
         return self.__prev__, self.__next__
 
     @property
-    def prev(self):
+    def prevId(self):
         """ Previous Node (Sibling)
 
-        :rtype: Node
+        :rtype: str
         """
         return self.__prev__
 
     @property
-    def next(self):
+    def nextId(self):
         """ Next Node (Sibling)
 
-        :rtype: Node
+        :rtype: str
         """
         return self.__next__
 
@@ -998,6 +998,6 @@ class Node(object):
     def id(self):
         """Current object identifier
 
-        :rtype: Node
+        :rtype: str
         """
         return self.__identifier__

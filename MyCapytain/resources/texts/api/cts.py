@@ -10,7 +10,7 @@ import MyCapytain.resources.collections.cts
 import MyCapytain.resources.prototypes.text
 import MyCapytain.resources.texts.tei
 import MyCapytain.retrievers.prototypes
-from MyCapytain.common.reference import URN, Reference, Node
+from MyCapytain.common.reference import URN, Reference, NodeId
 
 
 class Text(MyCapytain.resources.prototypes.text.Text):
@@ -227,19 +227,6 @@ class Text(MyCapytain.resources.prototypes.text.Text):
             ]
 
 
-class CTSAPINode(Node):
-
-    def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=1, api=None):
-        super(CTSAPINode, self).__init__(identifier, children, parent, siblings, depth)
-        self.__api__ = api
-
-    @property
-    def children(self):
-        if not self.__children__:
-            a = 0
-        return self.__children__
-
-
 class Passage(MyCapytain.resources.texts.tei.Passage):
 
     def __init__(self, urn, resource, *args, **kwargs):
@@ -256,15 +243,15 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         self.__parse__()
 
     @property
-    def first(self):
+    def firstId(self):
         """ Children passage
 
-        :rtype: Node
+        :rtype: str
         :returns: First children of the graph. Shortcut to self.graph.children[0]
         """
         if self.__first__ is False:
             # Request the next urn
-            self.__first__ = Node(
+            self.__first__ = NodeId(
                 identifier=self.parent.getFirstUrn(reference=str(self.urn.reference)),
                 depth=len(self.urn.reference.start)+1
             )
@@ -282,7 +269,7 @@ class Passage(MyCapytain.resources.texts.tei.Passage):
         if self.__prev__ is False:
             # Request the next urn
             self.__prev__, self.__next__ = self.parent.getPrevNextUrn(reference=self.urn.reference)
-            self.graph.prev = Node(identifier=self.__prev__)
+            self.graph.prev = NodeId(identifier=self.__prev__)
         return self.__prev__
 
     @property

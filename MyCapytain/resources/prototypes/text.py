@@ -11,17 +11,37 @@ from past.builtins import basestring
 from MyCapytain.common.reference import URN, Reference, Citation, Node
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import Mimetypes
+from MyCapytain.resources.prototypes.metadata import Collection
 
 
 class TextualNode(object):
+    """ Node representing a text passage.
+
+    :param textId: Identifier of the text
+    :type textId: str
+    :param graph: Graph giving the information about the node position in a text tree
+    :type graph: Node
+    :param citation: Citation system of the text
+    :type citation: Citation
+
+    :cvar default_exclude: Default exclude for exports
+    """
+
+    default_exclude = []
+
     def __init__(self, textId=None, graph=None, citation=None):
         self.__id__ = textId
         self.__graph__ = graph or Node()
         self.__citation__ = citation or Citation()
         self.__text__ = ""
+        self.__metadata__ = None
 
     @property
     def citation(self):
+        """
+
+        :rtype: Citation
+        """
         return self.__citation__
 
     @citation.setter
@@ -31,7 +51,7 @@ class TextualNode(object):
         self.__citation__ = value
 
     def text(self):
-        return self.__text__
+        return self.export(output=Mimetypes.PLAINTEXT, exclude=self.default_exclude)
 
     @property
     def id(self):
@@ -51,25 +71,64 @@ class TextualNode(object):
             raise TypeError("Graph property can only be a Node object")
         self.__graph__ = value
 
-    def default_export(self, output=Mimetypes.JSON_DTS, domain=""):
+    def default_export(self, output=Mimetypes.JSON_DTS, exclude=None):
         """ Export the textual node item in the Mimetype required
 
         :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
         :type output: str
+        :param exclude: Informations to exclude. Specific to implementations
+        :type exclude: [str]
         :return: Object using a different representation
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
-    def export(self, output=None):
+    def export(self, output=None, exclude=None):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
 
         :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
         :type output: str
+        :param exclude: Informations to exclude. Specific to implementations
+        :type exclude: [str]
         :return: Object using a different representation
         """
-        return self.default_export(output)
+        if exclude is None:
+            exclude = self.default_exclude
+        return self.default_export(output, exclude)
+
+    @property
+    def metadata(self):
+        """ Metadata information about the text
+
+        :return: Collection object with metadata about the text
+        """
+        return self.__metadata__
+
+    @metadata.setter
+    def metadata(self, value):
+        """ Set the metadata collection attribute
+
+        :param value: Collection of metadata
+        :type value: Collection
+        """
+        if isinstance(value, Collection):
+            self.__metadata__ = value
+        else:
+            raise TypeError("Metadata should be collection based")
+
+    def getPassage(self, reference):
+        """ Retrieve a passage and store it in the object
+
+        :param reference: Reference of the passage to retrieve
+        :type reference: str or Node or Reference
+        :rtype: TextualNode
+        :returns: Object representing the passage
+
+        :raises: *TypeError* when reference is not a list or a Reference
+        """
+
+        raise NotImplementedError()
 
 
 class CTSNode(TextualNode):
@@ -77,11 +136,17 @@ class CTSNode(TextualNode):
     
     :param urn: A URN identifier
     :type urn: URN
+    :param graph: Graph giving the information about the node position in a text tree
+    :type graph: Node
+    :param citation: Citation system of the text
+    :type citation: Citation
+
+    :cvar default_exclude: Default exclude for exports
     """
 
     def __init__(self, urn=None, graph=None, citation=None):
         super(CTSNode, self).__init__(textId=str(urn), citation=citation, graph=graph)
-        self._URN = None
+        self.__urn__ = None
 
         if urn is not None:
             self.urn = urn
@@ -91,9 +156,8 @@ class CTSNode(TextualNode):
         """ URN Identifier of the object
 
         :rtype: URN
-
         """
-        return self._URN
+        return self.__urn__
     
     @urn.setter
     def urn(self, value):
@@ -108,21 +172,10 @@ class CTSNode(TextualNode):
             value = URN(value)
         elif not isinstance(value, URN):
             raise TypeError()
-        self._URN = value
+        self.__urn__ = value
 
 
-class ParsedCTSNode(CTSNode):
-    """
-
-    :param resource: A resource
-    :type resource: Any
-    """
-    def __init__(self, resource=None, *args, **kwargs):
-        super(ParsedCTSNode, self).__init__(**kwargs)
-        self.resource = resource
-
-
-class Passage(ParsedCTSNode):
+class Passage(CTSNode):
     """ Passage representing object prototype
     
     :param urn: A URN identifier
@@ -152,8 +205,8 @@ class Passage(ParsedCTSNode):
 
         :rtype: Passage
         :returns: Previous passage at same level
-        """ 
-        raise NotImplementedError()
+        """
+        return self.graph.prev
 
     @property
     def next(self):
@@ -161,54 +214,45 @@ class Passage(ParsedCTSNode):
 
         :rtype: Passage
         :returns: Following passage at same level
-        """ 
-        raise NotImplementedError()
+        """
+        return self.graph.next
 
     @property
     def first(self):
         """ First child of current Passage 
         
-        :rtype: None or Passage
-        :returns: None if current Passage has no children,  first child passage if available
+        :rtype: Node
+        :returns: First passage node Information
         """
-        raise NotImplementedError()
+        if len(self.graph.children):
+            return self.graph.children[0]
+        else:
+            raise NotImplementedError
 
     @property
     def last(self):
         """ Last child of current Passage 
         
-        :rtype: None or Passage
-        :returns: None if current Passage has no children, last child passage if available
+        :rtype: Node
+        :returns: Last passage Node representation
         """
-        raise NotImplementedError()
+        if len(self.graph.children):
+            return self.graph.children[-1]
+        else:
+            raise NotImplementedError
 
     @property
     def children(self):
         """ Children of the passage
 
-        :rtype: OrderedDict
-        :returns: Dictionary of chidren, where key are subreferences
+        :rtype: [Node]
+        :returns: List of childrens according to .graph
         """
-        raise NotImplementedError()
-
-
-class Text(ParsedCTSNode):
-    """ A CTS Text """
-    def __init__(self, citation=None, metadata=None, **kwargs):
-        super(Text, self).__init__(**kwargs)
-
-        self._cRefPattern = Citation()
-        if citation is not None:
-            self.citation = citation
-
-        if metadata is not None:
-            self.metadata = metadata
-        else:
-            self.metadata = Metadata()
+        return self.graph.children
 
     def getValidReff(self, level=1, reference=None):
-        """ Given a resource, Text will compute valid reffs 
-        
+        """ Given a resource, Text will compute valid reffs
+
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
         :param passage: Subreference (optional)
@@ -218,39 +262,30 @@ class Text(ParsedCTSNode):
         """
         raise NotImplementedError()
 
-    def getChildren(self, reference=None, depth=None):
-        """ Given a resource, Text will compute valid reffs
-
-        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
-        :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
-        :rtype: List.basestring
-        :returns: Node
-        """
-        raise NotImplementedError()
-
-    def getPassage(self, reference):
-        """ Retrieve a passage and store it in the object
-        
-        :param reference: Reference of the passage
-        :type reference: MyCapytain.common.reference.Reference or List of basestring
-        :rtype: Passage
-        :returns: Object representing the passage
-        :rtype: Passage
-
-        :raises: *TypeError* when reference is not a list or a Reference
-        """
-
-        raise NotImplementedError()
-
     def getLabel(self):
         """ Retrieve metadata about the text
-        
-        :rtype: dict
-        :returns: Dictionary with label informations
+
+        :rtype: Collection
+        :returns: Retrieve Label informations in a Collection format
         """
         raise NotImplementedError()
+
+
+class Text(Passage):
+    """ A CTS Text """
+    def __init__(self, citation=None, metadata=None, **kwargs):
+        super(Text, self).__init__(**kwargs)
+
+        self._cRefPattern = Citation()
+        if citation is not None:
+            self.citation = citation
+
+        if metadata is not None:
+            self.__metadata__ = metadata
+        else:
+            self.__metadata__ = Metadata()
+
+        self.__reffs__ = None
 
     @property
     def reffs(self):
@@ -258,22 +293,6 @@ class Text(ParsedCTSNode):
 
         :rtype: MyCapytain.resources.texts.tei.Citation
         """
-        return [reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]
-
-    @property
-    def citation(self):
-        """ Get the lowest cRefPattern in the hierarchy
-
-        :rtype: MyCapytain.common.reference.Citation
-        """
-        return self._cRefPattern
-    
-    @citation.setter
-    def citation(self, value):
-        """ Set the cRefPattern
-
-        :param value: Citation to be saved
-        :type value:  MyCapytain.common.reference.Citation
-        """
-        if isinstance(value, Citation):
-            self._cRefPattern = value
+        if not self.__reffs__:
+            self.__reffs__ = [reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]
+        return self.__reffs__

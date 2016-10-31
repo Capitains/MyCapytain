@@ -381,5 +381,6 @@ class Mimetypes:
     RDFXML = "application/rdf+xml"
     CTS_XML = "text/xml:CTS"
     MY_CAPYTAIN = "MyCapytain"
-    ETREE = "xml"
+    ETREE = "python/lxml"
     MyCapytainText = "MyCapytain/Text"
+    PLAINTEXT = "text/plain"

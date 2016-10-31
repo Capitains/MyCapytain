@@ -230,12 +230,13 @@ class Text(MyCapytain.resources.prototypes.text.Text):
 class CTSAPINode(Node):
 
     def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=1, api=None):
-        self.
+        super(CTSAPINode, self).__init__(identifier, children, parent, siblings, depth)
+        self.__api__ = api
 
     @property
     def children(self):
         if not self.__children__:
-
+            a = 0
         return self.__children__
 
 

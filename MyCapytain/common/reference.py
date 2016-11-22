@@ -772,6 +772,11 @@ class Citation(object):
             else:
                 break
 
+    def __getitem__(self, item):
+        if not isinstance(item, int) or item > len(self)-1:
+            return KeyError
+        return [x for x in self][item]
+
     def __len__(self):
         """ Length method
 
@@ -877,7 +882,7 @@ class Citation(object):
         """ Ingest a resource and store data in its instance
 
         :param resource: XML node cRefPattern or list of them in ASC hierarchy order (deepest to highest, eg. lines to poem to book)
-        :type resource: lxml.etree._Element
+        :type resource: [lxml.etree._Element]
         :param xpath: XPath to use to retrieve citation
         :type xpath: str
 

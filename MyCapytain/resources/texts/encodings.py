@@ -32,13 +32,15 @@ class TEIResource(MyCapytain.resources.prototypes.text.InteractiveTextualNode):
         """
         return self.export(output=Mimetypes.XML)
 
-    def export(self, output=Mimetypes.PLAINTEXT, exclude=None):
+    def export(self, output=Mimetypes.PLAINTEXT, exclude=None, _preformatted=False):
         """ Text content of the passage
 
         :param output: Mimetype (From MyCapytian.common.utils.Mimetypes) to output
         :type output: str
         :param exclude: Remove some nodes from text
         :type exclude: list
+        :param _preformatted: This parameter is used when export loops on itself
+        :type _preformatted: booln
         :rtype: basestring
         :returns: Text of the xml node
 
@@ -49,23 +51,27 @@ class TEIResource(MyCapytain.resources.prototypes.text.InteractiveTextualNode):
 
 
         """
-        if exclude is None or len(self.default_exclude):
+        if exclude is None:
             exclude = self.default_exclude
 
-        if len(exclude) > 0:
+        if len(exclude) > 0 and _preformatted is False:
             exclude = "[{0}]".format(
                 " and ".join(
                     "not(./ancestor-or-self::{0})".format(excluded)
                     for excluded in exclude
                 )
             )
-        else:
+        elif _preformatted is False:
             exclude = ""
 
         if output == Mimetypes.ETREE:
+            """ Exports the whole resource as a LXML object
+            """
             return self.resource
 
         elif output == Mimetypes.XML:
+            """ Exports the whole resource formatted as XML but as string object
+            """
             return tostring(self.resource, encoding=str)
 
         elif output == Mimetypes.NestedDict:
@@ -75,7 +81,11 @@ class TEIResource(MyCapytain.resources.prototypes.text.InteractiveTextualNode):
             text = nested_ordered_dictionary()
             for reff in reffs:
                 _r = reff.split(".")
-                nested_set(text, _r, self.getPassage(_r).export(Mimetypes.PLAINTEXT))
+                nested_set(text, _r, self.getPassage(_r, simple=True).export(
+                    Mimetypes.PLAINTEXT,
+                    exclude=exclude,
+                    _preformatted=True
+                ))
             return text
 
         elif output == Mimetypes.PLAINTEXT:
@@ -85,11 +95,11 @@ class TEIResource(MyCapytain.resources.prototypes.text.InteractiveTextualNode):
                         element
                         for element
                         in self.resource.xpath(
-                        ".//descendant-or-self::text(){}".format(exclude),
-                        namespaces=NS,
-                        smart_strings=False
-                    )
-                        ]
+                            ".//descendant-or-self::text(){}".format(exclude),
+                            namespaces=NS,
+                            smart_strings=False
+                        )
+                    ]
                 )
             )
 

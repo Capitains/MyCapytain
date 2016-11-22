@@ -12,6 +12,7 @@ import MyCapytain.resources.texts.encodings
 import MyCapytain.common.reference
 import MyCapytain.common.utils
 import MyCapytain.errors
+from MyCapytain.common.utils import Mimetypes
 
 
 class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
@@ -69,8 +70,14 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         c = MyCapytain.common.reference.Citation(name="ahah",
                                                  refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']",
                                                  child=None)
-        b = MyCapytain.common.reference.Citation()
-        a = MyCapytain.resources.texts.local.Text(citation=b)
+        b = MyCapytain.common.reference.Citation(
+            name="ahah",
+            refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:z[@n='$1']",
+            child=None
+        )
+        with open("tests/testing_data/texts/sample.xml", "rb") as sample:
+            a = MyCapytain.resources.texts.local.Text(resource=sample, citation=b)
+
         """ Test original setting """
         self.assertIs(a.citation, b)
         """ Test simple replacement """
@@ -124,7 +131,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             [
                 '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9', '2.1.10', '2.1.11',
                 '2.1.12', '2.2.1', '2.2.2', '2.2.3', '2.2.4', '2.2.5', '2.2.6'
-             ],
+            ],
             "It could be possible to ask for range reffs children")
 
         self.assertEqual(
@@ -155,15 +162,16 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def test_nested_dict(self):
         """ Check the nested dict export of a local.Text object """
-        nested = self.TEI.nested_dict(exclude=["tei:note"])
+        nested = self.TEI.export(output=Mimetypes.NestedDict, exclude=["tei:note"])
+        print(nested["1"]["3"]["8"])
+        self.assertEqual(nested["1"]["3"]["8"], "Ibis ab excusso missus in astra sago. ",
+                         "Check that notes are removed ")
         self.assertEqual(nested["1"]["pr"]["1"], "Spero me secutum in libellis meis tale temperamen-",
                          "Check that dictionary path is well done")
         self.assertEqual(nested["1"]["12"]["1"], "Itur ad Herculeas gelidi qua Tiburis arces ",
                          "Check that dictionary path works on more than one passage")
         self.assertEqual(nested["2"]["pr"]["1"], "'Quid nobis' inquis 'cum epistula? parum enim tibi ",
                          "Check that different fist level works as well")
-        self.assertEqual(nested["1"]["3"]["8"], "Ibis ab excusso missus in astra sago. ",
-                         "Check that notes are removed ")
         self.assertEqual(
             [list(nested.keys()), list(nested["1"].keys())[:3], list(nested["2"]["pr"].keys())[:3]],
             [["1", "2"], ["pr", "1", "2"], ["sa", "1", "2"]],
@@ -185,8 +193,8 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
 
     def test_wrong_main_scope(self):
         with open("tests/testing_data/texts/sample2.xml", "rb") as file:
-            with self.assertRaises(MyCapytain.resources.texts.local.RefsDeclError):
-                text = MyCapytain.resources.texts.local.Text(resource=file, autoreffs=True)
+            with self.assertRaises(MyCapytain.errors.RefsDeclError):
+                text = MyCapytain.resources.texts.local.Text(resource=file)
 
     def test_reffs(self):
         """ Check that every level is returned trough reffs property """
@@ -217,19 +225,16 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             self.TEI.urn = 2
 
     def test_get_passage(self):
-        self.TEI.parse()
-        a = self.TEI.getPassage(["1", "pr", "2"], hypercontext=False)
-        self.assertEqual(a.text(), "tum, ut de illis queri non possit quisquis de se bene ")
+        a = self.TEI.getPassage(["1", "pr", "2"], simple=True)
+        self.assertEqual(a.export(output=Mimetypes.PLAINTEXT), "tum, ut de illis queri non possit quisquis de se bene ")
         # With reference
-        a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), hypercontext=False)
-        self.assertEqual(a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ")
+        a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), simple=True)
+        self.assertEqual(a.export(output=Mimetypes.PLAINTEXT), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
     def test_get_passage_autoparse(self):
-        self.assertEqual(self.TEI._passages.resource, None)
-        a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), hypercontext=False)
-        self.assertNotEqual(self.TEI._passages.resource, None)
+        a = self.TEI.getPassage(MyCapytain.common.reference.Reference("2.5.5"), simple=True)
         self.assertEqual(
-            a.text(), "Saepe domi non es, cum sis quoque, saepe negaris: ",
+            a.export(output=Mimetypes.PLAINTEXT), "Saepe domi non es, cum sis quoque, saepe negaris: ",
             "Text are automatically parsed in GetPassage hypercontext = False"
         )
 
@@ -239,11 +244,11 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation,
-            autoreffs=True
+            citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), simple=True).export(
+                output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (One reference Passage)"
         )
@@ -252,16 +257,27 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation,
-            autoreffs=True
+            citation=self.TEI.citation
         )
+        print(etree.tostring(
+            text.getPassage(
+                MyCapytain.common.reference.Reference("1.pr.2"),
+                simple=True
+            ).resource
+        ))
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
+            text.getPassage(
+                MyCapytain.common.reference.Reference("1.pr.2"),
+                simple=True
+            ).export(
+                output=Mimetypes.PLAINTEXT
+            ).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.3"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.3"), simple=True).export(
+                output=Mimetypes.PLAINTEXT).strip(),
             "senserit, cum salva infimarum quoque personarum re-",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same parent range Passage)"
         )
@@ -275,16 +291,17 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation,
-            autoreffs=True
+            citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), simple=True).export(
+                output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.1.6"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.1.6"), simple=True).export(
+                output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
@@ -304,16 +321,17 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.TEI.citation,
-            autoreffs=True
+            citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.pr.2"), simple=True).export(
+                output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.1.6"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.1.6"), simple=True).export(
+                output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -335,7 +353,7 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         """
         simple = self.TEI.getPassage(["1", "pr", "2"])
         self.assertEqual(
-            simple.text().strip(),
+            simple.export(output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -374,17 +392,18 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.text_complex.citation,
-            autoreffs=True
+            citation=self.text_complex.citation
         )
         self.assertIn(
             "Pervincis tandem",
-            text.getPassage(MyCapytain.common.reference.Reference("pr.1"), hypercontext=False).text(
+            text.getPassage(MyCapytain.common.reference.Reference("pr.1"), simple=True).export(
+                output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]).strip(),
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1.2"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1.2"), simple=True).export(
+                output=Mimetypes.PLAINTEXT).strip(),
             "lusimus quos in Suebae gratiam virgunculae,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -401,31 +420,36 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.seneca.citation,
-            autoreffs=True
+            citation=self.seneca.citation
         )
         self.assertEqual(
-            text.text(exclude=["tei:note"]).strip(),
+            text.export(output=Mimetypes.PLAINTEXT, exclude=["tei:note"]).strip(),
             "Di coniugales tuque genialis tori,",
             "Ensure text methods works on Text object"
         )
 
     def test_get_passage_hypercontext_double_slash_xpath(self):
         simple = self.seneca.getPassage(MyCapytain.common.reference.Reference("1-10"))
-        str_simple = simple.tostring(encoding=str)
+        str_simple = simple.export(
+            output=Mimetypes.XML
+        )
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.seneca.citation,
-            autoreffs=True
+            citation=self.seneca.citation
+
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(
-                exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1"), simple=True).export(
+                output=Mimetypes.PLAINTEXT,
+                exclude=["tei:note"]
+            ).strip(),
             "Di coniugales tuque genialis tori,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("10"), hypercontext=False).text().strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("10"), simple=True).export(
+                output=Mimetypes.PLAINTEXT
+            ).strip(),
             "aversa superis regna manesque impios",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -439,12 +463,13 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
         str_simple = simple.tostring(encoding=str)
         text = MyCapytain.resources.texts.local.Text(
             resource=str_simple,
-            citation=self.seneca.citation,
-            autoreffs=True
+            citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getPassage(MyCapytain.common.reference.Reference("1"), hypercontext=False).text(
-                exclude=["tei:note"]).strip(),
+            text.getPassage(MyCapytain.common.reference.Reference("1"), simple=True).export(
+                output=Mimetypes.PLAINTEXT,
+                exclude=["tei:note"]
+            ).strip(),
             "Di coniugales tuque genialis tori,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
@@ -453,7 +478,6 @@ class TestLocalXMLTextImplementation(unittest.TestCase, xmlunittest.XmlTestMixin
             ["1"],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
-
 
 class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test passage implementation """

@@ -10,23 +10,42 @@ Local files handler for CTS
 
 """
 
-from collections import OrderedDict, defaultdict
 import warnings
 
-from MyCapytain.errors import DuplicateReference, RefsDeclError, MissingAttribute
-from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize
+from MyCapytain.errors import DuplicateReference, MissingAttribute
+from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.reference import URN, Citation, Reference
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.texts import encodings
 
-from MyCapytain.errors import InvalidSiblingRequest
+from MyCapytain.errors import InvalidSiblingRequest, InvalidURN
 import MyCapytain.resources.texts.encodings
 from lxml import etree
 
 
-class __SharedMethods__(object):
-    def getPassage(self, reference=None, hypercontext=True):
+def __makePassageKwargs__(urn, reference):
+    """ Little helper used by Passage here to comply with parents args
+
+    :param urn:
+    :param reference:
+    :return:
+    """
+    kwargs = {}
+    if urn is not None:
+        if reference is not None:
+            kwargs["urn"] = URN("{}:{}".format(urn.upTo(URN.VERSION), reference))
+        else:
+            kwargs["urn"] = urn
+    return kwargs
+
+
+class __SharedMethods__:
+    class SimplePassage(encodings.TEIResource, text.Passage):
+        def __init__(self, resource, reference, citation, urn=None):
+            super(__SharedMethods__.SimplePassage, self).__init__(resource=resource, **__makePassageKwargs__(urn, reference))
+
+    def getPassage(self, reference=None, simple=False):
         """ Finds a passage in the current text
 
         :param reference: Identifier of the subreference / passages
@@ -35,36 +54,15 @@ class __SharedMethods__(object):
         :type hypercontext: boolean
         :rtype: Passage, ContextPassage
         :returns: Asked passage
-
+t
         .. note :: As of MyCapytain 0.1.0, Text().getPassage() returns by default a ContextPassage, thus being able
             to handle range. This design change also means that the returned tree is way different that a classic
              Passage. To retrieve MyCapytain<=0.0.9 behaviour, use `hypercontext=False`.
         """
-        if hypercontext is True:
-            return self._getPassageContext(reference)
 
-        if isinstance(reference, Reference):
-            reference = reference.list or reference.start.list
+        if reference is None:
+            return self._getSimplePassage(reference)
 
-        if self._passages.resource is None:
-            self.parse()
-
-        reference = [".".join(reference[:i]) for i in range(1, len(reference) + 1)]
-        passages = [self._passages]
-        while len(reference) > 0:
-            passages = [passage for sublist in [p.get(reference[0]) for p in passages] for passage in sublist]
-            reference.pop(0)
-
-        return passages[0]
-
-    def _getPassageContext(self, reference):
-        """ Retrieves nodes up to the given one, cleaning non required siblings.
-
-        :param reference: Identifier of the subreference / passages
-        :type reference: list, reference
-        :returns: Asked passage
-        :rtype: Passage
-        """
         if isinstance(reference, list):
             start, end = reference, reference
             reference = Reference(".".join(reference))
@@ -75,6 +73,9 @@ class __SharedMethods__(object):
 
         if len(start) > len(self.citation):
             raise ReferenceError("URN is deeper than citation scheme")
+
+        if simple is True:
+            return self._getSimplePassage(reference)
 
         citation_start = [citation for citation in self.citation][len(start)-1]
         citation_end = [citation for citation in self.citation][len(end)-1]
@@ -98,6 +99,33 @@ class __SharedMethods__(object):
             text=self,
             citation=self.citation,
             reference=reference
+        )
+
+    def _getSimplePassage(self, reference):
+        """ Retrieve a single node representing the passage.
+
+        .. warning:: Range support is awkward.
+
+        :param reference: Identifier of the subreference / passages
+        :type reference: list, reference
+        :returns: Asked passage
+        :rtype: Passage
+        """
+        if reference is None:
+            return self.SimplePassage(self.resource, reference=None, urn=self.urn, citation=self.citation)
+
+        resource = self.resource.xpath(
+            self.citation[len(reference)-1].fill(reference),
+            namespaces=NS
+        )
+
+        if len(resource) != 1:
+            raise InvalidURN
+        return self.SimplePassage(
+            resource[0],
+            reference=None,
+            urn=self.urn,
+            citation=self.citation
         )
 
     def getValidReff(self, level=None, reference=None, _debug=False):
@@ -186,6 +214,27 @@ class __SharedMethods__(object):
 
         return passages
 
+    def xpath(self, *args, **kwargs):
+        """ Perform XPath on the passage XML
+
+        :param args: Ordered arguments for etree._Element().xpath()
+        :param kwargs: Named arguments
+        :return: Result list
+        :rtype: list(etree._Element)
+        """
+        if "smart_strings" not in kwargs:
+            kwargs["smart_strings"] = False
+        return self.resource.xpath(*args, **kwargs)
+
+    def tostring(self, *args, **kwargs):
+        """ Transform the Passage in XML string
+
+        :param args: Ordered arguments for etree.tostring() (except the first one)
+        :param kwargs: Named arguments
+        :return:
+        """
+        return etree.tostring(self.resource, *args, **kwargs)
+
 
 class Text(__SharedMethods__, encodings.TEIResource, text.Text):
     """ Implementation of CTS tools for local files
@@ -210,12 +259,13 @@ class Text(__SharedMethods__, encodings.TEIResource, text.Text):
     def __findCRefPattern(self, xml):
         """ Find CRefPattern in the text and set object.citation
         :param xml: Xml Resource
+        :type xml: lxml.etree._Element
         :return: None
         """
-        self.citation = Citation.ingest(
-            resource=xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
-            xpath=".//tei:cRefPattern"
-        )
+        if self.citation.isEmpty():
+            citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
+            if len(citation):
+                self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")
 
 
 class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
@@ -265,11 +315,12 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
             1.1-1.2.3 or 1-a.b. Those will raise `InvalidSiblingRequest`
 
     """
-    def __init__(self, urn=None, citation=None, reference=None, resource=None, text=None):
+    def __init__(self, reference, urn=None, citation=None, resource=None, text=None):
+
         super(Passage, self).__init__(
-            urn="{}:{}".format(urn.upTo(URN.VERSION), reference),
             citation=citation,
-            resource=resource
+            resource=resource,
+            **__makePassageKwargs__(urn, reference)
         )
 
         self.__reference__ = reference
@@ -287,27 +338,6 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
     @property
     def reference(self):
         return self.__reference__
-
-    def xpath(self, *args, **kwargs):
-        """ Perform XPath on the passage XML
-
-        :param args: Ordered arguments for etree._Element().xpath()
-        :param kwargs: Named arguments
-        :return: Result list
-        :rtype: list(etree._Element)
-        """
-        if "smart_strings" not in kwargs:
-            kwargs["smart_strings"] = False
-        return self.resource.resource.xpath(*args, **kwargs)
-
-    def tostring(self, *args, **kwargs):
-        """ Transform the Passage in XML string
-
-        :param args: Ordered arguments for etree.tostring() (except the first one)
-        :param kwargs: Named arguments
-        :return:
-        """
-        return etree.tostring(self.resource.resource, *args, **kwargs)
 
     @property
     def children(self):

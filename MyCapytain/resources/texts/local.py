@@ -11,96 +11,28 @@ Local files handler for CTS
 """
 
 from collections import OrderedDict, defaultdict
-from past.builtins import basestring
 import warnings
 
-from MyCapytain.errors import DuplicateReference, RefsDeclError
-from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize, \
-    nested_set, nested_ordered_dictionary
+from MyCapytain.errors import DuplicateReference, RefsDeclError, MissingAttribute
+from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath, normalize
 from MyCapytain.common.reference import URN, Citation, Reference
+
 from MyCapytain.resources.prototypes import text
+from MyCapytain.resources.texts import encodings
+
 from MyCapytain.errors import InvalidSiblingRequest
-import MyCapytain.resources.texts.tei
+import MyCapytain.resources.texts.encodings
 from lxml import etree
 
 
-class Text(text.Text):
-    """ Implementation of CTS tools for local files
-
-    :param urn: A URN identifier
-    :type urn: MyCapytain.common.reference.URN
-    :param resource: A resource
-    :type resource: lxml.etree._Element
-    :param citation: Highest Citation level
-    :type citation: Citation
-    :param autoreffs: Parse references on load (default : True)
-    :type autoreffs: bool
-    :ivar resource: lxml
-    """
-
-    def __init__(self, urn=None, citation=None, resource=None, autoreffs=False):
-        super(Text, self).__init__(urn=urn, citation=citation)
-        self._passages = Passage()
-        self._orphan = defaultdict(Reference)  # Represents passage we got without asking for all. Storing convenience ?
-
-        self.xml = None
-
-        if citation is not None:
-            self.citation = citation
-
-        if resource is not None:
-            self.resource = resource
-            self.xml = xmlparser(resource)
-            self.__findCRefPattern(self.xml)
-
-            if autoreffs is True:
-                self.parse()
-
-    def __findCRefPattern(self, xml):
-        """ Find CRefPattern in the text and set object.citation
-        :param xml: Xml Resource
-        :return: None
-        """
-        self.citation = Citation.ingest(
-            resource=xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
-            xpath=".//tei:cRefPattern"
-        )
-
-    def parse(self):
-        """ Parse the object and generate the children
-        """
-        try:
-            xml = self.xml.xpath(self.citation.scope, namespaces=NS)[0]
-        except IndexError:
-            msg = "Main citation scope does not result in any result ({0})".format(self.citation.scope)
-            raise RefsDeclError(msg)
-        except Exception as E:
-            raise E
-
-        self._passages = Passage(resource=xml, citation=self.citation, urn=self.urn, reference=None)
-
-    def nested_dict(self, exclude=None):
-        """ Nested Dict Representation of the text passages
-
-        :param exclude: Remove some nodes from text according to `MyCapytain.resources.texts.tei.Passage.text`
-        :type exclude: List
-        :rtype: dict
-        :returns: Dictionary
-        """
-        reffs = self.getValidReff(level=len(self.citation))
-        text = nested_ordered_dictionary()
-        for reff in reffs:
-            _r = reff.split(".")
-            nested_set(text, _r, self.getPassage(_r, hypercontext=False).text(exclude=exclude))
-        return text
-
-    def getPassage(self, reference, hypercontext=True):
+class __SharedMethods__(object):
+    def getPassage(self, reference=None, hypercontext=True):
         """ Finds a passage in the current text
 
         :param reference: Identifier of the subreference / passages
-        :type reference: list, Reference
+        :type reference: Union[list, Reference]
         :param hypercontext: If set to true, retrieves nodes up to the given one, cleaning non required siblings.
-        :type hypercontext: bool
+        :type hypercontext: boolean
         :rtype: Passage, ContextPassage
         :returns: Asked passage
 
@@ -131,7 +63,7 @@ class Text(text.Text):
         :param reference: Identifier of the subreference / passages
         :type reference: list, reference
         :returns: Asked passage
-        :rtype: ContextPassage
+        :rtype: Passage
         """
         if isinstance(reference, list):
             start, end = reference, reference
@@ -160,9 +92,12 @@ class Text(text.Text):
             urn, reference = URN("{}:{}".format(self.urn, reference)), reference
         else:
             urn, reference = None, reference
-        return ContextPassage(
+        return Passage(
             urn=urn,
-            resource=root, parent=self, citation=self.citation
+            resource=root,
+            text=self,
+            citation=self.citation,
+            reference=reference
         )
 
     def getValidReff(self, level=None, reference=None, _debug=False):
@@ -251,277 +186,39 @@ class Text(text.Text):
 
         return passages
 
-    def text(self, exclude=None):
-        """ Returns the text of the XML resource without the excluded nodes
 
-        :param exclude: List of nodes
-        :type exclude: list(str)
-        :return: Text of the text without the text inside removed nodes
-        :rtype: str
-
-        .. example::
-            `epigrammata.exclude(["tei:note"])` would remove all note nodes of the XML and print the text
-
-        """
-        return self._passages.text(exclude=exclude)
-
-
-class Passage(MyCapytain.resources.texts.tei.Passage):
-    """ Passage class for local texts which is fast but contains the minimum DOM.
-
-        For design purposes, some people would prefer passage to be found quickly (Text indexing for example).
-        Passage keeps only the node found through the xpath
-
-        **Example** :  for a text with a citation scheme with following refsDecl :
-        `/TEI/text/body/div[@type='edition']/div[@n='$1']/div[@n='$2']/l[@n='$3']` and a passage 1.1.1, this
-        class will build an XML tree looking like the following
-
-         .. code-block:: xml
-
-            <l n='1'>Lorem ipsum</l>
+class Text(__SharedMethods__, encodings.TEIResource, text.Text):
+    """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
-    :type urn: URN
+    :type urn: MyCapytain.common.reference.URN
     :param resource: A resource
-    :type resource: etree._Element
-    :param parent: Parent of the current passage
-    :type parent: Passage
-    :param citation: Citation for children level
+    :type resource: lxml.etree._Element
+    :param citation: Highest Citation level
     :type citation: Citation
-    :param reference: Identifier of the subreference without URN information
-    :type reference: Reference, List
-
-    .. warning:: This passage system does not accept range
+    :param autoreffs: Parse references on load (default : True)
+    :type autoreffs: bool
+    :ivar resource: lxml
     """
 
-    def __init__(self, urn=None, resource=None, parent=None, citation=None, reference=None):
-        super(Passage, self).__init__(resource=resource, parent=parent)
+    def __init__(self, urn=None, citation=None, resource=None):
+        super(Text, self).__init__(urn=urn, citation=citation, resource=resource)
 
-        self.__next = False
-        self.__prev = False
+        if self.resource is not None:
+            self.__findCRefPattern(self.resource)
 
-        if citation:
-            self.citation = citation
-
-        self.__reference = Reference("")
-        if urn:
-            self.urn = urn
-
-        if reference:
-            self.reference = reference
-
-        self.__children = OrderedDict()
-        self.__parsed = False
-
-    @property
-    def reference(self):
-        """ Id represents the passage subreference as a list of basestring
-
-        :returns: Representation of the passage subreference as a list
-        :rtype: Reference
+    def __findCRefPattern(self, xml):
+        """ Find CRefPattern in the text and set object.citation
+        :param xml: Xml Resource
+        :return: None
         """
-        return self.__reference
-
-    @reference.setter
-    def reference(self, value):
-        """ Set up ID property
-
-        :param value: Representation of the passage subreference as a list
-        :type value: list, tuple, Reference
-
-        .. note:: `Passage.id = [..]` will update automatically the URN property as well if correct
-        """
-        _value = None
-        if isinstance(value, (list, tuple)):
-            _value = Reference(".".join(value))
-        elif isinstance(value, basestring):
-            _value = Reference(value)
-        elif isinstance(value, Reference):
-            _value = value
-
-        if _value and self.__reference != _value:
-            self.__reference = _value
-            if self._URN and len(self._URN):
-                if len(value):
-                    self._URN = URN("{}:{}".format(self._URN.upTo(URN.NO_PASSAGE), str(_value)))
-                else:
-                    self._URN = URN(self._URN["text"])
-
-    @property
-    def urn(self):
-        """ URN Identifier of the object
-
-        :rtype: URN
-        """
-        return self._URN
-
-    @urn.setter
-    def urn(self, value):
-        """ Set the urn
-
-        :param value: URN to be saved
-        :type value: URN, basestring, str
-        :raises: *TypeError* when the value is not URN compatible
-
-        .. note:: `Passage.URN = ...` will update automatically the id property if Passage is set
-
-        """
-        a = self._URN
-
-        if isinstance(value, basestring):
-            value = URN(value)
-        elif not isinstance(value, URN):
-            raise TypeError()
-
-        if str(a) != str(value):
-            self._URN = value
-
-            if value.reference and self.__reference != value.reference:
-                self.__reference = value.reference
-            elif not value.reference and self.__reference and len(self.__reference):
-                self._URN = URN("{}:{}".format(str(value), str(self.__reference)))
-
-    def get(self, key=None):
-        """ Get a child or multiple children
-
-        :param key: String identifying a passage
-        :type key: basestring or int 
-        :raises KeyError: When key identifies a child unknown to this passage
-        :rtype: List.Passage
-        :returns: List of passage identified by key. If key is None, returns all children
-        
-        .. note:: Call time depends on parsing status. If the passage was never parsed, then on first call citation is used to find children
-        """
-        if len(self.__children) == 0 and self.__parsed is False:
-            self.__parse()
-
-        if key is None:
-            return [self.__children[key] for key in self.__children]
-        elif isinstance(key, int):
-            keys = list(self.__children.copy().keys())
-            return [self.__children[keys[key]]]
-        elif key not in self.__children:
-            raise KeyError()
-        else:
-            return [self.__children[key]]
-
-    def __parse(self):
-        """ Private method for parsing children
-        """
-        if self.citation is None or self.citation.isEmpty():
-            self.__parsed = True
-            return None
-
-        elements = self.resource.xpath("."+self.citation.fill(passage=None, xpath=True), namespaces=NS)
-        ids = [self.reference.list+[element.get("n")] for element in elements]
-        ns = [".".join(_id) for _id in ids]
-
-        # Checking for duplicates
-        duplicates = set([n for n in ns if ns.count(n) > 1])
-        if len(duplicates) > 0:
-            message = ", ".join(duplicates)
-            warnings.warn(message, DuplicateReference)
-
-        for element, _id, n in zip(elements, ids, ns):
-            self.__children[n] = Passage(
-                resource=element,
-                citation=self.citation.child,
-                reference=_id,
-                urn=self.urn,
-                parent=self
-            )
-        self.__parsed = True
-
-    @property
-    def first(self):
-        """ First child of current Passage 
-
-        :returns: None if current Passage has no children,  first child passage if available
-        :rtype: None, Passage
-        """
-        try:
-            return self.get(0)[0]
-        except:
-            return None
-
-    @property
-    def last(self):
-        """ Last child of current Passage 
-
-        :returns: None if current Passage has no children, last child passage if available
-        :rtype: None, Passage
-        """
-        try:
-            return self.get(-1)[0]
-        except :
-            return None
-
-    @property
-    def children(self):
-        """ Children of the passage
-
-        :returns: Dictionary of chidren, where key are subreferences
-        :rtype: OrderedDict
-        """
-        if len(self.__children) == 0 and self.__parsed is False:
-            self.__parse()
-
-        return self.__children
-    
-    @property
-    def next(self):
-        """ Next passage 
-
-        :returns: Next passage at same level
-        :rtype: Passage
-        """ 
-        if self.__next is False:
-
-            if self.parent is None:  # When top of hierarchy is access, should return None
-                self.__next = None
-                return None
-
-            keys = list(self.parent.children.copy().keys())
-            current = keys.index(str(self.reference))
-            if len(keys) - 1 > current:
-                self.__next = self.parent.get(keys[current + 1])[0]
-            else:
-                n = self.parent.next
-                if n is None:
-                    self.__next = None
-                else:
-                    self.__next = n.first
-
-        return self.__next
-
-    @property
-    def prev(self):
-        """ Previous passage 
-
-        :returns: Previous passage at same level
-        :rtype: Passage
-        """ 
-        if self.__prev is False:
-
-            if self.parent is None:  # When top of hierarchy is access, should return None
-                self.__prev = None
-                return None
-
-            keys = list(self.parent.children.copy().keys())
-            current = keys.index(str(self.reference))
-            if current > 0:
-                self.__prev = self.parent.get(keys[current - 1])[0]
-            else:
-                n = self.parent.prev
-                if n is None:
-                    self.__prev = None
-                else:
-                    self.__prev = n.last
-
-        return self.__prev
+        self.citation = Citation.ingest(
+            resource=xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
+            xpath=".//tei:cRefPattern"
+        )
 
 
-class ContextPassage(Passage):
+class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
     """ Passage class for local texts which rebuilds the tree up to the passage.
 
         For design purposes, some people would prefer the output of GetPassage to be consistent. ContextPassage rebuilds
@@ -556,8 +253,8 @@ class ContextPassage(Passage):
         :type urn: URN
         :param resource: Element representing the passage
         :type resource: etree._Element, Text
-        :param parent: Text containing the passage
-        :type parent: Text
+        :param text: Text containing the passage
+        :type text: Text
         :param citation: Citation scheme of the text
         :type citation: Citation
         :param reference: Passage reference
@@ -568,28 +265,28 @@ class ContextPassage(Passage):
             1.1-1.2.3 or 1-a.b. Those will raise `InvalidSiblingRequest`
 
     """
-    def __init__(self, urn=None, resource=None, parent=None, citation=None, reference=None):
-        super(ContextPassage, self).__init__(urn=urn, reference=reference)
+    def __init__(self, urn=None, citation=None, reference=None, resource=None, text=None):
+        super(Passage, self).__init__(
+            urn="{}:{}".format(urn.upTo(URN.VERSION), reference),
+            citation=citation,
+            resource=resource
+        )
 
-        if isinstance(resource, etree._Element):
-            if urn:
-                self.resource = Text(resource=resource, urn=urn.upTo(URN.NO_PASSAGE), citation=parent.citation)
-            else:
-                self.resource = Text(resource=resource, citation=parent.citation)
-        else:
-            self.resource = resource
-        self.parent = parent
-        self.citation = parent.citation
-        self.__children = None
-
-        self.depth = self.depth_2 = 1
+        self.__reference__ = reference
+        self.__text__ = text
+        self.__children__ = None
+        self.__depth__ = self.__depth_2__ = 1
 
         if self.reference.start:
-            self.depth_2 = self.depth = len(self.reference.start)
+            self.__depth_2__ = self.__depth__ = len(self.reference.start)
         if self.reference and self.reference.end:
-            self.depth_2 = len(self.reference.end)
+            self.__depth_2__ = len(self.reference.end)
 
-        self.__prevnext = None  # For caching purpose
+        self.__prevnext__ = None  # For caching purpose
+
+    @property
+    def reference(self):
+        return self.__reference__
 
     def xpath(self, *args, **kwargs):
         """ Perform XPath on the passage XML
@@ -612,38 +309,6 @@ class ContextPassage(Passage):
         """
         return etree.tostring(self.resource.resource, *args, **kwargs)
 
-    def __str__(self):
-        """ Text based representation of the passage
-
-        :returns: XML of the passage in string form
-        :rtype: basestring
-        """
-        return self.tostring(encoding=str)
-
-    @property
-    def first(self):
-        """ First child of current Passage
-
-        :returns: None if current Passage has no children,  first child passage if available
-        :rtype: None, Reference
-        """
-        if self.depth >= len(self.citation):
-            return None
-        else:
-            return self.children[0]
-
-    @property
-    def last(self):
-        """ Last child of current Pass
-
-        :returns: None if current Passage has no children, last child passage if available
-        :rtype: None, Reference
-        """
-        if self.depth >= len(self.citation):
-            return None
-        else:
-            return self.children[-1]
-
     @property
     def children(self):
         """ Children of the passage
@@ -651,93 +316,66 @@ class ContextPassage(Passage):
         :rtype: None, Reference
         :returns: Dictionary of chidren, where key are subreferences
         """
-        self.__raiseDepth()
+        self.__raiseDepth__()
         if self.depth >= len(self.citation):
             return []
-        elif self.__children and len(self.__children):
-            return self.__children
+        elif self.__children__ is not None:
+            return self.__children__
         else:
-            self.__children = self.resource.getValidReff(level=self.depth+1)
-            return self.__children
+            self.__children__ = self.getValidReff(level=self.depth+1)
+            return self.__children__
 
     @property
-    def next(self):
+    def firstId(self):
+        return self.children[0]
+
+    @property
+    def lastId(self):
+        return self.children[-1]
+
+    @property
+    def nextId(self):
         """ Next passage
 
         :returns: Next passage at same level
         :rtype: None, Reference
         """
-        return self.__getSiblings(direction=1)
+        return self.siblingsId[1]
 
     @property
-    def prev(self):
+    def prevId(self):
         """ Get the Previous passage reference
 
         :returns: Previous passage reference at the same level
         :rtype: None, Reference
         """
-        return self.__getSiblings(direction=0)
+        return self.siblingsId[0]
 
-    def text(self, exclude=None):
-        """ Text content of the passage
-
-        :param exclude: Remove some nodes from text
-        :type exclude: List
-        :rtype: basestring
-        :returns: Text of the xml node
-        :Example:
-            >>>    P = Passage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
-            >>>    P.text == "Ibis hello b ab excusso missus in astra sago. "
-            >>>    P.text(exclude=["note"]) == "Ibis ab excusso missus in astra sago. "
-
-
-        """
-
-        if exclude is None:
-            exclude = ""
-        else:
-            exclude = "[{0}]".format(
-                " and ".join(
-                    "not(./ancestor-or-self::{0})".format(excluded)
-                    for excluded in exclude
-                )
-            )
-
-        return normalize(
-            " ".join(
-                [
-                    element
-                    for element
-                    in self.xpath(
-                        ".//descendant-or-self::text()" + exclude,
-                        namespaces=NS
-                    )
-                ]
-            )
-        )
-
-    def __raiseDepth(self):
+    def __raiseDepth__(self):
         """ Simple check that raises an exception if the passage cannot run first, last, next or prev
 
         See object notes
 
         :raise: InvalidSiblingRequest
         """
-        if self.depth != self.depth_2:
+        if self.__depth__ != self.__depth_2__:
             raise InvalidSiblingRequest()
 
-    def __getSiblings(self, direction=1):
+    @property
+    def siblingsId(self):
+        """ Siblings Identifiers of the passage
+
+        :rtype: (str, str)
         """
+        self.__raiseDepth__()
 
-        :return: Reference
-        """
-        self.__raiseDepth()
+        if not self.__text__:
+            raise MissingAttribute("Passage was iniated without Text object")
+        if self.__prevnext__:
+            return self.__prevnext__
 
-        if self.__prevnext:
-            return self.__prevnext[direction]
-
-        document_references = list(map(lambda x: str(x), self.parent.getValidReff(level=self.depth)))
-        range_length = len(self.resource.getValidReff(level=self.depth))
+        document_references = list(map(lambda x: str(x), self.__text__.getValidReff(level=self.depth)))
+        range_length = len(self.getValidReff(level=self.depth))
 
         if self.reference.end:
             start, end = str(self.reference.start), str(self.reference.end)
@@ -785,6 +423,5 @@ class ContextPassage(Passage):
                     "{}-{}".format(document_references[end + 1], document_references[end + range_length])
                 )
 
-        self.__prevnext = (_prev, _next)
-        return self.__prevnext[direction]
-
+        self.__prevnext__ = (_prev, _next)
+        return self.__prevnext__

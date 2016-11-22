@@ -8,7 +8,7 @@ import warnings
 from lxml import etree
 from copy import copy
 import MyCapytain.resources.texts.local
-import MyCapytain.resources.texts.tei
+import MyCapytain.resources.texts.encodings
 import MyCapytain.common.reference
 import MyCapytain.common.utils
 import MyCapytain.errors
@@ -597,21 +597,21 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("1.pr.2-1.2")
         )
         with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
-            a = DifferentRangePassage.next
+            a = DifferentRangePassage.nextId
 
         with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
-            a = DifferentRangePassage.prev
+            a = DifferentRangePassage.prevId
 
     def test_prevnext_on_first_passage(self):
         DifferentRangePassage = self.text.getPassage(
             MyCapytain.common.reference.Reference("1.pr.1-1.2.1")
         )
         self.assertEqual(
-            str(DifferentRangePassage.next), "1.2.2-1.5.2",
+            str(DifferentRangePassage.nextId), "1.2.2-1.5.2",
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            DifferentRangePassage.prev, None,
+            DifferentRangePassage.prevId, None,
             "Prev reff should be none if we are on the first passage of the text"
         )
 
@@ -620,11 +620,11 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("1.pr.10-1.2.1")
         )
         self.assertEqual(
-            str(DifferentRangePassage.next), "1.2.2-1.4.1",
+            str(DifferentRangePassage.nextId), "1.2.2-1.4.1",
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            str(DifferentRangePassage.prev), "1.pr.1-1.pr.9",
+            str(DifferentRangePassage.prevId), "1.pr.1-1.pr.9",
             "Prev reff should start at the beginning of the text, no matter the length of the reference"
         )
 
@@ -633,11 +633,11 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("2.39.2-2.40.8")
         )
         self.assertEqual(
-            DifferentRangePassage.next, None,
+            DifferentRangePassage.nextId, None,
             "Next reff should be none if we are on the last passage of the text"
         )
         self.assertEqual(
-            str(DifferentRangePassage.prev), "2.37.6-2.39.1",
+            str(DifferentRangePassage.prevId), "2.37.6-2.39.1",
             "Prev reff should be the same length as sibling"
         )
 
@@ -646,11 +646,11 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("2.39.2-2.40.5")
         )
         self.assertEqual(
-            str(DifferentRangePassage.next), "2.40.6-2.40.8",
+            str(DifferentRangePassage.nextId), "2.40.6-2.40.8",
             "Next reff should finish at the end of the text, no matter the length of the reference"
         )
         self.assertEqual(
-            str(DifferentRangePassage.prev), "2.37.9-2.39.1",
+            str(DifferentRangePassage.prevId), "2.37.9-2.39.1",
             "Prev reff should be the same length as sibling"
         )
 
@@ -659,22 +659,22 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("1.pr.5-1.pr.6")
         )
         self.assertEqual(
-            str(DifferentRangePassage.next), "1.pr.7-1.pr.8",
+            str(DifferentRangePassage.nextId), "1.pr.7-1.pr.8",
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            str(DifferentRangePassage.prev), "1.pr.3-1.pr.4",
+            str(DifferentRangePassage.prevId), "1.pr.3-1.pr.4",
             "Prev reff should be the same length as sibling"
         )
         DifferentRangePassage = self.text.getPassage(
             MyCapytain.common.reference.Reference("1.pr.5")
         )
         self.assertEqual(
-            str(DifferentRangePassage.next), "1.pr.6",
+            str(DifferentRangePassage.nextId), "1.pr.6",
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            str(DifferentRangePassage.prev), "1.pr.4",
+            str(DifferentRangePassage.prevId), "1.pr.4",
             "Prev reff should be the same length as sibling"
         )
 
@@ -682,11 +682,11 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("1.pr")
         )
         self.assertEqual(
-            str(DifferentRangePassage.next), "1.1",
+            str(DifferentRangePassage.nextId), "1.1",
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            DifferentRangePassage.prev, None,
+            DifferentRangePassage.prevId, None,
             "Prev reff should be None when at the start"
         )
         
@@ -694,24 +694,25 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("2.40")
         )
         self.assertEqual(
-            str(DifferentRangePassage.prev), "2.39",
+            str(DifferentRangePassage.prevId), "2.39",
             "Prev reff should be the same length as sibling"
         )
         self.assertEqual(
-            DifferentRangePassage.next, None,
+            DifferentRangePassage.nextId, None,
             "Next reff should be None when at the start"
         )
 
     def test_first_list(self):
+        """ Check that Passage can give information about first and end"""
         DifferentRangePassage = self.text.getPassage(
             MyCapytain.common.reference.Reference("2.39")
         )
         self.assertEqual(
-            str(DifferentRangePassage.first), "2.39.1",
+            str(DifferentRangePassage.firstId), "2.39.1",
             "First reff should be the first"
         )
         self.assertEqual(
-            str(DifferentRangePassage.last), "2.39.2",
+            str(DifferentRangePassage.lastId), "2.39.2",
             "Last reff should be the last"
         )
 
@@ -719,10 +720,10 @@ class TestPassageRange(unittest.TestCase):
             MyCapytain.common.reference.Reference("2.39-2.40")
         )
         self.assertEqual(
-            str(DifferentRangePassage.first), "2.39.1",
+            str(DifferentRangePassage.firstId), "2.39.1",
             "First reff should be the first"
         )
         self.assertEqual(
-            str(DifferentRangePassage.last), "2.40.8",
+            str(DifferentRangePassage.lastId), "2.40.8",
             "Last reff should be the last"
         )

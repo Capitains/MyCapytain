@@ -5,7 +5,7 @@ import unittest
 from six import text_type as str
 
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.resources.texts.tei import *
+from MyCapytain.resources.texts.encodings import *
 from MyCapytain.common.reference import Reference, Citation
 
 
@@ -106,18 +106,18 @@ class TestTEICitation(unittest.TestCase):
 class TestTEIPassage(unittest.TestCase):
     def test_text(self):
         """ Test text attribute """
-        P = Passage(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
+        P = TEIResource(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
         # Without exclusion0
-        self.assertEqual(P.text(), "Ibis hello b ab excusso missus in astra sago. ")
+        self.assertEqual(P.export(output=Mimetypes.PLAINTEXT), "Ibis hello b ab excusso missus in astra sago. ")
         # With Exclusion
-        self.assertEqual(P.text(exclude=["note"]), "Ibis ab excusso missus in astra sago. ")
+        self.assertEqual(P.export(output=Mimetypes.PLAINTEXT, exclude=["note"]), "Ibis ab excusso missus in astra sago. ")
 
     def test_str(self):
         """ Test STR conversion of xml """
-        P = Passage(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
+        P = TEIResource(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
         self.assertEqual(str(P), '<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
 
     def test_xml(self):
         X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
-        P = Passage(resource=X)
+        P = TEIResource(resource=X)
         self.assertIs(X, P.xml)

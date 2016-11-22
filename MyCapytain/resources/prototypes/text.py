@@ -194,6 +194,18 @@ class InteractiveTextualNode(TextualNode):
         """
         return self.getPassage(self.parentId)
 
+    def getReffs(self, level=1, reference=None):
+        """ Reference available at a given level
+
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
+        :type passage: Reference
+        :rtype: List.basestring
+        :returns: List of levels
+        """
+        raise NotImplementedError()
+
 
 class CTSNode(TextualNode):
     """ Initiate a Resource object
@@ -249,7 +261,7 @@ class CTSNode(TextualNode):
 
 
 class Passage(CTSNode):
-    """ Initiate a Resource object
+    """ Passage objects possess metadata informations
 
     :param urn: A URN identifier
     :type urn: URN
@@ -280,8 +292,8 @@ class Passage(CTSNode):
         :rtype: Node
         :returns: First passage node Information
         """
-        if len(self.graph.children):
-            return self.graph.children[0]
+        if len(self.children):
+            return self.children[0]
         else:
             raise NotImplementedError
 
@@ -292,8 +304,8 @@ class Passage(CTSNode):
         :rtype: Node
         :returns: Last passage Node representation
         """
-        if len(self.graph.children):
-            return self.graph.children[-1]
+        if len(self.children):
+            return self.children[-1]
         else:
             raise NotImplementedError
 
@@ -319,7 +331,8 @@ class Passage(CTSNode):
 
 
 class Text(Passage):
-    """ A CTS Text """
+    """ A CTS Text
+    """
     def __init__(self, citation=None, metadata=None, **kwargs):
         super(Text, self).__init__(**kwargs)
 
@@ -338,7 +351,7 @@ class Text(Passage):
     def reffs(self):
         """ Get all valid reffs for every part of the Text
 
-        :rtype: MyCapytain.resources.texts.tei.Citation
+        :rtype: [str]
         """
         if not self.__reffs__:
             self.__reffs__ = [reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]

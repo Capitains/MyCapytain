@@ -8,14 +8,22 @@ Shared elements for TEI Citation
 """
 
 import MyCapytain.common.reference
-from MyCapytain.common.utils import NS, Mimetypes, normalize
+from MyCapytain.common.utils import NS, Mimetypes, normalize, xmlparser, \
+    nested_set, nested_ordered_dictionary
 import MyCapytain.resources.prototypes.text
 
 from lxml.etree import tostring
 from six import text_type as str
 
 
-class Passage(MyCapytain.resources.prototypes.text.Passage):
+class TEIResource(MyCapytain.resources.prototypes.text.InteractiveTextualNode):
+    """ TEI Resource
+
+    """
+    def __init__(self, resource, **kwargs):
+        super(TEIResource, self).__init__(**kwargs)
+        self.resource = xmlparser(resource)
+
     def __str__(self):
         """ Text based representation of the passage
     
@@ -30,7 +38,7 @@ class Passage(MyCapytain.resources.prototypes.text.Passage):
         :param output: Mimetype (From MyCapytian.common.utils.Mimetypes) to output
         :type output: str
         :param exclude: Remove some nodes from text
-        :type exclude: List
+        :type exclude: list
         :rtype: basestring
         :returns: Text of the xml node
 
@@ -41,28 +49,43 @@ class Passage(MyCapytain.resources.prototypes.text.Passage):
 
 
         """
+        if exclude is None or len(self.default_exclude):
+            exclude = self.default_exclude
+
+        if len(exclude) > 0:
+            exclude = "[{0}]".format(
+                " and ".join(
+                    "not(./ancestor-or-self::{0})".format(excluded)
+                    for excluded in exclude
+                )
+            )
+        else:
+            exclude = ""
+
         if output == Mimetypes.ETREE:
             return self.resource
+
         elif output == Mimetypes.XML:
             return tostring(self.resource, encoding=str)
-        elif output == Mimetypes.PLAINTEXT:
-            if exclude is None:
-                exclude = self.default_exclude
-            else:
-                exclude = "[{0}]".format(
-                    " and ".join(
-                        "not(./ancestor-or-self::{0})".format(excluded)
-                        for excluded in exclude
-                    )
-                )
 
-            return MyCapytain.common.utils.normalize(
+        elif output == Mimetypes.NestedDict:
+            """ Exports the whole resource into a NestedDict
+            """
+            reffs = self.getValidReff(level=len(self.citation))
+            text = nested_ordered_dictionary()
+            for reff in reffs:
+                _r = reff.split(".")
+                nested_set(text, _r, self.getPassage(_r).export(Mimetypes.PLAINTEXT))
+            return text
+
+        elif output == Mimetypes.PLAINTEXT:
+            return normalize(
                 " ".join(
                     [
                         element
                         for element
                         in self.resource.xpath(
-                        ".//descendant-or-self::text()" + exclude,
+                        ".//descendant-or-self::text(){}".format(exclude),
                         namespaces=NS,
                         smart_strings=False
                     )

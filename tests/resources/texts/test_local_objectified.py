@@ -8,7 +8,7 @@ import warnings
 from lxml import etree
 from copy import copy
 import MyCapytain.resources.texts.local
-import MyCapytain.resources.texts.tei
+import MyCapytain.resources.texts.encodings
 import MyCapytain.common.reference
 import MyCapytain.common.utils
 import MyCapytain.errors
@@ -510,7 +510,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
     def test_next(self):
         """ Test next property """
         # Normal passage checking
-        self.TEI.parse()
+        # self.TEI.parse()
         p = self.TEI.getPassage(["1", "pr", "1"], hypercontext=False)
         self.assertEqual(str(p.next.reference), "1.pr.2")
 
@@ -534,7 +534,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
         """ Test children property """
         # Normal children checking
         with open("tests/testing_data/texts/sample.xml", "rb") as text:
-            self.TEI = MyCapytain.resources.texts.local.Text(resource=text, autoreffs=True)
+            self.TEI = MyCapytain.resources.texts.local.Text(resource=text)#, autoreffs=True)
             p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
             self.assertEqual(str(p.children["1.pr.1"].reference), "1.pr.1")
 
@@ -544,7 +544,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
     def test_first(self):
         """ Test first property """
         # Test when there is one
-        self.TEI.parse()
+        # self.TEI.parse()
         p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
         self.assertEqual(str(p.first.reference), "1.pr.1")
         # #And failing when no first
@@ -553,7 +553,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
 
     def test_last(self):
         """ Test last property """
-        self.TEI.parse()
+        # self.TEI.parse()
         # Test when there is one
         p = self.TEI.getPassage(["1", "pr"], hypercontext=False)
         self.assertEqual(str(p.last.reference), "1.pr.22")
@@ -563,7 +563,7 @@ class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMi
 
     def test_prev(self):
         """ Test prev property """
-        self.TEI.parse()
+        # self.TEI.parse()
         # Normal passage checking
         p = self.TEI.getPassage(["2", "40", "8"], hypercontext=False)
         self.assertEqual(str(p.prev.reference), "2.40.7")

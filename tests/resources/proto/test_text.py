@@ -77,7 +77,6 @@ class TestProtoText(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             a.getValidReff(level=1, reference=["1"])
 
-
     def test_proto_passage(self):
         """ Test that getPassage function are not implemented but are consistent"""
         a = Text()
@@ -88,7 +87,6 @@ class TestProtoText(unittest.TestCase):
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError): 
             a.getPassage(reference=None)
-
 
     def test_get_label(self):
         """ Test that getLabel function are not implemented but are consistent"""

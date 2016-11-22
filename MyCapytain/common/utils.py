@@ -16,7 +16,7 @@ from io import IOBase, StringIO
 from past.builtins import basestring
 import re
 from copy import copy
-from lxml.objectify import ObjectifiedElement
+from lxml.objectify import ObjectifiedElement, parse
 
 
 __strip = re.compile("([ ]{2,})+")
@@ -107,7 +107,7 @@ RDF_MAPPING = {
 }
 
 
-def xmlparser(xml):
+def xmlparser(xml, objectify=True):
     """ Parse xml 
 
     :param xml: XML element
@@ -126,8 +126,12 @@ def xmlparser(xml):
         xml = StringIO(xml)
         doclose = True
     else:
-        raise TypeError("Unsupported type of resource")
-    parsed = etree.parse(xml).getroot()
+
+        raise TypeError("Unsupported type of resource {}".format(type(xml)))
+    if objectify:
+        parsed = etree.parse(xml).getroot()
+    else:
+        parsed = parse(xml, parser=__parser__)
     if doclose:
         xml.close()
     return parsed
@@ -384,3 +388,4 @@ class Mimetypes:
     ETREE = "python/lxml"
     MyCapytainText = "MyCapytain/Text"
     PLAINTEXT = "text/plain"
+    NestedDict = "python/NestedDict"

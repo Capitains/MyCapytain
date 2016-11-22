@@ -8,7 +8,7 @@ import MyCapytain.common.metadata
 import MyCapytain.common.utils
 import MyCapytain.resources.collections.cts
 import MyCapytain.resources.prototypes.text
-import MyCapytain.resources.texts.tei
+import MyCapytain.resources.texts.encodings
 import MyCapytain.retrievers.prototypes
 from MyCapytain.common.reference import URN, Reference, NodeId
 
@@ -227,7 +227,7 @@ class Text(MyCapytain.resources.prototypes.text.Text):
             ]
 
 
-class Passage(MyCapytain.resources.texts.tei.Passage):
+class Passage(MyCapytain.resources.texts.encodings.TEIResource):
 
     def __init__(self, urn, resource, *args, **kwargs):
         super(Passage, self).__init__(resource=resource, *args, **kwargs)

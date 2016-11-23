@@ -111,6 +111,7 @@ class TextualNode(TextualElement, NodeId):
         super(TextualNode, self).__init__(identifier=identifier, **kwargs)
         self.__citation__ = citation or Citation()
         self.__text__ = ""
+        self.__childIds__ = []
 
     @property
     def citation(self):
@@ -167,7 +168,8 @@ class InteractiveTextualNode(TextualNode):
 
         :rtype: Passage
         """
-        return self.getPassage(self.prevId)
+        if self.prevId is not None:
+            return self.getPassage(self.prevId)
 
     @property
     def next(self):
@@ -175,7 +177,8 @@ class InteractiveTextualNode(TextualNode):
 
         :rtype: Passage
         """
-        return self.getPassage(self.nextId)
+        if self.nextId is not None:
+            return self.getPassage(self.nextId)
 
     @property
     def children(self):
@@ -193,6 +196,58 @@ class InteractiveTextualNode(TextualNode):
         :rtype: Passage
         """
         return self.getPassage(self.parentId)
+
+    @property
+    def first(self):
+        """ First Passage
+
+        :rtype: Passage
+        """
+        if self.firstId is not None:
+            return self.getPassage(self.firstId)
+
+    @property
+    def last(self):
+        """ Last Passage
+
+        :rtype: Passage
+        """
+        if self.lastId is not None:
+            return self.getPassage(self.lastId)
+
+    @property
+    def childIds(self):
+        if self.__childIds__ is None:
+            self.__childIds__ = self.getReffs()
+        return self.__childIds__
+
+    @property
+    def firstId(self):
+        """ First child of current Passage
+
+        :rtype: Node
+        :returns: First passage node Information
+        """
+        if self.childIds is not None:
+            if len(self.childIds) > 0:
+                return self.childIds[0]
+            return None
+        else:
+            raise NotImplementedError
+
+    @property
+    def lastId(self):
+        """ Last child of current Passage
+
+        :rtype: Node
+        :returns: Last passage Node representation
+        """
+        if self.childIds is not None:
+            if len(self.childIds) > 0:
+                return self.childIds[-1]
+            return None
+        else:
+            raise NotImplementedError
 
     def getReffs(self, level=1, reference=None):
         """ Reference available at a given level
@@ -284,30 +339,6 @@ class Passage(CTSNode):
 
     def __init__(self, **kwargs):
         super(Passage, self).__init__(**kwargs)
-
-    @property
-    def firstId(self):
-        """ First child of current Passage 
-        
-        :rtype: Node
-        :returns: First passage node Information
-        """
-        if len(self.children):
-            return self.children[0]
-        else:
-            raise NotImplementedError
-
-    @property
-    def lastId(self):
-        """ Last child of current Passage 
-        
-        :rtype: Node
-        :returns: Last passage Node representation
-        """
-        if len(self.children):
-            return self.children[-1]
-        else:
-            raise NotImplementedError
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, Text will compute valid reffs

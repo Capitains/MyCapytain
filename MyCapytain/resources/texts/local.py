@@ -41,9 +41,6 @@ def __makePassageKwargs__(urn, reference):
 
 
 class __SharedMethods__:
-    class SimplePassage(encodings.TEIResource, text.Passage):
-        def __init__(self, resource, reference, citation, urn=None):
-            super(__SharedMethods__.SimplePassage, self).__init__(resource=resource, **__makePassageKwargs__(urn, reference))
 
     def getPassage(self, reference=None, simple=False):
         """ Finds a passage in the current text
@@ -121,12 +118,41 @@ t
 
         if len(resource) != 1:
             raise InvalidURN
-        return self.SimplePassage(
+
+        return __SimplePassage__(
             resource[0],
-            reference=None,
+            reference=reference,
             urn=self.urn,
-            citation=self.citation
+            citation=self.citation,
+            text=self.textObject
         )
+
+    @property
+    def textObject(self):
+        text = None
+        if isinstance(self, Text):
+            text = self
+        elif hasattr(self, "__text__") and self.__text__ is not None:
+            text = self.__text__
+        return text
+
+    def getReffs(self, level=1, reference=None):
+        """ Reference available at a given level
+
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
+        :type passage: Reference
+        :rtype: List.basestring
+        :returns: List of levels
+        """
+        if hasattr(self, "__depth__"):
+            level = level + self.depth
+        if not reference:
+            if hasattr(self, "reference"):
+                reference = self.reference
+
+        return self.getValidReff(level, reference)
 
     def getValidReff(self, level=None, reference=None, _debug=False):
         """ Retrieve valid passages directly
@@ -145,7 +171,7 @@ t
 
         """
         depth = 0
-        xml = self.xml
+        xml = self.textObject.xml
         if reference:
             if isinstance(reference, Reference):
                 if reference.end is None:
@@ -236,6 +262,130 @@ t
         return etree.tostring(self.resource, *args, **kwargs)
 
 
+class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
+    def __init__(self, resource, reference, citation, urn=None, text=None):
+        """ Passage for simple and quick parsing of texts
+
+        :param resource: Element representing the passage
+        :type resource: etree._Element
+        :param reference: Passage reference
+        :type reference: Reference
+        :param urn: URN of the source text or of the passage
+        :type urn: URN
+        :param citation: Citation scheme of the text
+        :type citation: Citation
+        :param text: Text containing the passage
+        :type text: Text
+        """
+        super(__SimplePassage__, self).__init__(
+            resource=resource,
+            citation=citation,
+            **__makePassageKwargs__(urn, reference)
+        )
+        self.__text__ = text
+        self.reference = reference
+        self.__children__ = None
+        self.__depth__ = len(reference)
+        self.__prevnext__ = None
+
+    @property
+    def childIds(self):
+        """ Children of the passage
+
+        :rtype: None, Reference
+        :returns: Dictionary of chidren, where key are subreferences
+        """
+        if self.depth >= len(self.citation):
+            return []
+        elif self.__children__ is not None:
+            return self.__children__
+        else:
+            self.__children__ = self.getReffs()
+            return self.__children__
+
+    def getReffs(self, level=1, reference=None):
+        """ Reference available at a given level
+
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
+        :type passage: Reference
+        :rtype: List.basestring
+        :returns: List of levels
+        """
+        level = self.depth + level
+        if not reference:
+            reference = self.reference
+        return __SharedMethods__.getValidReff(self, level, reference=reference)
+
+    def getPassage(self, reference=None, simple=True):
+        """ Special GetPassage implementation for SimplePassage (Simple is True by default)
+
+        :param reference:
+        :param simple:
+        :return:
+        """
+        if not isinstance(reference, Reference):
+            reference = Reference(reference)
+        return __SharedMethods__.getPassage(self, reference, simple)
+
+    @property
+    def nextId(self):
+        """ Next passage
+
+        :returns: Next passage at same level
+        :rtype: None, Reference
+        """
+        return self.siblingsId[1]
+
+    @property
+    def prevId(self):
+        """ Get the Previous passage reference
+
+        :returns: Previous passage reference at the same level
+        :rtype: None, Reference
+        """
+        return self.siblingsId[0]
+
+    @property
+    def siblingsId(self):
+        """ Siblings Identifiers of the passage
+
+        :rtype: (str, str)
+        """
+
+        if not self.__text__:
+            raise MissingAttribute("Passage was iniated without Text object")
+        if self.__prevnext__ is not None:
+            return self.__prevnext__
+
+        document_references = list(map(lambda x: str(x), self.__text__.getReffs(level=self.depth)))
+        range_length = len(self.getReffs())
+
+        start = str(self.reference.start)
+
+        start = document_references.index(start)
+
+        if start == 0:
+            # If the passage is already at the beginning
+            _prev = None
+        elif start - range_length < 0:
+            _prev = Reference(document_references[0])
+        else:
+            _prev = Reference(document_references[start-1])
+
+        if start + 1 == len(document_references):
+            # If the passage is already at the end
+            _next = None
+        elif start + range_length > len(document_references):
+            _next = Reference(document_references[-1])
+        else:
+            _next = Reference(document_references[start +1])
+
+        self.__prevnext__ = (_prev, _next)
+        return self.__prevnext__
+
+
 class Text(__SharedMethods__, encodings.TEIResource, text.Text):
     """ Implementation of CTS tools for local files
 
@@ -299,16 +449,16 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
                 </text>
             </TEI>
 
-        :param urn: URN of the source text or of the passage
-        :type urn: URN
-        :param resource: Element representing the passage
-        :type resource: etree._Element, Text
-        :param text: Text containing the passage
-        :type text: Text
-        :param citation: Citation scheme of the text
-        :type citation: Citation
         :param reference: Passage reference
         :type reference: Reference
+        :param urn: URN of the source text or of the passage
+        :type urn: URN
+        :param citation: Citation scheme of the text
+        :type citation: Citation
+        :param resource: Element representing the passage
+        :type resource: etree._Element
+        :param text: Text containing the passage
+        :type text: Text
 
         .. note::
             .prev, .next, .first and .last won't run on passage with a range made of two different level, such as
@@ -340,7 +490,7 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
         return self.__reference__
 
     @property
-    def children(self):
+    def childIds(self):
         """ Children of the passage
 
         :rtype: None, Reference
@@ -352,16 +502,8 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
         elif self.__children__ is not None:
             return self.__children__
         else:
-            self.__children__ = self.getValidReff(level=self.depth+1)
+            self.__children__ = self.getReffs()
             return self.__children__
-
-    @property
-    def firstId(self):
-        return self.children[0]
-
-    @property
-    def lastId(self):
-        return self.children[-1]
 
     @property
     def nextId(self):
@@ -400,12 +542,12 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
         self.__raiseDepth__()
 
         if not self.__text__:
-            raise MissingAttribute("Passage was iniated without Text object")
+            raise MissingAttribute("Passage was initiated without Text object")
         if self.__prevnext__:
             return self.__prevnext__
 
-        document_references = list(map(lambda x: str(x), self.__text__.getValidReff(level=self.depth)))
-        range_length = len(self.getValidReff(level=self.depth))
+        document_references = list(map(lambda x: str(x), self.__text__.getReffs(level=self.depth)))
+        range_length = len(self.getReffs())
 
         if self.reference.end:
             start, end = str(self.reference.start), str(self.reference.end)
@@ -414,8 +556,6 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
 
         start = document_references.index(start)
         end = document_references.index(end)
-
-        _prev, _next = None, None
 
         if start == 0:
             # If the passage is already at the beginning
@@ -455,3 +595,20 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
 
         self.__prevnext__ = (_prev, _next)
         return self.__prevnext__
+
+    @property
+    def next(self):
+        if self.nextId is not None:
+            return __SharedMethods__.getPassage(self.__text__, self.nextId)
+
+    @property
+    def prev(self):
+        if self.prevId is not None:
+            return __SharedMethods__.getPassage(self.__text__, self.prevId)
+
+    def getPassage(self, reference, simple=False):
+        if not isinstance(reference, Reference):
+            reference = Reference(reference)
+        X = __SharedMethods__.getPassage(self, reference, simple)
+        X.__text__ = self.__text__
+        return X

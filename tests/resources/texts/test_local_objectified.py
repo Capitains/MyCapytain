@@ -4,24 +4,21 @@ import unittest
 from six import text_type as str
 from io import open
 import xmlunittest
-import warnings
 from lxml import etree
-from copy import copy
 import MyCapytain.resources.texts.local
 import MyCapytain.resources.texts.encodings
 import MyCapytain.common.reference
-from MyCapytain.common.utils import Mimetypes
 import MyCapytain.errors
 from lxml import objectify
-from tests.resources.texts.test_local import TestLocalXMLTextImplementation as TextTests
+from tests.resources.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests
+
+
 P = objectify.makeparser()
-
-
 def objectifiedParser(file):
     return objectify.parse(file, parser=P)
 
 
-class TestLocalXMLTextImplementation(TextTests, unittest.TestCase, xmlunittest.XmlTestMixin):
+class TestLocalXMLTextImplementation(CapitainsXmlTextTest, unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test XML Implementation of resources found in local file """
 
     def setUp(self):
@@ -47,131 +44,38 @@ class TestLocalXMLTextImplementation(TextTests, unittest.TestCase, xmlunittest.X
         self.text.close()
 
 
-class TestLocalXMLPassageImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
+class TestLocalXMLPassageImplementation(CapitainsXmlPassageTests, unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test passage implementation """
+
+    simple = False
 
     def setUp(self):
         self.URN = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
-        self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
+        self.TEI = MyCapytain.resources.texts.local.Text(resource=objectifiedParser(self.text))
+
+        assert self.simple is False, "Simple should be True"
 
     def tearDown(self):
         self.text.close()
 
-    def test_urn(self):
-        """ Test URN and ids getters/setters """
 
-        a = MyCapytain.resources.texts.local.Passage()
+class TestLocalXMLSimplePassageImplementation(CapitainsXmlPassageTests, unittest.TestCase, xmlunittest.XmlTestMixin):
+    """ Test passage implementation """
 
-        # ~Test simple set up
-        a.urn = self.URN
-        self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        # Test update on ID update
-        a.reference = "1.pr.1"
-        self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
-        # Should keep the ID if URN changes
-        a.urn = self.URN_2
-        self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat3:1.pr.1")
-        # Test init
-        a = MyCapytain.resources.texts.local.Passage(urn=self.URN)
-        self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        # Test init with id and URN
-        a = MyCapytain.resources.texts.local.Passage(urn=self.URN, reference=["1", "pr", "1"])
-        self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
-        # Should raise error if not URN for consistency
-        with self.assertRaises(TypeError):
-            a.urn = 1
-        # Should work with plain text
-        a = MyCapytain.resources.texts.local.Passage()
-        a.urn = "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1"
-        self.assertEqual(str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
-        self.assertEqual(str(a.reference), "1.pr.1")
-        # This should affect id !
-        # Test Id value on init
-        a = MyCapytain.resources.texts.local.Passage(reference=["1", "pr", "1"])
-        self.assertEqual(str(a.reference), "1.pr.1")
+    simple = True
 
-    def test_next(self):
-        """ Test next property """
-        # Normal passage checking
-        # self.TEI.parse()
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=True)
-        self.assertEqual(str(p.next.reference), "1.pr.2")
+    def setUp(self):
+        self.URN = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
+        self.text = open("tests/testing_data/texts/sample.xml", "rb")
+        self.TEI = MyCapytain.resources.texts.local.Text(resource=objectifiedParser(self.text))
 
-        # End of lowest level passage checking but not end of parent level
-        p = self.TEI.getPassage(["1", "pr", "22"], simple=True)
-        self.assertEqual(str(p.next.reference), "1.1.1")
+        assert self.simple is True, "Simple should be True"
 
-        # End of lowest level passage and end of parent level
-        p = self.TEI.getPassage(["1", "39", "8"], simple=True)
-        self.assertEqual(str(p.next.reference), "2.pr.sa")
-
-        # Last line should always be None
-        p = self.TEI.getPassage(["2", "40", "8"], simple=True)
-        self.assertIsNone(p.next)
-        p = self.TEI.getPassage(["2", "40"], simple=True)
-        self.assertIsNone(p.next)
-        p = self.TEI.getPassage(["2"], simple=True)
-        self.assertIsNone(p.next)
-
-    def test_children(self):
-        """ Test children property """
-        # Normal children checking
-        with open("tests/testing_data/texts/sample.xml", "rb") as text:
-            self.TEI = MyCapytain.resources.texts.local.Text(resource=text)#, autoreffs=True)
-            p = self.TEI.getPassage(["1", "pr"], simple=True)
-            self.assertEqual(str(p.children["1.pr.1"].reference), "1.pr.1")
-
-            p = self.TEI.getPassage(["1", "pr", "1"], simple=True)
-            self.assertEqual(len(p.children), 0)
-
-    def test_first(self):
-        """ Test first property """
-        # Test when there is one
-        # self.TEI.parse()
-        p = self.TEI.getPassage(["1", "pr"], simple=True)
-        self.assertEqual(str(p.first.reference), "1.pr.1")
-        # #And failing when no first
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=True)
-        self.assertEqual(p.first, None)
-
-    def test_last(self):
-        """ Test last property """
-        # self.TEI.parse()
-        # Test when there is one
-        p = self.TEI.getPassage(["1", "pr"], simple=True)
-        self.assertEqual(str(p.last.reference), "1.pr.22")
-        # #And failing when no last
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=True)
-        self.assertEqual(p.last, None)
-
-    def test_prev(self):
-        """ Test prev property """
-        # self.TEI.parse()
-        # Normal passage checking
-        p = self.TEI.getPassage(["2", "40", "8"], simple=True)
-        self.assertEqual(str(p.prev.reference), "2.40.7")
-        p = self.TEI.getPassage(["2", "40"], simple=True)
-        self.assertEqual(str(p.prev.reference), "2.39")
-        p = self.TEI.getPassage(["2"], simple=True)
-        self.assertEqual(str(p.prev.reference), "1")
-
-        # test failing passage
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=True)
-        self.assertEqual(p.prev, None)
-        p = self.TEI.getPassage(["1", "pr"], simple=True)
-        self.assertEqual(p.prev, None)
-        p = self.TEI.getPassage(["1"], simple=True)
-        self.assertEqual(p.prev, None)
-
-        # First child should get to parent's prev last child
-        p = self.TEI.getPassage(["1", "1", "1"], simple=True)
-        self.assertEqual(str(p.prev.reference), "1.pr.22")
-
-        # Beginning of lowest level passage and beginning of parent level
-        p = self.TEI.getPassage(["2", "pr", "sa"], simple=True)
-        self.assertEqual(str(p.prev.reference), "1.39.8")
+    def tearDown(self):
+        self.text.close()
 
 
 class TestPassageRange(unittest.TestCase):

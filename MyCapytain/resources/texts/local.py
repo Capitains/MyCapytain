@@ -547,7 +547,7 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
             return self.__prevnext__
 
         document_references = list(map(lambda x: str(x), self.__text__.getReffs(level=self.depth)))
-        range_length = len(self.getReffs())
+        range_length = len(self.getReffs(level=0))
 
         if self.reference.end:
             start, end = str(self.reference.start), str(self.reference.end)
@@ -583,14 +583,14 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
                 _next = Reference(document_references[-1])
             else:
                 _next = Reference(
-                    "{}-{}".format(document_references[end +1], document_references[-1])
+                    "{}-{}".format(document_references[end+1], document_references[-1])
                 )
         else:
             if start == end:
-                _next = Reference(document_references[end +1])
+                _next = Reference(document_references[end+1])
             else:
                 _next = Reference(
-                    "{}-{}".format(document_references[end + 1], document_references[end + range_length])
+                    "{}-{}".format(document_references[end+1], document_references[end + range_length])
                 )
 
         self.__prevnext__ = (_prev, _next)

@@ -604,3 +604,158 @@ class CapitainsXmlPassageTests(TestCase):
         # Beginning of lowest level passage and beginning of parent level
         p = self.TEI.getPassage(["2", "pr", "sa"], simple=self.simple)
         self.assertEqual(str(p.prev.reference), "1.39.8")
+
+
+class CapitainsXMLRangePassageTests(TestCase):
+    text = None
+    passage = None
+    
+    def __init__(self, *args, **kwargs):
+        """ Small helper to prevent run while inheriting from TestCase """
+        super(CapitainsXMLRangePassageTests, self).__init__(*args, **kwargs)
+        self.helper = None
+        # Kludge alert: We want this class to carry test cases without being run
+        # by the unit test framework, so the `run' method is overridden to do
+        # nothing.  But in order for sub-classes to be able to do something when
+        # run is invoked, the constructor will rebind `run' from TestCase.
+        if self.__class__ != CapitainsXmlPassageTests:
+            # Rebind `run' from the parent class.
+            self.run = TestCase.run.__get__(self, self.__class__)
+        else:
+            self.run = lambda self, *args, **kwargs: None
+
+    def test_errors(self):
+        """ Ensure that some results throws errors according to some standards """
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("1.pr.2-1.2")
+        )
+        with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
+            a = passage.next
+
+        with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
+            a = passage.prev
+
+    def test_prevnext_on_first_passage(self):
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("1.pr.1-1.2.1")
+        )
+        self.assertEqual(
+            str(passage.nextId), "1.2.2-1.5.2",
+            "Next reff should be the same length as sibling"
+        )
+        self.assertEqual(
+            passage.prevId, None,
+            "Prev reff should be none if we are on the first passage of the text"
+        )
+
+    def test_prevnext_on_close_to_first_passage(self):
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("1.pr.10-1.2.1")
+        )
+        self.assertEqual(
+            str(passage.nextId), "1.2.2-1.4.1",
+            "Next reff should be the same length as sibling"
+        )
+        self.assertEqual(
+            str(passage.prevId), "1.pr.1-1.pr.9",
+            "Prev reff should start at the beginning of the text, no matter the length of the reference"
+        )
+
+    def test_prevnext_on_last_passage(self):
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("2.39.2-2.40.8")
+        )
+        self.assertEqual(
+            passage.nextId, None,
+            "Next reff should be none if we are on the last passage of the text"
+        )
+        self.assertEqual(
+            str(passage.prevId), "2.37.6-2.39.1",
+            "Prev reff should be the same length as sibling"
+        )
+
+    def test_prevnext_on_close_to_last_passage(self):
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("2.39.2-2.40.5")
+        )
+        self.assertEqual(
+            str(passage.nextId), "2.40.6-2.40.8",
+            "Next reff should finish at the end of the text, no matter the length of the reference"
+        )
+        self.assertEqual(
+            str(passage.prevId), "2.37.9-2.39.1",
+            "Prev reff should be the same length as sibling"
+        )
+
+    def test_prevnext(self):
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("1.pr.5-1.pr.6")
+        )
+        self.assertEqual(
+            str(passage.nextId), "1.pr.7-1.pr.8",
+            "Next reff should be the same length as sibling"
+        )
+        self.assertEqual(
+            str(passage.prevId), "1.pr.3-1.pr.4",
+            "Prev reff should be the same length as sibling"
+        )
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("1.pr.5")
+        )
+        self.assertEqual(
+            str(passage.nextId), "1.pr.6",
+            "Next reff should be the same length as sibling"
+        )
+        self.assertEqual(
+            str(passage.prevId), "1.pr.4",
+            "Prev reff should be the same length as sibling"
+        )
+
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("1.pr")
+        )
+        self.assertEqual(
+            str(passage.nextId), "1.1",
+            "Next reff should be the same length as sibling"
+        )
+        self.assertEqual(
+            passage.prevId, None,
+            "Prev reff should be None when at the start"
+        )
+
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("2.40")
+        )
+        self.assertEqual(
+            str(passage.prevId), "2.39",
+            "Prev reff should be the same length as sibling"
+        )
+        self.assertEqual(
+            passage.nextId, None,
+            "Next reff should be None when at the start"
+        )
+
+    def test_first_list(self):
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("2.39")
+        )
+        self.assertEqual(
+            str(passage.firstId), "2.39.1",
+            "First reff should be the first"
+        )
+        self.assertEqual(
+            str(passage.lastId), "2.39.2",
+            "Last reff should be the last"
+        )
+
+        passage = self.text.getPassage(
+            MyCapytain.common.reference.Reference("2.39-2.40")
+        )
+        self.assertEqual(
+            str(passage.firstId), "2.39.1",
+            "First reff should be the first"
+        )
+        self.assertEqual(
+            str(passage.lastId), "2.40.8",
+            "Last reff should be the last"
+        )

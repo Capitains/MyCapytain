@@ -7,16 +7,15 @@ Shared elements for TEI Citation
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 """
 
-import MyCapytain.common.reference
 from MyCapytain.common.utils import NS, Mimetypes, normalize, xmlparser, \
     nested_set, nested_ordered_dictionary
-import MyCapytain.resources.prototypes.text
+from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 
 from lxml.etree import tostring
 from six import text_type as str
 
 
-class TEIResource(MyCapytain.resources.prototypes.text.InteractiveTextualNode):
+class TEIResource(InteractiveTextualNode):
     """ TEI Resource
 
     """

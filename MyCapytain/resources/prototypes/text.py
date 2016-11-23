@@ -28,8 +28,10 @@ class TextualElement(object):
     default_exclude = []
 
     def __init__(self, identifier=None, metadata=None):
-        self.__metadata__ = None
+        self.__about__ = Collection()
         self.__identifier__ = identifier
+
+        self.about.metadata = metadata
 
     @property
     def text(self):
@@ -40,12 +42,32 @@ class TextualElement(object):
         return self.__identifier__
 
     @property
+    def about(self):
+        """ Metadata information about the text
+
+        :return: Collection object with metadata about the text
+        """
+        return self.__about__
+
+    @about.setter
+    def about(self, value):
+        """ Set the metadata collection attribute
+
+        :param value: Collection of metadata
+        :type value: Collection
+        """
+        if isinstance(value, Collection):
+            self.__about__ = value
+        else:
+            raise TypeError(".about should be an instance of Collection")
+
+    @property
     def metadata(self):
         """ Metadata information about the text
 
         :return: Collection object with metadata about the text
         """
-        return self.__metadata__
+        return self.about.metadata
 
     @metadata.setter
     def metadata(self, value):
@@ -54,10 +76,10 @@ class TextualElement(object):
         :param value: Collection of metadata
         :type value: Collection
         """
-        if isinstance(value, Collection):
-            self.__metadata__ = value
+        if isinstance(value, Metadata):
+            self.__about__.metadata = value
         else:
-            raise TypeError("Metadata should be collection based")
+            raise TypeError(".metadata should be an instance of Metadata")
 
     def default_export(self, output=Mimetypes.JSON_DTS, exclude=None):
         """ Export the textual node item in the Mimetype required
@@ -81,9 +103,9 @@ class TextualElement(object):
         :type exclude: [str]
         :return: Object using a different representation
         """
-        if exclude is None:
-            exclude = self.default_exclude
-        return self.default_export(output, exclude)
+        raise NotImplementedError(
+            "Mimetype {} has not been implemented for this resource".format(output or "(No Mimetype)")
+        )
 
 
 class TextualNode(TextualElement, NodeId):
@@ -372,9 +394,7 @@ class Text(Passage):
             self.citation = citation
 
         if metadata is not None:
-            self.__metadata__ = metadata
-        else:
-            self.__metadata__ = Metadata()
+            self.metadata = metadata
 
         self.__reffs__ = None
 

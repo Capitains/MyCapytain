@@ -5,12 +5,11 @@ import unittest
 from six import text_type as str
 from io import open
 
-from MyCapytain.common.utils import xmlparser, NS
-from MyCapytain.resources.texts.api.cts import *
-from MyCapytain.common.reference import Citation
+from MyCapytain.resources.texts.api.cts import Passage, Text
 from MyCapytain.retrievers.cts5 import CTS
-from MyCapytain.common.reference import Reference, URN
-from lxml import etree
+from MyCapytain.common.reference import Reference, Citation
+from MyCapytain.common.metadata import Metadata, Metadatum
+from MyCapytain.common.utils import xmlparser
 import mock
 
 with open("tests/testing_data/cts/getValidReff.xml") as f:
@@ -58,9 +57,10 @@ class TestAPIText(unittest.TestCase):
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2",
             self.endpoint,
             citation=self.citation,
-            metadata=MyCapytain.common.metadata.Metadata(["testing"])
+            metadata=Metadata(keys=["testing_init"])
         )
-        self.assertIsInstance(text.metadata["testing"], MyCapytain.common.metadata.Metadatum)
+        print(type(text.metadata))
+        self.assertIsInstance(text.metadata.metadata["testing_init"], Metadatum)
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getvalidreff(self, requests):
@@ -254,8 +254,8 @@ class TestAPIText(unittest.TestCase):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
         requests.return_value.text = GET_LABEL
 
-        label = text.getLabel()
-        self.assertEqual(label["title"]["eng"], "Epigrammata")
+        collection = text.getLabel()
+        self.assertEqual(collection.metadata["title"]["eng"], "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):

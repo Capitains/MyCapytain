@@ -1,9 +1,10 @@
-from MyCapytain.resources.texts.local import Passage, Text
-from MyCapytain.common.utils import Mimetypes
-from MyCapytain.common.reference import Reference, URN, Citation
 import warnings
-import MyCapytain.errors
 from unittest import TestCase
+
+import MyCapytain.errors
+from MyCapytain.common.reference import Reference, URN, Citation
+from MyCapytain.common.utils import Mimetypes
+from MyCapytain.resources.texts.locals.tei import Text
 
 
 class CapitainsXmlTextTest(TestCase):
@@ -618,7 +619,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         # by the unit test framework, so the `run' method is overridden to do
         # nothing.  But in order for sub-classes to be able to do something when
         # run is invoked, the constructor will rebind `run' from TestCase.
-        if self.__class__ != CapitainsXmlPassageTests:
+        if self.__class__ != CapitainsXMLRangePassageTests:
             # Rebind `run' from the parent class.
             self.run = TestCase.run.__get__(self, self.__class__)
         else:

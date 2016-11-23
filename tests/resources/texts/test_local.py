@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import unittest
-from six import text_type as str
 from io import open
+
 import xmlunittest
 from lxml import etree
-import MyCapytain.resources.texts.local
-import MyCapytain.resources.texts.encodings
+
 import MyCapytain.common.reference
 import MyCapytain.common.utils
 import MyCapytain.errors
-
+import MyCapytain.resources.texts.encodings
+import MyCapytain.resources.texts.locals.tei
 from tests.resources.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests, CapitainsXMLRangePassageTests
 
 
@@ -19,20 +20,20 @@ class TestLocalXMLTextImplementation(CapitainsXmlTextTest, unittest.TestCase, xm
 
     def setUp(self):
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
-        self.TEI = MyCapytain.resources.texts.local.Text(
+        self.TEI = MyCapytain.resources.texts.locals.tei.Text(
             resource=self.text,
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
         )
         self.treeroot = etree._ElementTree()
 
         with open("tests/testing_data/texts/text_or_xpath.xml") as f:
-            self.text_complex = MyCapytain.resources.texts.local.Text(
+            self.text_complex = MyCapytain.resources.texts.locals.tei.Text(
                 resource=f,
                 urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
             )
 
         with open("tests/testing_data/texts/seneca.xml") as f:
-            self.seneca = MyCapytain.resources.texts.local.Text(
+            self.seneca = MyCapytain.resources.texts.locals.tei.Text(
                 resource=f
             )
 
@@ -48,7 +49,7 @@ class TestLocalXMLPassageImplementation(CapitainsXmlPassageTests, unittest.TestC
         self.URN = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
-        self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
+        self.TEI = MyCapytain.resources.texts.locals.tei.Text(resource=self.text)
 
         assert self.simple is False, "Simple should be False"
 
@@ -64,7 +65,7 @@ class TestLocalXMLSimplePassageImplementation(CapitainsXmlPassageTests, unittest
         self.URN = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
-        self.TEI = MyCapytain.resources.texts.local.Text(resource=self.text)
+        self.TEI = MyCapytain.resources.texts.locals.tei.Text(resource=self.text)
 
         assert self.simple is True, "Simple should be True"
 
@@ -75,7 +76,7 @@ class TestLocalXMLSimplePassageImplementation(CapitainsXmlPassageTests, unittest
 class TestPassageRange(CapitainsXMLRangePassageTests, unittest.TestCase):
     def setUp(self):
         with open("tests/testing_data/texts/sample.xml", "rb") as text:
-            self.text = MyCapytain.resources.texts.local.Text(
+            self.text = MyCapytain.resources.texts.locals.tei.Text(
                 resource=text, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
             )
         self.passage = self.text.getPassage(MyCapytain.common.reference.Reference("1.pr.2-1.pr.7"))

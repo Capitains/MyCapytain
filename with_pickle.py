@@ -1,7 +1,10 @@
-from MyCapytain.resources.texts.local import Text
 import pickle
+
 import lxml.objectify
 from lxml.etree import XMLParser
+
+from MyCapytain.resources.texts.locals.tei import Text
+
 X = XMLParser()
 Z = lxml.objectify.makeparser()
 

@@ -221,7 +221,7 @@ class Text(cts.Text):
             for parent in self.parents:
                 if isinstance(parent, cts.CTSCollection) and hasattr(parent, "metadata"):
                     complete_metadata = complete_metadata + parent.metadata
-            return text.Text(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
+            return text.CitableText(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
         return self.default_export(output, domain)
 
     def __findCitations(self, xml, xpath="ti:citation"):

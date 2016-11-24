@@ -37,7 +37,7 @@ class TestProtoResource(unittest.TestCase):
             a.urn = 2
 
         # Test Resource setting works out as well
-        b = Text(urn="urn:cts:latinLit:tg.wk.v")
+        b = CitableText(urn="urn:cts:latinLit:tg.wk.v")
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
 
@@ -46,27 +46,20 @@ class TestProtoText(unittest.TestCase):
 
     def test_init(self):
         """ Test init works correctly """
-        a = Text()
-        self.assertEqual(a.resource, None)
-
-        a = Text(resource=False)
-        self.assertEqual(a.resource, False)
-
-        a.resource = True
-        self.assertEqual(a.resource, True)
+        a = CitableText()
 
         #  Test with metadata
-        a = Text()
+        a = CitableText()
         self.assertIsInstance(a.metadata, MyCapytain.common.metadata.Metadata)
 
         m = MyCapytain.common.metadata.Metadata(keys=["title", "author"])
         m["title"]["fre"] = "I am a metadata"
-        a = Text(metadata=m)
+        a = CitableText(metadata=m)
         self.assertEqual(a.metadata["title"]["fre"], "I am a metadata")
 
     def test_proto_reff(self):
         """ Test that getValidReff function are not implemented """
-        a = Text()
+        a = CitableText()
 
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError):
@@ -79,7 +72,7 @@ class TestProtoText(unittest.TestCase):
 
     def test_proto_passage(self):
         """ Test that getPassage function are not implemented but are consistent"""
-        a = Text()
+        a = CitableText()
 
         # For getPassage, reference arg is required
         with self.assertRaises(TypeError): 
@@ -90,7 +83,7 @@ class TestProtoText(unittest.TestCase):
 
     def test_get_label(self):
         """ Test that getLabel function are not implemented but are consistent"""
-        a = Text()
+        a = CitableText()
 
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError): 
@@ -98,7 +91,7 @@ class TestProtoText(unittest.TestCase):
 
     def test_urn(self):
         """ Test setters and getters for urn """
-        a = Text()
+        a = CitableText()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
         self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)
@@ -114,13 +107,13 @@ class TestProtoText(unittest.TestCase):
             a.urn = 2
 
         # Test original setting works out as well
-        b = Text(urn="urn:cts:latinLit:tg.wk.v")
+        b = CitableText(urn="urn:cts:latinLit:tg.wk.v")
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
 
     def test_reffs(self):
         """ Test property reff, should fail because it supposes validReff is implemented """
-        a = Text()
+        a = CitableText()
 
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError):
@@ -128,12 +121,12 @@ class TestProtoText(unittest.TestCase):
 
     def test_citation(self):
         """ Test citation property setter and getter """
-        a = Text()
+        a = CitableText()
         a.citation = MyCapytain.common.reference.Citation(name="label")
         self.assertIsInstance(a.citation, MyCapytain.common.reference.Citation)
 
         #On init ?
-        b = Text(citation=MyCapytain.common.reference.Citation(name="label"))
+        b = CitableText(citation=MyCapytain.common.reference.Citation(name="label"))
         self.assertEqual(a.citation.name, "label")
 
 class TestProtoPassage(unittest.TestCase):

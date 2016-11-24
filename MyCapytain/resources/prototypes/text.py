@@ -131,8 +131,6 @@ class TextualNode(TextualElement, NodeId):
     def __init__(self, identifier=None, citation=None, **kwargs):
         super(TextualNode, self).__init__(identifier=identifier, **kwargs)
         self.__citation__ = citation or Citation()
-        self.__text__ = ""
-        self.__childIds__ = []
 
     @property
     def citation(self):
@@ -308,7 +306,7 @@ class InteractiveTextualNode(TextualGraph):
             raise NotImplementedError
 
 
-class CTSNode(TextualGraph):
+class CTSNode(InteractiveTextualNode):
     """ Initiate a Resource object
     
     :param urn: A URN identifier
@@ -360,6 +358,26 @@ class CTSNode(TextualGraph):
             raise TypeError()
         self.__urn__ = value
 
+    def getValidReff(self, level=1, reference=None):
+        """ Given a resource, CitableText will compute valid reffs
+
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
+        :type passage: Reference
+        :rtype: List.basestring
+        :returns: List of levels
+        """
+        raise NotImplementedError()
+
+    def getLabel(self):
+        """ Retrieve metadata about the text
+
+        :rtype: Collection
+        :returns: Retrieve Label informations in a Collection format
+        """
+        raise NotImplementedError()
+
 
 class Passage(CTSNode):
     """ Passage objects possess metadata informations
@@ -386,40 +404,17 @@ class Passage(CTSNode):
     def __init__(self, **kwargs):
         super(Passage, self).__init__(**kwargs)
 
-    def getValidReff(self, level=1, reference=None):
-        """ Given a resource, CitableText will compute valid reffs
-
-        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
-        :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
-        :rtype: List.basestring
-        :returns: List of levels
-        """
-        raise NotImplementedError()
-
-    def getLabel(self):
-        """ Retrieve metadata about the text
-
-        :rtype: Collection
-        :returns: Retrieve Label informations in a Collection format
-        """
-        raise NotImplementedError()
+    @property
+    def reference(self):
+        return self.urn.reference
 
 
-class CitableText(Passage):
+
+class CitableText(CTSNode):
     """ A CTS CitableText
     """
     def __init__(self, citation=None, metadata=None, **kwargs):
         super(CitableText, self).__init__(citation=citation, metadata=metadata, **kwargs)
-
-        self._cRefPattern = Citation()
-        if citation is not None:
-            self.citation = citation
-
-        if metadata is not None:
-            self.metadata = metadata
-
         self.__reffs__ = None
 
     @property

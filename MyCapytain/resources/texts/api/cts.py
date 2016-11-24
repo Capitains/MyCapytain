@@ -11,17 +11,27 @@ from MyCapytain.resources.collections import cts as CTSCollection
 from MyCapytain.resources.prototypes import text as prototypes
 from MyCapytain.resources.texts.encodings import TEIResource
 from MyCapytain.retrievers.prototypes import CitableTextServiceRetriever
+from MyCapytain.errors import MissingAttribute
 
 
-class __SharedMethod__:
+class __SharedMethod__(prototypes.InteractiveTextualNode):
     """ Set of methods shared by Text and Passage
 
     :param retriever: CitableTextServiceRetriever
     """
 
-    def __init__(self, retriever, *args, **kwargs):
+    def __init__(self, retriever=None, *args, **kwargs):
         super(__SharedMethod__, self).__init__(*args, **kwargs)
         self.__retriever__ = retriever
+        if retriever is None:
+            raise MissingAttribute("Object has not retriever")
+
+        if "metadata" in kwargs and isinstance(kwargs["metadata"], Metadata):
+            self.metadata = kwargs["metadata"]
+        else:
+            self.metadata = Metadata(keys=[
+                "groupname", "label", "title"
+            ])
 
     @property
     def retriever(self):
@@ -77,7 +87,7 @@ class __SharedMethod__:
         response = xmlparser(self.retriever.getPassage(urn=urn))
 
         self.__parse_request__(response.xpath("//ti:request", namespaces=NS)[0])
-        return Passage(urn=urn, resource=response, parent=self)
+        return Passage(urn=urn, resource=response, retriever=self.retriever)
 
     def getPassagePlus(self, reference=None):
         """ Retrieve a passage and informations around it and store it in the object
@@ -96,7 +106,7 @@ class __SharedMethod__:
         response = xmlparser(self.retriever.getPassagePlus(urn=urn))
 
         self.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
-        return Passage(urn=urn, resource=response, parent=self)
+        return Passage(urn=urn, resource=response, retriever=self.retriever)
 
     def __parse_request__(self, xml):
         """ Parse a request with metadata information
@@ -146,7 +156,7 @@ class __SharedMethod__:
         :type reference: Reference
         :return: (Previous Passage Reference,Next Passage Reference)
         """
-        _prev, _next = Passage.prevnext(
+        _prev, _next = __SharedMethod__.prevnext(
             self.retriever.getPrevNextUrn(
                 urn="{}:{}".format(
                     str(
@@ -175,15 +185,59 @@ class __SharedMethod__:
         else:
             urn = self.urn
 
-        _first = Passage.firstUrn(
+        _first = __SharedMethod__.firstUrn(
             self.retriever.getFirstUrn(
                 urn
             )
         )
         return _first
 
+    @staticmethod
+    def firstUrn(resource):
+        """ Parse a resource to get the first URN
 
-class Text(__SharedMethod__, prototypes.CitableText, prototypes.InteractiveTextualNode):
+        :param resource: XML Resource
+        :type resource: etree._Element
+        :return: Tuple representing previous and next urn
+        :rtype: URN
+        """
+        resource = xmlparser(resource)
+        urn = resource.xpath("//ti:reply/ti:urn/text()", namespaces=NS, magic_string=True)
+
+        if len(urn) > 0:
+            urn = str(urn[0])
+
+            return URN(urn)
+
+    @staticmethod
+    def prevnext(resource):
+        """ Parse a resource to get the prev and next urn
+
+        :param resource: XML Resource
+        :type resource: etree._Element
+        :return: Tuple representing previous and next urn
+        :rtype: (URN, URN)
+        """
+        _prev, _next = False, False
+        resource = xmlparser(resource)
+        prevnext = resource.xpath("//ti:prevnext", namespaces=NS)
+
+        if len(prevnext) > 0:
+            _next, _prev = None, None
+            prevnext = prevnext[0]
+            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=NS, smart_strings=False)
+            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=NS, smart_strings=False)
+
+            if len(_next_xpath):
+                _next = URN(_next_xpath[0])
+
+            if len(_prev_xpath):
+                _prev = URN(_prev_xpath[0])
+
+        return _prev, _next
+
+
+class Text(__SharedMethod__, prototypes.CitableText):
     """ API Text object
 
     :param urn: A URN identifier
@@ -201,20 +255,6 @@ class Text(__SharedMethod__, prototypes.CitableText, prototypes.InteractiveTextu
 
     def __init__(self, urn, retriever, citation=None, **kwargs):
         super(Text, self).__init__(retriever=retriever, urn=urn, citation=citation, **kwargs)
-
-        self._cRefPattern = None
-
-        if citation is not None:
-            self.citation = citation
-
-        if "metadata" in kwargs and isinstance(kwargs["metadata"], Metadata):
-            self.metadata = kwargs["metadata"]
-        else:
-            self.metadata = Metadata(keys=[
-                "groupname", "label", "title"
-            ])
-
-        self.passages = []
 
     @property
     def reffs(self):
@@ -242,19 +282,19 @@ class Text(__SharedMethod__, prototypes.CitableText, prototypes.InteractiveTextu
         return self.getPassage().export(output, exclude)
 
 
-class Passage(TEIResource):
+class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
     """ Passage representing
 
     :param urn:
     :param resource:
+    :param retriever:
     :param args:
     :param kwargs:
     """
 
-    def __init__(self, urn, resource, retriever=None, *args, **kwargs):
-        SuperKwargs = {key:value for key, value in kwargs.items() if key not in ["parent"]}
+    def __init__(self, urn, resource, *args, **kwargs):
+        SuperKwargs = {key: value for key, value in kwargs.items() if key not in ["parent"]}
         super(Passage, self).__init__(resource=resource, *args, **SuperKwargs)
-
         self.urn = urn
 
         # Could be set during parsing
@@ -262,7 +302,6 @@ class Passage(TEIResource):
         self.__prev__ = False
         self.__first__ = False
         self.__last__ = False
-        self.__retriever__ = retriever
 
         self.__parse__()
 
@@ -275,16 +314,11 @@ class Passage(TEIResource):
         """
         if self.__first__ is False:
             # Request the next urn
-            self.__first__ = Reference(
-                identifier=self.__retriever__.getFirstUrn(reference=str(self.urn.reference)),
-                depth=len(self.urn.reference.start)+1
-            )
-            if len(self.graph.children) == 0:
-                self.graph.children.append(self.__first__)
+            self.__first__ = self.getFirstUrn(reference=str(self.urn.reference))
         return self.__first__
 
     @property
-    def prev(self):
+    def prevId(self):
         """ Previous passage
 
         :rtype: Passage
@@ -292,12 +326,11 @@ class Passage(TEIResource):
         """
         if self.__prev__ is False:
             # Request the next urn
-            self.__prev__, self.__next__ = self.__retriever__.getPrevNextUrn(reference=self.urn.reference)
-            self.graph.prev = NodeId(identifier=self.__prev__)
+            self.__prev__, self.__next__ = self.getPrevNextUrn(reference=self.urn.reference)
         return self.__prev__
 
     @property
-    def next(self):
+    def nextId(self):
         """ Shortcut for getting the following passage
 
         :rtype: Reference
@@ -305,93 +338,21 @@ class Passage(TEIResource):
         """
         if self.__next__ is False:
             # Request the next urn
-            self.__prev__, self.__next__ = self.parent.getPrevNextUrn(reference=self.urn.reference)
+            self.__prev__, self.__next__ = self.getPrevNextUrn(reference=self.urn.reference)
         return self.__next__
-
-    def getNext(self):
-        """ Shortcut for getting the following passage
-
-        :rtype: Passage
-        :returns: Following passage at same level
-        """
-        if self.next:
-            return self.parent.getPassage(reference=self.next)
-
-    def getPrev(self):
-        """ Shortcut for getting the preceding passage
-
-        :rtype: Passage
-        :returns: Previous passage at same level
-        """
-        if self.prev:
-            return self.parent.getPassage(reference=self.prev)
-
-    def getFirst(self):
-        """ Shortcut for getting the first child passage
-
-        :rtype: Passage
-        :returns: Previous passage at same level
-        """
-        if self.first:
-            return self.parent.getPassage(reference=self.first)
 
     def __parse__(self):
         """ Given self.resource, split informations from the CTS API
 
         :return: None
         """
+        self.response = self.resource
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=NS)[0]
 
-        self.__prev__, self.__next__ = Passage.prevnext(self.resource)
+        self.__prev__, self.__next__ = __SharedMethod__.prevnext(self.response)
 
         if self.citation.isEmpty():
-            self.__citation__ = CTSCollection.Citation.ingest(
-                self.resource,
+            self.citation = CTSCollection.Citation.ingest(
+                self.response,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
             )
-
-    @staticmethod
-    def prevnext(resource):
-        """ Parse a resource to get the prev and next urn
-
-        :param resource: XML Resource
-        :type resource: etree._Element
-        :return: Tuple representing previous and next urn
-        :rtype: (URN, URN)
-        """
-        _prev, _next = False, False
-        resource = xmlparser(resource)
-        prevnext = resource.xpath("//ti:prevnext", namespaces=NS)
-
-        if len(prevnext) > 0:
-            _next, _prev = None, None
-            prevnext = prevnext[0]
-            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=NS, smart_strings=False)
-            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=NS, smart_strings=False)
-
-            if len(_next_xpath):
-               _next = URN(_next_xpath[0])
-
-            if len(_prev_xpath):
-                _prev = URN(_prev_xpath[0])
-
-        return _prev, _next
-
-    @staticmethod
-    def firstUrn(resource):
-        """ Parse a resource to get the first URN
-
-        :param resource: XML Resource
-        :type resource: etree._Element
-        :return: Tuple representing previous and next urn
-        :rtype: URN
-        """
-        _child = False
-        resource = xmlparser(resource)
-        urn = resource.xpath("//ti:reply/ti:urn/text()", namespaces=NS, magic_string=True)
-
-        if len(urn) > 0:
-            urn = str(urn[0])
-
-            return URN(urn)
-

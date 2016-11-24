@@ -9,7 +9,7 @@ from MyCapytain.resources.texts.api.cts import Passage, Text
 from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, Citation
 from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils import xmlparser, NS
 import mock
 
 with open("tests/testing_data/cts/getValidReff.xml") as f:
@@ -58,7 +58,6 @@ class TestAPIText(unittest.TestCase):
 
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation,
                     metadata=Metadata(keys=["testing_init"]))
-        print(type(text.metadata))
         self.assertIsInstance(text.metadata.metadata["testing_init"], Metadatum)
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
@@ -317,11 +316,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __next = passage.getNext()
+        __next = passage.next
 
         self.endpoint.getPrevNextUrn.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
@@ -340,11 +339,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE_PLUS,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __next = passage.getNext()
+        __next = passage.next
         # print(self.endpoint.getPrevNextUrn.mock_calls)
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2")
         self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
@@ -356,11 +355,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __prev = passage.getPrev()
+        __prev = passage.prev
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
@@ -373,7 +372,7 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
@@ -389,11 +388,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE_PLUS,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __prev = passage.getPrev()
+        __prev = passage.prev
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
         self.assertIsInstance(__prev, Passage)
@@ -406,20 +405,20 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
-        self.assertIn("لا یا ایها الساقی ادر کاسا و ناولها ###", passage.text())
+        self.assertIn("لا یا ایها الساقی ادر کاسا و ناولها ###", passage.text)
 
     def test_first_urn(self):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,
-            parent=text
+            retriever=self.endpoint
         )
         self.assertEqual(
-            str(passage.first), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            str(passage.firstId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
             "Endpoint should be called and URN should be parsed"
         )
         self.endpoint.getFirstUrn.assert_called_with(
@@ -430,11 +429,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        first = passage.getFirst()
+        first = passage.first
         self.endpoint.getFirstUrn.assert_called_with("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
@@ -448,12 +447,13 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,
-            parent=text
+            retriever=endpoint
         )
-        self.assertEqual(
-            passage.first, None,
-            "Endpoint should be called and none should be returned if there is none"
-        )
+        first = passage.firstId
         endpoint.getFirstUrn.assert_called_with(
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1"
+        )
+        self.assertEqual(
+            first, None,
+            "Endpoint should be called and none should be returned if there is none"
         )

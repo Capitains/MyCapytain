@@ -282,10 +282,19 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
             **__makePassageKwargs__(urn, reference)
         )
         self.__text__ = text
-        self.reference = reference
+        self.__reference__ = reference
         self.__children__ = None
         self.__depth__ = len(reference)
         self.__prevnext__ = None
+
+    @property
+    def reference(self):
+        return self.__reference__
+
+    @reference.setter
+    def reference(self, value):
+        self.__reference__ = value
+
 
     @property
     def childIds(self):

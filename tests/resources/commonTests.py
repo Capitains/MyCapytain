@@ -157,7 +157,6 @@ class CapitainsXmlTextTest(TestCase):
     def test_nested_dict(self):
         """ Check the nested dict export of a local.Text object """
         nested = self.TEI.export(output=Mimetypes.NestedDict, exclude=["tei:note"])
-        print(nested["1"]["3"]["8"])
         self.assertEqual(nested["1"]["3"]["8"], "Ibis ab excusso missus in astra sago. ",
                          "Check that notes are removed ")
         self.assertEqual(nested["1"]["pr"]["1"], "Spero me secutum in libellis meis tale temperamen-",
@@ -543,7 +542,6 @@ class CapitainsXmlPassageTests(TestCase):
         # Test when there is one
         # self.TEI.parse()
         p = self.TEI.getPassage(["1", "1"], simple=self.simple)
-        print(str(p.export(output=Mimetypes.XML)))
         self.assertEqual(
             str(p.firstId), "1.1.1",
             "Property first Id should be the reference of the first item"

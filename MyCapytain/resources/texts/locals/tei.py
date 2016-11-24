@@ -385,7 +385,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         return self.__prevnext__
 
 
-class Text(__SharedMethods__, encodings.TEIResource, text.Text):
+class Text(__SharedMethods__, encodings.TEIResource, text.CitableText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier

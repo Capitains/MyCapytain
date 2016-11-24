@@ -33,15 +33,18 @@ class TestAPIText(unittest.TestCase):
     """
     def setUp(self):
         a = Citation(
-            name="line"
+            name="line",
+            refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']/tei:div[@n='$2']/tei:l[@n='$3']"
         )
         b = Citation(
             name="poem",
-            child=a
+            child=a,
+            refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']/tei:div[@n='$2']"
         )
         self.citation = Citation(
             name="book",
-            child=b
+            child=b,
+            refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']"
         )
         self.endpoint = CTS("http://services.perseids.org/api/cts")
 
@@ -260,7 +263,11 @@ class TestAPIText(unittest.TestCase):
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", citation=self.citation, resource=self.endpoint)
-        requests.return_value.text = GET_VALID_REFF
+        requests.side_effect = [
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF)
+        ]
 
         reffs = text.reffs
         self.assertEqual(len(requests.mock_calls), 3)
@@ -270,9 +277,14 @@ class TestAPIText(unittest.TestCase):
         )
         # And when no citation length
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat3", resource=self.endpoint)
-
+        requests.side_effect = [
+            mock.Mock(text=GET_LABEL),
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF)
+        ]
         reffs = text.reffs
-        self.assertEqual(len(requests.mock_calls), 6)
+        self.assertEqual(len(requests.mock_calls), 7)
         requests.assert_called_with(
             'http://services.perseids.org/api/cts',
             params={'urn': 'urn:cts:latinLit:phi1294.phi002.perseus-lat3', 'request': 'GetValidReff', 'level': '3'}

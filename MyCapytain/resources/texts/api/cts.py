@@ -161,7 +161,9 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
             self.resource.getLabel(urn=str(self.urn))
         )
 
-        self.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
+        self.__parse_request__(
+            response.xpath("//ti:reply/ti:label", namespaces=NS)[0]
+        )
 
         return self.metadata
 

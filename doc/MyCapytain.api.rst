@@ -75,12 +75,7 @@ Text
 TEI based texts
 +++++++++++++++
 
-.. autoclass:: MyCapytain.resources.texts.tei.Citation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. autoclass:: MyCapytain.resources.texts.tei.Passage
+.. autoclass:: MyCapytain.resources.texts.tei.TEIResource
     :members:
     :undoc-members:
     :show-inheritance:
@@ -88,17 +83,17 @@ TEI based texts
 Locally read text
 +++++++++++++++++
 
-.. autoclass:: MyCapytain.resources.texts.local.Text
+.. autoclass:: MyCapytain.resources.texts.local.tei.Text
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. autoclass:: MyCapytain.resources.texts.local.Passage
+.. autoclass:: MyCapytain.resources.texts.local.tei.Passage
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. autoclass:: MyCapytain.resources.texts.local.ContextPassage
+.. autoclass:: MyCapytain.resources.texts.local.tei.__SimplePassage__
     :members:
     :undoc-members:
     :show-inheritance:
@@ -131,8 +126,6 @@ Metadata
 
 CTS inventory
 +++++++++++++
-
-Formerly MyCapytain.resources.inventory (< 2.0.0)
 
 .. automodule:: MyCapytain.resources.collections.cts
     :members:

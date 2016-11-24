@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 .. module:: MyCapytain.resources.proto.text
-   :synopsis: Prototypes for Text
+   :synopsis: Prototypes for CitableText
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
@@ -149,7 +149,7 @@ class TextualNode(TextualElement, NodeId):
         self.__citation__ = value
 
 
-class InteractiveTextualNode(TextualNode):
+class TextualGraph(TextualNode):
     """ Node representing a text passage.
 
     :param identifier: Identifier of the text
@@ -183,6 +183,41 @@ class InteractiveTextualNode(TextualNode):
         """
 
         raise NotImplementedError()
+
+    def getReffs(self, level=1, reference=None):
+        """ Reference available at a given level
+
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
+        :type passage: Reference
+        :rtype: List.basestring
+        :returns: List of levels
+        """
+        raise NotImplementedError()
+
+
+class InteractiveTextualNode(TextualGraph):
+    """ Node representing a text passage.
+
+    :param identifier: Identifier of the text
+    :type identifier: str
+    :param metadata: Collection Information about the Item
+    :type metadata: Collection
+    :param citation: Citation system of the text
+    :type citation: Citation
+    :param children: Current node Children's Identifier
+    :type children: [str]
+    :param parent: Parent of the current node
+    :type parent: str
+    :param siblings: Previous and next node of the current node
+    :type siblings: str
+    :param depth: Depth of the node in the global hierarchy of the text tree
+    :type depth: int
+    :param resource: Resource used to navigate through the textual graph
+
+    :cvar default_exclude: Default exclude for exports
+    """
 
     @property
     def prev(self):
@@ -271,18 +306,6 @@ class InteractiveTextualNode(TextualNode):
         else:
             raise NotImplementedError
 
-    def getReffs(self, level=1, reference=None):
-        """ Reference available at a given level
-
-        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
-        :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
-        :rtype: List.basestring
-        :returns: List of levels
-        """
-        raise NotImplementedError()
-
 
 class CTSNode(TextualNode):
     """ Initiate a Resource object
@@ -363,7 +386,7 @@ class Passage(CTSNode):
         super(Passage, self).__init__(**kwargs)
 
     def getValidReff(self, level=1, reference=None):
-        """ Given a resource, Text will compute valid reffs
+        """ Given a resource, CitableText will compute valid reffs
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
@@ -383,11 +406,11 @@ class Passage(CTSNode):
         raise NotImplementedError()
 
 
-class Text(Passage):
-    """ A CTS Text
+class CitableText(Passage):
+    """ A CTS CitableText
     """
     def __init__(self, citation=None, metadata=None, **kwargs):
-        super(Text, self).__init__(**kwargs)
+        super(CitableText, self).__init__(**kwargs)
 
         self._cRefPattern = Citation()
         if citation is not None:
@@ -400,7 +423,7 @@ class Text(Passage):
 
     @property
     def reffs(self):
-        """ Get all valid reffs for every part of the Text
+        """ Get all valid reffs for every part of the CitableText
 
         :rtype: [str]
         """

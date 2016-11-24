@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 from six import text_type as str
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.common.utils import Mimetypes, xmlparser, NS
 from MyCapytain.common.reference import Citation, URN, Reference
 from MyCapytain.resources.collections import cts as CTSCollection
@@ -15,11 +14,11 @@ from MyCapytain.retrievers.prototypes import CitableTextServiceRetriever
 
 
 
-class Text(prototypes.Text, prototypes.InteractiveTextualNode):
+class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
     """ Passage representing object prototype
 
     :param urn: A URN identifier
-    :type urn: URN
+    :type urn: Union[URN, str, unicode]
     :param resource: An API endpoint
     :type resource: CitableTextServiceRetriever
     :param citation: Citation for children level
@@ -51,7 +50,7 @@ class Text(prototypes.Text, prototypes.InteractiveTextualNode):
         self.passages = []
 
     def getValidReff(self, level=1, reference=None):
-        """ Given a resource, Text will compute valid reffs
+        """ Given a resource, CitableText will compute valid reffs
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
@@ -73,7 +72,7 @@ class Text(prototypes.Text, prototypes.InteractiveTextualNode):
             urn=urn
         )
         xml = xmlparser(xml)
-        self.__parse_request(xml.xpath("//ti:request", namespaces=NS)[0])
+        self.__parse_request__(xml.xpath("//ti:request", namespaces=NS)[0])
 
         for ref in xml.xpath(
             "//ti:reply//ti:urn/text()",
@@ -105,7 +104,7 @@ class Text(prototypes.Text, prototypes.InteractiveTextualNode):
 
         response = xmlparser(self.resource.getPassage(urn=urn))
 
-        self.__parse_request(response.xpath("//ti:request", namespaces=NS)[0])
+        self.__parse_request__(response.xpath("//ti:request", namespaces=NS)[0])
         return Passage(urn=urn, resource=response, parent=self)
 
     def getPassagePlus(self, reference=None):
@@ -124,16 +123,14 @@ class Text(prototypes.Text, prototypes.InteractiveTextualNode):
 
         response = xmlparser(self.resource.getPassagePlus(urn=urn))
 
-        self.__parse_request(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
+        self.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
         return Passage(urn=urn, resource=response, parent=self)
 
-    def __parse_request(self, xml):
-        """
+    def __parse_request__(self, xml):
+        """ Parse a request with metadata information
 
-        :param xml:
-        :return:
-
-        .. TODO: Finish self.citation parsing
+        :param xml: LXML Object
+        :type xml: Union[lxml.etree._Element]
         """
         for node in xml.xpath(".//ti:groupname", namespaces=NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
@@ -148,7 +145,7 @@ class Text(prototypes.Text, prototypes.InteractiveTextualNode):
             self.metadata.metadata["label"][lang] = node.text
 
         # Need to code that p
-        if self.citation.isEmpty():
+        if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=NS):
             self.citation = CTSCollection.Citation.ingest(
                 xml,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
@@ -164,7 +161,7 @@ class Text(prototypes.Text, prototypes.InteractiveTextualNode):
             self.resource.getLabel(urn=str(self.urn))
         )
 
-        self.__parse_request(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
+        self.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
 
         return self.metadata
 
@@ -213,19 +210,15 @@ class Text(prototypes.Text, prototypes.InteractiveTextualNode):
 
     @property
     def reffs(self):
-        """ Get all valid reffs for every part of the Text
+        """ Get all valid reffs for every part of the CitableText
 
         :rtype: MyCapytain.resources.texts.tei.Citation
         """
-        if self.citation is None:
-            reffs = [self.getValidReff()]
-            return reffs + [
-                reff for reffs in [self.getValidReff(level=i) for i in range(2, len(self.citation) + 1)] for reff in reffs
-            ]
-        else:
-            return [
-                reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs
-            ]
+        if self.citation.isEmpty():
+            self.getLabel()
+        return [
+            reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs
+        ]
 
     def export(self, output=None, exclude=None):
         """ Export the collection item in the Mimetype required.

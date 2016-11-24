@@ -111,7 +111,7 @@ def xmlparser(xml, objectify=True):
     """ Parse xml 
 
     :param xml: XML element
-    :type xml: basestring, lxml.etree._Element
+    :type xml: Union[basestring, lxml.etree._Element]
     :rtype: lxml.etree._Element
     :returns: An element object
     :raises: TypeError if element is not in accepted type

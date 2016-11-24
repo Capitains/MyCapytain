@@ -30,7 +30,6 @@ class TextualElement(object):
     def __init__(self, identifier=None, metadata=None):
         self.__about__ = Collection()
         self.__identifier__ = identifier
-
         self.about.metadata = metadata
 
     @property
@@ -170,6 +169,8 @@ class TextualGraph(TextualNode):
 
     :cvar default_exclude: Default exclude for exports
     """
+    def __init__(self, identifier=None, **kwargs):
+        super(TextualGraph, self).__init__(identifier=identifier, **kwargs)
 
     def getPassage(self, reference):
         """ Retrieve a passage and store it in the object
@@ -307,7 +308,7 @@ class InteractiveTextualNode(TextualGraph):
             raise NotImplementedError
 
 
-class CTSNode(TextualNode):
+class CTSNode(TextualGraph):
     """ Initiate a Resource object
     
     :param urn: A URN identifier
@@ -410,7 +411,7 @@ class CitableText(Passage):
     """ A CTS CitableText
     """
     def __init__(self, citation=None, metadata=None, **kwargs):
-        super(CitableText, self).__init__(**kwargs)
+        super(CitableText, self).__init__(citation=citation, metadata=metadata, **kwargs)
 
         self._cRefPattern = Citation()
         if citation is not None:
@@ -428,5 +429,5 @@ class CitableText(Passage):
         :rtype: [str]
         """
         if not self.__reffs__:
-            self.__reffs__ = [reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]
+            self.__reffs__ = [reff for reffs in [self.getReffs(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs]
         return self.__reffs__

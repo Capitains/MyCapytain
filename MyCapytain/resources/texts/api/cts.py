@@ -13,41 +13,19 @@ from MyCapytain.resources.texts.encodings import TEIResource
 from MyCapytain.retrievers.prototypes import CitableTextServiceRetriever
 
 
+class __SharedMethod__:
+    """ Set of methods shared by Text and Passage
 
-class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
-    """ Passage representing object prototype
-
-    :param urn: A URN identifier
-    :type urn: Union[URN, str, unicode]
-    :param resource: An API endpoint
-    :type resource: CitableTextServiceRetriever
-    :param citation: Citation for children level
-    :type citation: Citation
-    :param id: Identifier of the subreference without URN informations
-    :type id: List
-
+    :param retriever: CitableTextServiceRetriever
     """
 
-    DEFAULT_LANG = "eng"
+    def __init__(self, retriever, *args, **kwargs):
+        super(__SharedMethod__, self).__init__(*args, **kwargs)
+        self.__retriever__ = retriever
 
-    def __init__(self, urn, resource, citation=None, **kwargs):
-        super(Text, self).__init__(urn=urn, citation=citation, **kwargs)
-
-        self._cRefPattern = None
-
-        self.resource = resource
-
-        if citation is not None:
-            self.citation = citation
-
-        if "metadata" in kwargs and isinstance(kwargs["metadata"], Metadata):
-            self.metadata = kwargs["metadata"]
-        else:
-            self.metadata = Metadata(keys=[
-                "groupname", "label", "title"
-            ])
-
-        self.passages = []
+    @property
+    def retriever(self):
+        return self.__retriever__
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, CitableText will compute valid reffs
@@ -67,20 +45,14 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
         if level == -1:
             level = len(self.citation)
 
-        xml = self.resource.getValidReff(
+        xml = self.retriever.getValidReff(
             level=level,
             urn=urn
         )
         xml = xmlparser(xml)
         self.__parse_request__(xml.xpath("//ti:request", namespaces=NS)[0])
 
-        for ref in xml.xpath(
-            "//ti:reply//ti:urn/text()",
-            namespaces=NS
-        ):
-            self.passages.append(ref)
-
-        return self.passages
+        return [ref for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=NS)]
 
     def getPassage(self, reference=None):
         """ Retrieve a passage and store it in the object
@@ -102,7 +74,7 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
         else:
             urn = str(self.urn)
 
-        response = xmlparser(self.resource.getPassage(urn=urn))
+        response = xmlparser(self.retriever.getPassage(urn=urn))
 
         self.__parse_request__(response.xpath("//ti:request", namespaces=NS)[0])
         return Passage(urn=urn, resource=response, parent=self)
@@ -121,7 +93,7 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
         else:
             urn = str(self.urn)
 
-        response = xmlparser(self.resource.getPassagePlus(urn=urn))
+        response = xmlparser(self.retriever.getPassagePlus(urn=urn))
 
         self.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
         return Passage(urn=urn, resource=response, parent=self)
@@ -134,15 +106,15 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
         """
         for node in xml.xpath(".//ti:groupname", namespaces=NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
-            self.metadata.metadata["groupname"][lang] = node.text
+            self.metadata["groupname"][lang] = node.text
 
         for node in xml.xpath(".//ti:title", namespaces=NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
-            self.metadata.metadata["title"][lang] = node.text
+            self.metadata["title"][lang] = node.text
 
         for node in xml.xpath(".//ti:label", namespaces=NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
-            self.metadata.metadata["label"][lang] = node.text
+            self.metadata["label"][lang] = node.text
 
         # Need to code that p
         if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=NS):
@@ -158,7 +130,7 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
         :returns: Dictionary with label informations
         """
         response = xmlparser(
-            self.resource.getLabel(urn=str(self.urn))
+            self.retriever.getLabel(urn=str(self.urn))
         )
 
         self.__parse_request__(
@@ -175,7 +147,7 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
         :return: (Previous Passage Reference,Next Passage Reference)
         """
         _prev, _next = Passage.prevnext(
-            self.resource.getPrevNextUrn(
+            self.retriever.getPrevNextUrn(
                 urn="{}:{}".format(
                     str(
                         URN(
@@ -204,11 +176,45 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
             urn = self.urn
 
         _first = Passage.firstUrn(
-            self.resource.getFirstUrn(
+            self.retriever.getFirstUrn(
                 urn
             )
         )
         return _first
+
+
+class Text(__SharedMethod__, prototypes.CitableText, prototypes.InteractiveTextualNode):
+    """ API Text object
+
+    :param urn: A URN identifier
+    :type urn: Union[URN, str, unicode]
+    :param resource: An API endpoint
+    :type resource: CitableTextServiceRetriever
+    :param citation: Citation for children level
+    :type citation: Citation
+    :param id: Identifier of the subreference without URN informations
+    :type id: List
+
+    """
+
+    DEFAULT_LANG = "eng"
+
+    def __init__(self, urn, retriever, citation=None, **kwargs):
+        super(Text, self).__init__(retriever=retriever, urn=urn, citation=citation, **kwargs)
+
+        self._cRefPattern = None
+
+        if citation is not None:
+            self.citation = citation
+
+        if "metadata" in kwargs and isinstance(kwargs["metadata"], Metadata):
+            self.metadata = kwargs["metadata"]
+        else:
+            self.metadata = Metadata(keys=[
+                "groupname", "label", "title"
+            ])
+
+        self.passages = []
 
     @property
     def reffs(self):
@@ -237,8 +243,15 @@ class Text(prototypes.CitableText, prototypes.InteractiveTextualNode):
 
 
 class Passage(TEIResource):
+    """ Passage representing
 
-    def __init__(self, urn, resource, *args, **kwargs):
+    :param urn:
+    :param resource:
+    :param args:
+    :param kwargs:
+    """
+
+    def __init__(self, urn, resource, retriever=None, *args, **kwargs):
         SuperKwargs = {key:value for key, value in kwargs.items() if key not in ["parent"]}
         super(Passage, self).__init__(resource=resource, *args, **SuperKwargs)
 
@@ -249,6 +262,7 @@ class Passage(TEIResource):
         self.__prev__ = False
         self.__first__ = False
         self.__last__ = False
+        self.__retriever__ = retriever
 
         self.__parse__()
 
@@ -262,7 +276,7 @@ class Passage(TEIResource):
         if self.__first__ is False:
             # Request the next urn
             self.__first__ = Reference(
-                identifier=self.parent.getFirstUrn(reference=str(self.urn.reference)),
+                identifier=self.__retriever__.getFirstUrn(reference=str(self.urn.reference)),
                 depth=len(self.urn.reference.start)+1
             )
             if len(self.graph.children) == 0:
@@ -278,7 +292,7 @@ class Passage(TEIResource):
         """
         if self.__prev__ is False:
             # Request the next urn
-            self.__prev__, self.__next__ = self.parent.getPrevNextUrn(reference=self.urn.reference)
+            self.__prev__, self.__next__ = self.__retriever__.getPrevNextUrn(reference=self.urn.reference)
             self.graph.prev = NodeId(identifier=self.__prev__)
         return self.__prev__
 

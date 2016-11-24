@@ -53,15 +53,11 @@ class TestAPIText(unittest.TestCase):
         """
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
         self.assertEqual(str(text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        self.assertEqual(text.resource, self.endpoint)
+        self.assertEqual(text.retriever, self.endpoint)
         self.assertEqual(text.citation, self.citation)
 
-        text = Text(
-            "urn:cts:latinLit:phi1294.phi002.perseus-lat2",
-            self.endpoint,
-            citation=self.citation,
-            metadata=Metadata(keys=["testing_init"])
-        )
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation,
+                    metadata=Metadata(keys=["testing_init"]))
         print(type(text.metadata))
         self.assertIsInstance(text.metadata.metadata["testing_init"], Metadatum)
 
@@ -196,7 +192,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_get_prev_next_urn(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = NEXT_PREV
         _prev, _next = text.getPrevNextUrn("1.1")
         self.assertEqual(str(_prev.reference), "1.pr", "Endpoint should be called and URN should be parsed")
@@ -204,7 +200,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_first_urn(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = Get_FIRST
         first = text.getFirstUrn()
         self.assertEqual(
@@ -221,7 +217,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_first_urn_when_empty(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = Get_FIRST_EMPTY
         first = text.getFirstUrn()
         self.assertEqual(
@@ -238,7 +234,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_init_without_citation(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = GET_PASSAGE
 
         # Test with -1
@@ -254,7 +250,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getLabel(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = GET_LABEL
 
         collection = text.getLabel()
@@ -262,7 +258,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", citation=self.citation, resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint, citation=self.citation)
         requests.side_effect = [
             mock.Mock(text=GET_VALID_REFF),
             mock.Mock(text=GET_VALID_REFF),
@@ -276,7 +272,7 @@ class TestAPIText(unittest.TestCase):
             params={'urn': 'urn:cts:latinLit:phi1294.phi002.perseus-lat2', 'request': 'GetValidReff', 'level': '3'}
         )
         # And when no citation length
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat3", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat3", retriever=self.endpoint)
         requests.side_effect = [
             mock.Mock(text=GET_LABEL),
             mock.Mock(text=GET_VALID_REFF),
@@ -312,9 +308,7 @@ class TestCTSPassage(unittest.TestCase):
         self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
         self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
-        self.text = Text(
-            "urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation
-        )
+        self.text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
 
     def test_next_getprevnext(self):
         """ Test next property, given that next information already exists or not)
@@ -418,7 +412,7 @@ class TestCTSPassage(unittest.TestCase):
         self.assertIn("لا یا ایها الساقی ادر کاسا و ناولها ###", passage.text())
 
     def test_first_urn(self):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,
@@ -450,7 +444,7 @@ class TestCTSPassage(unittest.TestCase):
 
         endpoint = CTS(self.url)
         endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST_EMPTY)
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,

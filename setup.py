@@ -14,11 +14,11 @@ setup(
   install_requires=[
     "requests>=2.8.1",
     "six>=1.10.0",
-    "lxml==3.6.4",
-    "future==0.15.2"
+    "lxml>=3.6.4",
+    "future>=0.16.0"
   ],
   tests_require=[
-    "mock==1.3.0",
+    "mock>=2.0.0",
     "xmlunittest>=0.3.2"
   ],
   extras_require={

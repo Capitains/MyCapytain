@@ -120,14 +120,12 @@ def xmlparser(xml, objectify=True):
     doclose = None
     if isinstance(xml, (etree._Element, ObjectifiedElement, etree._ElementTree)):
         return xml
-    elif isinstance(xml, IOBase):
-        pass
     elif isinstance(xml, basestring):
         xml = StringIO(xml)
         doclose = True
-    else:
-
+    elif not isinstance(xml, IOBase):
         raise TypeError("Unsupported type of resource {}".format(type(xml)))
+
     if objectify:
         parsed = etree.parse(xml).getroot()
     else:

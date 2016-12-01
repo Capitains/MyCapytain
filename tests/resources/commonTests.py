@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from six import text_type as str
+
 import warnings
 from unittest import TestCase
 
@@ -5,6 +9,7 @@ import MyCapytain.errors
 from MyCapytain.common.reference import Reference, URN, Citation
 from MyCapytain.common.utils import Mimetypes
 from MyCapytain.resources.texts.locals.tei import Text
+from io import open
 
 
 class CapitainsXmlTextTest(TestCase):

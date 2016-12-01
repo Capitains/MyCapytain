@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from six import text_type as str
 
 import unittest
 
 from MyCapytain.resources.prototypes.text import *
 import MyCapytain.common.reference
 import MyCapytain.common.metadata
+
 
 class TestProtoResource(unittest.TestCase):
     """ Test for resource, mother class of Text and Passage """

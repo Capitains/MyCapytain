@@ -7,6 +7,7 @@ from collections import defaultdict
 from MyCapytain.common.metadata import Metadata, Metadatum
 from MyCapytain.common.utils import Mimetypes
 
+
 class TestMetadatum(unittest.TestCase):
     def test_init(self):
         a = Metadatum("title")
@@ -36,7 +37,6 @@ class TestMetadatum(unittest.TestCase):
             a[3.5] = "test"
         with six.assertRaisesRegex(self, ValueError, "Less values than keys detected"):
             a[("lat", "grc")] = ["Epigrammata"]
-        
 
     def test_init_with_children(self):
         a = Metadatum("title", [

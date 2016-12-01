@@ -187,7 +187,7 @@ class CapitainsXmlTextTest(TestCase):
     def test_wrong_main_scope(self):
         with open("tests/testing_data/texts/sample2.xml", "rb") as f:
             with self.assertRaises(MyCapytain.errors.RefsDeclError):
-                Text(resource=f)
+                (Text(resource=f)).test()
 
     def test_reffs(self):
         """ Check that every level is returned trough reffs property """

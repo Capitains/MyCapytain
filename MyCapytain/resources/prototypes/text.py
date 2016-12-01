@@ -30,7 +30,8 @@ class TextualElement(object):
     def __init__(self, identifier=None, metadata=None):
         self.__about__ = Collection()
         self.__identifier__ = identifier
-        self.about.metadata = metadata
+        if metadata:
+            self.metadata = metadata
 
     @property
     def text(self):
@@ -76,7 +77,7 @@ class TextualElement(object):
         :type value: Collection
         """
         if isinstance(value, Metadata):
-            self.__about__.metadata = value
+            self.about.metadata = value
         else:
             raise TypeError(".metadata should be an instance of Metadata")
 
@@ -217,6 +218,8 @@ class InteractiveTextualNode(TextualGraph):
 
     :cvar default_exclude: Default exclude for exports
     """
+    def __init__(self, identifier=None, **kwargs):
+        super(InteractiveTextualNode, self).__init__(identifier=identifier, **kwargs)
 
     @property
     def prev(self):

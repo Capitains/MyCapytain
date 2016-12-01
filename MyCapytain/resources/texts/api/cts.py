@@ -200,14 +200,16 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :return: Children URN
         :rtype: URN
         """
-        if reference:
-            urn = "{}:{}".format(
-                str(URN(str(self.urn)).upTo(URN.NO_PASSAGE)),
-                str(reference)
-            )
+        if reference is not None:
+            if ":" in reference:
+                urn = reference
+            else:
+                urn = "{}:{}".format(
+                    str(URN(str(self.urn)).upTo(URN.NO_PASSAGE)),
+                    str(reference)
+                )
         else:
-            urn = self.urn
-
+            urn = str(self.urn)
         _first = __SharedMethod__.firstUrn(
             self.retriever.getFirstUrn(
                 urn
@@ -224,7 +226,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         """
         if self.__first__ is False:
             # Request the next urn
-            self.__first__ = self.getFirstUrn(reference=str(self.urn.reference))
+            self.__first__ = self.getFirstUrn()
         return self.__first__
 
     @property
@@ -313,6 +315,26 @@ class Text(__SharedMethod__, prototypes.CitableText):
         return [
             reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs
         ]
+
+    @property
+    def nextId(self):
+        raise NotImplementedError
+
+    @property
+    def next(self):
+        raise NotImplementedError
+
+    @property
+    def prev(self):
+        raise NotImplementedError
+
+    @property
+    def prevId(self):
+        raise NotImplementedError
+
+    @property
+    def siblingsId(self):
+        raise NotImplementedError
 
     def export(self, output=None, exclude=None):
         """ Export the collection item in the Mimetype required.

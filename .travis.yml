@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.7"
   - "3.4"
   - "3.5"
   - "pypy"
@@ -16,6 +15,7 @@ script:
 
 matrix:
   allow_failures:
+    - python: "2.7"
     - python: pypy
     - python: pypy3
 

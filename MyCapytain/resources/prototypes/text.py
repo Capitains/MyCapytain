@@ -220,6 +220,7 @@ class InteractiveTextualNode(TextualGraph):
     """
     def __init__(self, identifier=None, **kwargs):
         super(InteractiveTextualNode, self).__init__(identifier=identifier, **kwargs)
+        self.__childIds__ = None
 
     @property
     def prev(self):

@@ -327,7 +327,7 @@ class URN(object):
 
     def __init__(self, urn):
         self.__urn = None
-        self.__parsed = self.__parse(urn)
+        self.__parsed = self.__parse__(urn)
 
     @property
     def urn_namespace(self):
@@ -580,7 +580,7 @@ class URN(object):
             "reference": None
         }
 
-    def __parse(self, urn):
+    def __parse__(self, urn):
         """ Parse a URN
 
         :param urn: A URN:CTS

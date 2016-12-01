@@ -23,6 +23,8 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
     def __init__(self, retriever=None, *args, **kwargs):
         super(__SharedMethod__, self).__init__(*args, **kwargs)
         self.__retriever__ = retriever
+        self.__first__ = False
+        self.__last__ = False
         if retriever is None:
             raise MissingAttribute("Object has not retriever")
 
@@ -78,7 +80,10 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         elif isinstance(reference, Reference):
             urn = "{0}:{1}".format(self.urn, str(reference))
         elif isinstance(reference, str):
-            urn = "{0}:{1}".format(self.urn, reference)
+            if ":" in reference:
+                urn = reference
+            else:
+                urn = "{0}:{1}".format(self.urn, reference)
         elif isinstance(reference, list):
             urn = "{0}:{1}".format(self.urn, ".".join(reference))
         else:
@@ -88,6 +93,24 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         self.__parse_request__(response.xpath("//ti:request", namespaces=NS)[0])
         return Passage(urn=urn, resource=response, retriever=self.retriever)
+
+    def getReffs(self, level=1, reference=None):
+        """ Reference available at a given level
+
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
+        :type level: Int
+        :param passage: Subreference (optional)
+        :type passage: Reference
+        :rtype: List.basestring
+        :returns: List of levels
+        """
+        if hasattr(self, "__depth__"):
+            level = level + self.depth
+        if not reference:
+            if hasattr(self, "reference"):
+                reference = self.reference
+
+        return self.getValidReff(level, reference)
 
     def getPassagePlus(self, reference=None):
         """ Retrieve a passage and informations around it and store it in the object
@@ -192,6 +215,30 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         )
         return _first
 
+    @property
+    def firstId(self):
+        """ Children passage
+
+        :rtype: str
+        :returns: First children of the graph. Shortcut to self.graph.children[0]
+        """
+        if self.__first__ is False:
+            # Request the next urn
+            self.__first__ = self.getFirstUrn(reference=str(self.urn.reference))
+        return self.__first__
+
+    @property
+    def lastId(self):
+        """ Children passage
+
+        :rtype: str
+        :returns: First children of the graph. Shortcut to self.graph.children[0]
+        """
+        if self.__last__ is False:
+            # Request the next urn
+            self.__last__ = self.childIds[-1]
+        return self.__last__
+
     @staticmethod
     def firstUrn(resource):
         """ Parse a resource to get the first URN
@@ -199,15 +246,14 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :param resource: XML Resource
         :type resource: etree._Element
         :return: Tuple representing previous and next urn
-        :rtype: URN
+        :rtype: str
         """
         resource = xmlparser(resource)
         urn = resource.xpath("//ti:reply/ti:urn/text()", namespaces=NS, magic_string=True)
 
         if len(urn) > 0:
             urn = str(urn[0])
-
-            return URN(urn)
+            return urn
 
     @staticmethod
     def prevnext(resource):
@@ -216,7 +262,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :param resource: XML Resource
         :type resource: etree._Element
         :return: Tuple representing previous and next urn
-        :rtype: (URN, URN)
+        :rtype: (str, str)
         """
         _prev, _next = False, False
         resource = xmlparser(resource)
@@ -229,10 +275,10 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
             _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=NS, smart_strings=False)
 
             if len(_next_xpath):
-                _next = URN(_next_xpath[0])
+                _next = _next_xpath[0]
 
             if len(_prev_xpath):
-                _prev = URN(_prev_xpath[0])
+                _prev = _prev_xpath[0]
 
         return _prev, _next
 
@@ -304,18 +350,6 @@ class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
         self.__last__ = False
 
         self.__parse__()
-
-    @property
-    def firstId(self):
-        """ Children passage
-
-        :rtype: str
-        :returns: First children of the graph. Shortcut to self.graph.children[0]
-        """
-        if self.__first__ is False:
-            # Request the next urn
-            self.__first__ = self.getFirstUrn(reference=str(self.urn.reference))
-        return self.__first__
 
     @property
     def prevId(self):

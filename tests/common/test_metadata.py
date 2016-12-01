@@ -211,6 +211,23 @@ class TestMetadata(unittest.TestCase):
         self.assertEqual(len(c), 3)
         self.assertEqual(len(c["desc"]), 2)
 
+    def test_export_json(self):
+        b = Metadata()
+        m3 = Metadatum("desc", [("fre", "Omelette")])
+        m4 = Metadatum("title", [("eng", "ttl"), ("fre", "titre")])
+        m5 = Metadatum("dc:editor", [("eng", "Captain Hook"), ("fre", "Capitaine Crochet")])
+        b[("desc", "title", "dc:editor")] = (m3, m4, m5)
+
+        six.assertCountEqual(
+            self,
+            b.export(Mimetypes.JSON),
+            {'dc:editor': {'default': 'eng', 'langs': [('eng', 'Captain Hook'), ('fre', 'Capitaine Crochet')],
+                           'name': 'dc:editor'},
+             'title': {'default': 'eng', 'langs': [('eng', 'ttl'), ('fre', 'titre')], 'name': 'title'},
+             'desc': {'default': 'fre', 'langs': [('fre', 'Omelette')], 'name': 'desc'}},
+            "JSON LD Expression should take into account prefixes"
+        )
+
     def test_export_jsonld(self):
         b = Metadata()
         m3 = Metadatum("desc", [("fre", "Omelette")])

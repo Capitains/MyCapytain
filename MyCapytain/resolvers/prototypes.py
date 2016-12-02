@@ -29,11 +29,12 @@ class Resolver(object):
         """
         raise NotImplementedError()
 
-    def getChildren(self, textId, reference=None, depth=None):
+    def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
         :param textId: Text Identifier
-        :param reference: Passage Reference
-        :return: Graph
+        :param level: Depth for retrieval
+        :param subreference: Passage Reference
+        :return: (str, str)
         """
         raise NotImplementedError()

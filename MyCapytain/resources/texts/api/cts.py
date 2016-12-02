@@ -106,9 +106,6 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         """
         if hasattr(self, "__depth__"):
             level = level + self.depth
-        if not reference:
-            if hasattr(self, "reference"):
-                reference = self.reference
 
         return self.getValidReff(level, reference)
 

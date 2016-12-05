@@ -19,7 +19,10 @@ MyCapytain is a python package which provides a large set of tools to deal with 
 Installation and Requirements
 #############################
 
-The best way to install MyCapytain is to use pip. MyCapytain tries to support both Python 2.7 and Python 3.4.
+The best way to install MyCapytain is to use pip. MyCapytain tries to support Python over 3.4.
+
+The work needed for supporting Python 2.7 is mostly done, however, since 2.0.0, we are giving up on ensuring that \
+MyCapytain will be compatible with Python < 3 while accepting PR which would help doing so.
 
 .. code-block:: shell
 

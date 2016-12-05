@@ -7,11 +7,12 @@
 
 
 """
-import MyCapytain.retrievers.proto
+import MyCapytain.retrievers.prototypes
+from MyCapytain.common.reference import Reference
 import requests
 
 
-class CTS(MyCapytain.retrievers.proto.CTS):
+class CTS(MyCapytain.retrievers.prototypes.CTS):
 
     """ 
         Basic integration of the MyCapytain.retrievers.proto.CTS abstraction
@@ -50,7 +51,7 @@ class CTS(MyCapytain.retrievers.proto.CTS):
         request = requests.get(self.endpoint, params=parameters)
         return request.text
 
-    def getCapabilities(self, inventory=None):
+    def getCapabilities(self, inventory=None, urn=None):
         """ Retrieve the inventory information of an API 
         
         :param inventory: Name of the inventory
@@ -59,6 +60,7 @@ class CTS(MyCapytain.retrievers.proto.CTS):
         """
         return self.call({
             "inv": inventory,
+            "urn": urn,
             "request": "GetCapabilities"
         })
 
@@ -161,3 +163,64 @@ class CTS(MyCapytain.retrievers.proto.CTS):
             "context": context,
             "request": "GetPassagePlus"
         })
+
+    #
+    # Common methods
+    #
+
+    def getMetadata(self, objectId=None, **filters):
+        """ Request metadata about a text or a collection
+
+        :param objectId: Filter for some object identifier
+        :param filters: Kwargs parameters. URN and Inv are available
+        :return: GetCapabilities CTS API request response
+        """
+        filters.update({"urn": objectId})
+        return self.getCapabilities(**filters)
+
+    def getText(self, textId, reference=None, prevnext=False, metadata=False):
+        """ Retrieve a text node from the API
+
+        :param textId: Text Identifier
+        :param reference: Passage Reference
+        :param prevnext: Retrieve graph representing previous and next passage
+        :param metadata: Retrieve metadata about the passage and the text
+        :return: GetPassage or GetPassagePlus CTS API request response
+        """
+        if reference:
+            textId = "{}:{}".format(textId, reference)
+
+        if prevnext or metadata:
+            return self.getPassagePlus(urn=textId)
+        else:
+            return self.getPassage(urn=textId)
+
+    def getSiblings(self, textId, reference):
+        """ Retrieve the siblings of a textual node
+
+        :param textId: Text Identifier
+        :param reference: Passage Reference
+        :return: GetPrevNextUrn request response from the endpoint
+        """
+        textId = "{}:{}".format(textId, reference)
+        return self.getPrevNextUrn(urn=textId)
+
+    def getChildren(self, textId, reference=None, depth=1):
+        """ Retrieve the siblings of a textual node
+
+        :param textId: Text Identifier
+        :param reference: Passage Reference
+        :param depth: Depth of the children reference to retrieve
+        :return: GetValidReff request response from the endpoint
+        """
+        if reference:
+            textId = "{}:{}".format(textId, reference)
+        level = depth
+        if reference:
+            if isinstance(reference, Reference):
+                level += len(reference)
+            else:
+                level += len(Reference(reference))
+        if depth:
+            level = max(depth, level)
+        return self.getValidReff(urn=textId, level=level)

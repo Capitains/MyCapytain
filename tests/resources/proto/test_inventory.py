@@ -6,22 +6,25 @@ import six
 
 from io import open
 from collections import defaultdict
-from MyCapytain.resources.proto import inventory
+from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import URN
 
-class Resource(inventory.Resource):
+
+class Resource(cts.CTSCollection):
     def parse(self, resource):
         return resource
 
-class TIV(inventory.TextInventory):
+
+class TIV(cts.TextInventory):
     def parse(self, resource):
-        self.textgroups = defaultdict(inventory.TextGroup)
+        self.textgroups = defaultdict(cts.TextGroup)
         return resource
+
 
 class TestRepoProto(unittest.TestCase):
     def test_resource_proto(self):
         with self.assertRaises(NotImplementedError):
-            a = inventory.Resource(resource="hello")
+            a = cts.CTSCollection(resource="hello")
 
     def test_implementation(self):
         a = Resource(resource="hello")
@@ -62,17 +65,16 @@ class TestRepoProto(unittest.TestCase):
             b["urn:cts:greekLit:tg2"]
         
     def test_edit_trans(self):
-        a = inventory.Edition()
-        b = inventory.Translation()
-        self.assertIsInstance(a, inventory.Text)
-        self.assertIsInstance(b, inventory.Text)
+        a = cts.Edition()
+        b = cts.Translation()
+        self.assertIsInstance(a, cts.Text)
+        self.assertIsInstance(b, cts.Text)
         self.assertEqual(a.subtype, "Edition")
         self.assertEqual(b.subtype, "Translation")
 
     def test_write(self):
         a = Resource(resource="hello")
-        with self.assertRaises(NotImplementedError):
-            a.export()
+        self.assertEqual(a.export(), None, "Empty data should be None")
 
     def test_str(self):
         a = Resource(resource="hello")

@@ -5,12 +5,11 @@ import unittest
 from six import text_type as str
 from io import open
 
-from MyCapytain.common.utils import xmlparser, NS
-from MyCapytain.resources.texts.api import *
-from MyCapytain.resources.texts.tei import Citation
+from MyCapytain.resources.texts.api.cts import Passage, Text
 from MyCapytain.retrievers.cts5 import CTS
-from MyCapytain.common.reference import Reference, URN
-from lxml import etree
+from MyCapytain.common.reference import Reference, Citation, URN
+from MyCapytain.common.metadata import Metadata, Metadatum
+from MyCapytain.common.utils import xmlparser, NS
 import mock
 
 with open("tests/testing_data/cts/getValidReff.xml") as f:
@@ -27,6 +26,8 @@ with open("tests/testing_data/cts/getFirstUrnEmpty.xml") as f:
     Get_FIRST_EMPTY = xmlparser(f)
 with open("tests/testing_data/cts/getlabel.xml") as f:
     GET_LABEL = xmlparser(f)
+with open("tests/testing_data/cts/getValidReff.1.1.xml") as f:
+    GET_VALID_REFF_1_1 = xmlparser(f)
 
 
 class TestAPIText(unittest.TestCase):
@@ -34,15 +35,18 @@ class TestAPIText(unittest.TestCase):
     """
     def setUp(self):
         a = Citation(
-            name="line"
+            name="line",
+            refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']/tei:div[@n='$2']/tei:l[@n='$3']"
         )
         b = Citation(
             name="poem",
-            child=a
+            child=a,
+            refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']/tei:div[@n='$2']"
         )
         self.citation = Citation(
             name="book",
-            child=b
+            child=b,
+            refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']"
         )
         self.endpoint = CTS("http://services.perseids.org/api/cts")
 
@@ -51,16 +55,12 @@ class TestAPIText(unittest.TestCase):
         """
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
         self.assertEqual(str(text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        self.assertEqual(text.resource, self.endpoint)
+        self.assertEqual(text.retriever, self.endpoint)
         self.assertEqual(text.citation, self.citation)
 
-        text = Text(
-            "urn:cts:latinLit:phi1294.phi002.perseus-lat2",
-            self.endpoint,
-            citation=self.citation,
-            metadata=MyCapytain.common.metadata.Metadata(["testing"])
-        )
-        self.assertIsInstance(text.metadata["testing"], MyCapytain.common.metadata.Metadatum)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation,
+                    metadata=Metadata(keys=["testing_init"]))
+        self.assertIsInstance(text.metadata.metadata["testing_init"], Metadatum)
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getvalidreff(self, requests):
@@ -193,15 +193,15 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_get_prev_next_urn(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = NEXT_PREV
         _prev, _next = text.getPrevNextUrn("1.1")
-        self.assertEqual(str(_prev.reference), "1.pr", "Endpoint should be called and URN should be parsed")
-        self.assertEqual(str(_next.reference), "1.2", "Endpoint should be called and URN should be parsed")
+        self.assertEqual(str((URN(_prev)).reference), "1.pr", "Endpoint should be called and URN should be parsed")
+        self.assertEqual(str((URN(_next)).reference), "1.2", "Endpoint should be called and URN should be parsed")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_first_urn(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = Get_FIRST
         first = text.getFirstUrn()
         self.assertEqual(
@@ -218,7 +218,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_first_urn_when_empty(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = Get_FIRST_EMPTY
         first = text.getFirstUrn()
         self.assertEqual(
@@ -235,7 +235,7 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_init_without_citation(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = GET_PASSAGE
 
         # Test with -1
@@ -251,16 +251,20 @@ class TestAPIText(unittest.TestCase):
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getLabel(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = GET_LABEL
 
-        label = text.getLabel()
-        self.assertEqual(label["title"]["eng"], "Epigrammata")
+        collection = text.getLabel()
+        self.assertEqual(collection.metadata["title"]["eng"], "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", citation=self.citation, resource=self.endpoint)
-        requests.return_value.text = GET_VALID_REFF
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint, citation=self.citation)
+        requests.side_effect = [
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF)
+        ]
 
         reffs = text.reffs
         self.assertEqual(len(requests.mock_calls), 3)
@@ -269,13 +273,133 @@ class TestAPIText(unittest.TestCase):
             params={'urn': 'urn:cts:latinLit:phi1294.phi002.perseus-lat2', 'request': 'GetValidReff', 'level': '3'}
         )
         # And when no citation length
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat3", resource=self.endpoint)
-
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat3", retriever=self.endpoint)
+        requests.side_effect = [
+            mock.Mock(text=GET_LABEL),
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF),
+            mock.Mock(text=GET_VALID_REFF)
+        ]
         reffs = text.reffs
-        self.assertEqual(len(requests.mock_calls), 6)
+        self.assertEqual(len(requests.mock_calls), 7)
         requests.assert_called_with(
             'http://services.perseids.org/api/cts',
             params={'urn': 'urn:cts:latinLit:phi1294.phi002.perseus-lat3', 'request': 'GetValidReff', 'level': '3'}
+        )
+
+    def test_siblings_raise(self):
+        text = Text(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2",
+            retriever=self.endpoint
+        )
+        with self.assertRaises(NotImplementedError):
+            text.prev
+        with self.assertRaises(NotImplementedError):
+            text.prevId
+        with self.assertRaises(NotImplementedError):
+            text.siblingsId
+        with self.assertRaises(NotImplementedError):
+            text.next
+        with self.assertRaises(NotImplementedError):
+            text.nextId
+
+    def test_get_first(self):
+        self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
+        self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        passage = Text(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2",
+            retriever=self.endpoint
+        )
+
+        # When next does not exist from the original resource
+        first = passage.first
+        self.endpoint.getFirstUrn.assert_called_with("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
+        self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
+        self.assertIsInstance(first, Passage)
+
+    def test_get_first_id(self):
+        self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
+        self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
+        self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        passage = Text(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2",
+            retriever=self.endpoint
+        )
+
+        # When next does not exist from the original resource
+        self.assertEqual(
+            str(passage.firstId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "FirstId should resolve"
+        )
+
+    def test_get_last_id(self):
+        self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
+        self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
+        self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        passage = Text(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2",
+            retriever=self.endpoint
+        )
+
+        # When next does not exist from the original resource
+        self.assertEqual(
+            str(passage.lastId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6",
+            "FirstId should resolve"
+        )
+
+    def test_child_id(self):
+        """ Test next property, given that next information already exists or not)
+        """
+        self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
+        self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
+        self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        passage = Text(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            retriever=self.endpoint
+        )
+
+        self.assertEqual(
+            passage.childIds,
+            [
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.2",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.3",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.4",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
+            ],
+            "FirstId should resolve"
+        )
+
+    def test_children(self):
+        """ Test next property, given that next information already exists or not)
+        """
+
+        self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
+        self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
+        self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        passage = Text(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            retriever=self.endpoint
+        )
+
+        self.assertEqual(len(list(passage.children)), 6)
+        self.assertEqual(
+            [str(x.urn) for x in passage.children],
+            [
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.2",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.3",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.4",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
+            ],
+            "Passage should be retrieved and have the correct URN"
         )
 
 
@@ -299,10 +423,9 @@ class TestCTSPassage(unittest.TestCase):
         self.endpoint = CTS(self.url)
         self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF)
         self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
-        self.text = Text(
-            "urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation
-        )
+        self.text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
 
     def test_next_getprevnext(self):
         """ Test next property, given that next information already exists or not)
@@ -311,11 +434,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __next = passage.getNext()
+        __next = passage.next
 
         self.endpoint.getPrevNextUrn.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
@@ -334,11 +457,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE_PLUS,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __next = passage.getNext()
+        __next = passage.next
         # print(self.endpoint.getPrevNextUrn.mock_calls)
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2")
         self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
@@ -350,11 +473,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __prev = passage.getPrev()
+        __prev = passage.prev
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
@@ -367,12 +490,12 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        self.assertEqual(str(passage.prev.reference), "1.pr")
-        self.assertEqual(str(passage.next.reference), "1.2")
+        self.assertEqual(str((URN(passage.prevId)).reference), "1.pr")
+        self.assertEqual(str((URN(passage.nextId)).reference), "1.2")
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
 
     def test_prev_resource(self):
@@ -383,11 +506,11 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE_PLUS,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        __prev = passage.getPrev()
+        __prev = passage.prev
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
         self.assertIsInstance(__prev, Passage)
@@ -400,20 +523,20 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
-        self.assertIn("لا یا ایها الساقی ادر کاسا و ناولها ###", passage.text())
+        self.assertIn("لا یا ایها الساقی ادر کاسا و ناولها ###", passage.text)
 
     def test_first_urn(self):
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=self.endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,
-            parent=text
+            retriever=self.endpoint
         )
         self.assertEqual(
-            str(passage.first), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            str(passage.firstId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
             "Endpoint should be called and URN should be parsed"
         )
         self.endpoint.getFirstUrn.assert_called_with(
@@ -424,30 +547,137 @@ class TestCTSPassage(unittest.TestCase):
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,
-            parent=self.text
+            retriever=self.endpoint
         )
 
         # When next does not exist from the original resource
-        first = passage.getFirst()
+        first = passage.first
         self.endpoint.getFirstUrn.assert_called_with("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
         self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=NS)[0])
         self.assertIsInstance(first, Passage)
 
+    def test_get_first_id(self):
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            resource=GET_PASSAGE,
+            retriever=self.endpoint
+        )
+
+        # When next does not exist from the original resource
+        self.assertEqual(
+            str(passage.firstId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "FirstId should resolve"
+        )
+
+    def test_get_last_id(self):
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            resource=GET_PASSAGE,
+            retriever=self.endpoint
+        )
+
+        # When next does not exist from the original resource
+        self.assertEqual(
+            str(passage.lastId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6",
+            "FirstId should resolve"
+        )
+
+    def test_prev_id(self):
+        """ Test next property, given that next information already exists or not)
+        """
+
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            resource=GET_PASSAGE,
+            retriever=self.endpoint
+        )
+
+        self.assertEqual(
+            str(passage.prevId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "PrevId should resolve"
+        )
+
+    def test_next_id(self):
+        """ Test next property, given that next information already exists or not)
+        """
+
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            resource=GET_PASSAGE,
+            retriever=self.endpoint
+        )
+
+        self.assertEqual(
+            str(passage.nextId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            "NextId should resolve"
+        )
+
+    def test_child_id(self):
+        """ Test next property, given that next information already exists or not)
+        """
+
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            resource=GET_PASSAGE,
+            retriever=self.endpoint
+        )
+
+        self.assertEqual(
+            passage.childIds,
+            [
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.2",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.3",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.4",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
+            ],
+            "Passage should be retrieved and have the correct URN"
+        )
+
+    def test_children(self):
+        """ Test next property, given that next information already exists or not)
+        """
+
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            resource=GET_PASSAGE,
+            retriever=self.endpoint
+        )
+
+        self.assertEqual(len(list(passage.children)), 6)
+        self.assertEqual(
+            [str(x.urn) for x in passage.children],
+            [
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.2",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.3",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.4",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
+                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
+            ],
+            "FirstId should resolve"
+        )
+
     def test_first_urn_when_empty(self):
 
         endpoint = CTS(self.url)
         endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST_EMPTY)
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", resource=endpoint)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
         passage = Passage(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
             resource=GET_PASSAGE,
-            parent=text
+            retriever=endpoint
         )
-        self.assertEqual(
-            passage.first, None,
-            "Endpoint should be called and none should be returned if there is none"
-        )
+        first = passage.firstId
         endpoint.getFirstUrn.assert_called_with(
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1"
+        )
+        self.assertEqual(
+            first, None,
+            "Endpoint should be called and none should be returned if there is none"
         )

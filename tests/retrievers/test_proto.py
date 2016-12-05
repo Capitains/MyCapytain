@@ -1,6 +1,6 @@
 import unittest
 
-from MyCapytain.retrievers.proto import *
+from MyCapytain.retrievers.prototypes import *
 
 
 class TestEndpointsProto(unittest.TestCase):
@@ -60,6 +60,18 @@ class TestEndpointsProto(unittest.TestCase):
 
         with self.assertRaises(NotImplementedError):
             self.cts.getLabel("urn", "inventory")
+
+    def test_raise_CitableTextServicesProto(self):
+        """ Ensure nothing is implemented """
+        Proto = CitableTextServiceRetriever("url")
+        with self.assertRaises(NotImplementedError):
+            Proto.getMetadata(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        with self.assertRaises(NotImplementedError):
+            Proto.getText(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        with self.assertRaises(NotImplementedError):
+            Proto.getChildren(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        with self.assertRaises(NotImplementedError):
+            Proto.getSiblings(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", reference="1.1")
 
     def test_raise_CTS_getCapabilities_arguments(self):
         """ Tests that methods getCapabilities have consistent arguments"""

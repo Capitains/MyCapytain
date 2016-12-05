@@ -2,14 +2,16 @@
 from __future__ import unicode_literals
 
 import unittest
-import xmlunittest
-import lxml.etree as etree
-from io import open, StringIO
 from copy import deepcopy
+from io import open, StringIO
 from operator import attrgetter
 
-from MyCapytain.resources.inventory import *
-import MyCapytain.resources.proto.text
+import lxml.etree as etree
+import six
+import xmlunittest
+
+from MyCapytain.common.utils import Mimetypes
+from MyCapytain.resources.collections.cts import *
 
 
 class XML_Compare(object):
@@ -141,17 +143,17 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     def test_xml_TextInventoryLength(self):
         """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         self.assertEqual(len(TI), 15)
 
     def test_xml_TextInventoryParsing(self):
         """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         self.assertGreater(len(TI.textgroups), 0)
 
     def test_xml_TextInventory_GetItem(self):
         """ Test access through getItem obj[urn] """
-        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         self.assertIsInstance(TI["urn:cts:latinLit:phi1294"], TextGroup)
         self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002"], Work)
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].urn), "urn:cts:latinLit:phi1294.phi002")
@@ -162,7 +164,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     def test_xml_Work_GetItem(self):
         """ Test access through getItem obj[urn] """
-        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         tg = TI["urn:cts:latinLit:phi1294"]
         self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002"], Work)
         self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002"].urn), "urn:cts:latinLit:phi1294.phi002")
@@ -213,7 +215,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(T.editions(), [E])
 
     def test_get_parent(self):
-        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         tg = TI["urn:cts:latinLit:phi1294"]
         wk = TI["urn:cts:latinLit:phi1294.phi002"]
         tx = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
@@ -225,14 +227,14 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(tx[3], TI)
 
     def test_translation(self):
-        TI = TextInventory(resource=self.getCapabilities, id="TestInv")
+        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         tr = TI["urn:cts:latinLit:phi1294.phi002.perseus-eng2"]
         self.assertIsInstance(tr, Text)
         self.assertEqual(tr.subtype, "Translation")
 
     def test_parse_string(self):
         TI = TextInventory(
-            id="TestInv",
+            name="TestInv",
             resource="""
 <ti:TextInventory xmlns:ti="http://chs.harvard.edu/xmlns/cts" tiid="thibault3">
     <ti:textgroup urn="urn:cts:greekLit:tlg0003">
@@ -252,13 +254,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def test_parse_error(self):
         with self.assertRaises(TypeError):
             TI = TextInventory(
-                id="TestInv",
+                name="TestInv",
                 resource=5
             )
 
     def test_Inventory_pickle(self):
         """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
+        TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
         from pickle import dumps, loads
 
         dp = dumps(TI)
@@ -273,7 +275,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     def test_Inventory_metadata(self):
         """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
+        TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
         self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["eng"], "Martial")
         self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["lat"], "Martialis")
         self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["eng"], "Epigrammata")
@@ -318,7 +320,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
         t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
 
-        ti = TextInventory(resource=t, id="annotsrc")
+        ti = TextInventory(resource=t, name="annotsrc")
         self.assertXmlEquivalentOutputs(*compareSTR(str(ti), t))
 
         # Test individual :
@@ -338,10 +340,10 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     def test_export_to_text(self):
         """ Test export to Text object """
-        TI = TextInventory(resource=self.getCapabilities, id="annotsrc")
+        TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
-        txt_text = ti_text.export(output=MyCapytain.resources.proto.text.Text)
+        txt_text = ti_text.export(output=Mimetypes.PYTHON.MyCapytain.ReadableText)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(txt_text.metadata["groupname"]["eng"], "Martial")  # Check inheritance of textgroup metadata
         self.assertEqual(txt_text.metadata["title"]["eng"], "Epigrammata")  # Check inheritance of work metadata
@@ -351,7 +353,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(txt_text.citation.scope, "/tei:TEI/tei:text/tei:body/tei:div")
 
     def test_partial_str(self):
-        ti = TextInventory(resource=self.t, id="annotsrc")
+        ti = TextInventory(resource=self.t, name="annotsrc")
 
         e = deepcopy(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
         e.urn = None
@@ -513,6 +515,122 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             TypeError,
             lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(Work(urn="urn:cts:latinLit:phi1297.phi002")),
             "Addition of different type should fail for TextGroup"
+        )
+
+    def test_export_jsonld(self):
+        tg = """<ti:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+        <ti:groupname xml:lang='eng'>Martial</ti:groupname>
+        <ti:groupname xml:lang='lat'>Martialis</ti:groupname>
+        <ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+        <ti:title xml:lang='eng'>Epigrammata</ti:title>
+        <ti:title xml:lang='ger'>Epigrammen</ti:title>
+        <ti:edition urn='urn:cts:latinLit:phi1294.phi002.opp-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+        <ti:label xml:lang='eng'>Epigrammata Label</ti:label>
+        <ti:label xml:lang='fre'>Epigrammes Label</ti:label>
+        <ti:description xml:lang='eng'>W. Heraeus</ti:description>
+        <ti:description xml:lang='fre'>G. Heraeus</ti:description>
+        <ti:online></ti:online>
+        </ti:edition>
+        </ti:work>
+        <ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi001' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+        <ti:title xml:lang='eng'>On the Spectacles</ti:title>
+        <ti:title xml:lang='ger'>De spectaculis</ti:title>
+        </ti:work>
+        </ti:textgroup>"""
+        tg = TextGroup(urn="urn:cts:latinLit:phi1294", resource=tg)
+
+        six.assertCountEqual(
+            self,
+            {
+                '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294',
+                'http://w3id.org/dts-ontology/capabilities': {
+                    'http://w3id.org/dts-ontology/navigation': {
+                        'http://w3id.org/dts-ontology/parents': [
+
+                        ],
+                        'http://w3id.org/dts-ontology/siblings': {
+
+                        }
+                    },
+                    'http://w3id.org/dts-ontology/ordered': False,
+                    'http://w3id.org/dts-ontology/static': True,
+                    'http://w3id.org/dts-ontology/supportsRole': False
+                },
+                'http://w3id.org/dts-ontology/description': None,
+                'http://w3id.org/dts-ontology/members': [
+                    {
+                        '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002',
+                        'http://w3id.org/dts-ontology/capabilities': {
+                            'http://w3id.org/dts-ontology/navigation': {
+                                'http://w3id.org/dts-ontology/parents': [
+
+                                ],
+                                'http://w3id.org/dts-ontology/siblings': {
+
+                                }
+                            },
+                            'http://w3id.org/dts-ontology/ordered': False,
+                            'http://w3id.org/dts-ontology/static': True,
+                            'http://w3id.org/dts-ontology/supportsRole': False
+                        },
+                        'http://w3id.org/dts-ontology/description': None,
+                        'http://w3id.org/dts-ontology/members': [
+                            {
+                                '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002.opp-lat2',
+                                'http://w3id.org/dts-ontology/capabilities': {
+                                    'http://w3id.org/dts-ontology/navigation': {
+                                        'http://w3id.org/dts-ontology/parents': [
+
+                                        ],
+                                        'http://w3id.org/dts-ontology/siblings': {
+
+                                        }
+                                    },
+                                    'http://w3id.org/dts-ontology/ordered': False,
+                                    'http://w3id.org/dts-ontology/static': True,
+                                    'http://w3id.org/dts-ontology/supportsRole': False
+                                },
+                                'http://w3id.org/dts-ontology/description': None,
+                                'http://w3id.org/dts-ontology/properties': {
+                                    'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://w3id.org/dts-ontology/collection'
+                                }
+                            }
+                        ],
+                        'http://w3id.org/dts-ontology/properties': {
+                            'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
+                        }
+                    },
+                    {
+                        '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi001',
+                        'http://w3id.org/dts-ontology/capabilities': {
+                            'http://w3id.org/dts-ontology/navigation': {
+                                'http://w3id.org/dts-ontology/parents': [
+
+                                ],
+                                'http://w3id.org/dts-ontology/siblings': {
+
+                                }
+                            },
+                            'http://w3id.org/dts-ontology/ordered': False,
+                            'http://w3id.org/dts-ontology/static': True,
+                            'http://w3id.org/dts-ontology/supportsRole': False
+                        },
+                        'http://w3id.org/dts-ontology/description': None,
+                        'http://w3id.org/dts-ontology/properties': {
+                            'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
+                        }
+                    }
+                ],
+                'http://w3id.org/dts-ontology/properties': {
+                    'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/TextGroup'
+                }
+            },
+            tg.export(Mimetypes.JSON.DTS.Std, domain="http://capitain.github.io/domain/"),
+            "JSON DTS export should be stable"
         )
 
 

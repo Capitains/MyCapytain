@@ -15,12 +15,25 @@ from six import text_type as str
 from builtins import range, object
 from copy import copy
 import re
-
+from lxml.etree import _Element
+from MyCapytain.common.utils import NS
 
 REFSDECL_SPLITTER = re.compile("/+[\*()|\sa-zA-Z0-9:\[\]@=\\\{\$'\"\.\s]+")
 REFSDECL_REPLACER = re.compile("\$[0-9]+")
 SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
 REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
+
+
+def __childOrNone__(liste):
+    """ Used to parse resources in Citation
+
+    :param liste:
+    :return:
+    """
+    if len(liste) > 0:
+        return liste[-1]
+    else:
+        return None
 
 
 class Reference(object):
@@ -314,7 +327,7 @@ class URN(object):
 
     def __init__(self, urn):
         self.__urn = None
-        self.__parsed = self.__parse(urn)
+        self.__parsed = self.__parse__(urn)
 
     @property
     def urn_namespace(self):
@@ -567,7 +580,7 @@ class URN(object):
             "reference": None
         }
 
-    def __parse(self, urn):
+    def __parse__(self, urn):
         """ Parse a URN
 
         :param urn: A URN:CTS
@@ -621,6 +634,9 @@ class Citation(object):
     :type refsDecl: basestring
     :ivar child: A citation
     :type child: Citation
+
+    .. automethod:: __str__
+
 
     """
 
@@ -756,13 +772,18 @@ class Citation(object):
             else:
                 break
 
-    def __len__(self):
-       """ Length method
+    def __getitem__(self, item):
+        if not isinstance(item, int) or item > len(self)-1:
+            return KeyError
+        return [x for x in self][item]
 
-       :rtype: int
-       :returns: Number of nested citations
-       """
-       return len([item for item in self])
+    def __len__(self):
+        """ Length method
+
+        :rtype: int
+        :returns: Number of nested citations
+        """
+        return len([item for item in self])
 
     def fill(self, passage=None, xpath=None):
         """ Fill the xpath with given informations
@@ -822,6 +843,73 @@ class Citation(object):
         self.__dict__ = dic
         return self
 
+    """ Implementation of Citation for TEI markup
+    """
+
+    def isEmpty(self):
+        """ Check if the citation has not been set
+
+        :return: True if nothing was setup
+        :rtype: bool
+        """
+        return self.refsDecl is None and self.scope is None and self.xpath is None
+
+    def __str__(self):
+        """ Returns a string refsDecl version of the object
+
+        :Example:
+            >>>    a = Citation(name="book", xpath="/tei:TEI/tei:body/tei:text/tei:div", scope="/tei:div[@n=\"1\"]")
+            >>>    str(a) == "<tei:refsDecl n='book' xpath='/tei:TEI/tei:body/tei:text/tei:div' scope='/tei:div[@n=\"1\"]'>"
+            >>>         "<tei:p>This Citation extracts Book from the text</tei:p>"
+            >>>    "</tei:refsDecl>"
+        """
+        if self.refsDecl is None:
+            return ""
+
+        label = ""
+        if self.name is not None:
+            label = self.name
+
+        return "<tei:cRefPattern n=\"{label}\" matchPattern=\"{regexp}\" replacementPattern=\"#xpath({refsDecl})\">" \
+               "<tei:p>This pointer pattern extracts {label}</tei:p></tei:cRefPattern>".format(
+                   refsDecl=self.refsDecl,
+                   label=label,
+                   regexp="\.".join(["(\w+)" for i in range(0, self.refsDecl.count("$"))])
+               )
+
+    @staticmethod
+    def ingest(resource, xpath=".//tei:cRefPattern"):
+        """ Ingest a resource and store data in its instance
+
+        :param resource: XML node cRefPattern or list of them in ASC hierarchy order (deepest to highest, eg. lines to poem to book)
+        :type resource: [lxml.etree._Element]
+        :param xpath: XPath to use to retrieve citation
+        :type xpath: str
+
+        :returns: A citation object
+        :rtype: Citation
+        """
+        if len(resource) == 0 and isinstance(resource, list):
+            return None
+        elif isinstance(resource, list):
+            resource = resource[0]
+        elif not isinstance(resource, _Element):
+            return None
+
+        resource = resource.xpath(xpath, namespaces=NS)
+        resources = []
+
+        for x in range(0, len(resource)):
+            resources.append(
+                Citation(
+                    name=resource[x].get("n"),
+                    refsDecl=resource[x].get("replacementPattern")[7:-1],
+                    child=__childOrNone__(resources)
+                )
+            )
+
+        return resources[-1]
+
 
 def REF_REPLACER(match, passage):
     """ Helper to replace xpath/scope/refsDecl on iteration with passage value
@@ -840,3 +928,81 @@ def REF_REPLACER(match, passage):
         return groups[0]
     else:
         return "{1}='{0}'".format(ref, groups[0])
+
+
+class NodeId(object):
+    """ Collection of directional references for a Tree
+
+    :param identifier: Current object identifier
+    :type identifier: str
+    :param children: Current node Children's Identifier
+    :type children: [str]
+    :param parent: Parent of the current node
+    :type parent: str
+    :param siblings: Previous and next node of the current node
+    :type siblings: str
+    :param depth: Depth of the node in the global hierarchy of the text tree
+    :type depth: int
+    """
+    def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=1):
+        self.__children__ = children or []
+        self.__parent__ = parent
+        self.__prev__, self.__next__ = siblings
+        self.__identifier__ = identifier
+        self.__depth__ = depth
+
+    @property
+    def depth(self):
+        """ Depth of the node in the global hierarchy of the text tree
+
+        :rtype: [str]
+        """
+        return self.__depth__
+
+    @property
+    def childIds(self):
+        """ Siblings Node
+
+        :rtype: [str]
+        """
+        return self.__children__
+
+    @property
+    def parentId(self):
+        """ Parent Node
+
+        :rtype: str
+        """
+        return self.__parent__
+
+    @property
+    def siblingsId(self):
+        """ Siblings Node
+
+        :rtype: (str, str)
+        """
+        return self.__prev__, self.__next__
+
+    @property
+    def prevId(self):
+        """ Previous Node (Sibling)
+
+        :rtype: str
+        """
+        return self.__prev__
+
+    @property
+    def nextId(self):
+        """ Next Node (Sibling)
+
+        :rtype: str
+        """
+        return self.__next__
+
+    @property
+    def id(self):
+        """Current object identifier
+
+        :rtype: str
+        """
+        return self.__identifier__

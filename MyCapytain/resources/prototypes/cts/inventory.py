@@ -8,25 +8,30 @@
 
 """
 
+from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.common.reference import URN, Reference, Citation
 from MyCapytain.common.metadata import Metadata
+from MyCapytain.common.utils import RDF_PREFIX, Mimetypes
 from MyCapytain.errors import InvalidURN
 from past.builtins import basestring
 from collections import defaultdict
 from copy import copy, deepcopy
 from lxml import etree
-from builtins import object
 from six import text_type as str
 
 
-class Resource(object):
+class CTSCollection(Collection):
     """ Resource represents any resource from the inventory
 
     :param resource: Resource representing the TextInventory
     :type resource: Any
     """
     def __init__(self, resource=None):
-        self.metadata = Metadata()
+        super(CTSCollection, self).__init__()
+
+        if hasattr(type(self), "CTSMODEL"):
+            self.properties[RDF_PREFIX["cts"]+"model"] = RDF_PREFIX["cts"] + type(self).CTSMODEL
+
         self.resource = None
         if resource is not None:
             self.setResource(resource)
@@ -57,9 +62,6 @@ class Resource(object):
         return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn and self.resource == other.resource
 
     def __str__(self):
-        raise NotImplementedError()
-
-    def export(self, format=None):
         raise NotImplementedError()
 
     def __urnitem__(self, key):
@@ -96,7 +98,7 @@ class Resource(object):
     def setResource(self, resource):
         """ Set the object property resource
 
-        :param resource: Resource representing the TextInventory 
+        :param resource: Resource representing the TextInventory
         :type resource: Any
         :rtype: Any
         :returns: Input resource
@@ -106,9 +108,9 @@ class Resource(object):
         return self.resource
 
     def parse(self, resource):
-        """ Parse the object resource 
+        """ Parse the object resource
 
-        :param resource: Resource representing the TextInventory 
+        :param resource: Resource representing the TextInventory
         :type resource: Any
         :rtype: List
         """
@@ -143,7 +145,7 @@ class Resource(object):
         return self
 
 
-class Text(Resource):
+class Text(CTSCollection):
     """ Represents a CTS Text
 
     :param resource: Resource representing the TextInventory
@@ -151,7 +153,15 @@ class Text(Resource):
     :param urn: Identifier of the Text
     :type urn: str
     """
+
+    DC_TITLE = "label"
+
+    @property
+    def TEXT_URI(self):
+        return RDF_PREFIX["cts"] + self.subtype
+
     def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
+        super(Text, self).__init__()
         self.resource = None
         self.citation = None
         self.lang = None
@@ -164,6 +174,7 @@ class Text(Resource):
 
         if urn is not None:
             self.urn = URN(urn)
+            self.id = str(self.urn)
 
         if parents is not None:
             self.parents = parents
@@ -171,6 +182,18 @@ class Text(Resource):
 
         if resource is not None:
             self.setResource(resource)
+
+    @property
+    def readable(self):
+        return True
+
+    @property
+    def members(self):
+        return []
+
+    @property
+    def descendants(self):
+        return []
 
     def translations(self, key=None):
         """ Get translations in given language
@@ -201,7 +224,7 @@ def Translation(resource=None, urn=None, parents=None):
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
 
 
-class Work(Resource):
+class Work(CTSCollection):
     """ Represents a CTS Work
 
     CTS Work can be added to each other which would most likely happen if you take your data from multiple API or \
@@ -214,7 +237,12 @@ class Work(Resource):
     :param parents: List of parents for current object
     :type parents: Tuple.<TextInventory>
     """
+
+    DC_TITLE_KEY = "title"
+    TYPE_URI = RDF_PREFIX["cts"] + "Work"
+
     def __init__(self, resource=None, urn=None, parents=None):
+        super(Work, self).__init__()
         self.resource = None
         self.lang = None
         self.urn = None
@@ -224,12 +252,17 @@ class Work(Resource):
 
         if urn is not None:
             self.urn = URN(urn)
+            self.id = str(self.urn)
 
         if parents is not None:
             self.parents = parents
 
         if resource is not None:
             self.setResource(resource)
+
+    @property
+    def readable(self):
+        return True
 
     def update(self, other):
         """ Merge two Work Objects.
@@ -279,8 +312,12 @@ class Work(Resource):
         """
         return len(self.texts)
 
+    @property
+    def members(self):
+        return list(self.texts.values())
 
-class TextGroup(Resource):
+
+class TextGroup(CTSCollection):
     """ Represents a CTS Textgroup
 
     CTS TextGroup can be added to each other which would most likely happen if you take your data from multiple API or \
@@ -293,7 +330,15 @@ class TextGroup(Resource):
     :param parents: List of parents for current object
     :type parents: Tuple.<TextInventory>
     """
+    DC_TITLE_KEY = "groupname"
+    TYPE_URI = RDF_PREFIX["cts"] + "TextGroup"
+
+    @property
+    def members(self):
+        return list(self.works.values())
+
     def __init__(self, resource=None, urn=None, parents=None):
+        super(TextGroup, self).__init__()
         self.resource = None
         self.urn = None
         self.works = defaultdict(Work)
@@ -302,6 +347,7 @@ class TextGroup(Resource):
 
         if urn is not None:
             self.urn = URN(urn)
+            self.id = str(self.urn)
 
         if parents:
             self.parents = parents
@@ -349,7 +395,7 @@ class TextGroup(Resource):
         ])
 
 
-class TextInventory(Resource):
+class TextInventory(CTSCollection):
     """ Initiate a TextInventory resource
 
     :param resource: Resource representing the TextInventory
@@ -357,10 +403,17 @@ class TextInventory(Resource):
     :param id: Identifier of the TextInventory
     :type id: str
     """
-    def __init__(self, resource=None, id=None):
+    TYPE_URI = RDF_PREFIX["cts"] + "TextInventory"
+
+    @property
+    def members(self):
+        return list(self.textgroups.values())
+
+    def __init__(self, resource=None, name=None):
+        super(TextInventory, self).__init__()
         self.resource = None
         self.textgroups = defaultdict(TextGroup)
-        self.id = id
+        self.__id__ = name
         self.parents = list()
         if resource is not None:
             self.setResource(resource)

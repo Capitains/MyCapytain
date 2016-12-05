@@ -1,7 +1,7 @@
 language: python
 python:
-  - "2.7"
   - "3.4"
+  - "3.5"
   - "pypy"
   - "pypy3"
 
@@ -15,6 +15,7 @@ script:
 
 matrix:
   allow_failures:
+    - python: "2.7"
     - python: pypy
     - python: pypy3
 
@@ -25,3 +26,4 @@ branches:
   only:
     - master
     - 0.1.0dev
+    - dts-dev

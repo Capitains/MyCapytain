@@ -4,6 +4,7 @@ class DuplicateReference(SyntaxWarning):
     """ Error generated when a duplicate is found in Reference
     """
 
+
 class RefsDeclError(Exception):
     """ Error issued when an the refsDecl does not succeed in xpath (no results)
     """
@@ -19,4 +20,9 @@ class InvalidSiblingRequest(Exception):
 
 class InvalidURN(Exception):
     """ This error is thrown when URN are not valid
+    """
+
+
+class MissingAttribute(Exception):
+    """ This error is thrown when an attribute is not present in the Object (missing at startup)
     """

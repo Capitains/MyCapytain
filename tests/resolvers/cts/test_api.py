@@ -20,6 +20,8 @@ with open("tests/testing_data/cts/getValidReff.1.1.xml") as f:
     GET_VALID_REFF = xmlparser(f)
 with open("tests/testing_data/cts/getCapabilities.xml") as f:
     GET_CAPABILITIES = xmlparser(f)
+with open("tests/testing_data/cts/getCapabilities1294002.xml") as f:
+    GET_CAPABILITIES_FILTERED = xmlparser(f)
 
 
 class TestHttpCTSResolver(TestCase):
@@ -319,9 +321,56 @@ class TestHttpCTSResolver(TestCase):
             ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
+        self.assertCountEqual(
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["http://w3id.org/dts-ontology/members"]],
+            ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959", "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
+            "There should be 4 Members in DTS JSON"
+        )
+
+    def test_getMetadata_subset(self):
+        """ Checks retrieval of Metadata information """
+        self.resolver.endpoint.getCapabilities = MagicMock(return_value=GET_CAPABILITIES_FILTERED)
+        metadata = self.resolver.getMetadata(objectId="urn:cts:latinLit:phi1294.phi002")
+        self.resolver.endpoint.getCapabilities.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002")
+        self.assertIsInstance(
+            metadata, Collection,
+            "Resolver should return a collection object"
+        )
+        self.assertIsInstance(
+            metadata.members[0], Text,
+            "Members of Inventory should be TextGroups"
+        )
+        self.assertEqual(
+            len(metadata.descendants), 2,
+            "There should be as many descendants as there is edition, translation"
+        )
+        self.assertEqual(
+            len(metadata.readableDescendants), 2,
+            "There should be 1 edition + 1 translation in readableDescendants"
+        )
+        self.assertEqual(
+            len([x for x in metadata.readableDescendants if isinstance(x, Text)]), 2,
+            "There should be 1 edition + 1 translation in readableDescendants"
+        )
         self.assertEqual(
             len(metadata.export(
                 output=Mimetypes.PYTHON.ETREE
             ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
+        )
+        self.assertCountEqual(
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["http://w3id.org/dts-ontology/members"]],
+            ["urn:cts:latinLit:phi1294.phi002.perseus-lat2", "urn:cts:latinLit:phi1294.phi002.perseus-eng2"],
+            "There should be one member in DTS JSON"
+        )
+        self.assertCountEqual(
+            [
+                x["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]
+                for x in metadata.export(output=Mimetypes.JSON.DTS.Std)\
+                    ["http://w3id.org/dts-ontology/capabilities"]\
+                    ["http://w3id.org/dts-ontology/navigation"]\
+                    ["http://w3id.org/dts-ontology/parents"]
+             ],
+            ["http://chs.harvard.edu/xmlns/cts/TextGroup", "http://chs.harvard.edu/xmlns/cts/TextInventory"],
+            "There should be one member in DTS JSON"
         )

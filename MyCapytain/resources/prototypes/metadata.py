@@ -17,6 +17,7 @@ class Collection(object):
     :type DC_TITLE_KEY: str
     """
     DC_TITLE_KEY = None
+    TYPE_URI = "http://w3id.org/dts-ontology/collection"
 
     @property
     def title(self):
@@ -33,7 +34,8 @@ class Collection(object):
         self.metadata = Metadata()
         self.__id__ = None
         self.properties = {
-            RDF_PREFIX["dts"]+":model": "http://w3id.org/dts-ontology/collection"
+            RDF_PREFIX["dts"]+"model": "http://w3id.org/dts-ontology/collection",
+            RDF_PREFIX["rdf"]+"type": self.TYPE_URI
         }
         self.parents = []
 
@@ -80,7 +82,7 @@ class Collection(object):
         """
         return [member for member in self.descendants if member.readable]
 
-    def default_export(self, output=Mimetypes.JSON.DTS, domain=""):
+    def default_export(self, output=Mimetypes.JSON.DTS.Std, domain=""):
         """ Export the collection item in the Mimetype required
 
         :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
@@ -89,21 +91,7 @@ class Collection(object):
         :type domain: str
         :return: Object using a different representation
         """
-        if output == Mimetypes.JSON.DTS:
-            if self.title:
-                m = self.metadata + self.title
-            else:
-                m = self.metadata
-            o = {
-                "@id": domain+self.id,
-                RDF_PREFIX["dts"] + "description": m.export(Mimetypes.JSON.DTS),
-                RDF_PREFIX["dts"] + "properties" : self.properties
-            }
-            if len(self.members):
-                o[RDF_PREFIX["dts"] + "members"] = [
-                    member.export(Mimetypes.JSON.DTS, domain) for member in self.members
-                ]
-            return o
+        raise NotImplementedError
 
     def export(self, output=None, domain=""):
         """ Export the collection item in the Mimetype required.
@@ -116,4 +104,41 @@ class Collection(object):
         :type domain: str
         :return: Object using a different representation
         """
-        return self.default_export(output, domain)
+        if output == Mimetypes.JSON.DTS.Std or output == Mimetypes.JSON.DTS.NoParents:
+            identifier = self.id
+            if self.id is None:
+                identifier = ""
+            if self.title:
+                m = self.metadata + self.title
+            else:
+                m = self.metadata
+            o = {
+                "@id": domain+identifier,
+                RDF_PREFIX["dts"] + "description": m.export(Mimetypes.JSON.DTS.Std),
+                RDF_PREFIX["dts"] + "properties": self.properties,
+                RDF_PREFIX["dts"] + "capabilities": {
+                    RDF_PREFIX["dts"] + "ordered": False,
+                    RDF_PREFIX["dts"] + "supportsRole": False,
+                    RDF_PREFIX["dts"] + "static": True,
+                    RDF_PREFIX["dts"] + "navigation": {
+                        RDF_PREFIX["dts"] + "parents": [],
+                        RDF_PREFIX["dts"] + "siblings": {}
+                    }
+                },
+            }
+            if len(self.members):
+                o[RDF_PREFIX["dts"] + "members"] = [
+                    member.export(Mimetypes.JSON.DTS.NoParents, domain) for member in self.members
+                ]
+            if output != Mimetypes.JSON.DTS.NoParents and len(self.parents):
+                o[RDF_PREFIX["dts"] + "capabilities"]\
+                 [RDF_PREFIX["dts"] + "navigation"]\
+                 [RDF_PREFIX["dts"] + "parents"] = [
+                    {
+                        "@id": domain+(parent.id or ""),
+                        RDF_PREFIX["rdf"] + "type": parent.TYPE_URI,
+                        RDF_PREFIX["dts"] + "model": "http://w3id.org/dts-ontology/collection",
+                    }
+                    for parent in self.parents
+                ]
+            return o

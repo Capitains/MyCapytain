@@ -156,6 +156,10 @@ class Text(CTSCollection):
 
     DC_TITLE = "label"
 
+    @property
+    def TEXT_URI(self):
+        return RDF_PREFIX["cts"] + self.subtype
+
     def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
         super(Text, self).__init__()
         self.resource = None
@@ -235,6 +239,7 @@ class Work(CTSCollection):
     """
 
     DC_TITLE_KEY = "title"
+    TYPE_URI = RDF_PREFIX["cts"] + "Work"
 
     def __init__(self, resource=None, urn=None, parents=None):
         super(Work, self).__init__()
@@ -326,6 +331,7 @@ class TextGroup(CTSCollection):
     :type parents: Tuple.<TextInventory>
     """
     DC_TITLE_KEY = "groupname"
+    TYPE_URI = RDF_PREFIX["cts"] + "TextGroup"
 
     @property
     def members(self):
@@ -397,6 +403,7 @@ class TextInventory(CTSCollection):
     :param id: Identifier of the TextInventory
     :type id: str
     """
+    TYPE_URI = RDF_PREFIX["cts"] + "TextInventory"
 
     @property
     def members(self):

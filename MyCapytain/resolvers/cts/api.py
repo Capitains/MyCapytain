@@ -77,4 +77,6 @@ class HttpCTSResolver(Resolver):
 
         ti = TextInventory()
         ti.parse(self.endpoint.getCapabilities(**filters))
+        if objectId:
+            return [x for x in [ti] + ti.descendants if x.id == objectId][0]
         return ti

@@ -542,82 +542,94 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         six.assertCountEqual(
             self,
             {
-               "http://w3id.org/dts-ontology/members":[
-                  {
-                     "http://w3id.org/dts-ontology/members":[
-                        {
-            "@id":"http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002.opp-lat2",
-                           "http://w3id.org/dts-ontology/properties":{
-            "http://w3id.org/dts-ontology/:model":"http://w3id.org/dts-ontology/collection"
-                           },
-                           "http://w3id.org/dts-ontology/description":[
-                              {
-            "http://chs.harvard.edu/xmlns/cts/label":"Epigrammes Label",
-            "http://chs.harvard.edu/xmlns/cts/description":"G. Heraeus",
-                                 "@language":"fre"
-                              },
-                              {
-            "http://chs.harvard.edu/xmlns/cts/label":"Epigrammata Label",
-            "http://chs.harvard.edu/xmlns/cts/description":"W. Heraeus",
-                                 "@language":"eng"
-                              }
-                           ]
+                '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294',
+                'http://w3id.org/dts-ontology/capabilities': {
+                    'http://w3id.org/dts-ontology/navigation': {
+                        'http://w3id.org/dts-ontology/parents': [
+
+                        ],
+                        'http://w3id.org/dts-ontology/siblings': {
+
                         }
-                     ],
-            "@id":"http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002",
-                     "http://w3id.org/dts-ontology/properties":{
-            "http://w3id.org/dts-ontology/:model":"http://w3id.org/dts-ontology/collection"
-                     },
-                     "http://w3id.org/dts-ontology/description":[
-                        {
-            "http://purl.org/dc/elements/1.1/title":"Epigrammen",
-            "http://chs.harvard.edu/xmlns/cts/title":"Epigrammen",
-                           "@language":"ger"
+                    },
+                    'http://w3id.org/dts-ontology/ordered': False,
+                    'http://w3id.org/dts-ontology/static': True,
+                    'http://w3id.org/dts-ontology/supportsRole': False
+                },
+                'http://w3id.org/dts-ontology/description': None,
+                'http://w3id.org/dts-ontology/members': [
+                    {
+                        '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002',
+                        'http://w3id.org/dts-ontology/capabilities': {
+                            'http://w3id.org/dts-ontology/navigation': {
+                                'http://w3id.org/dts-ontology/parents': [
+
+                                ],
+                                'http://w3id.org/dts-ontology/siblings': {
+
+                                }
+                            },
+                            'http://w3id.org/dts-ontology/ordered': False,
+                            'http://w3id.org/dts-ontology/static': True,
+                            'http://w3id.org/dts-ontology/supportsRole': False
                         },
-                        {
-            "http://purl.org/dc/elements/1.1/title":"Epigrammata",
-            "http://chs.harvard.edu/xmlns/cts/title":"Epigrammata",
-                           "@language":"eng"
+                        'http://w3id.org/dts-ontology/description': None,
+                        'http://w3id.org/dts-ontology/members': [
+                            {
+                                '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002.opp-lat2',
+                                'http://w3id.org/dts-ontology/capabilities': {
+                                    'http://w3id.org/dts-ontology/navigation': {
+                                        'http://w3id.org/dts-ontology/parents': [
+
+                                        ],
+                                        'http://w3id.org/dts-ontology/siblings': {
+
+                                        }
+                                    },
+                                    'http://w3id.org/dts-ontology/ordered': False,
+                                    'http://w3id.org/dts-ontology/static': True,
+                                    'http://w3id.org/dts-ontology/supportsRole': False
+                                },
+                                'http://w3id.org/dts-ontology/description': None,
+                                'http://w3id.org/dts-ontology/properties': {
+                                    'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://w3id.org/dts-ontology/collection'
+                                }
+                            }
+                        ],
+                        'http://w3id.org/dts-ontology/properties': {
+                            'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
                         }
-                     ]
-                  },
-                  {
-            "@id":"http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi001",
-                     "http://w3id.org/dts-ontology/properties":{
-            "http://w3id.org/dts-ontology/:model":"http://w3id.org/dts-ontology/collection"
-                     },
-                     "http://w3id.org/dts-ontology/description":[
-                        {
-                           "http://purl.org/dc/elements/1.1/title":"De spectaculis",
-                           "http://chs.harvard.edu/xmlns/cts/title":"De spectaculis",
-                           "@language":"ger"
+                    },
+                    {
+                        '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi001',
+                        'http://w3id.org/dts-ontology/capabilities': {
+                            'http://w3id.org/dts-ontology/navigation': {
+                                'http://w3id.org/dts-ontology/parents': [
+
+                                ],
+                                'http://w3id.org/dts-ontology/siblings': {
+
+                                }
+                            },
+                            'http://w3id.org/dts-ontology/ordered': False,
+                            'http://w3id.org/dts-ontology/static': True,
+                            'http://w3id.org/dts-ontology/supportsRole': False
                         },
-                        {
-                           "http://purl.org/dc/elements/1.1/title":"On the Spectacles",
-                           "http://chs.harvard.edu/xmlns/cts/title":"On the Spectacles",
-                           "@language":"eng"
+                        'http://w3id.org/dts-ontology/description': None,
+                        'http://w3id.org/dts-ontology/properties': {
+                            'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
                         }
-                     ]
-                  }
-               ],
-            "@id":"http://capitain.github.io/domain/urn:cts:latinLit:phi1294",
-               "http://w3id.org/dts-ontology/properties":{
-            "http://w3id.org/dts-ontology/:model":"http://w3id.org/dts-ontology/collection"
-               },
-               "http://w3id.org/dts-ontology/description":[
-                  {
-                     "http://purl.org/dc/elements/1.1/title":"Martialis",
-                     "http://chs.harvard.edu/xmlns/cts/groupname":"Martialis",
-                     "@language":"lat"
-                  },
-                  {
-                     "http://purl.org/dc/elements/1.1/title":"Martial",
-                     "http://chs.harvard.edu/xmlns/cts/groupname":"Martial",
-                     "@language":"eng"
-                  }
-               ]
+                    }
+                ],
+                'http://w3id.org/dts-ontology/properties': {
+                    'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
+                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/TextGroup'
+                }
             },
-            tg.export(Mimetypes.JSON.DTS, domain="http://capitain.github.io/domain/"),
+            tg.export(Mimetypes.JSON.DTS.Std, domain="http://capitain.github.io/domain/"),
             "JSON DTS export should be stable"
         )
 

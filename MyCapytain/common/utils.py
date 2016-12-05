@@ -380,7 +380,10 @@ class Mimetypes:
     class JSON:
         Std = "application/text"
         CTS = "application/ld+json:CTS"
-        DTS = "application/ld+json:DTS"
+
+        class DTS:
+            Std = "application/ld+json:DTS"
+            NoParents = "application/ld+json:DTS/NoParents"
 
     class XML:
         Std = "text/xml"

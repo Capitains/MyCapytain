@@ -16,6 +16,12 @@ with open("tests/testing_data/cts/getpassageplus.xml") as f:
     GET_PASSAGE_PLUS = xmlparser(f)
 with open("tests/testing_data/cts/getprevnexturn.xml") as f:
     NEXT_PREV = xmlparser(f)
+with open("tests/testing_data/cts/getprevnexturn.nextonly.xml") as f:
+    NEXT = xmlparser(f)
+with open("tests/testing_data/cts/getprevnexturn.prevonly.xml") as f:
+    PREV = xmlparser(f)
+with open("tests/testing_data/cts/getValidReff.xml") as f:
+    GET_VALID_REFF_FULL = xmlparser(f)
 with open("tests/testing_data/cts/getValidReff.1.1.xml") as f:
     GET_VALID_REFF = xmlparser(f)
 with open("tests/testing_data/cts/getCapabilities.xml") as f:
@@ -373,4 +379,90 @@ class TestHttpCTSResolver(TestCase):
              ],
             ["http://chs.harvard.edu/xmlns/cts/TextGroup", "http://chs.harvard.edu/xmlns/cts/TextInventory"],
             "There should be one member in DTS JSON"
+        )
+
+    def test_getSiblings(self):
+        """ Ensure getSiblings works well """
+        previous, nextious = self.resolver.getSiblings(
+            textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1"
+        )
+        self.resolver.endpoint.getPrevNextUrn.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
+        )
+        self.assertEqual(
+            previous, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "Previous should be well computed"
+        )
+        self.assertEqual(
+            nextious, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            "Previous should be well computed"
+        )
+
+    def test_getSiblings_nextOnly(self):
+        """ Ensure getSiblings works well when there is only the next passage"""
+        self.resolver.endpoint.getPrevNextUrn = MagicMock(return_value=NEXT)
+        previous, nextious = self.resolver.getSiblings(
+            textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.pr"
+        )
+        self.resolver.endpoint.getPrevNextUrn.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr"
+        )
+        self.assertEqual(
+            previous, None,
+            "Previous Should not exist"
+        )
+        self.assertEqual(
+            nextious, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            "Next should be well computed"
+        )
+
+    def test_getSiblings_prevOnly(self):
+        """ Ensure getSiblings works well when there is only the previous passage"""
+        self.resolver.endpoint.getPrevNextUrn = MagicMock(return_value=PREV)
+        previous, nextious = self.resolver.getSiblings(
+            textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1.6"
+        )
+        self.resolver.endpoint.getPrevNextUrn.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
+        )
+        self.assertEqual(
+            previous, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
+            "Previous should be well computed"
+        )
+        self.assertEqual(
+            nextious, None,
+            "Next should not exist"
+        )
+
+    def test_getReffs_full(self):
+        """ Ensure getReffs works well """
+        self.resolver.endpoint.getValidReff = MagicMock(return_value=GET_VALID_REFF_FULL)
+        reffs = self.resolver.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", level=1)
+        self.resolver.endpoint.getValidReff.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2", level=1
+        )
+        self.assertEqual(
+            len(reffs), 9462,
+            "There should be 9462 references"
+        )
+        self.assertEqual(
+            reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1"
+        )
+        self.resolver.endpoint.getValidReff = MagicMock(return_value=GET_VALID_REFF_FULL)
+        self.resolver.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", level=2)
+        self.resolver.endpoint.getValidReff.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2", level=2
+        )
+
+        self.resolver.endpoint.getValidReff = MagicMock(return_value=GET_VALID_REFF)
+        reffs = self.resolver.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=1)
+        self.resolver.endpoint.getValidReff.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=1
+        )
+        self.assertEqual(
+            len(reffs), 6,
+            "There should be 6 references"
+        )
+        self.assertEqual(
+            reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1"
         )

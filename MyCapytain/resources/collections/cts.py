@@ -204,7 +204,7 @@ class Text(cts.Text):
         strings.append("</ti:{0}>".format(tag_end))
         return "".join(strings)
 
-    def export(self, output=Mimetypes.ETREE, domain="", **kwargs):
+    def export(self, output=Mimetypes.PYTHON.ETREE, domain="", **kwargs):
         """ Create a {format} version of the Work
         
         :param output: Format to be chosen (Only XML for now)
@@ -214,9 +214,9 @@ class Text(cts.Text):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        if output == Mimetypes.ETREE:
+        if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
-        elif output == Mimetypes.MyCapytainText:
+        elif output == Mimetypes.PYTHON.MyCapytain.ReadableText:
             complete_metadata = self.metadata
             for parent in self.parents:
                 if isinstance(parent, cts.CTSCollection) and hasattr(parent, "metadata"):
@@ -273,6 +273,17 @@ class Text(cts.Text):
                 self.metadata["namespaceMapping"][namespaceMapping.get("abbreviation")] = namespaceMapping.get("nsURI")
 
         return None
+
+    @property
+    def readable(self):
+        """ Readable property should return elements where the element can be queried for getPassage / getReffs
+        """
+        return True
+
+    @property
+    def descendants(self):
+        return []
+
 
 
 def Edition(resource=None, urn=None, parents=None):
@@ -333,7 +344,7 @@ class Work(cts.Work):
         strings.append("</ti:work>")
         return "".join(strings)
 
-    def export(self, output=Mimetypes.ETREE, domain=""):
+    def export(self, output=Mimetypes.PYTHON.ETREE, domain=""):
         """ Create a {format} version of the Work
         
         :param output: Format to be chosen (Only XML for now)
@@ -343,7 +354,7 @@ class Work(cts.Work):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        if output == Mimetypes.ETREE:
+        if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
         return self.default_export(output, domain)
 
@@ -420,7 +431,7 @@ class TextGroup(cts.TextGroup):
         strings.append("</ti:textgroup>")
         return "".join(strings)
 
-    def export(self, output=Mimetypes.ETREE, domain=""):
+    def export(self, output=Mimetypes.PYTHON.ETREE, domain=""):
         """ Create a {format} version of the Work
 
         :param output: Format to be chosen (Only XML for now)
@@ -430,7 +441,7 @@ class TextGroup(cts.TextGroup):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        if output == Mimetypes.ETREE:
+        if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
         return self.default_export(output, domain)
 
@@ -466,7 +477,7 @@ class TextInventory(cts.TextInventory):
     .. automethod:: __str__
     """
 
-    def export(self, output=Mimetypes.ETREE, domain=""):
+    def export(self, output=Mimetypes.PYTHON.ETREE, domain=""):
         """ Create a {format} version of the Work
 
         :param output: Format to be chosen (Only XML for now)
@@ -476,7 +487,7 @@ class TextInventory(cts.TextInventory):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        if output == Mimetypes.ETREE:
+        if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
         return self.default_export(output, domain)
 
@@ -500,7 +511,7 @@ class TextInventory(cts.TextInventory):
         strings.append("</ti:TextInventory>")
         return "".join(strings)
 
-    def export(self, output=Mimetypes.ETREE, domain=""):
+    def export(self, output=Mimetypes.PYTHON.ETREE, domain=""):
         """ Create a {format} version of the Work
 
         :param output: Format to be chosen (Only XML for now)
@@ -510,7 +521,7 @@ class TextInventory(cts.TextInventory):
         :rtype: lxml.etree._Element
         :returns: XML representation of the object
         """
-        if output == Mimetypes.ETREE:
+        if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
         return self.default_export(output, domain)
 

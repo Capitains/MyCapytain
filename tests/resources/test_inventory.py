@@ -343,7 +343,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
-        txt_text = ti_text.export(output=Mimetypes.MyCapytainText)
+        txt_text = ti_text.export(output=Mimetypes.PYTHON.MyCapytain.ReadableText)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(txt_text.metadata["groupname"]["eng"], "Martial")  # Check inheritance of textgroup metadata
         self.assertEqual(txt_text.metadata["title"]["eng"], "Epigrammata")  # Check inheritance of work metadata
@@ -617,7 +617,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                   }
                ]
             },
-            tg.export(Mimetypes.JSON_DTS, domain="http://capitain.github.io/domain/"),
+            tg.export(Mimetypes.JSON.DTS, domain="http://capitain.github.io/domain/"),
             "JSON DTS export should be stable"
         )
 

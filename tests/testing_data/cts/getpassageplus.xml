@@ -14,9 +14,7 @@
             <ti:groupname xml:lang="eng">Martial</ti:groupname>
             <ti:title xml:lang="eng">Epigrammata</ti:title>
             <ti:work>urn:cts:latinLit:phi1294.phi002</ti:work>
-            <ti:version xml:lang="eng">
-        M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus
-    </ti:version>
+            <ti:label xml:lang="eng">M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ti:label>
             <CTS:citation label="book" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
                 <CTS:citation label="poem" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
                     <CTS:citation label="line" xpath="/tei:l[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"/>

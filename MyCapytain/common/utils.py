@@ -376,14 +376,22 @@ class Mimetypes:
     :cvar MY_CAPYTAIN: MyCapytain Object Resource (Native Python CapiTainS Object)
 
     """
-    JSON = "application/text"
-    JSON_CTS = "application/ld+json:CTS"
-    JSON_DTS = "application/ld+json:DTS"
-    XML = "text/xml"
-    RDFXML = "application/rdf+xml"
-    CTS_XML = "text/xml:CTS"
-    MY_CAPYTAIN = "MyCapytain"
-    ETREE = "python/lxml"
-    MyCapytainText = "MyCapytain/Text"
+
+    class JSON:
+        Std = "application/text"
+        CTS = "application/ld+json:CTS"
+        DTS = "application/ld+json:DTS"
+
+    class XML:
+        Std = "text/xml"
+        RDF = "application/rdf+xml"
+        CTS = "text/xml:CTS"
+
+    class PYTHON:
+        NestedDict = "python/NestedDict"
+        ETREE = "python/lxml"
+
+        class MyCapytain:
+            ReadableText = "Capitains/ReadableText"
+
     PLAINTEXT = "text/plain"
-    NestedDict = "python/NestedDict"

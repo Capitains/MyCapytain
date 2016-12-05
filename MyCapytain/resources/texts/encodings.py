@@ -29,7 +29,7 @@ class TEIResource(InteractiveTextualNode):
         :rtype: basestring
         :returns: XML of the passage in string form 
         """
-        return self.export(output=Mimetypes.XML)
+        return self.export(output=Mimetypes.XML.Std)
 
     def export(self, output=Mimetypes.PLAINTEXT, exclude=None, _preformatted=False):
         """ Text content of the passage
@@ -63,20 +63,20 @@ class TEIResource(InteractiveTextualNode):
         elif _preformatted is False:
             exclude = ""
 
-        if output == Mimetypes.ETREE:
+        if output == Mimetypes.PYTHON.ETREE:
             """ Exports the whole resource as a LXML object
             """
             return self.resource
 
-        elif output == Mimetypes.XML:
+        elif output == Mimetypes.XML.Std:
             """ Exports the whole resource formatted as XML but as string object
             """
             return tostring(self.resource, encoding=str)
 
-        elif output == Mimetypes.NestedDict:
+        elif output == Mimetypes.PYTHON.NestedDict:
             """ Exports the whole resource into a NestedDict
             """
-            reffs = self.getValidReff(level=len(self.citation))
+            reffs = self.getReffs(level=len(self.citation))
             text = nested_ordered_dictionary()
             for reff in reffs:
                 _r = reff.split(".")

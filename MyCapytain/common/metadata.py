@@ -372,12 +372,12 @@ class Metadata(object):
         """
         return self.__keys
 
-    def export(self, mime=Mimetypes.JSON):
-        if mime == Mimetypes.JSON:
+    def export(self, mime=Mimetypes.JSON.Std):
+        if mime == Mimetypes.JSON.Std:
             return {
                 key: getattr(value, "__getstate__")() for key, value in self.metadata.items()
             }
-        elif mime == Mimetypes.JSON_DTS:
+        elif mime == Mimetypes.JSON.DTS:
             descs = {
 
             }
@@ -397,7 +397,7 @@ class Metadata(object):
                     descs[lang][ns+k] = value
             return [value for value in descs.values()]
 
-        elif mime == Mimetypes.RDFXML:
+        elif mime == Mimetypes.XML.RDF:
             out = ""
             for key in sorted(self.metadata.keys()):
                 metadatum = self.metadata[key]

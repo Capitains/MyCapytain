@@ -220,7 +220,7 @@ class TestMetadata(unittest.TestCase):
 
         six.assertCountEqual(
             self,
-            b.export(Mimetypes.JSON),
+            b.export(Mimetypes.JSON.Std),
             {'dc:editor': {'default': 'eng', 'langs': [('eng', 'Captain Hook'), ('fre', 'Capitaine Crochet')],
                            'name': 'dc:editor'},
              'title': {'default': 'eng', 'langs': [('eng', 'ttl'), ('fre', 'titre')], 'name': 'title'},
@@ -237,7 +237,7 @@ class TestMetadata(unittest.TestCase):
 
         six.assertCountEqual(
             self,
-            b.export(Mimetypes.JSON_DTS),
+            b.export(Mimetypes.JSON.DTS),
             [
                 {
                     'http://chs.harvard.edu/xmlns/cts/desc': 'Omelette',
@@ -261,7 +261,7 @@ class TestMetadata(unittest.TestCase):
         m5 = Metadatum("dc:editor", [("eng", "Captain Hook"), ("fre", "Capitaine Crochet")])
         b[("desc", "title", "dc:editor")] = (m3, m4, m5)
         self.assertEqual(
-            b.export(Mimetypes.RDFXML),
+            b.export(Mimetypes.XML.RDF),
             """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description>
     <editor xmlns="http://purl.org/dc/elements/1.1//" xml:lang="eng">Captain Hook</editor><editor xmlns="http://purl.org/dc/elements/1.1//" xml:lang="fre">Capitaine Crochet</editor><desc xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">Omelette</desc><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="eng">ttl</title><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">titre</title>

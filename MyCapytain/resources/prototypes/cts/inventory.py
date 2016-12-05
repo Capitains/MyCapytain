@@ -179,6 +179,18 @@ class Text(CTSCollection):
         if resource is not None:
             self.setResource(resource)
 
+    @property
+    def readable(self):
+        return True
+
+    @property
+    def members(self):
+        return []
+
+    @property
+    def descendants(self):
+        return []
+
     def translations(self, key=None):
         """ Get translations in given language
 
@@ -243,6 +255,10 @@ class Work(CTSCollection):
         if resource is not None:
             self.setResource(resource)
 
+    @property
+    def readable(self):
+        return True
+
     def update(self, other):
         """ Merge two Work Objects.
 
@@ -293,7 +309,7 @@ class Work(CTSCollection):
 
     @property
     def members(self):
-        return self.texts.values()
+        return list(self.texts.values())
 
 
 class TextGroup(CTSCollection):
@@ -313,7 +329,7 @@ class TextGroup(CTSCollection):
 
     @property
     def members(self):
-        return self.works.values()
+        return list(self.works.values())
 
     def __init__(self, resource=None, urn=None, parents=None):
         super(TextGroup, self).__init__()
@@ -384,7 +400,7 @@ class TextInventory(CTSCollection):
 
     @property
     def members(self):
-        return self.textgroups.values()
+        return list(self.textgroups.values())
 
     def __init__(self, resource=None, name=None):
         super(TextInventory, self).__init__()

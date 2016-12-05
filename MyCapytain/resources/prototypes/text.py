@@ -81,7 +81,7 @@ class TextualElement(object):
         else:
             raise TypeError(".metadata should be an instance of Metadata")
 
-    def default_export(self, output=Mimetypes.JSON_DTS, exclude=None):
+    def default_export(self, output=Mimetypes.JSON.DTS, exclude=None):
         """ Export the textual node item in the Mimetype required
 
         :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)

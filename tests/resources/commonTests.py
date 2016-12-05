@@ -161,7 +161,7 @@ class CapitainsXmlTextTest(TestCase):
 
     def test_nested_dict(self):
         """ Check the nested dict export of a local.Text object """
-        nested = self.TEI.export(output=Mimetypes.NestedDict, exclude=["tei:note"])
+        nested = self.TEI.export(output=Mimetypes.PYTHON.NestedDict, exclude=["tei:note"])
         self.assertEqual(nested["1"]["3"]["8"], "Ibis ab excusso missus in astra sago. ",
                          "Check that notes are removed ")
         self.assertEqual(nested["1"]["pr"]["1"], "Spero me secutum in libellis meis tale temperamen-",
@@ -426,12 +426,11 @@ class CapitainsXmlTextTest(TestCase):
     def test_get_passage_hyper_context_double_slash_xpath(self):
         simple = self.seneca.getPassage(Reference("1-10"))
         str_simple = simple.export(
-            output=Mimetypes.XML
+            output=Mimetypes.XML.Std
         )
         text = Text(
             resource=str_simple,
             citation=self.seneca.citation
-
         )
         self.assertEqual(
             text.getPassage(Reference("1"), simple=True).export(

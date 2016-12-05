@@ -126,7 +126,9 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         response = xmlparser(self.retriever.getPassagePlus(urn=urn))
 
         self.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
-        return Passage(urn=urn, resource=response, retriever=self.retriever)
+        passage = Passage(urn=urn, resource=response, retriever=self.retriever)
+        passage.metadata, passage.citation = self.metadata, self.citation
+        return passage
 
     def __parse_request__(self, xml):
         """ Parse a request with metadata information

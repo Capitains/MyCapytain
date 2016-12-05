@@ -10,5 +10,5 @@
 """
 
 __name__ = "MyCapytain"
-__version__ = "1.0.4"
-__all__ = ["common", "retrievers", "resources"]
+__version__ = "2.0.0b0"
+__all__ = ["common", "retrievers", "resources", "resolvers"]

@@ -28,6 +28,7 @@ Metadata containers
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 Utilities
 *********
@@ -36,19 +37,12 @@ Utilities
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 API Retrievers
 ##############
 
 Module endpoints contains prototypes and implementation of retrievers in MyCapytain
-
-Ahab
-****
-
-.. automodule:: MyCapytain.retrievers.ahab
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 CTS 5 API
 *********
@@ -57,6 +51,7 @@ CTS 5 API
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 Prototypes
 **********
@@ -65,6 +60,30 @@ Prototypes
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
+
+
+Resolvers
+#########
+
+Remote CTS API
+**************
+
+.. autoclass:: MyCapytain.resolvers.api.cts.HttpCTSResolver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :inherited-members:
+
+Prototypes
+**********
+
+.. automodule:: MyCapytain.resolvers.prototypes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :inherited-members:
+
 
 Texts and inventories
 #####################
@@ -75,10 +94,11 @@ Text
 TEI based texts
 +++++++++++++++
 
-.. autoclass:: MyCapytain.resources.texts.tei.TEIResource
+.. autoclass:: MyCapytain.resources.texts.encodings.TEIResource
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 Locally read text
 +++++++++++++++++
@@ -87,16 +107,19 @@ Locally read text
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 .. autoclass:: MyCapytain.resources.texts.local.tei.Passage
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 .. autoclass:: MyCapytain.resources.texts.local.tei.__SimplePassage__
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 CTS API Texts
 +++++++++++++
@@ -107,11 +130,13 @@ Formerly MyCapytain.resources.texts.api (< 2.0.0)
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 .. autoclass:: MyCapytain.resources.texts.api.cts.Passage
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 Collections
 ***********
@@ -123,6 +148,7 @@ Metadata
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 CTS inventory
 +++++++++++++
@@ -131,6 +157,7 @@ CTS inventory
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 CTS Inventory Prototypes
 ++++++++++++++++++++++++
@@ -139,6 +166,7 @@ CTS Inventory Prototypes
     :members:
     :undoc-members:
     :show-inheritance:
+    :inherited-members:
 
 Text Prototypes
 +++++++++++++++
@@ -146,4 +174,6 @@ Text Prototypes
 .. automodule:: MyCapytain.resources.prototypes.text
     :members:
     :undoc-members:
+    :inherited-members:
     :show-inheritance:
+

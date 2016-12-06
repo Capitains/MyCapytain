@@ -45,8 +45,8 @@ Introducing Resolvers, we managed to avoid this double parsing effect in any sit
     standard type (CTS, DTS, Proprietary, etc.).
 
 
-.. image:: doc/_static/images/Resolvers.After.svg
-    :target: doc/_static/images/Resolvers.After.dia
+.. image:: _static/images/Resolvers.After.svg
+    :target: _static/images/Resolvers.After.dia
     :alt: Diagram of operations with resolvers : duplicated steps have been removed
 
 

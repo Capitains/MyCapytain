@@ -12,23 +12,22 @@ This module contains methods to parse local resources using TEI/Epidoc guideline
 import warnings
 
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError
-from MyCapytain.common.utils import xmlparser, NS, copyNode, passageLoop, normalizeXpath
+from MyCapytain.common.utils import NS, copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.reference import URN, Citation, Reference
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.texts import encodings
 
 from MyCapytain.errors import InvalidSiblingRequest, InvalidURN
-import MyCapytain.resources.texts.encodings
 from lxml import etree
 
 
 def __makePassageKwargs__(urn, reference):
     """ Little helper used by Passage here to comply with parents args
 
-    :param urn:
-    :param reference:
-    :return:
+    :param urn: URN String
+    :param reference: Reference String
+    :return: Dictionary of arguments with URN based on identifier and reference
     """
     kwargs = {}
     if urn is not None:
@@ -108,7 +107,7 @@ t
         :rtype: Passage
         """
         if reference is None:
-            return self.SimplePassage(self.resource, reference=None, urn=self.urn, citation=self.citation)
+            return __SimplePassage__(self.resource, reference=None, urn=self.urn, citation=self.citation)
 
         resource = self.resource.xpath(
             self.citation[len(reference)-1].fill(reference),
@@ -128,6 +127,11 @@ t
 
     @property
     def textObject(self):
+        """ Textual Object with full capacities (Unlike Simple Passage)
+
+        :rtype: Text, Passage
+        :return: Textual Object with full capacities (Unlike Simple Passage)
+        """
         text = None
         if isinstance(self, Text):
             text = self
@@ -262,20 +266,20 @@ t
 
 
 class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
-    def __init__(self, resource, reference, citation, urn=None, text=None):
-        """ Passage for simple and quick parsing of texts
+    """ Passage for simple and quick parsing of texts
 
-        :param resource: Element representing the passage
-        :type resource: etree._Element
-        :param reference: Passage reference
-        :type reference: Reference
-        :param urn: URN of the source text or of the passage
-        :type urn: URN
-        :param citation: Citation scheme of the text
-        :type citation: Citation
-        :param text: Text containing the passage
-        :type text: Text
-        """
+    :param resource: Element representing the passage
+    :type resource: etree._Element
+    :param reference: Passage reference
+    :type reference: Reference
+    :param urn: URN of the source text or of the passage
+    :type urn: URN
+    :param citation: Citation scheme of the text
+    :type citation: Citation
+    :param text: Text containing the passage
+    :type text: Text
+    """
+    def __init__(self, resource, reference, citation, urn=None, text=None):
         super(__SimplePassage__, self).__init__(
             resource=resource,
             citation=citation,
@@ -367,7 +371,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         if self.__prevnext__ is not None:
             return self.__prevnext__
 
-        document_references = list(map(lambda x: str(x), self.__text__.getReffs(level=self.depth)))
+        document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
         range_length = len(self.getReffs())
 
         start = str(self.reference.start)
@@ -421,7 +425,7 @@ class Text(__SharedMethods__, encodings.TEIResource, text.CitableText):
         :return: None
         """
         if self.citation.isEmpty():
-            citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=MyCapytain.common.utils.NS),
+            citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=NS),
             if len(citation):
                 self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")
 

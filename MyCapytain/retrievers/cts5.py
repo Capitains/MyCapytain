@@ -36,7 +36,7 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
 
     def call(self, parameters):
         """ Call an endpoint given the parameters
-        
+
         :param parameters: Dictionary of parameters
         :type parameters: dict
         :rtype: text

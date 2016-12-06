@@ -5,14 +5,9 @@
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
->>> from MyCapytain.common.reference import URN, Reference, Citation
-
 """
 from __future__ import unicode_literals
-
-from past.builtins import basestring
-from six import text_type as str
-from builtins import range, object
+from six import text_type
 from copy import copy
 import re
 from lxml.etree import _Element
@@ -73,9 +68,9 @@ class Reference(object):
     def __init__(self, reference=""):
         self.reference = reference
         if reference == "":
-            self.parsed = (self.__model(), self.__model())
+            self.parsed = (self.__model__(), self.__model__())
         else:
-            self.parsed = self.__parse(reference)
+            self.parsed = self.__parse__(reference)
 
     @property
     def parent(self):
@@ -182,7 +177,7 @@ class Reference(object):
     def __str__(self):
         """ Return full reference in string format
 
-        :rtype: basestring
+        :rtype: str
         :returns: String representation of Reference Object
 
         :Example:
@@ -219,9 +214,10 @@ class Reference(object):
         """
         return not self.__eq__(other)
 
-    def __model(self):
+    @staticmethod
+    def __model__():
         """ 3-Tuple model for references
-        
+
         First element is full text reference,
         Second is list of passage identifiers
         Third is subreference
@@ -231,29 +227,33 @@ class Reference(object):
         """
         return [None, [], None, None]
 
-    def __regexp(self, subreference):
-        """ Split components of subreference 
+    def __regexp__(self, subreference):
+        """ Split components of subreference
         
         :param subreference: A subreference
-        :type subreference: basestring
+        :type subreference: str
         :rtype: List.<Tuple>
         :returns: List where first element is a tuple representing different components
         """
         return SUBREFERENCE.findall(subreference)[0]
 
-    def __parse(self, reference):
-        """ Parse references informations
-        
+    def __parse__(self, reference):
+        """ Parse references information
+
+        :param reference: String representation of a reference
+        :type reference: str
+        :returns: Tuple representing each part of the reference
+        :rtype: tuple(str)
         """
 
         ref = reference.split("-")
-        element = [self.__model(), self.__model()]
+        element = [self.__model__(), self.__model__()]
         for i in range(0, len(ref)):
             r = ref[i]
             element[i][0] = r
             subreference = r.split("@")
             if len(subreference) == 2:
-                element[i][2] = self.__regexp(subreference[1])
+                element[i][2] = self.__regexp__(subreference[1])
                 element[i][3] = "@" + subreference[1]
                 r = subreference[0]
             element[i][1] = r.split(".")
@@ -262,6 +262,13 @@ class Reference(object):
 
     @staticmethod
     def convert_subreference(word, counter):
+        """ Convert a word and a counter into a standard tuple representation
+
+        :param word: Word Element of the subreference
+        :param counter: Index of the Word
+        :return: Tuple representing the element
+        :rtype: (str, int)
+        """
         if len(counter) and word:
             return str(word), int(counter)
         elif len(counter) == 0 and word:
@@ -271,8 +278,7 @@ class Reference(object):
 
 
 class URN(object):
-
-    """ A URN object giving all useful sections 
+    """ A URN object giving all useful sections
 
     :param urn: A CTS URN
     :type urn: str
@@ -331,6 +337,11 @@ class URN(object):
 
     @property
     def urn_namespace(self):
+        """ General Namespace element of the URN
+
+        :rtype: str
+        :return: Namespace part of the URN
+        """
         return self.__parsed["urn_namespace"]
 
     @urn_namespace.setter
@@ -340,6 +351,11 @@ class URN(object):
 
     @property
     def namespace(self):
+        """ CTS Namespace element of the URN
+
+        :rtype: str
+        :return: Namespace part of the URN
+        """
         return self.__parsed["cts_namespace"]
 
     @namespace.setter
@@ -349,6 +365,11 @@ class URN(object):
 
     @property
     def textgroup(self):
+        """ Textgroup element of the URN
+
+        :rtype: str
+        :return: Textgroup part of the URN
+        """
         return self.__parsed["textgroup"]
 
     @textgroup.setter
@@ -358,6 +379,11 @@ class URN(object):
 
     @property
     def work(self):
+        """ Work element of the URN
+
+        :rtype: str
+        :return: Work part of the URN
+        """
         return self.__parsed["work"]
 
     @work.setter
@@ -367,6 +393,11 @@ class URN(object):
 
     @property
     def version(self):
+        """ Version element of the URN
+
+        :rtype: str
+        :return: Version part of the URN
+        """
         return self.__parsed["version"]
 
     @version.setter
@@ -376,6 +407,11 @@ class URN(object):
 
     @property
     def reference(self):
+        """ Reference element of the URN
+
+        :rtype: Reference
+        :return: Reference part of the URN
+        """
         return self.__parsed["reference"]
 
     @reference.setter
@@ -395,7 +431,7 @@ class URN(object):
         .. warning:: Does not take into account the passage !
 
         :Example:
-            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
+            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
             >>>    print(len(a))
         """
         
@@ -419,7 +455,7 @@ class URN(object):
         :Example:
             >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
             >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1") 
-            >>>    (a > b) == True # 
+            >>>    (a > b) == True
         """
         return len(self) > len(other)
 
@@ -571,6 +607,10 @@ class URN(object):
 
     @staticmethod
     def model():
+        """ Generate a standard dictionary model for URN inside function
+
+        :return: Dictionary of CTS elements
+        """
         return {
             "urn_namespace": None,
             "cts_namespace": None,
@@ -612,7 +652,7 @@ class URN(object):
 
 
 class Citation(object):
-    """ A citation object gives informations about the scheme 
+    """ A citation object gives informations about the scheme
         
     :param name: Name of the citation (e.g. "book")
     :type name: basestring
@@ -658,11 +698,11 @@ class Citation(object):
             self.child = child
 
     @property
-    def name(self): 
+    def name(self):
         """ Type of the citation represented
         
-        :type: basestring
-        :Example: Book, Chapter, Textpart, Section, Poem...
+        :type: text_type
+        :example: Book, Chapter, Textpart, Section, Poem...
         """
         return self.__name
 
@@ -702,9 +742,9 @@ class Citation(object):
 
     @property
     def refsDecl(self):
-        """ ResfDecl expression of the citation scheme 
+        """ ResfDecl expression of the citation scheme
 
-        :type: basestring
+        :rtype: str
         :Example: /tei:TEI/tei:text/tei:body/tei:div//tei:l[@n='$1']
         """
         return self.__refsDecl
@@ -814,7 +854,7 @@ class Citation(object):
 
             if passage is None:
                 replacement = r"\1"
-            elif isinstance(passage, basestring):
+            elif isinstance(passage, text_type):
                 replacement = r"\1\2'" + passage + "'"
 
             return REFERENCE_REPLACER.sub(replacement, xpath)
@@ -835,16 +875,13 @@ class Citation(object):
     def __getstate__(self):
         """ Pickling method
 
-        :return:
+        :return: dict
         """
         return copy(self.__dict__)
 
     def __setstate__(self, dic):
         self.__dict__ = dic
         return self
-
-    """ Implementation of Citation for TEI markup
-    """
 
     def isEmpty(self):
         """ Check if the citation has not been set

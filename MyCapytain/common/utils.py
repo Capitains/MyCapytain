@@ -8,12 +8,12 @@
 
 """
 from __future__ import unicode_literals
+from six import text_type
 from functools import reduce
 
 from collections import OrderedDict
 from lxml import etree
 from io import IOBase, StringIO
-from past.builtins import basestring
 import re
 from copy import copy
 from lxml.objectify import ObjectifiedElement, parse
@@ -39,13 +39,13 @@ def normalize(string):
     """ Remove double-or-more spaces in a string
 
     :param string: A string to change
-    :type string: basestring
-    :rtype: Basestring
+    :type string: text_type
+    :rtype: text_type
     :returns: Clean string
     """
     return __strip.sub(" ", string)
 
-""" Dictionary of namespace that can be useful """
+#: Dictionary of namespace that can be useful
 NS = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ahab": "http://localhost.local",
@@ -53,7 +53,7 @@ NS = {
     "xml": "http://www.w3.org/XML/1998/namespace"
 }
 
-""" Dictionary of RDF Prefixes """
+#: Dictionary of RDF Prefixes
 RDF_PREFIX = {
   "foaf": "http://xmlns.com/foaf/0.1/",
   "dc": "http://purl.org/dc/elements/1.1/",
@@ -82,6 +82,7 @@ RDF_PREFIX = {
   "cts": "http://chs.harvard.edu/xmlns/cts/"
 }
 
+#: Mapping of known domains to RDF Classical Prefixes
 RDF_MAPPING = {
     'http://chs.harvard.edu/xmlns/cts/': 'cts',
     'http://dbpedia.org/ontology/': 'dbo',
@@ -111,7 +112,7 @@ def xmlparser(xml, objectify=True):
     """ Parse xml 
 
     :param xml: XML element
-    :type xml: Union[basestring, lxml.etree._Element]
+    :type xml: Union[text_type, lxml.etree._Element]
     :rtype: lxml.etree._Element
     :returns: An element object
     :raises: TypeError if element is not in accepted type
@@ -120,7 +121,7 @@ def xmlparser(xml, objectify=True):
     doclose = None
     if isinstance(xml, (etree._Element, ObjectifiedElement, etree._ElementTree)):
         return xml
-    elif isinstance(xml, basestring):
+    elif isinstance(xml, text_type):
         xml = StringIO(xml)
         doclose = True
     elif not isinstance(xml, IOBase):
@@ -135,11 +136,12 @@ def xmlparser(xml, objectify=True):
     return parsed
 
 
-def formatXpath(xpath):
-    """
+def __formatXpath__(xpath):
+    """ Format at XPath for perform XPath
 
-    :param xpath:
-    :return:
+    :param xpath: XPath element lists
+    :return: Tuple where the first element is an XPath representing the next node to retrieve and the second the list \
+    of other elements to find
     """
     if len(xpath) > 1:
         current, queue = xpath[0], xpath[1:]
@@ -181,12 +183,12 @@ def performXpath(parent, xpath):
 
 
 def copyNode(node, children=False, parent=False):
-    """
+    """ Copy an XML Node
 
-    :param node:
-    :param children:
-    :param parent:
-    :return:
+    :param node: Etree Node
+    :param children: Copy children nodes is set to True
+    :param parent: Append copied node to parent if given
+    :return: New Element
     """
     if parent is not False:
         element = etree.SubElement(
@@ -238,7 +240,7 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
     :param following_siblings: Append following siblings of XPath 1/2 match to the tree
     :return: Newly incremented tree
     """
-    current_1, queue_1 = formatXpath(xpath1)
+    current_1, queue_1 = __formatXpath__(xpath1)
     if xpath2 is None:  # In case we need what is following or preceding our node
         result_1, loop = performXpath(parent, current_1)
         if loop is True:
@@ -279,9 +281,9 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
             if xpath2 == xpath1:
                 current_2, queue_2 = current_1, queue_1
             else:
-                current_2, queue_2 = formatXpath(xpath2)
+                current_2, queue_2 = __formatXpath__(xpath2)
         else:
-            current_2, queue_2 = formatXpath(xpath2)
+            current_2, queue_2 = __formatXpath__(xpath2)
 
         if xpath1 != xpath2:
             result_2, loop = performXpath(parent, current_2)
@@ -343,6 +345,11 @@ class OrderedDefaultDict(OrderedDict):
 
 
 def nested_ordered_dictionary():
+    """ Helper to create a nested ordered default dictionary
+
+    :rtype OrderedDefaultDict:
+    :return: Nested Ordered Default Dictionary instance
+    """
     return OrderedDefaultDict(nested_ordered_dictionary)
 
 
@@ -368,33 +375,58 @@ def nested_set(dictionary,  keys, value):
 
 
 class Mimetypes:
-    """ Mimetypes that can be used by different classes to refer to the same items
+    """ Mimetypes constants that are used to provide export functionality to base MyCapytain object.
 
     :cvar JSON: JSON Resource mimetype
     :cvar XML: XML Resource mimetype
-    :cvar CTS_XML: XML Resource mimetype
-    :cvar MY_CAPYTAIN: MyCapytain Object Resource (Native Python CapiTainS Object)
+    :cvar PYTHON: Python Native Object
+    :cvar PLAINTEXT: Plain string format
 
     """
 
     class JSON:
+        """ Json Mimetype
+
+        :cvar Std: Standard JSON Export
+        :cvar CTS: CTS Json Export
+        """
         Std = "application/text"
         CTS = "application/ld+json:CTS"
 
         class DTS:
+            """ JSON DTS Expression
+
+            :cvar Std: Standard DTS Json-LD Expression
+            :cvar NoParents: DTS Json-LD Expression without parents expression
+            """
             Std = "application/ld+json:DTS"
             NoParents = "application/ld+json:DTS/NoParents"
 
     class XML:
+        """ XML Mimetype
+
+        :cvar Std: Standard XML Export
+        :cvar RDF: RDF XML Expression Export
+        :cvar CTS: CTS API XML Expression Export
+        """
         Std = "text/xml"
         RDF = "application/rdf+xml"
         CTS = "text/xml:CTS"
 
     class PYTHON:
+        """ Python Native Objects
+
+        :cvar NestedDict: Nested Dictionary Object
+        :cvar ETREE: Python LXML Etree Object
+        """
         NestedDict = "python/NestedDict"
         ETREE = "python/lxml"
 
         class MyCapytain:
+            """ MyCapytain Objects
+
+            :cvar ReadableText: MyCapytain.resources.prototypes.text.CitableText
+            """
             ReadableText = "Capitains/ReadableText"
 
     PLAINTEXT = "text/plain"

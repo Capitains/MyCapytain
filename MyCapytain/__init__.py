@@ -9,6 +9,4 @@
 
 """
 
-__name__ = "MyCapytain"
 __version__ = "2.0.0b0"
-__all__ = ["common", "retrievers", "resources", "resolvers"]

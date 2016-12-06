@@ -1,23 +1,29 @@
 # -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.resources.texts.api.cts
+   :synopsis: Text and Passage implementation for dealing with CTS API Responses
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
 
 from __future__ import unicode_literals
 
-from six import text_type as str
-
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import Mimetypes, xmlparser, NS
+from MyCapytain.common.utils import xmlparser, NS
 from MyCapytain.common.reference import Citation, URN, Reference
 from MyCapytain.resources.collections import cts as CTSCollection
 from MyCapytain.resources.prototypes import text as prototypes
 from MyCapytain.resources.texts.encodings import TEIResource
-from MyCapytain.retrievers.prototypes import CitableTextServiceRetriever
 from MyCapytain.errors import MissingAttribute
 
 
 class __SharedMethod__(prototypes.InteractiveTextualNode):
     """ Set of methods shared by Text and Passage
 
-    :param retriever: CitableTextServiceRetriever
+    :param retriever: Retriever used to retrieve other data
+    :type retriever: MyCapytain.retrievers.prototypes.CitableTextServiceRetriever
     """
 
     def __init__(self, retriever=None, *args, **kwargs):
@@ -37,6 +43,10 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
     @property
     def retriever(self):
+        """ Retriever object used to query for more data
+
+        :rtype: CitableTextServiceRetriever
+        """
         return self.__retriever__
 
     def getValidReff(self, level=1, reference=None):
@@ -101,7 +111,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :type level: Int
         :param passage: Subreference (optional)
         :type passage: Reference
-        :rtype: List.basestring
+        :rtype: [text_type]
         :returns: List of levels
         """
         if hasattr(self, "__depth__"):
@@ -113,7 +123,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         """ Retrieve a passage and informations around it and store it in the object
 
         :param reference: Reference of the passage
-        :type reference: Reference or List of basestring
+        :type reference: Reference or List of text_type
         :rtype: Passage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference

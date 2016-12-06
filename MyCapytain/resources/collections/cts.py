@@ -8,13 +8,13 @@
 
 """
 from __future__ import unicode_literals
+from six import text_type
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype, URN
 from MyCapytain.common.utils import xmlparser, NS, Mimetypes
 import re
-from six import text_type as str
 from collections import defaultdict
 
 
@@ -54,7 +54,7 @@ class Citation(CitationPrototype):
     def ingest(resource, element=None, xpath="ti:citation"):
         """ Ingest xml to create a citation
 
-        :param xml: XML on which to do xpath
+        :param resource: XML on which to do xpath
         :param element: Element where the citation should be stored
         :param xpath: XPath to use to retrieve citation
 
@@ -88,8 +88,7 @@ class Citation(CitationPrototype):
 
 
 def xpathDict(xml, xpath, children, parents, **kwargs):
-    """ Returns a default Dict given certain informations
-        
+    """ Returns a default Dict given certain information
 
     :param xml: An xml tree
     :type xml: etree
@@ -277,23 +276,28 @@ class Text(cts.Text):
     @property
     def readable(self):
         """ Readable property should return elements where the element can be queried for getPassage / getReffs
+
+        :rtype: bool
         """
         return True
 
     @property
     def descendants(self):
+        """ List of descendants
+
+        :rtype: list
+        """
         return []
 
 
-
 def Edition(resource=None, urn=None, parents=None):
-    """ Create an edition subtyped Text object 
+    """ Create an edition subtyped Text object
     """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
 
 
 def Translation(resource=None, urn=None, parents=None):
-    """ Create a translation subtyped Text object 
+    """ Create a translation subtyped Text object
     """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
 

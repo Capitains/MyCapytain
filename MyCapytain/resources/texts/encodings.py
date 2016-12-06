@@ -27,7 +27,7 @@ class TEIResource(InteractiveTextualNode):
         """ Text based representation of the passage
     
         :rtype: basestring
-        :returns: XML of the passage in string form 
+        :returns: XML of the passage in string form
         """
         return self.export(output=Mimetypes.XML.Std)
 

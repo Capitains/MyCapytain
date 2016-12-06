@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.resources.prototypes.metadata
+   :synopsis: Definition of Metadata Type Objects
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+"""
 from copy import deepcopy
 
 from MyCapytain.common.metadata import Metadata

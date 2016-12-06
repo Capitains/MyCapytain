@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.resolvers.cts.api
+   :synopsis: Resolver built for CTS APIs
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
+
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resources.texts.api.cts import Text, Passage
 from MyCapytain.resources.collections.cts import TextInventory

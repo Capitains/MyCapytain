@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.resources.proto.inventory
-   :synopsis: Prototypes for repository/inventory
+.. module:: MyCapytain.resources.prototypes.cts.inventory
+   :synopsis: Prototypes for repository/inventory Collection CTS objects
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
-
 """
+from __future__ import unicode_literals
+from six import text_type
 
 from MyCapytain.resources.prototypes.metadata import Collection
-from MyCapytain.common.reference import URN, Reference, Citation
+from MyCapytain.common.reference import URN
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import RDF_PREFIX, Mimetypes
+from MyCapytain.common.utils import RDF_PREFIX
 from MyCapytain.errors import InvalidURN
-from past.builtins import basestring
 from collections import defaultdict
 from copy import copy, deepcopy
 from lxml import etree
-from six import text_type as str
 
 
 class CTSCollection(Collection):
@@ -25,7 +24,10 @@ class CTSCollection(Collection):
 
     :param resource: Resource representing the TextInventory
     :type resource: Any
+    :cvar CTSMODEL: String Representation of the type of collection
     """
+    CTSMODEL = "CTSCollection"
+
     def __init__(self, resource=None):
         super(CTSCollection, self).__init__()
 
@@ -46,7 +48,7 @@ class CTSCollection(Collection):
                 return r[0]
             else:
                 return r
-        elif isinstance(key, basestring):
+        elif isinstance(key, text_type):
             return self.__urnitem__(key)
         else:
             return None
@@ -127,10 +129,6 @@ class CTSCollection(Collection):
             dic["xml"] = etree.tostring(dic["xml"], encoding=str)
         if "resource" in dic:
             del dic["resource"]
-        """ The resource is unecessary in later than parsing state
-        if "resource" in dic:
-            dic["resource"] = str(dic["resource"])
-        """
         return dic
 
     def __setstate__(self, dic):
@@ -296,7 +294,7 @@ class Work(CTSCollection):
         """ Find a translation with given language
 
         :param key: Language to find
-        :type key: basestring
+        :type key: text_type
         :rtype: [Text]
         :returns: List of availables translations
         """

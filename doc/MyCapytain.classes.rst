@@ -25,24 +25,24 @@ The base functions are represented in the prototype, and only getMetadata might 
 depending on what filtering can be offered. Though, any additional filter has not necessarily effects with other \
 resolvers.
 
-A point of history
-******************
+Historical Perspective
+**********************
 
 The original incentive to build resolvers was the situation with retrievers, in the context of the Nautilus \
-    API and Nemo UI : Nemo took a retriever as object, which means that, based on the prototype, Nemo was retrieving \
-    string objects. That made sense as long as Nemo was running with HTTP remote API because it was actually receiving \
-    string objects which were not even (pre-)processed by the Retriever object. But since Nautilus was developed (a \
-    fully native python CTS API), we had the situation where Nemo was parsing strings that were exported from python \
-    etree objects by Nautilus which parsed strings.
+API and Nemo UI : Nemo took a retriever as object, which means that, based on the prototype, Nemo was retrieving \
+string objects. That made sense as long as Nemo was running with HTTP remote API because it was actually receiving \
+string objects which were not even (pre-)processed by the Retriever object. But since Nautilus was developed (a \
+fully native python CTS API), we had the situation where Nemo was parsing strings that were exported from python \
+etree objects by Nautilus which parsed strings.
 
 .. image:: _static/images/Resolvers.Before.svg
     :target: _static/images/Resolvers.Before.dia
     :alt: Diagram of operations before resolvers : there is duplication of processing
 
 Introducing Resolvers, we managed to avoid this double parsing effect in any situation : MyCapytain now provides a \
-    default class to provide access to querying text no matter what kind of transactions there is behind the Python \
-    object. At the same time, Resolvers provide a now unified system to retrieve texts independently from the retriever\
-    standard type (CTS, DTS, Proprietary, etc.).
+default class to provide access to querying text no matter what kind of transactions there is behind the Python \
+object. At the same time, Resolvers provide a now unified system to retrieve texts independently from the retriever\
+standard type (CTS, DTS, Proprietary, etc.).
 
 
 .. image:: _static/images/Resolvers.After.svg

@@ -33,7 +33,7 @@ class TestMetadatum(unittest.TestCase):
         self.assertEqual(a["lat"], "Epigrammata")
         self.assertEqual(a["grc"], "ἐπιγραμματον")
         # Set error because key is wrong
-        with six.assertRaisesRegex(self, TypeError, "Only basestring or tuple instances are accepted as key"):
+        with six.assertRaisesRegex(self, TypeError, "Only text_type or tuple instances are accepted as key"):
             a[3.5] = "test"
         with six.assertRaisesRegex(self, ValueError, "Less values than keys detected"):
             a[("lat", "grc")] = ["Epigrammata"]
@@ -147,7 +147,7 @@ class TestMetadata(unittest.TestCase):
         with self.assertRaises(KeyError):
             z = a["textgroup"]
 
-        with six.assertRaisesRegex(self, TypeError, "Only basestring or tuple instances are accepted as key"):
+        with six.assertRaisesRegex(self, TypeError, "Only text_type or tuple instances are accepted as key"):
             a[3.5] = "test"
         with six.assertRaisesRegex(self, ValueError, "Less values than keys detected"):
             a[("lat", "grc")] = ["Epigrammata"]

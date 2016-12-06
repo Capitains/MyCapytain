@@ -8,35 +8,7 @@ class TestEndpointsProto(unittest.TestCase):
     """ Testing prototypes retrievers """
 
     def setUp(self):
-        self.ahab = Ahab("http://ahab.com")
         self.cts = CTS("http://ahab.com")
-
-    def test_init_Ahab(self):
-        """ Test that init register the Ahab endpoint url"""
-        self.assertEqual(self.ahab.endpoint, "http://ahab.com")
-
-    def test_raise_Ahab_proto(self):
-        """ Tests that methods raises NotImplementedError """
-        with self.assertRaises(NotImplementedError):
-            self.ahab.search("query", "urn")
-
-        with self.assertRaises(NotImplementedError):
-            self.ahab.permalink("urn")
-
-    def test_raise_Ahab_search_arguments(self):
-        """ Tests that methods have consistent arguments"""
-        with self.assertRaises(NotImplementedError):
-            self.ahab.search(
-                query="query", urn="urn", start=1, limit=5, format="json")
-
-    def test_raise_Ahab_permalink_arguments(self):
-        """ Tests that methods have consistent arguments"""
-        with self.assertRaises(NotImplementedError):
-            self.ahab.permalink(urn="urn", format="json")
-
-    def test_init_CTS(self):
-        """ Test that init register the CTS endpoint url"""
-        self.assertEqual(self.ahab.endpoint, "http://ahab.com")
 
     def test_raise_CTS_proto(self):
         """ Tests that methods raises NotImplementedError """

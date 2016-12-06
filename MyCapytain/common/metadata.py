@@ -8,11 +8,9 @@
 
 """
 from __future__ import unicode_literals
-
+from six import text_type
 
 from collections import defaultdict, OrderedDict
-from past.builtins import basestring
-from builtins import range, object
 from MyCapytain.common.utils import Mimetypes, NS, RDF_PREFIX
 
 
@@ -20,7 +18,7 @@ class Metadatum(object):
     """ Metadatum object represent a single field of metadata
 
     :param name: Name of the field
-    :type name: basestring
+    :type name: text_type
     :param children: List of tuples, where first element is the key, and second the value
     :type children: List
 
@@ -52,7 +50,7 @@ class Metadatum(object):
         If string based key does not exist, see for a default.
 
         :param key: Key of wished value
-        :type key: basestring, tuple, int
+        :type key: text_type, tuple, int
         :returns: An element of children whose index is key
 
         :raises: KeyError if key is unknown (when using Int based key or when default is not set)
@@ -86,12 +84,12 @@ class Metadatum(object):
         """ Register index key and value for the instance
 
         :param key: Index key(s) for the metadata
-        :type key: basestring, list, tuple
+        :type key: text_type, list, tuple
         :param value: Values for the metadata
-        :type value: basestring, list, tuple
+        :type value: text_type, list, tuple
         :returns: An element of children whose index is key
 
-        :raises: `TypeError` if key is not basestring or tuple of basestring
+        :raises: `TypeError` if key is not text_type or tuple of text_type
         :raises: `ValueError` if key and value are list and are not the same size
 
         :Example:
@@ -114,9 +112,9 @@ class Metadatum(object):
                 raise ValueError("Less values than keys detected")
             for i in range(0, len(key)):
                 self[key[i]] = value[i]
-        elif not isinstance(key, basestring):
+        elif not isinstance(key, text_type):
             raise TypeError(
-                "Only basestring or tuple instances are accepted as key")
+                "Only text_type or tuple instances are accepted as key")
         else:
             self.children[key] = value
             if self.default is None:
@@ -126,7 +124,7 @@ class Metadatum(object):
         """ Set a default key when a field does not exist
 
         :param key: An existing key of the instance
-        :type key: basestring
+        :type key: text_type
         :returns: Default key
         :raises: `ValueError` If key is not registered
 
@@ -194,7 +192,7 @@ class Metadata(object):
         A metadatum aggregation object provided to centralize metadata
 
         :param key: A metadata field name
-        :type key: List.<basestring>
+        :type key: List.<text_type>
 
         :ivar metadata: Dictionary of metadatum
 
@@ -218,7 +216,7 @@ class Metadata(object):
         """ Add a quick access system through getitem on the instance
 
         :param key: Index key representing a set of metadatum
-        :type key: basestring, int, tuple
+        :type key: text_type, int, tuple
         :returns: An element of children whose index is key
         :raises: `KeyError` If key is not registered or recognized
 
@@ -251,12 +249,12 @@ class Metadata(object):
         """ Set a new metadata field
 
         :param key: Name of metadatum field
-        :type key: basestring, tuple
+        :type key: text_type, tuple
         :param value: Metadum dictionary
         :type value: Metadatum
         :returns: An element of children whose index is key
 
-        :raises: `TypeError` if key is not basestring or tuple of basestring
+        :raises: `TypeError` if key is not text_type or tuple of text_type
         :raises: `ValueError` if key and value are list and are not the same size
 
         :Example:
@@ -277,9 +275,9 @@ class Metadata(object):
                 raise ValueError("Less values than keys detected")
             for i in range(0, len(key)):
                 self[key[i]] = value[i]
-        elif not isinstance(key, basestring):
+        elif not isinstance(key, text_type):
             raise TypeError(
-                "Only basestring or tuple instances are accepted as key")
+                "Only text_type or tuple instances are accepted as key")
         else:
             if not isinstance(value, Metadatum) and isinstance(value, list):
                 self.metadata[key] = Metadatum(key, value)

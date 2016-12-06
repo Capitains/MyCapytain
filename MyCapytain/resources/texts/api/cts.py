@@ -175,7 +175,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         """ Get the previous URN of a reference of the text
 
         :param reference: Reference from which to find siblings
-        :type reference: Reference
+        :type reference: Union[Reference, str]
         :return: (Previous Passage Reference,Next Passage Reference)
         """
         _prev, _next = __SharedMethod__.prevnext(

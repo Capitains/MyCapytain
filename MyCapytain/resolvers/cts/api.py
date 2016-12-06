@@ -5,6 +5,14 @@ from MyCapytain.retrievers.cts5 import CTS
 
 
 class HttpCTSResolver(Resolver):
+    """ HttpCTSResolver provide a resolver for CTS API http endpoint.
+
+    :param endpoint: CTS API Retriever
+    :type endpoint: CTS
+
+    :ivar endpoint: CTS API Retriever
+    :type endpoint: CTS
+    """
     def __init__(self, endpoint):
         if not isinstance(endpoint, CTS):
             raise TypeError("Endpoint should be a CTS Endpoint object")
@@ -23,9 +31,13 @@ class HttpCTSResolver(Resolver):
         """ Retrieve a text node from the API
 
         :param textId: Text Identifier
+        :type textId: str
         :param subreference: Passage Reference
+        :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
+        :type prevnext: boolean
         :param metadata: Retrieve metadata about the passage and the text
+        :type metadata: boolean
         :return: Passage
         :rtype: Passage
         """
@@ -42,8 +54,13 @@ class HttpCTSResolver(Resolver):
         """ Retrieve the siblings of a textual node
 
         :param textId: Text Identifier
+        :type textId: str
+        :param level: Depth for retrieval
+        :type level: int
         :param subreference: Passage Reference
-        :return: (str, str)
+        :type subreference: str
+        :return: List of references
+        :rtype: [str]
         """
         text = Text(
             urn=textId,
@@ -55,9 +72,13 @@ class HttpCTSResolver(Resolver):
         """ Retrieve the siblings of a textual node
 
         :param textId: Text Identifier
+        :type textId: str
         :param level: Depth for retrieval
+        :type level: int
         :param subreference: Passage Reference
-        :return: (str, str)
+        :type subreference: str
+        :return: List of references
+        :rtype: [str]
         """
         text = Text(
             urn=textId,
@@ -69,7 +90,9 @@ class HttpCTSResolver(Resolver):
         """ Request metadata about a text or a collection
 
         :param textId: Object Identifier to filter on
-        :param filters: Kwargs parameters. URN and Inv are available
+        :type textId: str
+        :param filters: Kwargs parameters.
+        :type filters: dict
         :return: Collection
         """
         if objectId is not None:

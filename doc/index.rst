@@ -15,6 +15,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   MyCapytain.classes
    MyCapytain.uses
    MyCapytain.local
    MyCapytain.endpoint

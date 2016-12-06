@@ -35,8 +35,8 @@ The original incentive to build resolvers was the situation with retrievers, in 
     fully native python CTS API), we had the situation where Nemo was parsing strings that were exported from python \
     etree objects by Nautilus which parsed strings.
 
-.. image:: doc/_static/images/Resolvers.Before.svg
-    :target: doc/_static/images/Resolvers.Before.dia
+.. image:: _static/images/Resolvers.Before.svg
+    :target: _static/images/Resolvers.Before.dia
     :alt: Diagram of operations before resolvers : there is duplication of processing
 
 Introducing Resolvers, we managed to avoid this double parsing effect in any situation : MyCapytain now provides a \

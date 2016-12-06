@@ -6,6 +6,7 @@ build
 env
 src
 env2
+test.py 
 
 # Setuptools distribution folder.
 /dist/

@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: MyCapytain.errors
+   :synopsis: MyCapytain errors
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
 
 
 class DuplicateReference(SyntaxWarning):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.retrievers.proto
+.. module:: MyCapytain.retrievers.protoypes
    :synopsis: Prototypes of APIs endpoint
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
@@ -25,36 +25,6 @@ class API(object):
         """ Instantiate an API class
         """
         self.endpoint = endpoint
-
-
-class Ahab(API):
-    """
-    Abstract Capitains Ahab API
-    See : http://capitains.github.io/pages/ahab.html
-    """
-    def search(self, query, urn, start=1, limit=5, format="json"):
-        """ Perform a search on given namespace
-
-        :param query: Term to perform search on
-        :type query: text
-        :param urn: Partial or complete urn identifying the request
-        :type urn: text
-        :param start: Starting element to display
-        :type start: int
-        :param limit: Limit of result displayed
-        :type limit: int
-        :param format: Format to request (json or xml)
-        :type format: str
-        :rtype: str
-        """
-        raise NotImplementedError()
-
-    def permalink(self, urn, format="xml"):
-        """ Perform a permalink request on API
-
-        :rtype: str
-        """
-        raise NotImplementedError()
 
 
 class CitableTextServiceRetriever(API):
@@ -102,11 +72,10 @@ class CitableTextServiceRetriever(API):
 
 
 class CTS(CitableTextServiceRetriever):
-    """
-    CTS API Endpoint Prototype 
+    """ CTS API Endpoint Prototype
     """
     def getCapabilities(self, inventory):
-        """ Retrieve the inventory information of an API 
+        """ Retrieve the inventory information of an API
 
         :param inventory: Name of the inventory
         :type inventory: text
@@ -167,7 +136,8 @@ class CTS(CitableTextServiceRetriever):
         :type urn: text
         :param inventory: Name of the inventory
         :type inventory: text
-        :param context: Number of citation units at the same level of the citation hierarchy as the requested urn, immediately preceding and immediately following the requested urn to include in the reply
+        :param context: Number of citation units at the same level of the citation hierarchy as the requested urn, \
+         immediately preceding and immediately following the requested urn to include in the reply
         :type context: int
         :rtype: str
         """
@@ -175,12 +145,13 @@ class CTS(CitableTextServiceRetriever):
 
     def getPassagePlus(self, urn, inventory, context=None):
         """ Retrieve a passage and informations about it
-        
+
         :param urn: URN identifying the text's passage (Minimum depth : 1)
         :type urn: text
         :param inventory: Name of the inventory
         :type inventory: text
-        :param context: Number of citation units at the same level of the citation hierarchy as the requested urn, immediately preceding and immediately following the requested urn to include in the reply
+        :param context: Number of citation units at the same level of the citation hierarchy as the requested urn,\
+         immediately preceding and immediately following the requested urn to include in the reply
         :type context: int
         :rtype: str
         """

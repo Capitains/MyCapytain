@@ -109,7 +109,7 @@ RDF_MAPPING = {
 
 
 def xmlparser(xml, objectify=True):
-    """ Parse xml 
+    """ Parse xml
 
     :param xml: XML element
     :type xml: Union[text_type, lxml.etree._Element]
@@ -333,6 +333,11 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
 
 
 class OrderedDefaultDict(OrderedDict):
+    """ Extension of Default Dict that makes an OrderedDefaultDict
+
+    :param default_factory__: Default class to initiate
+    """
+
     def __init__(self, default_factory=None, *args, **kwargs):
         super(OrderedDefaultDict, self).__init__(*args, **kwargs)
         self.default_factory = default_factory

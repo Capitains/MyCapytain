@@ -39,20 +39,18 @@ def __makePassageKwargs__(urn, reference):
 
 
 class __SharedMethods__:
+    """ Set of shared methods between objects in locals TEI. Avoid recoding functions
+    """
 
     def getPassage(self, reference=None, simple=False):
         """ Finds a passage in the current text
 
         :param reference: Identifier of the subreference / passages
         :type reference: Union[list, Reference]
-        :param hypercontext: If set to true, retrieves nodes up to the given one, cleaning non required siblings.
-        :type hypercontext: boolean
+        :param simple: If set to true, retrieves nodes up to the given one, cleaning non required siblings.
+        :type simple: boolean
         :rtype: Passage, ContextPassage
         :returns: Asked passage
-t
-        .. note :: As of MyCapytain 0.1.0, Text().getPassage() returns by default a ContextPassage, thus being able
-            to handle range. This design change also means that the returned tree is way different that a classic
-             Passage. To retrieve MyCapytain<=0.0.9 behaviour, use `hypercontext=False`.
         """
 
         if reference is None:
@@ -299,7 +297,6 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
     def reference(self, value):
         self.__reference__ = value
 
-
     @property
     def childIds(self):
         """ Children of the passage
@@ -320,8 +317,8 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
+        :param reference: Subreference (optional)
+        :type reference: Reference
         :rtype: List.basestring
         :returns: List of levels
         """
@@ -569,7 +566,7 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
         if self.__prevnext__:
             return self.__prevnext__
 
-        document_references = list(map(lambda x: str(x), self.__text__.getReffs(level=self.depth)))
+        document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
         range_length = len(self.getReffs(level=0))
 
         if self.reference.end:
@@ -630,6 +627,7 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
             return __SharedMethods__.getPassage(self.__text__, self.prevId)
 
     def getPassage(self, reference, simple=False):
+        __doc__ = __SharedMethods__.__doc__
         if not isinstance(reference, Reference):
             reference = Reference(reference)
         X = __SharedMethods__.getPassage(self, reference, simple)

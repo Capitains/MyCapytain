@@ -26,7 +26,7 @@ class Citation(CitationPrototype):
     escape = re.compile('(")')
 
     def __str__(self):
-        """ Returns a string text inventory version of the object 
+        """ Returns a string text inventory version of the object
 
         :Example:
             >>>    a = Citation(name="book", xpath="/tei:TEI/tei:body/tei:text/tei:div", scope="/tei:div[@n=\"1\"]")
@@ -116,8 +116,8 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
 
 class Text(cts.Text):
     """ Represents a CTS Text
-        
-        ..automethod:: __str__
+
+    ..automethod:: __str__
     """
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
@@ -363,7 +363,7 @@ class Work(cts.Work):
         return super(Work, self).export(output, domain)
 
     def parse(self, resource):
-        """ Parse a resource 
+        """ Parse a resource
 
         :param resource: Element rerpresenting a work
         :param type: basestring, etree._Element

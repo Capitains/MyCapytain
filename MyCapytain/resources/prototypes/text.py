@@ -7,8 +7,8 @@
 
 
 """
-from past.builtins import basestring
-from MyCapytain.common.reference import URN, Reference, Citation, NodeId
+from six import text_type
+from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import Mimetypes
 from MyCapytain.resources.prototypes.metadata import Collection
@@ -35,10 +35,20 @@ class TextualElement(object):
 
     @property
     def text(self):
+        """ String representation of the text
+
+        :return: String representation of the text
+        :rtype: text_type
+        """
         return self.export(output=Mimetypes.PLAINTEXT, exclude=self.default_exclude)
 
     @property
     def id(self):
+        """ Identifier of the text
+
+        :return: Identifier of the text
+        :rtype: text_type
+        """
         return self.__identifier__
 
     @property
@@ -46,6 +56,7 @@ class TextualElement(object):
         """ Metadata information about the text
 
         :return: Collection object with metadata about the text
+        :rtype Collection:
         """
         return self.__about__
 
@@ -66,6 +77,7 @@ class TextualElement(object):
         """ Metadata information about the text
 
         :return: Collection object with metadata about the text
+        :rtype: Metadata
         """
         return self.about.metadata
 
@@ -92,7 +104,7 @@ class TextualElement(object):
         """
         raise NotImplementedError
 
-    def export(self, output=None, exclude=None):
+    def export(self, output=None, exclude=None, **kwargs):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
@@ -135,7 +147,9 @@ class TextualNode(TextualElement, NodeId):
 
     @property
     def citation(self):
-        """
+        """ Citation Object of the Text
+
+        :return: Citation Object of the Text
         :rtype: Citation
         """
         return self.__citation__
@@ -191,7 +205,7 @@ class TextualGraph(TextualNode):
         :type level: Int
         :param passage: Subreference (optional)
         :type passage: Reference
-        :rtype: List.basestring
+        :rtype: [text_type]
         :returns: List of levels
         """
         raise NotImplementedError()
@@ -277,6 +291,11 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def childIds(self):
+        """ Identifiers of children
+
+        :return: Identifiers of children
+        :rtype: [str]
+        """
         if self.__childIds__ is None:
             self.__childIds__ = self.getReffs()
         return self.__childIds__
@@ -285,7 +304,7 @@ class InteractiveTextualNode(TextualGraph):
     def firstId(self):
         """ First child of current Passage
 
-        :rtype: Node
+        :rtype: str
         :returns: First passage node Information
         """
         if self.childIds is not None:
@@ -299,7 +318,7 @@ class InteractiveTextualNode(TextualGraph):
     def lastId(self):
         """ Last child of current Passage
 
-        :rtype: Node
+        :rtype: str
         :returns: Last passage Node representation
         """
         if self.childIds is not None:
@@ -356,7 +375,7 @@ class CTSNode(InteractiveTextualNode):
         :raises: *TypeError* when the value is not URN compatible
 
         """
-        if isinstance(value, basestring):
+        if isinstance(value, text_type):
             value = URN(value)
         elif not isinstance(value, URN):
             raise TypeError()
@@ -369,7 +388,7 @@ class CTSNode(InteractiveTextualNode):
         :type level: Int
         :param passage: Subreference (optional)
         :type passage: Reference
-        :rtype: List.basestring
+        :rtype: List.text_type
         :returns: List of levels
         """
         raise NotImplementedError()

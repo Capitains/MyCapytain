@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser, NS
-from MyCapytain.common.reference import Citation, URN, Reference
+from MyCapytain.common.reference import URN, Reference
 from MyCapytain.resources.collections import cts as CTSCollection
 from MyCapytain.resources.prototypes import text as prototypes
 from MyCapytain.resources.texts.encodings import TEIResource

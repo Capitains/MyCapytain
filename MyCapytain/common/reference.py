@@ -229,7 +229,7 @@ class Reference(object):
 
     def __regexp__(self, subreference):
         """ Split components of subreference
-        
+
         :param subreference: A subreference
         :type subreference: str
         :rtype: List.<Tuple>
@@ -453,8 +453,8 @@ class URN(object):
         .. warning:: Does not take into account the passage !
 
         :Example:
-            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
-            >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1") 
+            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
+            >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1")
             >>>    (a > b) == True
         """
         return len(self) > len(other)
@@ -470,9 +470,9 @@ class URN(object):
         .. warning:: Does not take into account the passage !
 
         :Example:
-            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
-            >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1") 
-            >>>    (b < a) == True # 
+            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
+            >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1")
+            >>>    (b < a) == True
         """
         return len(self) < len(other)
 
@@ -485,8 +485,8 @@ class URN(object):
         :returns: Equality between other and self
 
         :Example:
-            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1") 
-            >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1") 
+            >>>    a = URN(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
+            >>>    b = URN(urn="urn:cts:latinLit:phi1294.phi002:1.1")
             >>>    (b == a) == False
         """
         return isinstance(other, type(self)) and str(self) == str(other)
@@ -858,7 +858,7 @@ class Citation(object):
                 replacement = r"\1\2'" + passage + "'"
 
             return REFERENCE_REPLACER.sub(replacement, xpath)
-        else:        
+        else:
             if isinstance(passage, Reference):
                 passage = passage.list or passage.start.list
             elif passage is None:

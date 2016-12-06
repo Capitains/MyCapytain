@@ -150,12 +150,21 @@ class Text(CTSCollection):
     :type resource: Any
     :param urn: Identifier of the Text
     :type urn: str
+    :param parents: Item parents of the current collection
+    :type parents: [CTSCollection]
+    :param subtype: Subtype of the object (Edition, Translation)
+    :type subtype: str
     """
 
     DC_TITLE = "label"
 
     @property
     def TEXT_URI(self):
+        """ Ontology URI of the text
+
+        :return: CTS Ontology Edition or Translation object
+        :rtype: str
+        """
         return RDF_PREFIX["cts"] + self.subtype
 
     def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
@@ -215,10 +224,28 @@ class Text(CTSCollection):
 
 
 def Edition(resource=None, urn=None, parents=None):
+    """ Represents a CTS Edition
+
+    :param resource: Resource representing the TextInventory
+    :type resource: Any
+    :param urn: Identifier of the Text
+    :type urn: str
+    :param parents: Item parents of the current collection
+    :type parents: [CTSCollection]
+    """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
 
 
 def Translation(resource=None, urn=None, parents=None):
+    """ Represents a CTS Translation
+
+    :param resource: Resource representing the TextInventory
+    :type resource: Any
+    :param urn: Identifier of the Text
+    :type urn: str
+    :param parents: Item parents of the current collection
+    :type parents: [CTSCollection]
+    """
     return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
 
 

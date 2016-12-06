@@ -1,3 +1,6 @@
+""" Mini snippet built to evaluate speed changes in between Etree and Objectify._element
+
+"""
 import pickle
 
 import lxml.objectify

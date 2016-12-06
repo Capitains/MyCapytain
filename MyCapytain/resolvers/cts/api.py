@@ -9,7 +9,7 @@
 """
 
 from MyCapytain.resolvers.prototypes import Resolver
-from MyCapytain.resources.texts.api.cts import Text, Passage
+from MyCapytain.resources.texts.api.cts import Text
 from MyCapytain.resources.collections.cts import TextInventory
 from MyCapytain.retrievers.cts5 import CTS
 

@@ -53,7 +53,7 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
 
     def getCapabilities(self, inventory=None, urn=None):
         """ Retrieve the inventory information of an API 
-        
+
         :param inventory: Name of the inventory
         :type inventory: text
         :rtype: str

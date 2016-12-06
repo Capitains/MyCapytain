@@ -1,3 +1,13 @@
+"""
+.. module:: MyCapytain.resolvers.prototypes
+   :synopsis: Resolver Prototype
+
+.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
+
+
+"""
+
+
 class Resolver(object):
     """ Resolver provide a native python API which returns python objects.
 

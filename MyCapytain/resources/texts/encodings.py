@@ -6,18 +6,21 @@ Shared elements for TEI Citation
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 """
+from __future__ import unicode_literals
+from six import text_type
 
 from MyCapytain.common.utils import NS, Mimetypes, normalize, xmlparser, \
     nested_set, nested_ordered_dictionary
 from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 
 from lxml.etree import tostring
-from six import text_type as str
 
 
 class TEIResource(InteractiveTextualNode):
-    """ TEI Resource
+    """ TEI Encoded Resource
 
+    :param resource: XML Resource that needs to be parsed into a Passage/Text
+    :type resource: Union[str,_Element]
     """
     def __init__(self, resource, **kwargs):
         super(TEIResource, self).__init__(**kwargs)
@@ -64,18 +67,15 @@ class TEIResource(InteractiveTextualNode):
             exclude = ""
 
         if output == Mimetypes.PYTHON.ETREE:
-            """ Exports the whole resource as a LXML object
-            """
+            # Exports the whole resource as a LXML object
             return self.resource
 
         elif output == Mimetypes.XML.Std:
-            """ Exports the whole resource formatted as XML but as string object
-            """
+            # Exports the whole resource formatted as XML but as string object
             return tostring(self.resource, encoding=str)
 
         elif output == Mimetypes.PYTHON.NestedDict:
-            """ Exports the whole resource into a NestedDict
-            """
+            # Exports the whole resource into a NestedDict
             reffs = self.getReffs(level=len(self.citation))
             text = nested_ordered_dictionary()
             for reff in reffs:
@@ -88,6 +88,7 @@ class TEIResource(InteractiveTextualNode):
             return text
 
         elif output == Mimetypes.PLAINTEXT:
+            # Exports to string
             return normalize(
                 " ".join(
                     [

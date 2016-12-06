@@ -28,6 +28,8 @@ with open("tests/testing_data/cts/getCapabilities.xml") as f:
     GET_CAPABILITIES = xmlparser(f)
 with open("tests/testing_data/cts/getCapabilities1294002.xml") as f:
     GET_CAPABILITIES_FILTERED = xmlparser(f)
+with open("tests/testing_data/cts/getPassageOtherTest.xml") as f:
+    GET_PASSAGE_CITATION_FAILURE = f.read()
 
 
 class TestHttpCTSResolver(TestCase):
@@ -465,4 +467,20 @@ class TestHttpCTSResolver(TestCase):
         )
         self.assertEqual(
             reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1"
+        )
+
+    def test_citation_failure(self):
+        """ Example for Resolver failed : some response have an issue with not available Citations ?
+        """
+        retriever = CTS("http://cts.dh.uni-leipzig.de/api/cts/")
+        retriever.getPassage = MagicMock(return_value=GET_PASSAGE_CITATION_FAILURE)
+        resolver = HttpCTSResolver(retriever)
+        # We require a passage : passage is now a Passage object
+        passage = resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+        # We need an export as plaintext
+        self.assertEqual(
+            passage.export(output=Mimetypes.PLAINTEXT),
+            "I Hic est quem legis ille, quem requiris, Toto notus in orbe Martialis Argutis epigrammaton libellis: \n"\
+                " Cui, lector studiose, quod dedisti Viventi decus atque sentienti, Rari post cineres habent poetae. ",
+            "Parsing should be successful"
         )

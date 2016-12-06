@@ -65,7 +65,7 @@ Example
 
     from MyCapytain.resolvers.cts.api import HttpCTSResolver
     from MyCapytain.retrievers.cts5 import CTS
-    from MyCapytain.common.utils import Mimetypes
+    from MyCapytain.common.utils import Mimetypes, NS
 
     # We set up a resolver which communicates with an API available in Leipzig
     resolver = HttpCTSResolver(CTS("http://cts.dh.uni-leipzig.de/api/cts/"))

@@ -416,7 +416,7 @@ class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
 
         self.__prev__, self.__next__ = __SharedMethod__.prevnext(self.response)
 
-        if self.citation.isEmpty():
+        if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=NS)):
             self.citation = CTSCollection.Citation.ingest(
                 self.response,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"

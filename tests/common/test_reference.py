@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from past.builtins import basestring
 from six import text_type as str
 import unittest
-from MyCapytain.common.reference import URN, Reference, Citation
+from MyCapytain.common.reference import URN, Reference, Citation, NodeId
 
 
 class TestReferenceImplementation(unittest.TestCase):
@@ -19,6 +19,16 @@ class TestReferenceImplementation(unittest.TestCase):
         self.assertEqual(len(a), 2)
         a = Reference("1.1.1")
         self.assertEqual(len(a), 3)
+
+    def test_highest(self):
+        self.assertEqual(
+            str((Reference("1.1-1.2.8")).highest), "1.1",
+            "1.1 is higher"
+        )
+        self.assertEqual(
+            str((Reference("1.1-2")).highest), "2",
+            "2 is higher"
+        )
 
     def test_properties(self):
         a = Reference("1.1@Achilles-1.10@Atreus[3]")
@@ -89,6 +99,8 @@ class TestURNImplementation(unittest.TestCase):
     def test_properties(self):
         a = URN("urn:cts:greekLit:tlg0012.tlg001.mth-01:1.1@Achilles-1.10@the[2]")
         self.assertEqual(a.urn_namespace, "cts")
+        a.urn_namespace = "dts"
+        self.assertEqual(a.urn_namespace, "dts")
         self.assertEqual(a.namespace, "greekLit")
         self.assertEqual(a.textgroup, "tlg0012")
         self.assertEqual(a.work, "tlg001")
@@ -152,8 +164,6 @@ class TestURNImplementation(unittest.TestCase):
         a.version = "vs"
         self.assertEqual(a.version, "vs")
         self.assertEqual(str(a), "urn:cts:ns:tg.wk.vs:1-2")
-
-
 
     def test_from_work_emptiness(self):
         a = URN("urn:cts:greekLit:textgroup.work")
@@ -225,6 +235,20 @@ class TestURNImplementation(unittest.TestCase):
         b = URN("urn:cts:greekLit:textgroup")
         self.assertEqual(a < b, True)
 
+    def test_set(self):
+        a = URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        a.reference = Reference("1.1")
+        self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
+        a.reference = "2.2"
+        self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:2.2")
+        a.version = "perseus-eng2"
+        self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi002.perseus-eng2:2.2")
+        a.work = "phi001"
+        self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi001.perseus-eng2:2.2")
+        a.textgroup = "phi1293"
+        self.assertEqual(str(a), "urn:cts:latinLit:phi1293.phi001.perseus-eng2:2.2")
+        a.namespace = "greekLit"
+        self.assertEqual(str(a), "urn:cts:greekLit:phi1293.phi001.perseus-eng2:2.2")
 
 class TestCitation(unittest.TestCase):
     """ Test the citation object """
@@ -320,6 +344,25 @@ class TestCitation(unittest.TestCase):
         )
         self.assertEqual(len(a), 3)
 
+    def test_get_item(self):
+        c = Citation(
+            name="line"
+        )
+        b = Citation(
+            name="poem",
+            child=c
+        )
+        a = Citation(
+            name="book",
+            child=b
+        )
+        self.assertEqual(a[-1], c, "Last citation is C")
+        self.assertEqual(a[2], c, "Third citation is C")
+        self.assertEqual(a[0], a, "First citation is A")
+        self.assertEqual(a[1], b, "Second citation is B")
+        with self.assertRaises(KeyError, msg="Citation is out of bound"):
+            a[8]
+
     def test_fill(self):
         c = Citation(
             name="line",
@@ -334,3 +377,31 @@ class TestCitation(unittest.TestCase):
         self.assertEqual(c.fill(None, xpath=True), "//l[@n]")
         self.assertEqual(c.fill([None, None]), "/TEI/text/body/div/div[@n]//l[@n]")
         self.assertEqual(c.fill(["1", None]), "/TEI/text/body/div/div[@n='1']//l[@n]")
+
+
+class TestNodeId(unittest.TestCase):
+    def test_setup(self):
+        """ Ensure basic properties works """
+        n = NodeId(children=["1", "b", "d"])
+        self.assertEqual(n.childIds, ["1", "b", "d"])
+        self.assertEqual(n.lastId, "d")
+        self.assertEqual(n.firstId, "1")
+        self.assertEqual(n.depth, None)
+        self.assertEqual(n.parentId, None)
+        self.assertEqual(n.id, None)
+        self.assertEqual(n.prevId, None)
+        self.assertEqual(n.nextId, None)
+        self.assertEqual(n.siblingsId, (None, None))
+
+        n = NodeId(parent="1", identifier="1.1")
+        self.assertEqual(n.parentId, "1")
+        self.assertEqual(n.id, "1.1")
+
+        n = NodeId(siblings=("1", "1.1"), depth=5)
+        self.assertEqual(n.prevId, "1")
+        self.assertEqual(n.nextId, "1.1")
+        self.assertEqual(n.childIds, [])
+        self.assertEqual(n.firstId, None)
+        self.assertEqual(n.lastId, None)
+        self.assertEqual(n.siblingsId, ("1", "1.1"))
+        self.assertEqual(n.depth, 5)

@@ -9,7 +9,8 @@ from MyCapytain.resources.texts.api.cts import Passage, Text
 from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, Citation, URN
 from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.utils import xmlparser, NS
+from MyCapytain.common.utils import xmlparser, NS, Mimetypes
+from MyCapytain.errors import MissingAttribute
 import mock
 
 with open("tests/testing_data/cts/getValidReff.xml") as f:
@@ -54,6 +55,8 @@ class TestAPIText(unittest.TestCase):
         """ Test the __init__ parameters of Text
         """
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
+        with self.assertRaises(MissingAttribute):
+            Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=None)
         self.assertEqual(str(text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(text.retriever, self.endpoint)
         self.assertEqual(text.citation, self.citation)
@@ -124,6 +127,59 @@ class TestAPIText(unittest.TestCase):
 
         # Test the parsing
         self.assertEqual(reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
+
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
+    def test_export_fulltext(self, requests):
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
+        requests.return_value.text = GET_PASSAGE
+
+        # Test with -1
+        export = text.export(Mimetypes.PYTHON.ETREE)
+        requests.assert_called_with(
+            "http://services.perseids.org/api/cts",
+            params={
+                "request": "GetPassage",
+                "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2"
+            }
+        )
+        self.assertEqual(
+            export.xpath(".//tei[@n='1']/text()", magic_string=False),
+            [],
+            "Export should be used correctly"
+        )
+
+    @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
+    def test_getpassage_variabletypes(self, requests):
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
+        requests.return_value.text = GET_PASSAGE
+
+        # Test with -1
+        _ = text.getPassage(reference=Reference("1.1"))
+        requests.assert_called_with(
+            "http://services.perseids.org/api/cts",
+            params={
+                "request": "GetPassage",
+                "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
+            }
+        )
+        # Test with -1
+        _ = text.getPassage(reference=URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2"))
+        requests.assert_called_with(
+            "http://services.perseids.org/api/cts",
+            params={
+                "request": "GetPassage",
+                "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2"
+            }
+        )
+        # Test with -1
+        _ = text.getPassage(reference=["1", "1", "1"])
+        requests.assert_called_with(
+            "http://services.perseids.org/api/cts",
+            params={
+                "request": "GetPassage",
+                "urn": "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1"
+            }
+        )
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getpassage(self, requests):
@@ -681,3 +737,56 @@ class TestCTSPassage(unittest.TestCase):
             first, None,
             "Endpoint should be called and none should be returned if there is none"
         )
+
+    def test_first_urn_whenfullurn(self):
+        endpoint = CTS(self.url)
+        endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            resource=GET_PASSAGE,
+            retriever=endpoint
+        )
+        first = passage.getFirstUrn("urn:cts:latinLit:phi1294.phi02.perseus-lat2:1.1")
+        endpoint.getFirstUrn.assert_called_with(
+            "urn:cts:latinLit:phi1294.phi02.perseus-lat2:1.1"
+        )
+        self.assertEqual(
+            first, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "Parsing should be done and getFirstUrn should treat correctly full urn"
+        )
+
+    def test_first_urn_whenreference(self):
+        endpoint = CTS(self.url)
+        endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            resource=GET_PASSAGE,
+            retriever=endpoint
+        )
+        first = passage.getFirstUrn("1.1")
+        endpoint.getFirstUrn.assert_called_with(
+            "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
+        )
+        self.assertEqual(
+            first, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            "Parsing should be done and getFirstUrn should treat correctly full urn"
+        )
+
+    def test_get_reffs_contextual(self):
+        """ Ensure getReffs works with context """
+        endpoint = CTS(self.url)
+        endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            resource=GET_PASSAGE,
+            retriever=endpoint
+        )
+        passage.getReffs()
+        endpoint.getValidReff.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1",
+            level=2
+        )
+

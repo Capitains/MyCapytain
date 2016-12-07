@@ -11,7 +11,7 @@
 from __future__ import unicode_literals
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import xmlparser, NS
+from MyCapytain.common.utils import xmlparser, NS, Mimetypes
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.resources.collections import cts as CTSCollection
 from MyCapytain.resources.prototypes import text as prototypes
@@ -25,6 +25,16 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
     :param retriever: Retriever used to retrieve other data
     :type retriever: MyCapytain.retrievers.prototypes.CitableTextServiceRetriever
     """
+
+    @property
+    def depth(self):
+        """ Depth of the current opbject
+
+        :return: Int representation of the depth based on URN information
+        :rtype: int
+        """
+        if self.urn.reference:
+            return len(self.urn.reference)
 
     def __init__(self, retriever=None, *args, **kwargs):
         super(__SharedMethod__, self).__init__(*args, **kwargs)
@@ -79,8 +89,9 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
     def getPassage(self, reference=None):
         """ Retrieve a passage and store it in the object
 
-        :param reference: Reference of the passage
-        :type reference: Reference, or URN, or str or list(str)
+        :param reference: Reference of the passage (Note : if given a list, this should be a list of string that \
+        compose the reference)
+        :type reference: Union[Reference, URN, str, list]
         :rtype: Passage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
@@ -104,20 +115,20 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         self.__parse_request__(response.xpath("//ti:request", namespaces=NS)[0])
         return Passage(urn=urn, resource=response, retriever=self.retriever)
 
-    def getReffs(self, level=1, reference=None):
+    def getReffs(self, level=1, subreference=None):
         """ Reference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
+        :param subreference: Subreference (optional)
+        :type subreference: Reference
         :rtype: [text_type]
         :returns: List of levels
         """
-        if hasattr(self, "__depth__"):
+        if self.depth is not None:
             level = level + self.depth
 
-        return self.getValidReff(level, reference)
+        return self.getValidReff(level, subreference)
 
     def getPassagePlus(self, reference=None):
         """ Retrieve a passage and informations around it and store it in the object
@@ -345,7 +356,7 @@ class Text(__SharedMethod__, prototypes.CitableText):
     def siblingsId(self):
         raise NotImplementedError
 
-    def export(self, output=None, exclude=None):
+    def export(self, output=Mimetypes.PLAINTEXT, exclude=None):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method

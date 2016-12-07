@@ -13,17 +13,17 @@ import re
 from lxml.etree import _Element
 from MyCapytain.common.utils import NS
 
-REFSDECL_SPLITTER = re.compile("/+[\*()|\sa-zA-Z0-9:\[\]@=\\\{\$'\"\.\s]+")
-REFSDECL_REPLACER = re.compile("\$[0-9]+")
-SUBREFERENCE = re.compile("(\w*)\[{0,1}([0-9]*)\]{0,1}", re.UNICODE)
-REFERENCE_REPLACER = re.compile("(@[a-zA-Z0-9:]+){1}(=){1}([\\\$'\"?0-9]{3,6})")
+REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
+REFSDECL_REPLACER = re.compile(r"\$[0-9]+")
+SUBREFERENCE = re.compile(r"(\w*)\[?([0-9]*)\]?", re.UNICODE)
+REFERENCE_REPLACER = re.compile(r"(@[a-zA-Z0-9:]+)(=)([\\$'\"?0-9]{3,6})")
 
 
 def __childOrNone__(liste):
     """ Used to parse resources in Citation
 
-    :param liste:
-    :return:
+    :param liste: List of item
+    :return: If there is > 1 element in the list, return the last one
     """
     if len(liste) > 0:
         return liste[-1]
@@ -32,22 +32,10 @@ def __childOrNone__(liste):
 
 
 class Reference(object):
-    """ A reference object giving informations
+    """ A reference object giving information
 
     :param reference: Passage Reference part of a Urn
     :type reference: basestring
-    :ivar parent: Parent Reference
-    :type parent: Reference
-    :ivar highest: List representation of the range member which is the highest in the hierarchy (If equal, start is returned)
-    :type highest: Reference
-    :ivar start: First part of the range
-    :type start: Reference
-    :ivar end: Second part of the range
-    :type end: Reference
-    :ivar list: List representation of the range. Not available for range
-    :type list: list
-    :ivar subreference: Word and Word counter ("Achiles", 1) representing the subreference. Not available for range
-    :type subreference: (str, int)
 
     :Example:
         >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
@@ -62,7 +50,8 @@ class Reference(object):
         >>>    b == Reference("1.1") && b != a
 
     .. note::
-        While Reference(...).subreference and .list are not available for range, Reference(..).start.subreference and Reference(..).end.subreference as well as .list are available
+        While Reference(...).subreference and .list are not available for range, Reference(..).start.subreference \
+        and Reference(..).end.subreference as well as .list are available
     """
 
     def __init__(self, reference=""):
@@ -119,11 +108,12 @@ class Reference(object):
             return self.end
         elif len(self.start):
             return self.start
-        return self
 
     @property
     def start(self):
         """ Quick access property for start list
+
+        :rtype: Reference
         """
         if self.parsed[0][0] and len(self.parsed[0][0]):
             return Reference(self.parsed[0][0])
@@ -131,6 +121,8 @@ class Reference(object):
     @property
     def end(self):
         """ Quick access property for reference end list
+
+        :rtype: Reference
         """
         if self.parsed[1][0] and len(self.parsed[1][0]):
             return Reference(self.parsed[1][0])
@@ -282,18 +274,6 @@ class URN(object):
 
     :param urn: A CTS URN
     :type urn: str
-    :ivar urn_namespace: Namespace of the URN
-    :type urn_namespace: str
-    :ivar namespace: CTS Namespace
-    :type namespace: str
-    :ivar textgroup: CTS Textgroup
-    :type textgroup: str
-    :ivar work: CTS Work
-    :type work: str
-    :ivar version: CTS Version
-    :type version: str
-    :ivar reference: CTS Reference
-    :type reference: Reference
     :cvar NAMESPACE: Constant representing the URN until its namespace
     :cvar TEXTGROUP: Constant representing the URN until its textgroup
     :cvar WORK: Constant representing the URN until its work
@@ -317,7 +297,6 @@ class URN(object):
         >>>     len(a) == 5 # Reference is not counted to not induce count equivalencies with the optional version
         >>>     len(b) == 4
 
-    .. exclude-members:: all
     .. automethod:: upTo
     """
 
@@ -814,7 +793,7 @@ class Citation(object):
 
     def __getitem__(self, item):
         if not isinstance(item, int) or item > len(self)-1:
-            return KeyError
+            raise KeyError("Citation index is too big")
         return [x for x in self][item]
 
     def __len__(self):
@@ -852,9 +831,8 @@ class Citation(object):
         if xpath is True:  # Then passage is a string or None
             xpath = self.xpath
 
-            if passage is None:
-                replacement = r"\1"
-            elif isinstance(passage, text_type):
+            replacement = r"\1"
+            if isinstance(passage, text_type):
                 replacement = r"\1\2'" + passage + "'"
 
             return REFERENCE_REPLACER.sub(replacement, xpath)
@@ -981,10 +959,10 @@ class NodeId(object):
     :param depth: Depth of the node in the global hierarchy of the text tree
     :type depth: int
     """
-    def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=1):
+    def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=None):
         self.__children__ = children or []
         self.__parent__ = parent
-        self.__prev__, self.__next__ = siblings
+        self.__prev__, self.__nextId__ = siblings
         self.__identifier__ = identifier
         self.__depth__ = depth
 
@@ -992,17 +970,37 @@ class NodeId(object):
     def depth(self):
         """ Depth of the node in the global hierarchy of the text tree
 
-        :rtype: [str]
+        :rtype: int
         """
         return self.__depth__
 
     @property
     def childIds(self):
-        """ Siblings Node
+        """ Children Node
 
         :rtype: [str]
         """
         return self.__children__
+
+    @property
+    def firstId(self):
+        """ First child Node
+
+        :rtype: str
+        """
+        if len(self.__children__) == 0:
+            return None
+        return self.__children__[0]
+
+    @property
+    def lastId(self):
+        """ Last child Node
+
+        :rtype: str
+        """
+        if len(self.__children__) == 0:
+            return None
+        return self.__children__[-1]
 
     @property
     def parentId(self):
@@ -1018,7 +1016,7 @@ class NodeId(object):
 
         :rtype: (str, str)
         """
-        return self.__prev__, self.__next__
+        return self.__prev__, self.__nextId__
 
     @property
     def prevId(self):
@@ -1034,7 +1032,7 @@ class NodeId(object):
 
         :rtype: str
         """
-        return self.__next__
+        return self.__nextId__
 
     @property
     def id(self):

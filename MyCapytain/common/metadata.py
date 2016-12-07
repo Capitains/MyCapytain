@@ -23,7 +23,7 @@ class Metadatum(object):
     :type children: List
 
     :Example:
-        >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+        >>>    a = Metadatum("label", [("lat", "Amores"), ("fre", "Les Amours")])
         >>>    print(a["lat"]) # == "Amores"
 
     .. automethod:: __getitem__
@@ -56,7 +56,7 @@ class Metadatum(object):
         :raises: KeyError if key is unknown (when using Int based key or when default is not set)
 
         :Example:
-            >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    a = Metadatum("label", [("lat", "Amores"), ("fre", "Les Amours")])
             >>>    print(a["lat"]) # Amores
             >>>    print(a[("lat", "fre")]) # Amores, Les Amours
             >>>    print(a[0]) # Amores
@@ -129,7 +129,7 @@ class Metadatum(object):
         :raises: `ValueError` If key is not registered
 
         :Example:
-            >>>    a = Metadatum(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    a = Metadatum("label", [("lat", "Amores"), ("fre", "Les Amours")])
             >>>    a.setDefault("fre")
             >>>    print(a["eng"]) # == "Les Amours"
 
@@ -144,7 +144,7 @@ class Metadatum(object):
         """ Iter method of Metadatum
 
         :Example:
-            >>> a = Metadata(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>> a = Metadata("label", [("lat", "Amores"), ("fre", "Les Amours")])
             >>> for key, value in a:
             >>>     print(key, value) # Print ("lat", "Amores") and then ("fre", "Les Amours")
         """
@@ -160,7 +160,7 @@ class Metadatum(object):
         :rtype: int
 
         :Example:
-            >>> a = Metadata(name="label", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>> a = Metadata("label", [("lat", "Amores"), ("fre", "Les Amours")])
             >>> len(a) == 2
         """
         return len(self.children)
@@ -178,8 +178,8 @@ class Metadatum(object):
 
     def __setstate__(self, dic):
         """ Unpickling method
-        :param value:
-        :return:
+        :param dic: Dictionary to use to set up the object
+        :return: New generated object
         """
         self.name = dic["name"]
         self.children = OrderedDict(dic["langs"])
@@ -191,8 +191,8 @@ class Metadata(object):
     """
         A metadatum aggregation object provided to centralize metadata
 
-        :param key: A metadata field name
-        :type key: List.<text_type>
+        :param keys: A metadata field names list
+        :type keys: [text_type]
 
         :ivar metadata: Dictionary of metadatum
 
@@ -206,7 +206,7 @@ class Metadata(object):
         """ Initiate the object
         """
         self.metadata = defaultdict(Metadatum)
-        self.__keys = []
+        self.__keys__ = []
 
         if keys is not None:
             for key in keys:
@@ -222,8 +222,8 @@ class Metadata(object):
 
         :Example:
             >>>    a = Metadata()
-            >>>    m1 = Metadatum(name="title", [("lat", "Amores"), ("fre", "Les Amours")])
-            >>>    m2 = Metadatum(name="author", [("lat", "Ovidius"), ("fre", "Ovide")])
+            >>>    m1 = Metadatum("title", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    m2 = Metadatum("author", [("lat", "Ovidius"), ("fre", "Ovide")])
             >>>    a[("title", "author")] = (m1, m2)
 
             >>>    a["title"] == m1
@@ -233,10 +233,10 @@ class Metadata(object):
 
         """
         if isinstance(key, int):
-            if key + 1 > len(self.__keys):
+            if key + 1 > len(self.__keys__):
                 raise KeyError()
             else:
-                key = self.__keys[key]
+                key = self.__keys__[key]
         elif isinstance(key, tuple):
             return tuple([self[k] for k in key])
 
@@ -260,12 +260,12 @@ class Metadata(object):
         :Example:
             >>>    a = Metadata()
 
-            >>>    a["title"] = Metadatum(name="title", [("lat", "Amores"), ("fre", "Les Amours")])
+            >>>    a["title"] = Metadatum("title", [("lat", "Amores"), ("fre", "Les Amours")])
             >>>    print(a["title"]["lat"]) # Amores
 
             >>>    a[("title", "author")] = (
-            >>>         Metadatum(name="title", [("lat", "Amores"), ("fre", "Les Amours")]),
-            >>>         Metadatum(name="author", [("lat", "Ovidius"), ("fre", "Ovide")])
+            >>>         Metadatum("title", [("lat", "Amores"), ("fre", "Les Amours")]),
+            >>>         Metadatum("author", [("lat", "Ovidius"), ("fre", "Ovide")])
             >>>     )
             >>>    print(a["title"]["lat"], a["author"]["fre"]) # Amores, Ovide
 
@@ -284,8 +284,8 @@ class Metadata(object):
             elif isinstance(value, Metadatum):
                 self.metadata[key] = value
 
-            if key in self.metadata and key not in self.__keys:
-                self.__keys.append(key)
+            if key in self.metadata and key not in self.__keys__:
+                self.__keys__.append(key)
 
     def __iter__(self):
         """ Iter method of Metadata
@@ -296,7 +296,7 @@ class Metadata(object):
             >>>     print(key, value) # Print ("title", "<Metadatum object>") then ("desc", "<Metadatum object>")...
         """
         i = 0
-        for key in self.__keys:
+        for key in self.__keys__:
             yield (key, self.metadata[key])
             i += 1
 
@@ -316,7 +316,7 @@ class Metadata(object):
         from copy import deepcopy
         result = deepcopy(self)
         for metadata_key, metadatum in other:
-            if metadata_key in self.__keys:
+            if metadata_key in self.__keys__:
                 for key, value in metadatum:
                     result[metadata_key][key] = value
             else:
@@ -336,7 +336,7 @@ class Metadata(object):
         return len(
             [
                 k
-                for k in self.__keys
+                for k in self.__keys__
                 if isinstance(self.metadata[k], Metadatum)
             ]
         )
@@ -357,9 +357,9 @@ class Metadata(object):
         """
         self.metadata = defaultdict(Metadatum)
 
-        self.__keys = []
+        self.__keys__ = []
         for key, value in dic.items():
-            self.__keys.append(key)
+            self.__keys__.append(key)
             self.metadata[key] = getattr(Metadatum(name=value["name"]), "__setstate__")(value)
         return self
 
@@ -368,7 +368,7 @@ class Metadata(object):
 
         :return: List of metadatum keys
         """
-        return self.__keys
+        return self.__keys__
 
     def export(self, mime=Mimetypes.JSON.Std):
         if mime == Mimetypes.JSON.Std:
@@ -390,7 +390,7 @@ class Metadata(object):
                     ns = RDF_PREFIX[ns]
 
                 for lang, value in metadatum:
-                    if not lang in descs:
+                    if lang not in descs:
                         descs[lang] = {"@language": lang}
                     descs[lang][ns+k] = value
             return [value for value in descs.values()]

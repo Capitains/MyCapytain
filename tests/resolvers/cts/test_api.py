@@ -95,7 +95,7 @@ class TestHttpCTSResolver(TestCase):
         # We check the passage is able to perform further requests and is well instantiated
         self.resolver.endpoint.getValidReff.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
-            level=1
+            level=3
         )
         self.assertEqual(
             children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
@@ -206,7 +206,7 @@ class TestHttpCTSResolver(TestCase):
         # We check the passage is able to perform further requests and is well instantiated
         self.resolver.endpoint.getValidReff.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
-            level=1
+            level=3
         )
         self.assertEqual(
             children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
@@ -281,7 +281,7 @@ class TestHttpCTSResolver(TestCase):
         # We check the passage is able to perform further requests and is well instantiated
         self.resolver.endpoint.getValidReff.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
-            level=1
+            level=3
         )
         self.assertEqual(
             children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
@@ -459,7 +459,7 @@ class TestHttpCTSResolver(TestCase):
         self.resolver.endpoint.getValidReff = MagicMock(return_value=GET_VALID_REFF)
         reffs = self.resolver.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=1)
         self.resolver.endpoint.getValidReff.assert_called_with(
-            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=1
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=3
         )
         self.assertEqual(
             len(reffs), 6,

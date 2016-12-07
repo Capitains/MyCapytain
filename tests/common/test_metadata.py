@@ -125,11 +125,17 @@ class TestMetadata(unittest.TestCase):
 
         a = Metadata(keys=["title"])
         self.assertTrue(isinstance(a.metadata["title"], Metadatum))
+        self.assertEqual(
+            a.keys(), ["title"], "Keys should be set"
+        )
 
     def test_set(self):
         a = Metadata()
         a["title"] = [("eng", "Epigrams")]
         self.assertEqual(a["title"]["eng"], "Epigrams")
+        self.assertEqual(
+            a.keys(), ["title"], "Keys should be set"
+        )
         a[("desc", "label")] = ([("eng", "desc")], [("eng", "lbl"), ("fre", "label")])
         self.assertEqual(a["desc"]["eng"], "desc")
         self.assertEqual(a["label"][("eng", "fre")], ("lbl", "label"))

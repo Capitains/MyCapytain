@@ -37,6 +37,13 @@ class CapitainsXmlTextTest(TestCase):
         tei = Text(resource=self.TEI.xml, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(str(tei.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
+    def test_fulltext(self):
+        """ Ensure that you can make a getPassage on the full text """
+        self.assertEqual(
+            self.TEI.getPassage().export(Mimetypes.PYTHON.ETREE), self.TEI.resource,
+            "GetPassage empty on a text returns the full XML"
+        )
+
     def testFindCitation(self):
         self.assertEqual(
             str(self.TEI.citation),

@@ -54,7 +54,7 @@ class __SharedMethods__:
         """
 
         if reference is None:
-            return self._getSimplePassage(reference)
+            return self._getSimplePassage()
 
         if isinstance(reference, list):
             start, end = reference, reference
@@ -94,7 +94,7 @@ class __SharedMethods__:
             reference=reference
         )
 
-    def _getSimplePassage(self, reference):
+    def _getSimplePassage(self, reference=None):
         """ Retrieve a single node representing the passage.
 
         .. warning:: Range support is awkward.
@@ -286,11 +286,18 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         self.__text__ = text
         self.__reference__ = reference
         self.__children__ = None
-        self.__depth__ = len(reference)
+        self.__depth__ = None
+        if reference is not None:
+            self.__depth__ = len(reference)
         self.__prevnext__ = None
 
     @property
     def reference(self):
+        """ URN Passage Reference
+
+        :return: Reference
+        :rtype: Reference
+        """
         return self.__reference__
 
     @reference.setter
@@ -492,7 +499,8 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
             resource=resource,
             **__makePassageKwargs__(urn, reference)
         )
-
+        if urn is not None and urn.reference is not None:
+            reference = urn.reference
         self.__reference__ = reference
         self.__text__ = text
         self.__children__ = None

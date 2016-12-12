@@ -22,13 +22,3 @@ Contents
    MyCapytain.workarounds
    MyCapytain.api
    MyCapytain.benchmark
-
-
-Indices and tables
-##################
-
-* :ref:`modules`
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

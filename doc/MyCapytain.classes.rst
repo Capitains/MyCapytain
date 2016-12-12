@@ -21,7 +21,7 @@ Recommendations
 For Textual API, it is recommended to implement the following requests
 
 - getPassage(textId[str], subreference[str], prevnext[bool], metadata[bool])
-- getMetadata(objectId[str], **kwargs)
+- getMetadata(objectId[str], \*\*kwargs)
 - getSiblings(textId[str], subreference[str])
 - getReffs(textId[str], subreference[str], depth[int])
 
@@ -48,6 +48,15 @@ Text and Passages
 
 Needs to be written
 
+
+Collection
+##########
+
+CTS Collections
+***************
+
+Needs to be written
+
 Resolvers
 #########
 
@@ -60,7 +69,7 @@ The principle behind resolver is to provide native python object based on API-Li
 four simple commands :
 
 - getPassage(textId[str], subreference[str], prevnext[bool], metadata[bool]) -> Passage
-- getMetadata(objectId[str], **kwargs) -> Collection
+- getMetadata(objectId[str], \*\*kwargs) -> Collection
 - getSiblings(textId[str], subreference[str]) -> tuple([str, str])
 - getReffs(textId[str], subreference[str], depth[int]) -> list([str])
 

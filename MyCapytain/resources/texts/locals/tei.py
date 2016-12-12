@@ -167,9 +167,8 @@ class __SharedMethods__:
         :returns: List of levels
         :rtype: list(basestring, str)
 
-        .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid
+        .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid \
         informations. Maybe something is more powerfull ?
-
         """
         depth = 0
         xml = self.textObject.xml

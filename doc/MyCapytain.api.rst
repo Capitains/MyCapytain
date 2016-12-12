@@ -9,7 +9,7 @@ Module common contains tools such as a namespace dictionary as well as cross-imp
 URN, References and Citations
 *****************************
 
-.. autoclass:: MyCapytain.common.reference.Node
+.. autoclass:: MyCapytain.common.reference.NodeId
     :members:
 
 .. autoclass:: MyCapytain.common.reference.URN
@@ -26,9 +26,6 @@ Metadata containers
 
 .. automodule:: MyCapytain.common.metadata
     :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
 
 Utilities
 *********
@@ -69,16 +66,19 @@ Resolvers
 Remote CTS API
 **************
 
-.. autoclass:: MyCapytain.resolvers.api.cts.HttpCTSResolver
+.. autoclass:: MyCapytain.resolvers.cts.api.HttpCTSResolver
     :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
+
+Local CapiTainS Guidelines CTS Resolver
+***************************************
+
+.. autoclass:: MyCapytain.resolvers.cts.local.CTSCapitainsLocalResolver
+    :members:
 
 Prototypes
 **********
 
-.. automodule:: MyCapytain.resolvers.prototypes
+.. autoclass:: MyCapytain.resolvers.prototypes.Resolver
     :members:
     :undoc-members:
     :show-inheritance:
@@ -103,21 +103,20 @@ TEI based texts
 Locally read text
 +++++++++++++++++
 
-.. autoclass:: MyCapytain.resources.texts.local.tei.Text
+.. autoclass:: MyCapytain.resources.texts.locals.tei.Text
     :members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
 
-.. autoclass:: MyCapytain.resources.texts.local.tei.Passage
+.. autoclass:: MyCapytain.resources.texts.locals.tei.Passage
     :members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
 
-.. autoclass:: MyCapytain.resources.texts.local.tei.__SimplePassage__
+.. autoclass:: MyCapytain.resources.texts.locals.tei.__SimplePassage__
     :members:
-    :undoc-members:
     :show-inheritance:
     :inherited-members:
 
@@ -176,4 +175,3 @@ Text Prototypes
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-

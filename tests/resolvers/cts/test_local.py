@@ -159,6 +159,7 @@ class TextXMLFolderResolver(TestCase):
         children = list(passage.getReffs())
 
         # We check the passage is able to perform further requests and is well instantiated
+        print(children)
         self.assertEqual(
             children[0], '1',
             "Resource should be string identifiers"

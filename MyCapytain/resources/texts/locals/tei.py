@@ -77,12 +77,14 @@ class __SharedMethods__:
         start, end = citation_start.fill(passage=start), citation_end.fill(passage=end)
         start, end = normalizeXpath(start.split("/")[2:]), normalizeXpath(end.split("/")[2:])
 
-        if isinstance(self.xml, etree._Element):
-            root = copyNode(self.xml)
-        else:
-            root = copyNode(self.xml.getroot())
+        xml = self.textObject.xml
 
-        root = passageLoop(self.xml, root, start, end)
+        if isinstance(xml, etree._Element):
+            root = copyNode(xml)
+        else:
+            root = copyNode(xml.getroot())
+
+        root = passageLoop(xml, root, start, end)
 
         if self.urn:
             urn, subreference = URN("{}:{}".format(self.urn, subreference)), subreference
@@ -108,7 +110,10 @@ class __SharedMethods__:
         """
         if reference is None:
             return __SimplePassage__(
-                self.resource, reference=None, urn=self.urn, citation=self.citation,
+                resource=self.resource,
+                reference=None,
+                urn=self.urn,
+                citation=self.citation,
                 text=self
             )
 
@@ -138,8 +143,6 @@ class __SharedMethods__:
         text = None
         if isinstance(self, Text):
             text = self
-        elif hasattr(self, "__text__") and self.__text__ is not None:
-            text = self.__text__
         return text
 
     def getReffs(self, level=1, subreference=None):
@@ -282,7 +285,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
     :param text: Text containing the passage
     :type text: Text
     """
-    def __init__(self, resource, reference, citation, urn=None, text=None):
+    def __init__(self, resource, reference, citation, text, urn=None):
         super(__SimplePassage__, self).__init__(
             resource=resource,
             citation=citation,
@@ -334,10 +337,10 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         :rtype: List.basestring
         :returns: List of levels
         """
-        level = self.depth + level
+        level += self.depth
         if not subreference:
             subreference = self.reference
-        return __SharedMethods__.getValidReff(self, level, reference=subreference)
+        return self.textObject.getValidReff(level, reference=subreference)
 
     def getTextualNode(self, subreference=None):
         """ Special GetPassage implementation for SimplePassage (Simple is True by default)
@@ -347,7 +350,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         """
         if not isinstance(subreference, Reference):
             subreference = Reference(subreference)
-        return __SharedMethods__.getTextualNode(self, subreference)
+        return self.textObject.getTextualNode(subreference)
 
     @property
     def nextId(self):
@@ -404,6 +407,14 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
 
         self.__prevnext__ = (_prev, _next)
         return self.__prevnext__
+
+    @property
+    def textObject(self):
+        """ Text Object. Required for NextPrev
+
+        :rtype: Text
+        """
+        return self.__text__
 
 
 class Text(__SharedMethods__, encodings.TEIResource, text.CitableText):
@@ -519,6 +530,8 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
 
     @property
     def reference(self):
+        """ Reference of the object
+        """
         return self.__reference__
 
     @property
@@ -622,11 +635,15 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
 
     @property
     def next(self):
+        """ Next Passage (Interactive Passage)
+        """
         if self.nextId is not None:
             return __SharedMethods__.getTextualNode(self.__text__, self.nextId)
 
     @property
     def prev(self):
+        """ Previous Passage (Interactive Passage)
+        """
         if self.prevId is not None:
             return __SharedMethods__.getTextualNode(self.__text__, self.prevId)
 
@@ -636,3 +653,11 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
         X = __SharedMethods__.getTextualNode(self, subreference)
         X.__text__ = self.__text__
         return X
+
+    @property
+    def textObject(self):
+        """ Text Object. Required for NextPrev
+
+        :rtype: Text
+        """
+        return self.__text__

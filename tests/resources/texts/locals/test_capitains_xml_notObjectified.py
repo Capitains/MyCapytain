@@ -6,17 +6,16 @@ from io import open
 
 import xmlunittest
 from lxml import etree
-from lxml import objectify
 
+from MyCapytain.common.utils import xmlparser
 import MyCapytain.common.reference
 import MyCapytain.errors
 import MyCapytain.resources.texts.encodings
 import MyCapytain.resources.texts.locals.tei
 from tests.resources.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests, CapitainsXMLRangePassageTests
 
-P = objectify.makeparser()
-def objectifiedParser(file):
-    return objectify.parse(file, parser=P)
+
+objectifiedParser = lambda x: xmlparser(x, objectify=False)
 
 
 class TestLocalXMLTextImplementation(CapitainsXmlTextTest, unittest.TestCase, xmlunittest.XmlTestMixin):

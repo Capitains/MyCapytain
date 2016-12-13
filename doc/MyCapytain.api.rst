@@ -25,16 +25,15 @@ Metadata containers
 *******************
 
 .. automodule:: MyCapytain.common.metadata
+    :noindex:
     :members:
 
 Utilities
 *********
 
 .. automodule:: MyCapytain.common.utils
+    :noindex:
     :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
 
 API Retrievers
 ##############
@@ -45,6 +44,7 @@ CTS 5 API
 *********
 
 .. automodule:: MyCapytain.retrievers.cts5
+    :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
@@ -54,6 +54,7 @@ Prototypes
 **********
 
 .. automodule:: MyCapytain.retrievers.prototypes
+    :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
@@ -80,9 +81,7 @@ Prototypes
 
 .. autoclass:: MyCapytain.resolvers.prototypes.Resolver
     :members:
-    :undoc-members:
-    :show-inheritance:
-    :inherited-members:
+    :noindex:
 
 
 Texts and inventories
@@ -144,6 +143,7 @@ Metadata
 ++++++++
 
 .. automodule:: MyCapytain.resources.prototypes.metadata
+    :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
@@ -153,6 +153,7 @@ CTS inventory
 +++++++++++++
 
 .. automodule:: MyCapytain.resources.collections.cts
+    :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
@@ -162,6 +163,7 @@ CTS Inventory Prototypes
 ++++++++++++++++++++++++
 
 .. automodule:: MyCapytain.resources.prototypes.cts.inventory
+    :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
@@ -171,6 +173,7 @@ Text Prototypes
 +++++++++++++++
 
 .. automodule:: MyCapytain.resources.prototypes.text
+    :noindex:
     :members:
     :undoc-members:
     :inherited-members:

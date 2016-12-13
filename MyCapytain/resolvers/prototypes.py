@@ -23,7 +23,7 @@ class Resolver(object):
         :type filters: dict
         :return: Collection
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API

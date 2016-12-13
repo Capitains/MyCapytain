@@ -1,9 +1,6 @@
 MyCapytain's Main Objects Explained
 ===================================
 
-.. toctree::
-   :maxdepth: 2
-
 Retrievers
 ##########
 

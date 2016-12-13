@@ -154,7 +154,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_PASSAGE
 
         # Test with -1
-        _ = text.getPassage(reference=Reference("1.1"))
+        _ = text.getTextualNode(subreference=Reference("1.1"))
         requests.assert_called_with(
             "http://services.perseids.org/api/cts",
             params={
@@ -163,7 +163,7 @@ class TestAPIText(unittest.TestCase):
             }
         )
         # Test with -1
-        _ = text.getPassage(reference=URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2"))
+        _ = text.getTextualNode(subreference=URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2"))
         requests.assert_called_with(
             "http://services.perseids.org/api/cts",
             params={
@@ -172,7 +172,7 @@ class TestAPIText(unittest.TestCase):
             }
         )
         # Test with -1
-        _ = text.getPassage(reference=["1", "1", "1"])
+        _ = text.getTextualNode(subreference=["1", "1", "1"])
         requests.assert_called_with(
             "http://services.perseids.org/api/cts",
             params={
@@ -187,7 +187,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_PASSAGE
 
         # Test with -1
-        passage = text.getPassage(reference="1.1")
+        passage = text.getTextualNode(subreference="1.1")
         requests.assert_called_with(
             "http://services.perseids.org/api/cts",
             params={
@@ -204,7 +204,7 @@ class TestAPIText(unittest.TestCase):
         )
 
         # Test without reference
-        passage = text.getPassage()
+        passage = text.getTextualNode()
         requests.assert_called_with(
             "http://services.perseids.org/api/cts",
             params={
@@ -295,7 +295,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_PASSAGE
 
         # Test with -1
-        text.getPassage(reference="1.1")
+        text.getTextualNode(subreference="1.1")
         requests.assert_called_with(
             "http://services.perseids.org/api/cts",
             params={

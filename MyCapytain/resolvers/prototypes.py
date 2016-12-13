@@ -25,7 +25,7 @@ class Resolver(object):
         """
         raise NotImplementedError
 
-    def getPassage(self, textId, subreference=None, prevnext=False, metadata=False):
+    def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
         :param textId: Text Identifier

@@ -43,7 +43,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_full(self):
         """ Test that we can get a full text """
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassage.assert_called_with(
@@ -79,7 +79,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_subreference(self):
         """ Test that we can get a subreference text passage"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassage.assert_called_with(
@@ -115,7 +115,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_full_metadata(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", metadata=True)
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", metadata=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -174,7 +174,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True)
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -226,7 +226,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_metadata_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True, prevnext=True)
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True, prevnext=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -476,7 +476,7 @@ class TestHttpCTSResolver(TestCase):
         retriever.getPassage = MagicMock(return_value=GET_PASSAGE_CITATION_FAILURE)
         resolver = HttpCTSResolver(retriever)
         # We require a passage : passage is now a Passage object
-        passage = resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+        passage = resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
         # We need an export as plaintext
         self.assertEqual(
             passage.export(output=Mimetypes.PLAINTEXT),

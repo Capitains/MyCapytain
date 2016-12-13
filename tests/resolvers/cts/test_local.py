@@ -43,7 +43,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "Object has a citation property of length 4"
         )
         self.assertEqual(
-            text.getPassage(Reference("1.1.1.1")).export(output=Mimetypes.PLAINTEXT),
+            text.getTextualNode(Reference("1.1.1.1")).export(output=Mimetypes.PLAINTEXT),
             "Ho ! Saki, pass around and offer the bowl (of love for God) : ### ",
             "It should be possible to retrieve text"
         )
@@ -150,7 +150,7 @@ class TextXMLFolderResolver(TestCase):
 
     def test_getPassage_full(self):
         """ Test that we can get a full text """
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertIsInstance(
             passage, Passage,
             "GetPassage should always return passages objects"
@@ -181,7 +181,7 @@ class TextXMLFolderResolver(TestCase):
 
     def test_getPassage_subreference(self):
         """ Test that we can get a subreference text passage"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
 
         # We check we made a reroute to GetPassage request
         self.assertIsInstance(
@@ -209,7 +209,7 @@ class TextXMLFolderResolver(TestCase):
 
     def test_getPassage_full_metadata(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", metadata=True)
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", metadata=True)
 
         self.assertIsInstance(
             passage, Passage,
@@ -267,7 +267,7 @@ class TextXMLFolderResolver(TestCase):
 
     def test_getPassage_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage(
+        passage = self.resolver.getTextualNode(
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1",  metadata=True
         )
 
@@ -316,7 +316,7 @@ class TextXMLFolderResolver(TestCase):
 
     def test_getPassage_metadata_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage(
+        passage = self.resolver.getTextualNode(
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True, prevnext=True
         )
         self.assertIsInstance(

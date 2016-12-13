@@ -86,27 +86,27 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         return [ref.split(":")[-1] for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=NS)]
 
-    def getPassage(self, reference=None):
+    def getTextualNode(self, subreference=None):
         """ Retrieve a passage and store it in the object
 
-        :param reference: Reference of the passage (Note : if given a list, this should be a list of string that \
+        :param subreference: Reference of the passage (Note : if given a list, this should be a list of string that \
         compose the reference)
-        :type reference: Union[Reference, URN, str, list]
+        :type subreference: Union[Reference, URN, str, list]
         :rtype: Passage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
         """
-        if isinstance(reference, URN):
-            urn = str(reference)
-        elif isinstance(reference, Reference):
-            urn = "{0}:{1}".format(self.urn, str(reference))
-        elif isinstance(reference, str):
-            if ":" in reference:
-                urn = reference
+        if isinstance(subreference, URN):
+            urn = str(subreference)
+        elif isinstance(subreference, Reference):
+            urn = "{0}:{1}".format(self.urn, str(subreference))
+        elif isinstance(subreference, str):
+            if ":" in subreference:
+                urn = subreference
             else:
-                urn = "{0}:{1}".format(self.urn.upTo(URN.NO_PASSAGE), reference)
-        elif isinstance(reference, list):
-            urn = "{0}:{1}".format(self.urn, ".".join(reference))
+                urn = "{0}:{1}".format(self.urn.upTo(URN.NO_PASSAGE), subreference)
+        elif isinstance(subreference, list):
+            urn = "{0}:{1}".format(self.urn, ".".join(subreference))
         else:
             urn = str(self.urn)
 
@@ -367,7 +367,7 @@ class Text(__SharedMethod__, prototypes.CitableText):
         :type exclude: [str]
         :return: Object using a different representation
         """
-        return self.getPassage().export(output, exclude)
+        return self.getTextualNode().export(output, exclude)
 
 
 class Passage(__SharedMethod__, prototypes.Passage, TEIResource):

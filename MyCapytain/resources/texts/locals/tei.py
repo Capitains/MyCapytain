@@ -42,35 +42,35 @@ class __SharedMethods__:
     """ Set of shared methods between objects in locals TEI. Avoid recoding functions
     """
 
-    def getPassage(self, reference=None, simple=False):
+    def getTextualNode(self, subreference=None, simple=False):
         """ Finds a passage in the current text
 
-        :param reference: Identifier of the subreference / passages
-        :type reference: Union[list, Reference]
+        :param subreference: Identifier of the subreference / passages
+        :type subreference: Union[list, Reference]
         :param simple: If set to true, retrieves nodes up to the given one, cleaning non required siblings.
         :type simple: boolean
         :rtype: Passage, ContextPassage
         :returns: Asked passage
         """
 
-        if reference is None:
+        if subreference is None:
             return self._getSimplePassage()
 
-        if isinstance(reference, str):
-            reference = Reference(reference)
-        if isinstance(reference, list):
-            start, end = reference, reference
-            reference = Reference(".".join(reference))
-        elif not reference.end:
-            start, end = reference.start.list, reference.start.list
+        if isinstance(subreference, str):
+            subreference = Reference(subreference)
+        if isinstance(subreference, list):
+            start, end = subreference, subreference
+            subreference = Reference(".".join(subreference))
+        elif not subreference.end:
+            start, end = subreference.start.list, subreference.start.list
         else:
-            start, end = reference.start.list, reference.end.list
+            start, end = subreference.start.list, subreference.end.list
 
         if len(start) > len(self.citation):
             raise ReferenceError("URN is deeper than citation scheme")
 
         if simple is True:
-            return self._getSimplePassage(reference)
+            return self._getSimplePassage(subreference)
 
         citation_start = [citation for citation in self.citation][len(start)-1]
         citation_end = [citation for citation in self.citation][len(end)-1]
@@ -85,15 +85,15 @@ class __SharedMethods__:
         root = passageLoop(self.xml, root, start, end)
 
         if self.urn:
-            urn, reference = URN("{}:{}".format(self.urn, reference)), reference
+            urn, subreference = URN("{}:{}".format(self.urn, subreference)), subreference
         else:
-            urn, reference = None, reference
+            urn, subreference = None, subreference
         return Passage(
             urn=urn,
             resource=root,
             text=self,
             citation=self.citation,
-            reference=reference
+            reference=subreference
         )
 
     def _getSimplePassage(self, reference=None):
@@ -184,7 +184,7 @@ class __SharedMethods__:
                     passages = [reference.list]
                     depth = len(passages[0])
                 else:
-                    xml = self.getPassage(reference=reference)
+                    xml = self.getTextualNode(subreference=reference)
                     common = []
                     for index in range(0, len(reference.start.list)):
                         if index == (len(common) - 1):
@@ -324,31 +324,30 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
             self.__children__ = self.getReffs()
             return self.__children__
 
-    def getReffs(self, level=1, reference=None):
+    def getReffs(self, level=1, subreference=None):
         """ Reference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param reference: Subreference (optional)
-        :type reference: Reference
+        :param subreference: Subreference (optional)
+        :type subreference: Reference
         :rtype: List.basestring
         :returns: List of levels
         """
         level = self.depth + level
-        if not reference:
-            reference = self.reference
-        return __SharedMethods__.getValidReff(self, level, reference=reference)
+        if not subreference:
+            subreference = self.reference
+        return __SharedMethods__.getValidReff(self, level, reference=subreference)
 
-    def getPassage(self, reference=None, simple=True):
+    def getTextualNode(self, subreference=None):
         """ Special GetPassage implementation for SimplePassage (Simple is True by default)
 
-        :param reference:
-        :param simple:
+        :param subreference:
         :return:
         """
-        if not isinstance(reference, Reference):
-            reference = Reference(reference)
-        return __SharedMethods__.getPassage(self, reference, simple)
+        if not isinstance(subreference, Reference):
+            subreference = Reference(subreference)
+        return __SharedMethods__.getTextualNode(self, subreference)
 
     @property
     def nextId(self):
@@ -624,16 +623,16 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
     @property
     def next(self):
         if self.nextId is not None:
-            return __SharedMethods__.getPassage(self.__text__, self.nextId)
+            return __SharedMethods__.getTextualNode(self.__text__, self.nextId)
 
     @property
     def prev(self):
         if self.prevId is not None:
-            return __SharedMethods__.getPassage(self.__text__, self.prevId)
+            return __SharedMethods__.getTextualNode(self.__text__, self.prevId)
 
-    def getPassage(self, reference, simple=False):
-        if not isinstance(reference, Reference):
-            reference = Reference(reference)
-        X = __SharedMethods__.getPassage(self, reference, simple)
+    def getTextualNode(self, subreference=None, *args, **kwargs):
+        if not isinstance(subreference, Reference):
+            subreference = Reference(subreference)
+        X = __SharedMethods__.getTextualNode(self, subreference)
         X.__text__ = self.__text__
         return X

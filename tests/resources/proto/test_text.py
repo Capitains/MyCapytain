@@ -76,12 +76,9 @@ class TestProtoText(unittest.TestCase):
         """ Test that getPassage function are not implemented but are consistent"""
         a = CitableText()
 
-        # For getPassage, reference arg is required
-        with self.assertRaises(TypeError): 
-            a.getPassage()
         # It should fail because not implemented
-        with self.assertRaises(NotImplementedError): 
-            a.getPassage(reference=None)
+        with self.assertRaises(NotImplementedError):
+            a.getTextualNode(subreference=None)
 
     def test_get_label(self):
         """ Test that getLabel function are not implemented but are consistent"""

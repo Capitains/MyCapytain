@@ -185,11 +185,11 @@ class TextualGraph(TextualNode):
     def __init__(self, identifier=None, **kwargs):
         super(TextualGraph, self).__init__(identifier=identifier, **kwargs)
 
-    def getPassage(self, reference):
+    def getTextualNode(self, subreference):
         """ Retrieve a passage and store it in the object
 
-        :param reference: Reference of the passage to retrieve
-        :type reference: str or Node or Reference
+        :param subreference: Reference of the passage to retrieve
+        :type subreference: str or Node or Reference
         :rtype: TextualNode
         :returns: Object representing the passage
 
@@ -198,7 +198,7 @@ class TextualGraph(TextualNode):
 
         raise NotImplementedError()
 
-    def getReffs(self, level=1, reference=None):
+    def getReffs(self, level=1, subreference=None):
         """ Reference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
@@ -243,7 +243,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.prevId is not None:
-            return self.getPassage(self.prevId)
+            return self.getTextualNode(self.prevId)
 
     @property
     def next(self):
@@ -252,7 +252,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.nextId is not None:
-            return self.getPassage(self.nextId)
+            return self.getTextualNode(self.nextId)
 
     @property
     def children(self):
@@ -261,7 +261,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: iterator(Passage)
         """
         for ID in self.childIds:
-            yield self.getPassage(ID)
+            yield self.getTextualNode(ID)
 
     @property
     def parent(self):
@@ -269,7 +269,7 @@ class InteractiveTextualNode(TextualGraph):
 
         :rtype: Passage
         """
-        return self.getPassage(self.parentId)
+        return self.getTextualNode(self.parentId)
 
     @property
     def first(self):
@@ -278,7 +278,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.firstId is not None:
-            return self.getPassage(self.firstId)
+            return self.getTextualNode(self.firstId)
 
     @property
     def last(self):
@@ -287,7 +287,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.lastId is not None:
-            return self.getPassage(self.lastId)
+            return self.getTextualNode(self.lastId)
 
     @property
     def childIds(self):

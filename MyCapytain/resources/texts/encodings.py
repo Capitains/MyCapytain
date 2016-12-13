@@ -80,7 +80,7 @@ class TEIResource(InteractiveTextualNode):
             text = nested_ordered_dictionary()
             for reff in reffs:
                 _r = reff.split(".")
-                nested_set(text, _r, self.getPassage(_r, simple=True).export(
+                nested_set(text, _r, self.getTextualNode(_r).export(
                     Mimetypes.PLAINTEXT,
                     exclude=exclude,
                     _preformatted=True

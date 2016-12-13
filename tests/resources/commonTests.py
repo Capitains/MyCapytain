@@ -40,7 +40,7 @@ class CapitainsXmlTextTest(TestCase):
     def test_fulltext(self):
         """ Ensure that you can make a getPassage on the full text """
         self.assertEqual(
-            self.TEI.getPassage().export(Mimetypes.PYTHON.ETREE), self.TEI.resource,
+            self.TEI.getTextualNode(None).export(Mimetypes.PYTHON.ETREE), self.TEI.resource,
             "GetPassage empty on a text returns the full XML"
         )
 
@@ -230,14 +230,14 @@ class CapitainsXmlTextTest(TestCase):
             self.TEI.urn = 2
 
     def test_get_passage(self):
-        a = self.TEI.getPassage(["1", "pr", "2"], simple=True)
+        a = self.TEI.getTextualNode(["1", "pr", "2"])
         self.assertEqual(a.export(output=Mimetypes.PLAINTEXT), "tum, ut de illis queri non possit quisquis de se bene ")
         # With reference
-        a = self.TEI.getPassage(Reference("2.5.5"), simple=True)
+        a = self.TEI.getTextualNode(Reference("2.5.5"))
         self.assertEqual(a.export(output=Mimetypes.PLAINTEXT), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
     def test_get_passage_autoparse(self):
-        a = self.TEI.getPassage(Reference("2.5.5"), simple=True)
+        a = self.TEI.getTextualNode(Reference("2.5.5"))
         self.assertEqual(
             a.export(output=Mimetypes.PLAINTEXT), "Saepe domi non es, cum sis quoque, saepe negaris: ",
             "Text are automatically parsed in GetPassage hypercontext = False"
@@ -245,30 +245,27 @@ class CapitainsXmlTextTest(TestCase):
 
     def test_get_Passage_context_no_double_slash(self):
         """ Check that get Passage contexts return right information """
-        simple = self.TEI.getPassage(Reference("1.pr.2"))
+        simple = self.TEI.getTextualNode(Reference("1.pr.2"))
         str_simple = simple.tostring(encoding=str)
         text = Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(Reference("1.pr.2"), simple=True).export(
+            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (One reference Passage)"
         )
 
-        simple = self.TEI.getPassage(Reference("1.pr.2-1.pr.7"))
+        simple = self.TEI.getTextualNode(Reference("1.pr.2-1.pr.7"))
         str_simple = simple.tostring(encoding=str)
         text = Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(
-                Reference("1.pr.2"),
-                simple=True
-            ).export(
+            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT
             ).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
@@ -276,7 +273,7 @@ class CapitainsXmlTextTest(TestCase):
             "parent range Passage)"
         )
         self.assertEqual(
-            text.getPassage(Reference("1.pr.3"), simple=True).export(
+            text.getTextualNode(Reference("1.pr.3"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "senserit, cum salva infimarum quoque personarum re-",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same "
@@ -289,20 +286,20 @@ class CapitainsXmlTextTest(TestCase):
             "parent range Passage)"
         )
 
-        simple = self.TEI.getPassage(Reference("1.pr.2-1.1.6"))
+        simple = self.TEI.getTextualNode(Reference("1.pr.2-1.1.6"))
         str_simple = simple.tostring(encoding=str)
         text = Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(Reference("1.pr.2"), simple=True).export(
+            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(Reference("1.1.6"), simple=True).export(
+            text.getTextualNode(Reference("1.1.6"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
@@ -319,20 +316,20 @@ class CapitainsXmlTextTest(TestCase):
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range Passage)"
         )
 
-        simple = self.TEI.getPassage(Reference("1.pr.2-1.2"))
+        simple = self.TEI.getTextualNode(Reference("1.pr.2-1.2"))
         str_simple = simple.tostring(encoding=str)
         text = Text(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getPassage(Reference("1.pr.2"), simple=True).export(
+            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(Reference("1.1.6"), simple=True).export(
+            text.getTextualNode(Reference("1.1.6"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
@@ -353,7 +350,7 @@ class CapitainsXmlTextTest(TestCase):
     def test_get_passage_with_list(self):
         """ In range, passage in between could be removed from the original text by error
         """
-        simple = self.TEI.getPassage(["1", "pr", "2"])
+        simple = self.TEI.getTextualNode(["1", "pr", "2"])
         self.assertEqual(
             simple.export(output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
@@ -370,19 +367,19 @@ class CapitainsXmlTextTest(TestCase):
         """ In range, passage in between could be removed from the original text by error
         """
         with self.assertRaises(ReferenceError):
-            self.TEI.getPassage(["1", "pr", "2", "5"])
+            self.TEI.getTextualNode(["1", "pr", "2", "5"])
 
     def test_ensure_passage_is_not_removed(self):
         """ In range, passage in between could be removed from the original text by error
         """
-        self.TEI.getPassage(Reference("1.pr.1-1.2.5"))
+        self.TEI.getTextualNode(Reference("1.pr.1-1.2.5"))
         orig_refs = self.TEI.getValidReff(level=3)
         self.assertIn("1.pr.1", orig_refs)
         self.assertIn("1.1.1", orig_refs)
         self.assertIn("1.2.4", orig_refs)
         self.assertIn("1.2.5", orig_refs)
 
-        self.TEI.getPassage(Reference("1.pr-1.2"))
+        self.TEI.getTextualNode(Reference("1.pr-1.2"))
         orig_refs = self.TEI.getValidReff(level=3)
         self.assertIn("1.pr.1", orig_refs)
         self.assertIn("1.1.1", orig_refs)
@@ -390,7 +387,7 @@ class CapitainsXmlTextTest(TestCase):
         self.assertIn("1.2.5", orig_refs)
 
     def test_get_passage_hypercontext_complex_xpath(self):
-        simple = self.text_complex.getPassage(Reference("pr.1-1.2"))
+        simple = self.text_complex.getTextualNode(Reference("pr.1-1.2"))
         str_simple = simple.tostring(encoding=str)
         text = Text(
             resource=str_simple,
@@ -398,13 +395,13 @@ class CapitainsXmlTextTest(TestCase):
         )
         self.assertIn(
             "Pervincis tandem",
-            text.getPassage(Reference("pr.1"), simple=True).export(
+            text.getTextualNode(Reference("pr.1"), simple=True).export(
                 output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]).strip(),
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(Reference("1.2"), simple=True).export(
+            text.getTextualNode(Reference("1.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "lusimus quos in Suebae gratiam virgunculae,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
@@ -418,7 +415,7 @@ class CapitainsXmlTextTest(TestCase):
         )
 
     def test_Text_text_function(self):
-        simple = self.seneca.getPassage(Reference("1"))
+        simple = self.seneca.getTextualNode(Reference("1"))
         str_simple = simple.tostring(encoding=str)
         text = Text(
             resource=str_simple,
@@ -431,7 +428,7 @@ class CapitainsXmlTextTest(TestCase):
         )
 
     def test_get_passage_hyper_context_double_slash_xpath(self):
-        simple = self.seneca.getPassage(Reference("1-10"))
+        simple = self.seneca.getTextualNode(Reference("1-10"))
         str_simple = simple.export(
             output=Mimetypes.XML.Std
         )
@@ -440,7 +437,7 @@ class CapitainsXmlTextTest(TestCase):
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getPassage(Reference("1"), simple=True).export(
+            text.getTextualNode(Reference("1"), simple=True).export(
                 output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]
             ).strip(),
@@ -448,7 +445,7 @@ class CapitainsXmlTextTest(TestCase):
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
         self.assertEqual(
-            text.getPassage(Reference("10"), simple=True).export(
+            text.getTextualNode(Reference("10"), simple=True).export(
                 output=Mimetypes.PLAINTEXT
             ).strip(),
             "aversa superis regna manesque impios",
@@ -460,14 +457,14 @@ class CapitainsXmlTextTest(TestCase):
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range Passage)"
         )
 
-        simple = self.seneca.getPassage(Reference("1"))
+        simple = self.seneca.getTextualNode(Reference("1"))
         str_simple = simple.tostring(encoding=str)
         text = Text(
             resource=str_simple,
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getPassage(Reference("1"), simple=True).export(
+            text.getTextualNode(Reference("1"), simple=True).export(
                 output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]
             ).strip(),
@@ -504,7 +501,7 @@ class CapitainsXmlPassageTests(TestCase):
     def test_urn(self):
         """ Test URN and ids getters/setters """
 
-        a = self.TEI.getPassage(["2", "40", "8"], simple=self.simple)
+        a = self.TEI.getTextualNode(["2", "40", "8"])
         #self.assertEqual(
         #    str(a.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2",
         #    "Passage should have a URN parameter"
@@ -514,29 +511,29 @@ class CapitainsXmlPassageTests(TestCase):
         """ Test next property """
         # Normal passage checking
         # self.TEI.parse()
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr", "1"])
         self.assertEqual(str(p.next.reference), "1.pr.2")
 
         # End of lowest level passage checking but not end of parent level
-        p = self.TEI.getPassage(["1", "pr", "22"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr", "22"])
         self.assertEqual(str(p.next.reference), "1.1.1")
 
         # End of lowest level passage and end of parent level
-        p = self.TEI.getPassage(["1", "39", "8"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "39", "8"])
         self.assertEqual(str(p.next.reference), "2.pr.sa")
 
         # Last line should always be None
-        p = self.TEI.getPassage(["2", "40", "8"], simple=self.simple)
+        p = self.TEI.getTextualNode(["2", "40", "8"])
         self.assertIsNone(p.next)
-        p = self.TEI.getPassage(["2", "40"], simple=self.simple)
+        p = self.TEI.getTextualNode(["2", "40"])
         self.assertIsNone(p.next)
-        p = self.TEI.getPassage(["2"], simple=self.simple)
+        p = self.TEI.getTextualNode(["2"])
         self.assertIsNone(p.next)
 
     def test_children(self):
         """ Test children property """
         # Normal children checking
-        p = self.TEI.getPassage(["1", "pr"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr"])
         self.assertEqual(
             [
                 x for x in p.children if str(x.reference) == "1.pr.1"
@@ -545,14 +542,14 @@ class CapitainsXmlPassageTests(TestCase):
             """ Ensure that children are text objects and retain there capacities """
         )
 
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr", "1"])
         self.assertEqual(len(list(p.children)), 0)
 
     def test_first(self):
         """ Test first property """
         # Test when there is one
         # self.TEI.parse()
-        p = self.TEI.getPassage(["1", "1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "1"])
         self.assertEqual(
             str(p.firstId), "1.1.1",
             "Property first Id should be the reference of the first item"
@@ -562,7 +559,7 @@ class CapitainsXmlPassageTests(TestCase):
             "First should be a passage with passage capacities"
         )
         # #And failing when no first
-        p = self.TEI.getPassage(["1", "1", "1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "1", "1"])
         self.assertEqual(
             p.lastId, None,
             "Property such as ID should not raise error when there is no child"
@@ -572,7 +569,7 @@ class CapitainsXmlPassageTests(TestCase):
         """ Test last property """
         # self.TEI.parse()
         # Test when there is one
-        p = self.TEI.getPassage(["1", "pr"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr"])
         self.assertEqual(p.last.export(
             output=Mimetypes.PLAINTEXT), "An ideo tantum veneras, ut exires? ",
             ".last should be a passage with passage capacities"
@@ -582,7 +579,7 @@ class CapitainsXmlPassageTests(TestCase):
             "Property lastId should be the reference of the last item"
         )
         # #And failing when no last
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr", "1"])
         self.assertEqual(
             p.lastId, None,
             "Property such as ID should not raise error when there is no child"
@@ -592,27 +589,27 @@ class CapitainsXmlPassageTests(TestCase):
         """ Test prev property """
         # self.TEI.parse()
         # Normal passage checking
-        p = self.TEI.getPassage(["2", "40", "8"], simple=self.simple)
+        p = self.TEI.getTextualNode(["2", "40", "8"])
         self.assertEqual(str(p.prev.reference), "2.40.7")
-        p = self.TEI.getPassage(["2", "40"], simple=self.simple)
+        p = self.TEI.getTextualNode(["2", "40"])
         self.assertEqual(str(p.prev.reference), "2.39")
-        p = self.TEI.getPassage(["2"], simple=self.simple)
+        p = self.TEI.getTextualNode(["2"])
         self.assertEqual(str(p.prev.reference), "1")
 
         # test failing passage
-        p = self.TEI.getPassage(["1", "pr", "1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr", "1"])
         self.assertEqual(p.prev, None)
-        p = self.TEI.getPassage(["1", "pr"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "pr"])
         self.assertEqual(p.prev, None)
-        p = self.TEI.getPassage(["1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1"])
         self.assertEqual(p.prev, None)
 
         # First child should get to parent's prev last child
-        p = self.TEI.getPassage(["1", "1", "1"], simple=self.simple)
+        p = self.TEI.getTextualNode(["1", "1", "1"])
         self.assertEqual(str(p.prev.reference), "1.pr.22")
 
         # Beginning of lowest level passage and beginning of parent level
-        p = self.TEI.getPassage(["2", "pr", "sa"], simple=self.simple)
+        p = self.TEI.getTextualNode(["2", "pr", "sa"])
         self.assertEqual(str(p.prev.reference), "1.39.8")
 
 
@@ -636,9 +633,7 @@ class CapitainsXMLRangePassageTests(TestCase):
 
     def test_errors(self):
         """ Ensure that some results throws errors according to some standards """
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("1.pr.2-1.2")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.2-1.2"))
         with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
             a = passage.next
 
@@ -646,9 +641,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             a = passage.prev
 
     def test_prevnext_on_first_passage(self):
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("1.pr.1-1.2.1")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.1-1.2.1"))
         self.assertEqual(
             str(passage.nextId), "1.2.2-1.5.2",
             "Next reff should be the same length as sibling"
@@ -659,9 +652,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext_on_close_to_first_passage(self):
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("1.pr.10-1.2.1")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.10-1.2.1"))
         self.assertEqual(
             str(passage.nextId), "1.2.2-1.4.1",
             "Next reff should be the same length as sibling"
@@ -672,9 +663,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext_on_last_passage(self):
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("2.39.2-2.40.8")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39.2-2.40.8"))
         self.assertEqual(
             passage.nextId, None,
             "Next reff should be none if we are on the last passage of the text"
@@ -685,9 +674,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext_on_close_to_last_passage(self):
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("2.39.2-2.40.5")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39.2-2.40.5"))
         self.assertEqual(
             str(passage.nextId), "2.40.6-2.40.8",
             "Next reff should finish at the end of the text, no matter the length of the reference"
@@ -698,9 +685,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext(self):
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("1.pr.5-1.pr.6")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.5-1.pr.6"))
         self.assertEqual(
             str(passage.nextId), "1.pr.7-1.pr.8",
             "Next reff should be the same length as sibling"
@@ -709,9 +694,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             str(passage.prevId), "1.pr.3-1.pr.4",
             "Prev reff should be the same length as sibling"
         )
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("1.pr.5")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.5"))
         self.assertEqual(
             str(passage.nextId), "1.pr.6",
             "Next reff should be the same length as sibling"
@@ -721,9 +704,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             "Prev reff should be the same length as sibling"
         )
 
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("1.pr")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr"))
         self.assertEqual(
             str(passage.nextId), "1.1",
             "Next reff should be the same length as sibling"
@@ -733,9 +714,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             "Prev reff should be None when at the start"
         )
 
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("2.40")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.40"))
         self.assertEqual(
             str(passage.prevId), "2.39",
             "Prev reff should be the same length as sibling"
@@ -746,9 +725,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_first_list(self):
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("2.39")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39"))
         self.assertEqual(
             str(passage.firstId), "2.39.1",
             "First reff should be the first"
@@ -758,9 +735,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             "Last reff should be the last"
         )
 
-        passage = self.text.getPassage(
-            MyCapytain.common.reference.Reference("2.39-2.40")
-        )
+        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39-2.40"))
         self.assertEqual(
             str(passage.firstId), "2.39.1",
             "First reff should be the first"

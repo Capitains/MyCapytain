@@ -37,7 +37,7 @@ class HttpCTSResolver(Resolver):
         """
         return self.__endpoint__
 
-    def getPassage(self, textId, subreference=None, prevnext=False, metadata=False):
+    def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
         :param textId: Text Identifier
@@ -58,7 +58,7 @@ class HttpCTSResolver(Resolver):
         if metadata or prevnext:
             return text.getPassagePlus(reference=subreference)
         else:
-            return text.getPassage(reference=subreference)
+            return text.getTextualNode(subreference=subreference)
 
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node

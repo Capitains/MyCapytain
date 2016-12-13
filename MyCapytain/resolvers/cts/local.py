@@ -283,7 +283,7 @@ class CTSCapitainsLocalResolver(Resolver):
             ])
         return inventory[objectId]
 
-    def getPassage(self, textId, subreference=None, prevnext=False, metadata=False):
+    def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
         :param textId: Text Identifier
@@ -300,7 +300,7 @@ class CTSCapitainsLocalResolver(Resolver):
         text, inventory = self.__getText__(textId)
         if subreference is not None:
             subreference = Reference(subreference)
-        passage = text.getPassage(subreference)
+        passage = text.getTextualNode(subreference)
         if metadata:
             for descendant in [inventory] + inventory.parents:
                 passage.about.metadata += descendant.metadata
@@ -317,7 +317,7 @@ class CTSCapitainsLocalResolver(Resolver):
         :rtype: (str, str)
         """
         text, inventory = self.__getText__(textId)
-        passage = text.getPassage(Reference(subreference))
+        passage = text.getTextualNode(Reference(subreference))
         return passage.siblingsId
 
     def getReffs(self, textId, level=1, subreference=None):
@@ -334,5 +334,5 @@ class CTSCapitainsLocalResolver(Resolver):
         """
         passage, inventory = self.__getText__(textId)
         if subreference:
-            passage = passage.getPassage(subreference)
+            passage = passage.getTextualNode(subreference)
         return passage.getReffs(level=level, subreference=subreference)

@@ -17,8 +17,8 @@ class Resolver(object):
     def getMetadata(self, objectId=None, **filters):
         """ Request metadata about a text or a collection
 
-        :param textId: Object Identifier to filter on
-        :type textId: str
+        :param objectId: Object Identifier to filter on
+        :type objectId: str
         :param filters: Kwargs parameters.
         :type filters: dict
         :return: Collection

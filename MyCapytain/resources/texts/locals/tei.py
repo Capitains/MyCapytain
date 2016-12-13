@@ -56,6 +56,8 @@ class __SharedMethods__:
         if reference is None:
             return self._getSimplePassage()
 
+        if isinstance(reference, str):
+            reference = Reference(reference)
         if isinstance(reference, list):
             start, end = reference, reference
             reference = Reference(".".join(reference))
@@ -105,7 +107,10 @@ class __SharedMethods__:
         :rtype: Passage
         """
         if reference is None:
-            return __SimplePassage__(self.resource, reference=None, urn=self.urn, citation=self.citation)
+            return __SimplePassage__(
+                self.resource, reference=None, urn=self.urn, citation=self.citation,
+                text=self
+            )
 
         resource = self.resource.xpath(
             self.citation[len(reference)-1].fill(reference),
@@ -137,23 +142,24 @@ class __SharedMethods__:
             text = self.__text__
         return text
 
-    def getReffs(self, level=1, reference=None):
+    def getReffs(self, level=1, subreference=None):
         """ Reference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
+        :param subreference: Subreference (optional)
+        :type subreference: str
         :rtype: List.basestring
         :returns: List of levels
         """
         if hasattr(self, "__depth__"):
             level = level + self.depth
-        if not reference:
+        if not subreference:
             if hasattr(self, "reference"):
-                reference = self.reference
-
-        return self.getValidReff(level, reference)
+                subreference = self.reference
+        else:
+            subreference = Reference(subreference)
+        return self.getValidReff(level, subreference)
 
     def getValidReff(self, level=None, reference=None, _debug=False):
         """ Retrieve valid passages directly
@@ -285,7 +291,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         self.__text__ = text
         self.__reference__ = reference
         self.__children__ = None
-        self.__depth__ = None
+        self.__depth__ = 0
         if reference is not None:
             self.__depth__ = len(reference)
         self.__prevnext__ = None
@@ -589,36 +595,28 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
             _prev = None
         elif start - range_length < 0:
             if start == end:
-                _prev = Reference(document_references[0])
+                _prev = document_references[0]
             else:
-                _prev = Reference(
-                    "{}-{}".format(document_references[0], document_references[start-1])
-                )
+                _prev = "{}-{}".format(document_references[0], document_references[start-1])
         else:
             if start == end:
-                _prev = Reference(document_references[start-1])
+                _prev = document_references[start-1]
             else:
-                _prev = Reference(
-                    "{}-{}".format(document_references[start-range_length], document_references[start-1])
-                )
+                _prev = "{}-{}".format(document_references[start-range_length], document_references[start-1])
 
         if start + 1 == len(document_references) or end + 1 == len(document_references):
             # If the passage is already at the end
             _next = None
         elif end + range_length > len(document_references):
             if start == end:
-                _next = Reference(document_references[-1])
+                _next = document_references[-1]
             else:
-                _next = Reference(
-                    "{}-{}".format(document_references[end+1], document_references[-1])
-                )
+                _next = "{}-{}".format(document_references[end+1], document_references[-1])
         else:
             if start == end:
-                _next = Reference(document_references[end+1])
+                _next = document_references[end+1]
             else:
-                _next = Reference(
-                    "{}-{}".format(document_references[end+1], document_references[end + range_length])
-                )
+                _next = "{}-{}".format(document_references[end+1], document_references[end + range_length])
 
         self.__prevnext__ = (_prev, _next)
         return self.__prevnext__
@@ -634,7 +632,6 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
             return __SharedMethods__.getPassage(self.__text__, self.prevId)
 
     def getPassage(self, reference, simple=False):
-        __doc__ = __SharedMethods__.__doc__
         if not isinstance(reference, Reference):
             reference = Reference(reference)
         X = __SharedMethods__.getPassage(self, reference, simple)

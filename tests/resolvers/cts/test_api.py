@@ -62,7 +62,7 @@ class TestHttpCTSResolver(TestCase):
             level=1
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -98,7 +98,7 @@ class TestHttpCTSResolver(TestCase):
             level=3
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -157,7 +157,7 @@ class TestHttpCTSResolver(TestCase):
             level=1
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -174,7 +174,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", metadata=True)
+        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -185,11 +185,11 @@ class TestHttpCTSResolver(TestCase):
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            passage.prevId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            passage.prevId, "1.pr",
             "Previous Passage ID should be parsed"
         )
         self.assertEqual(
-            passage.nextId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            passage.nextId, "1.2",
             "Next Passage ID should be parsed"
         )
         children = list(passage.getReffs())
@@ -209,7 +209,7 @@ class TestHttpCTSResolver(TestCase):
             level=3
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -226,7 +226,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_metadata_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", metadata=True, prevnext=True)
+        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True, prevnext=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -260,11 +260,11 @@ class TestHttpCTSResolver(TestCase):
             "CTS API Remote HTTP Response should be correctly parsed"
         )
         self.assertEqual(
-            passage.prevId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            passage.prevId, "1.pr",
             "Previous Passage ID should be parsed"
         )
         self.assertEqual(
-            passage.nextId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            passage.nextId, "1.2",
             "Next Passage ID should be parsed"
         )
         children = list(passage.getReffs())
@@ -284,7 +284,7 @@ class TestHttpCTSResolver(TestCase):
             level=3
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -342,11 +342,11 @@ class TestHttpCTSResolver(TestCase):
         self.resolver.endpoint.getCapabilities.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002")
         self.assertIsInstance(
             metadata, Collection,
-            "Resolver should return a collection object"
+            "Resolver should return a collection object (specifically here a Work)"
         )
         self.assertIsInstance(
             metadata.members[0], Text,
-            "Members of Inventory should be TextGroups"
+            "Members of Work should be TextGroups"
         )
         self.assertEqual(
             len(metadata.descendants), 2,
@@ -392,11 +392,11 @@ class TestHttpCTSResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertEqual(
-            previous, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            previous, "1.pr",
             "Previous should be well computed"
         )
         self.assertEqual(
-            nextious, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            nextious, "1.2",
             "Previous should be well computed"
         )
 
@@ -414,7 +414,7 @@ class TestHttpCTSResolver(TestCase):
             "Previous Should not exist"
         )
         self.assertEqual(
-            nextious, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            nextious, "1.1",
             "Next should be well computed"
         )
 
@@ -428,7 +428,7 @@ class TestHttpCTSResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
         )
         self.assertEqual(
-            previous, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
+            previous, "1.1.5",
             "Previous should be well computed"
         )
         self.assertEqual(
@@ -448,7 +448,7 @@ class TestHttpCTSResolver(TestCase):
             "There should be 9462 references"
         )
         self.assertEqual(
-            reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1"
+            reffs[0], "1.pr.1"
         )
         self.resolver.endpoint.getValidReff = MagicMock(return_value=GET_VALID_REFF_FULL)
         self.resolver.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", level=2)
@@ -466,7 +466,7 @@ class TestHttpCTSResolver(TestCase):
             "There should be 6 references"
         )
         self.assertEqual(
-            reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1"
+            reffs[0], "1.1.1"
         )
 
     def test_citation_failure(self):

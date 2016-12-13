@@ -35,3 +35,8 @@ class InvalidURN(Exception):
 class MissingAttribute(Exception):
     """ This error is thrown when an attribute is not present in the Object (missing at startup)
     """
+
+
+class UnknownObjectError(ValueError):
+    """ This error is thrown when an object does not exist in an inventory or in an API
+    """

@@ -126,7 +126,7 @@ class TestAPIText(unittest.TestCase):
         )
 
         # Test the parsing
-        self.assertEqual(reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1")
+        self.assertEqual(reffs[0], "1.pr.1")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_export_fulltext(self, requests):
@@ -252,8 +252,8 @@ class TestAPIText(unittest.TestCase):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = NEXT_PREV
         _prev, _next = text.getPrevNextUrn("1.1")
-        self.assertEqual(str((URN(_prev)).reference), "1.pr", "Endpoint should be called and URN should be parsed")
-        self.assertEqual(str((URN(_next)).reference), "1.2", "Endpoint should be called and URN should be parsed")
+        self.assertEqual(_prev, "1.pr", "Endpoint should be called and URN should be parsed")
+        self.assertEqual(_next, "1.2", "Endpoint should be called and URN should be parsed")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_first_urn(self, requests):
@@ -261,7 +261,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = Get_FIRST
         first = text.getFirstUrn()
         self.assertEqual(
-            str(first), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            str(first), "1.pr",
             "Endpoint should be called and URN should be parsed"
         )
         requests.assert_called_with(
@@ -386,7 +386,7 @@ class TestAPIText(unittest.TestCase):
 
         # When next does not exist from the original resource
         self.assertEqual(
-            str(passage.firstId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            str(passage.firstId), "1.pr",
             "FirstId should resolve"
         )
 
@@ -402,7 +402,7 @@ class TestAPIText(unittest.TestCase):
 
         # When next does not exist from the original resource
         self.assertEqual(
-            str(passage.lastId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6",
+            str(passage.lastId), "1.1.6",
             "FirstId should resolve"
         )
 
@@ -421,14 +421,14 @@ class TestAPIText(unittest.TestCase):
         self.assertEqual(
             passage.childIds,
             [
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.2",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.3",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.4",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
+                "1.1.1",
+                "1.1.2",
+                "1.1.3",
+                "1.1.4",
+                "1.1.5",
+                "1.1.6"
             ],
-            "FirstId should resolve"
+            "ChildIds should resolve"
         )
 
     def test_children(self):
@@ -550,8 +550,8 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         # When next does not exist from the original resource
-        self.assertEqual(str((URN(passage.prevId)).reference), "1.pr")
-        self.assertEqual(str((URN(passage.nextId)).reference), "1.2")
+        self.assertEqual(passage.prevId, "1.pr")
+        self.assertEqual(passage.nextId, "1.2")
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
 
     def test_prev_resource(self):
@@ -592,7 +592,7 @@ class TestCTSPassage(unittest.TestCase):
             retriever=self.endpoint
         )
         self.assertEqual(
-            str(passage.firstId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            passage.firstId, "1.pr",
             "Endpoint should be called and URN should be parsed"
         )
         self.endpoint.getFirstUrn.assert_called_with(
@@ -622,7 +622,7 @@ class TestCTSPassage(unittest.TestCase):
 
         # When next does not exist from the original resource
         self.assertEqual(
-            str(passage.firstId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            str(passage.firstId), "1.pr",
             "FirstId should resolve"
         )
 
@@ -636,7 +636,7 @@ class TestCTSPassage(unittest.TestCase):
 
         # When next does not exist from the original resource
         self.assertEqual(
-            str(passage.lastId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6",
+            str(passage.lastId), "1.1.6",
             "FirstId should resolve"
         )
 
@@ -651,7 +651,7 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         self.assertEqual(
-            str(passage.prevId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            passage.prevId, "1.pr",
             "PrevId should resolve"
         )
 
@@ -666,7 +666,7 @@ class TestCTSPassage(unittest.TestCase):
         )
 
         self.assertEqual(
-            str(passage.nextId), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            passage.nextId, "1.2",
             "NextId should resolve"
         )
 
@@ -684,12 +684,12 @@ class TestCTSPassage(unittest.TestCase):
         self.assertEqual(
             passage.childIds,
             [
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.2",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.3",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.4",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
-                "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
+                "1.1.1",
+                "1.1.2",
+                "1.1.3",
+                "1.1.4",
+                "1.1.5",
+                "1.1.6"
             ],
             "Passage should be retrieved and have the correct URN"
         )
@@ -752,7 +752,7 @@ class TestCTSPassage(unittest.TestCase):
             "urn:cts:latinLit:phi1294.phi02.perseus-lat2:1.1"
         )
         self.assertEqual(
-            first, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            first, "1.pr",
             "Parsing should be done and getFirstUrn should treat correctly full urn"
         )
 
@@ -770,7 +770,7 @@ class TestCTSPassage(unittest.TestCase):
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertEqual(
-            first, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            first, "1.pr",
             "Parsing should be done and getFirstUrn should treat correctly full urn"
         )
 

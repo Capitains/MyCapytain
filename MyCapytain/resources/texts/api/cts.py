@@ -84,7 +84,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         xml = xmlparser(xml)
         self.__parse_request__(xml.xpath("//ti:request", namespaces=NS)[0])
 
-        return [ref for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=NS)]
+        return [ref.split(":")[-1] for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=NS)]
 
     def getPassage(self, reference=None):
         """ Retrieve a passage and store it in the object
@@ -104,7 +104,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
             if ":" in reference:
                 urn = reference
             else:
-                urn = "{0}:{1}".format(self.urn, reference)
+                urn = "{0}:{1}".format(self.urn.upTo(URN.NO_PASSAGE), reference)
         elif isinstance(reference, list):
             urn = "{0}:{1}".format(self.urn, ".".join(reference))
         else:
@@ -126,7 +126,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :returns: List of levels
         """
         if self.depth is not None:
-            level = level + self.depth
+            level += self.depth
 
         return self.getValidReff(level, subreference)
 
@@ -275,7 +275,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         if len(urn) > 0:
             urn = str(urn[0])
-            return urn
+            return urn.split(":")[-1]
 
     @staticmethod
     def prevnext(resource):
@@ -297,10 +297,10 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
             _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=NS, smart_strings=False)
 
             if len(_next_xpath):
-                _next = _next_xpath[0]
+                _next = _next_xpath[0].split(":")[-1]
 
             if len(_prev_xpath):
-                _prev = _prev_xpath[0]
+                _prev = _prev_xpath[0].split(":")[-1]
 
         return _prev, _next
 

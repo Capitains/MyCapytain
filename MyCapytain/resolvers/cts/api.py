@@ -65,12 +65,10 @@ class HttpCTSResolver(Resolver):
 
         :param textId: Text Identifier
         :type textId: str
-        :param level: Depth for retrieval
-        :type level: int
         :param subreference: Passage Reference
         :type subreference: str
-        :return: List of references
-        :rtype: [str]
+        :return: Tuple of references
+        :rtype: (str, str)
         """
         text = Text(
             urn=textId,
@@ -99,8 +97,8 @@ class HttpCTSResolver(Resolver):
     def getMetadata(self, objectId=None, **filters):
         """ Request metadata about a text or a collection
 
-        :param textId: Object Identifier to filter on
-        :type textId: str
+        :param objectId: Object Identifier to filter on
+        :type objectId: str
         :param filters: Kwargs parameters.
         :type filters: dict
         :return: Collection

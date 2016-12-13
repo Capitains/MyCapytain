@@ -117,7 +117,6 @@ def xpathDict(xml, xpath, children, parents, **kwargs):
 class Text(cts.Text):
     """ Represents a CTS Text
 
-    ..automethod:: __str__
     """
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
@@ -305,8 +304,6 @@ def Translation(resource=None, urn=None, parents=None):
 class Work(cts.Work):
 
     """ Represents a CTS Textgroup in XML
-
-        ..automethod:: __str__
     """
 
     def __init__(self, **kwargs):
@@ -406,8 +403,6 @@ class Work(cts.Work):
 class TextGroup(cts.TextGroup):
 
     """ Represents a CTS Textgroup in XML
-        
-        .. automethod:: __str__
     """
 
     def __init__(self, **kwargs):
@@ -477,8 +472,6 @@ class TextGroup(cts.TextGroup):
 class TextInventory(cts.TextInventory):
 
     """ Represents a CTS Inventory file
-        
-    .. automethod:: __str__
     """
 
     def __init__(self, **kwargs):

@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 
 class CTSCapitainsLocalResolver(Resolver):
-    """ XML Folder Based resolver.
+    """ XML Folder Based resolver. Text and metadata resolver based on local directories
 
     :param resource: Resource should be a list of folders retaining data as Capitains Guidelines Repositories
     :type resource: [str]

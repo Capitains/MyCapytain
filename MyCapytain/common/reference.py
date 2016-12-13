@@ -142,7 +142,7 @@ class Reference(object):
     def subreference(self):
         """ Return the subreference of a single node reference
 
-        .. note:: Access to start and end subreference should be done through obj.start.subreference
+        .. note:: Access to start and end subreference should be done through obj.start.subreference \
         and obj.end.subreference
 
         :rtype: (str, int)
@@ -297,7 +297,6 @@ class URN(object):
         >>>     len(a) == 5 # Reference is not counted to not induce count equivalencies with the optional version
         >>>     len(b) == 4
 
-    .. automethod:: upTo
     """
 
     NAMESPACE = 0

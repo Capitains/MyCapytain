@@ -10,11 +10,11 @@
 from six import text_type
 from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import Mimetypes
+from MyCapytain.common.constants import Mimetypes, Exportable
 from MyCapytain.resources.prototypes.metadata import Collection
 
 
-class TextualElement(object):
+class TextualElement(Exportable):
     """ Node representing a text passage.
 
     :param identifier: Identifier of the text
@@ -93,31 +93,18 @@ class TextualElement(object):
         else:
             raise TypeError(".metadata should be an instance of Metadata")
 
-    def default_export(self, output=Mimetypes.JSON.DTS, exclude=None):
-        """ Export the textual node item in the Mimetype required
-
-        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
-        :type output: str
-        :param exclude: Informations to exclude. Specific to implementations
-        :type exclude: [str]
-        :return: Object using a different representation
-        """
-        raise NotImplementedError
-
     def export(self, output=None, exclude=None, **kwargs):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
 
-        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
+        :param output: Mimetype to export to (Uses MyCapytain.common.constants.Mimetypes)
         :type output: str
-        :param exclude: Informations to exclude. Specific to implementations
+        :param exclude: Information to exclude. Specific to implementations
         :type exclude: [str]
         :return: Object using a different representation
         """
-        raise NotImplementedError(
-            "Mimetype {} has not been implemented for this resource".format(output or "(No Mimetype)")
-        )
+        return Exportable.export(self, output, exclude=exclude, **kwargs)
 
 
 class TextualNode(TextualElement, NodeId):
@@ -430,7 +417,6 @@ class Passage(CTSNode):
     @property
     def reference(self):
         return self.urn.reference
-
 
 
 class CitableText(CTSNode):

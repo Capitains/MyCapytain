@@ -109,7 +109,6 @@ class TestProtoText(unittest.TestCase):
         b = CitableText(urn="urn:cts:latinLit:tg.wk.v")
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
-
     def test_reffs(self):
         """ Test property reff, should fail because it supposes validReff is implemented """
         a = CitableText()
@@ -126,4 +125,4 @@ class TestProtoText(unittest.TestCase):
 
         #On init ?
         b = CitableText(citation=MyCapytain.common.reference.Citation(name="label"))
-        self.assertEqual(a.citation.name, "label")
+        self.assertEqual(b.citation.name, "label")

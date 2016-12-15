@@ -74,7 +74,8 @@ class TestRepoProto(unittest.TestCase):
 
     def test_write(self):
         a = Resource(resource="hello")
-        self.assertEqual(a.export(), None, "Empty data should be None")
+        with self.assertRaises(NotImplementedError):
+            a.export()
 
     def test_str(self):
         a = Resource(resource="hello")

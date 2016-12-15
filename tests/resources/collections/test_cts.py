@@ -10,7 +10,6 @@ import lxml.etree as etree
 import six
 import xmlunittest
 
-from MyCapytain.common.utils import Mimetypes
 from MyCapytain.resources.collections.cts import *
 
 

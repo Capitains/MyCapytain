@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 
 import unittest
+
 from six import text_type as str
 
-from MyCapytain.common.utils import xmlparser
-from MyCapytain.resources.texts.encodings import *
 from MyCapytain.common.reference import Reference, Citation
+from MyCapytain.resources.texts.encodings import *
 
 
 class TestTEICitation(unittest.TestCase):
@@ -121,3 +121,12 @@ class TestTEIPassage(unittest.TestCase):
         X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
         P = TEIResource(resource=X)
         self.assertIs(X, P.xml)
+
+    def test_exportable_capacities(self):
+        X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+        P = TEIResource(resource=X)
+        self.assertEqual(
+            P.export_capacities,
+            [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT],
+            "Passage should be able to export to given resources"
+        )

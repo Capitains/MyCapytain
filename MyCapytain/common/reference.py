@@ -11,7 +11,7 @@ from six import text_type
 from copy import copy
 import re
 from lxml.etree import _Element
-from MyCapytain.common.utils import NS
+from MyCapytain.common.constants import NS
 
 REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
 REFSDECL_REPLACER = re.compile(r"\$[0-9]+")

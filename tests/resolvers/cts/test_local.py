@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
-from MyCapytain.common.utils import Mimetypes, NS
+from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.common.metadata import Metadatum
 from MyCapytain.resources.prototypes.metadata import Collection

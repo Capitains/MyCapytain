@@ -11,7 +11,8 @@
 from __future__ import unicode_literals
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import xmlparser, NS, Mimetypes
+from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.resources.collections import cts as CTSCollection
 from MyCapytain.resources.prototypes import text as prototypes
@@ -356,7 +357,7 @@ class Text(__SharedMethod__, prototypes.CitableText):
     def siblingsId(self):
         raise NotImplementedError
 
-    def export(self, output=Mimetypes.PLAINTEXT, exclude=None):
+    def export(self, output=Mimetypes.PLAINTEXT, exclude=None, **kwargs):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method

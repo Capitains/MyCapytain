@@ -9,7 +9,8 @@ from MyCapytain.resources.texts.api.cts import Passage, Text
 from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, Citation, URN
 from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.utils import xmlparser, NS, Mimetypes
+from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.errors import MissingAttribute
 import mock
 

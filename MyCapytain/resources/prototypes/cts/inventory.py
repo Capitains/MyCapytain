@@ -12,7 +12,7 @@ from six import text_type
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.common.reference import URN
 from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.utils import RDF_PREFIX, NAMESPACES
+from MyCapytain.common.constants import NAMESPACES, RDF_PREFIX, Mimetypes
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
 from copy import copy, deepcopy

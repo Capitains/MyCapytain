@@ -1,6 +1,7 @@
 from MyCapytain.resolvers.cts.api import HttpCTSResolver
 from MyCapytain.retrievers.cts5 import CTS
-from MyCapytain.common.utils import xmlparser, Mimetypes, NS
+from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.common.metadata import Metadatum
 from MyCapytain.resources.prototypes.text import Passage
 from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Text

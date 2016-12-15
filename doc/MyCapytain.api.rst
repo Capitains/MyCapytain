@@ -6,6 +6,13 @@ Utilities, metadata and references
 
 Module common contains tools such as a namespace dictionary as well as cross-implementation objects, like URN, Citations...
 
+Constants
+*********
+
+.. automodule:: MyCapytain.common.constants
+    :noindex:
+    :members:
+
 URN, References and Citations
 *****************************
 
@@ -27,6 +34,7 @@ Metadata containers
 .. automodule:: MyCapytain.common.metadata
     :noindex:
     :members:
+    :inherited-members:
 
 Utilities
 *********

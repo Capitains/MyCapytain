@@ -12,7 +12,7 @@ from six import text_type
 from random import randint
 from types import GeneratorType
 from collections import defaultdict, OrderedDict
-from MyCapytain.common.utils import Mimetypes, RDF_PREFIX, Namespace, RDF_MAPPING
+from MyCapytain.common.constants import Namespace, RDF_PREFIX, RDF_MAPPING, Mimetypes, Exportable
 from MyCapytain.errors import UnknownNamespace
 
 
@@ -224,7 +224,7 @@ class Metadatum(object):
         return self
 
 
-class Metadata(object):
+class Metadata(Exportable):
     """
         A metadatum aggregation object provided to centralize metadata
 
@@ -238,7 +238,13 @@ class Metadata(object):
         .. automethod:: __iter__
         .. automethod:: __len__
         .. automethod:: __add__
+
+    :cvar EXPORT_TO: List of exportable supported formats
+    :cvar DEFAULT_EXPORT: Default export (CTS XML Inventory)
     """
+    EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.JSON.DTS.Std]
+    DEFAULT_EXPORT = Mimetypes.JSON.Std
+
     def __init__(self, keys=None):
         """ Initiate the object
         """
@@ -407,7 +413,7 @@ class Metadata(object):
         """
         return self.__keys__
 
-    def export(self, output=Mimetypes.JSON.Std):
+    def __export__(self, output=Mimetypes.JSON.Std, **kwargs):
         """ Export a set of Metadata
 
         :param output: Mimetype to export to

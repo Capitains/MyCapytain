@@ -7,7 +7,7 @@ from unittest import TestCase
 
 import MyCapytain.errors
 from MyCapytain.common.reference import Reference, URN, Citation
-from MyCapytain.common.utils import Mimetypes
+from MyCapytain.common.constants import Mimetypes
 from MyCapytain.resources.texts.locals.tei import Text
 from io import open
 import functools

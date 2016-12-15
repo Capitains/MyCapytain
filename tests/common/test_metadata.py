@@ -5,7 +5,7 @@ import unittest
 import six
 from collections import defaultdict
 from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.utils import Mimetypes, NAMESPACES
+from MyCapytain.common.constants import NAMESPACES, Mimetypes
 
 
 class TestMetadatum(unittest.TestCase):

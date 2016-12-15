@@ -13,7 +13,8 @@ from six import text_type
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype, URN
-from MyCapytain.common.utils import xmlparser, NS, Mimetypes
+from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.constants import NS, Mimetypes
 import re
 from collections import defaultdict
 
@@ -118,6 +119,9 @@ class Text(cts.Text):
     """ Represents a CTS Text
 
     """
+    EXPORT_TO = [Mimetypes.PYTHON.MyCapytain.ReadableText, Mimetypes.PYTHON.ETREE, Mimetypes.XML.CTS]
+    DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
+
     def __init__(self, **kwargs):
         super(Text, self).__init__(**kwargs)
 
@@ -202,7 +206,7 @@ class Text(cts.Text):
         strings.append("</ti:{0}>".format(tag_end))
         return "".join(strings)
 
-    def export(self, output=Mimetypes.PYTHON.ETREE, domain="", **kwargs):
+    def __export__(self, output=Mimetypes.PYTHON.ETREE, domain="", **kwargs):
         """ Create a {format} version of the Work
         
         :param output: Format to be chosen (Only XML for now)
@@ -220,7 +224,8 @@ class Text(cts.Text):
                 if isinstance(parent, cts.CTSCollection) and hasattr(parent, "metadata"):
                     complete_metadata = complete_metadata + parent.metadata
             return text.CitableText(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
-        return super(Text, self).export(output, domain)
+        elif output == Mimetypes.XML.CTS:
+            return str(self)
 
     def __findCitations(self, xml, xpath="ti:citation"):
         """ Find citation in current xml. Used as a loop for self.xmlparser()
@@ -304,7 +309,12 @@ def Translation(resource=None, urn=None, parents=None):
 class Work(cts.Work):
 
     """ Represents a CTS Textgroup in XML
+
+    :cvar EXPORT_TO: List of exportable supported formats
+    :cvar DEFAULT_EXPORT: Default export (CTS XML Inventory)
     """
+    EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.CTS]
+    DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
 
     def __init__(self, **kwargs):
 
@@ -345,7 +355,7 @@ class Work(cts.Work):
         strings.append("</ti:work>")
         return "".join(strings)
 
-    def export(self, output=Mimetypes.PYTHON.ETREE, domain=""):
+    def __export__(self, output=Mimetypes.PYTHON.ETREE, domain=""):
         """ Create a {format} version of the Work
         
         :param output: Format to be chosen (Only XML for now)
@@ -357,7 +367,8 @@ class Work(cts.Work):
         """
         if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
-        return super(Work, self).export(output, domain)
+        elif output == Mimetypes.XML.CTS:
+            return str(self)
 
     def parse(self, resource):
         """ Parse a resource
@@ -403,7 +414,12 @@ class Work(cts.Work):
 class TextGroup(cts.TextGroup):
 
     """ Represents a CTS Textgroup in XML
+
+    :cvar EXPORT_TO: List of exportable supported formats
+    :cvar DEFAULT_EXPORT: Default export (CTS XML Inventory)
     """
+    EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.CTS]
+    DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
 
     def __init__(self, **kwargs):
         super(TextGroup, self).__init__(**kwargs)
@@ -430,7 +446,7 @@ class TextGroup(cts.TextGroup):
         strings.append("</ti:textgroup>")
         return "".join(strings)
 
-    def export(self, output=Mimetypes.PYTHON.ETREE, domain=""):
+    def __export__(self, output=Mimetypes.PYTHON.ETREE, domain=""):
         """ Create a {format} version of the Work
 
         :param output: Format to be chosen (Only XML for now)
@@ -442,7 +458,8 @@ class TextGroup(cts.TextGroup):
         """
         if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
-        return super(TextGroup, self).export(output, domain)
+        elif output == Mimetypes.XML.CTS:
+            return str(self)
 
     def parse(self, resource):
         """ Parse a resource 
@@ -472,7 +489,12 @@ class TextGroup(cts.TextGroup):
 class TextInventory(cts.TextInventory):
 
     """ Represents a CTS Inventory file
+
+    :cvar EXPORT_TO: List of exportable supported formats
+    :cvar DEFAULT_EXPORT: Default export (CTS XML Inventory)
     """
+    EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.CTS]
+    DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
 
     def __init__(self, **kwargs):
         super(TextInventory, self).__init__(**kwargs)
@@ -494,7 +516,7 @@ class TextInventory(cts.TextInventory):
         strings.append("</ti:TextInventory>")
         return "".join(strings)
 
-    def export(self, output=Mimetypes.PYTHON.ETREE, domain=""):
+    def __export__(self, output=Mimetypes.PYTHON.ETREE, domain=""):
         """ Create a {format} version of the Work
 
         :param output: Format to be chosen (Only XML for now)
@@ -506,7 +528,8 @@ class TextInventory(cts.TextInventory):
         """
         if output == Mimetypes.PYTHON.ETREE:
             return xmlparser(str(self))
-        return super(TextInventory, self).export(output, domain)
+        elif output == Mimetypes.XML.CTS:
+            return str(self)
 
     def parse(self, resource):
         """ Parse a resource 

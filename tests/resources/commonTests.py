@@ -20,9 +20,9 @@ def call_with_simple(f):
     :return:
     """
     @functools.wraps(f)
-    def decorator(*args):
+    def decorator(s):
         for arg_tuple in [True, False]:
-            f(*args, arg_tuple)
+            f(s, arg_tuple)
     return decorator
 
 

@@ -168,8 +168,6 @@ class Exportable(object):
     def export(self, output=None, **kwargs):
         """ Export the collection item in the Mimetype required.
 
-        ..note:: If current implementation does not have special mimetypes, reuses default_export method
-
         :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
         :type output: str
         :return: Object using a different representation

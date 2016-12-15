@@ -159,7 +159,6 @@ class TextXMLFolderResolver(TestCase):
         children = list(passage.getReffs())
 
         # We check the passage is able to perform further requests and is well instantiated
-        print(children)
         self.assertEqual(
             children[0], '1',
             "Resource should be string identifiers"
@@ -413,9 +412,7 @@ class TextXMLFolderResolver(TestCase):
             "There should be 14 editions + 1 translations in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(
-                output=Mimetypes.PYTHON.ETREE
-            ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -452,9 +449,7 @@ class TextXMLFolderResolver(TestCase):
             "First parent should be TextGroup"
         )
         self.assertEqual(
-            len(metadata.export(
-                output=Mimetypes.PYTHON.ETREE
-            ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertEqual(
@@ -465,11 +460,11 @@ class TextXMLFolderResolver(TestCase):
         self.assertCountEqual(
             [
                 x["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]
-                for x in metadata.export(output=Mimetypes.JSON.DTS.Std)\
+                for x in metadata.export(output=Mimetypes.JSON.DTS.Std) \
                     ["http://w3id.org/dts-ontology/capabilities"]\
                     ["http://w3id.org/dts-ontology/navigation"]\
                     ["http://w3id.org/dts-ontology/parents"]
-             ],
+                ],
             ["http://chs.harvard.edu/xmlns/cts/TextGroup", "http://chs.harvard.edu/xmlns/cts/TextInventory"],
             "There should be one member in DTS JSON"
         )

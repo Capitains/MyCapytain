@@ -9,9 +9,11 @@
 """
 from __future__ import unicode_literals
 from six import text_type
-
+from random import randint
+from types import GeneratorType
 from collections import defaultdict, OrderedDict
-from MyCapytain.common.utils import Mimetypes, NS, RDF_PREFIX
+from MyCapytain.common.utils import Mimetypes, RDF_PREFIX, Namespace, RDF_MAPPING
+from MyCapytain.errors import UnknownNamespace
 
 
 class Metadatum(object):
@@ -21,6 +23,8 @@ class Metadatum(object):
     :type name: text_type
     :param children: List of tuples, where first element is the key, and second the value
     :type children: List
+    :param namespace: Object representing a namespace
+    :type namespace: Namespace
 
     :Example:
         >>>    a = Metadatum("label", [("lat", "Amores"), ("fre", "Les Amours")])
@@ -32,16 +36,49 @@ class Metadatum(object):
 
     """
 
-    def __init__(self, name, children=None):
+    def __init__(self, name, children=None, namespace=None):
         """ Initiate a Metadatum object
         """
         self.name = name
         self.children = OrderedDict()
         self.default = None
+        self.__namespace__ = namespace
+        if "//" in name and namespace is None:
+            uri, self.name = tuple(name.rsplit("/"))
+            if uri not in RDF_MAPPING:
+                prefix = "ns{}".format(randint(1, 4096))
+            else:
+                prefix = RDF_MAPPING[uri]
+            self.namespace = Namespace(uri, prefix)
+
+        if ":" in name and namespace is None:
+            prefix, self.name = tuple(name.split(":"))
+
+            if prefix not in RDF_PREFIX:
+                raise UnknownNamespace(
+                    "%s is unknown. Update MyCapytain.common.utils.RDF_PREFIX to support this prefix" % prefix
+                )
+            self.namespace = Namespace(RDF_PREFIX[prefix], prefix)
 
         if children is not None and isinstance(children, list):
             for tup in children:
                 self[tup[0]] = tup[1]
+
+    @property
+    def namespace(self):
+        """ Namespace of the metadata entry """
+        return self.__namespace__
+
+    @namespace.setter
+    def namespace(self, namespace):
+        """ Set namespace property
+
+        :param namespace: Namespace to set
+        :type namespace: Namespace
+        """
+        if namespace is not None and not isinstance(namespace, Namespace):
+            raise TypeError("Only None and Namespace value are accepted")
+        self.__namespace__ = namespace
 
     def __getitem__(self, key):
         """ Add an iterable access method
@@ -208,7 +245,7 @@ class Metadata(object):
         self.metadata = defaultdict(Metadatum)
         self.__keys__ = []
 
-        if keys is not None:
+        if keys is not None and isinstance(keys, (list, set, GeneratorType)):
             for key in keys:
                 self[key] = Metadatum(name=key)
 
@@ -370,46 +407,49 @@ class Metadata(object):
         """
         return self.__keys__
 
-    def export(self, mime=Mimetypes.JSON.Std):
-        if mime == Mimetypes.JSON.Std:
+    def export(self, output=Mimetypes.JSON.Std):
+        """ Export a set of Metadata
+
+        :param output: Mimetype to export to
+        :return: Formatted Export
+        """
+        if output == Mimetypes.JSON.Std:
             return {
                 key: getattr(value, "__getstate__")() for key, value in self.metadata.items()
             }
-        elif mime == Mimetypes.JSON.DTS:
+        elif output == Mimetypes.JSON.DTS.Std:
             descs = {
 
             }
             for key in sorted(self.metadata.keys()):
                 metadatum = self.metadata[key]
-                ks = key.split(":")
-                if len(ks) == 2:
-                    ns, k = tuple(ks)
+                if metadatum.namespace is not None:
+                    ns = metadatum.namespace.uri
                 else:
-                    ns, k = RDF_PREFIX["cts"], key
-                if ns in RDF_PREFIX:
-                    ns = RDF_PREFIX[ns]
+                    ns = ""
 
                 for lang, value in metadatum:
                     if lang not in descs:
                         descs[lang] = {"@language": lang}
-                    descs[lang][ns+k] = value
+                    descs[lang][ns+metadatum.name] = value
             return [value for value in descs.values()]
 
-        elif mime == Mimetypes.XML.RDF:
+        elif output == Mimetypes.XML.RDF:
             out = ""
             for key in sorted(self.metadata.keys()):
                 metadatum = self.metadata[key]
-                ks = key.split(":")
-                if len(ks) == 2:
-                    ns, k = tuple(ks)
-                    if ns in RDF_PREFIX:
-                        ns = RDF_PREFIX[ns]
+                if metadatum.namespace is None:
+                    out += "".join([
+                        "<{0} xml:lang=\"{1}\">{2}</{0}>".format(metadatum.name, lang, value)
+                        for lang, value in metadatum
+                       ])
                 else:
-                    ns, k = NS["ti"], key
-                out += "".join([
-                    "<{1} xmlns=\"{0}/\" xml:lang=\"{2}\">{3}</{1}>".format(ns, k, lang, value)
-                    for lang, value in metadatum
-                   ])
+                    out += "".join([
+                        "<{1} xmlns=\"{0}\" xml:lang=\"{2}\">{3}</{1}>".format(
+                            metadatum.namespace.uri, metadatum.name, lang, value
+                        )
+                        for lang, value in metadatum
+                    ])
             return """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description>
     """+out+"""

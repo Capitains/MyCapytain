@@ -189,7 +189,11 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         W = Work(resource=xml, urn="urn:cts:latinLit:phi1294.phi002")
         self.assertEqual(len(W.getLang("eng")), 2)
         self.assertEqual(len(W.getLang()), 3)
-
+        self.assertEqual(
+            W.metadata.export(output=Mimetypes.JSON.DTS.Std),
+            [{'http://chs.harvard.edu/xmlns/cts/title': 'Epigrammata', '@language': 'eng'}],
+            "Default export should work well"
+        )
 
     def test_xml_Text_others(self):
         """ Test access to translation """

@@ -324,9 +324,7 @@ class TestHttpCTSResolver(TestCase):
             "There should be 14 editions + 1 translations in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(
-                output=Mimetypes.PYTHON.ETREE
-            ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -361,9 +359,7 @@ class TestHttpCTSResolver(TestCase):
             "There should be 1 edition + 1 translation in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(
-                output=Mimetypes.PYTHON.ETREE
-            ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -374,11 +370,11 @@ class TestHttpCTSResolver(TestCase):
         self.assertCountEqual(
             [
                 x["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]
-                for x in metadata.export(output=Mimetypes.JSON.DTS.Std)\
+                for x in metadata.export(output=Mimetypes.JSON.DTS.Std) \
                     ["http://w3id.org/dts-ontology/capabilities"]\
                     ["http://w3id.org/dts-ontology/navigation"]\
                     ["http://w3id.org/dts-ontology/parents"]
-             ],
+                ],
             ["http://chs.harvard.edu/xmlns/cts/TextGroup", "http://chs.harvard.edu/xmlns/cts/TextInventory"],
             "There should be one member in DTS JSON"
         )

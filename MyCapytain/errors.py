@@ -40,3 +40,8 @@ class MissingAttribute(Exception):
 class UnknownObjectError(ValueError):
     """ This error is thrown when an object does not exist in an inventory or in an API
     """
+
+
+class UnknownNamespace(ValueError):
+    """ This error is thrown when a namespace is unknown
+    """

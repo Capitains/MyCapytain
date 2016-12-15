@@ -5,7 +5,7 @@ import unittest
 import six
 from collections import defaultdict
 from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.utils import Mimetypes
+from MyCapytain.common.utils import Mimetypes, NAMESPACES
 
 
 class TestMetadatum(unittest.TestCase):
@@ -234,33 +234,61 @@ class TestMetadata(unittest.TestCase):
             "JSON LD Expression should take into account prefixes"
         )
 
-    def test_export_jsonld(self):
+    def test_export_jsonld_nons(self):
+        """ With no namespace """
         b = Metadata()
-        m3 = Metadatum("desc", [("fre", "Omelette")])
-        m4 = Metadatum("title", [("eng", "ttl"), ("fre", "titre")])
-        m5 = Metadatum("dc:editor", [("eng", "Captain Hook"), ("fre", "Capitaine Crochet")])
+        m3 = Metadatum("desc", [("fre", "Un bon livre")])
+        m4 = Metadatum("title", [("eng", "A title"), ("fre", "Un titre")])
+        m5 = Metadatum("dc:editor", [("eng", "An Editor"), ("fre", "Un Editeur")])
         b[("desc", "title", "dc:editor")] = (m3, m4, m5)
 
         six.assertCountEqual(
             self,
-            b.export(Mimetypes.JSON.DTS),
+            b.export(Mimetypes.JSON.DTS.Std),
             [
                 {
-                    'http://chs.harvard.edu/xmlns/cts/desc': 'Omelette',
-                    'http://chs.harvard.edu/xmlns/cts/title': 'titre',
-                    'http://purl.org/dc/elements/1.1/editor': "Capitaine Crochet",
+                    'desc': 'Un bon livre',
+                    'title': 'Un titre',
+                    'http://purl.org/dc/elements/1.1/editor': "Un Editeur",
                     '@language': 'fre'
                 },
                 {
-                    'http://chs.harvard.edu/xmlns/cts/title': 'ttl',
-                    'http://purl.org/dc/elements/1.1/editor': "Captain Hook",
+                    'title': 'A title',
+                    'http://purl.org/dc/elements/1.1/editor': "An Editor",
                     '@language': 'eng'
                 }
             ],
             "JSON LD Expression should take into account prefixes"
         )
 
-    def test_export_xmlRDF(self):
+    def test_export_jsonld_withns(self):
+        """ With no namespace """
+        b = Metadata()
+        m3 = Metadatum("desc", [("fre", "Un bon livre")], namespace=NAMESPACES.CTS)
+        m4 = Metadatum("title", [("eng", "A title"), ("fre", "Un titre")], namespace=NAMESPACES.CTS)
+        m5 = Metadatum("dc:editor", [("eng", "An Editor"), ("fre", "Un Editeur")])
+        b[("desc", "title", "dc:editor")] = (m3, m4, m5)
+
+        six.assertCountEqual(
+            self,
+            b.export(Mimetypes.JSON.DTS.Std),
+            [
+                {
+                    'http://chs.harvard.edu/xmlns/cts/desc': 'Un bon livre',
+                    'http://chs.harvard.edu/xmlns/cts/title': 'Un titre',
+                    'http://purl.org/dc/elements/1.1/editor': "Un Editeur",
+                    '@language': 'fre'
+                },
+                {
+                    'http://chs.harvard.edu/xmlns/cts/title': 'A title',
+                    'http://purl.org/dc/elements/1.1/editor': "An Editor",
+                    '@language': 'eng'
+                }
+            ],
+            "JSON LD Expression should take into account prefixes"
+        )
+
+    def test_export_xmlRDF_noNS(self):
         b = Metadata()
         m3 = Metadatum("desc", [("fre", "Omelette")])
         m4 = Metadatum("title", [("eng", "ttl"), ("fre", "titre")])
@@ -270,7 +298,23 @@ class TestMetadata(unittest.TestCase):
             b.export(Mimetypes.XML.RDF),
             """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description>
-    <editor xmlns="http://purl.org/dc/elements/1.1//" xml:lang="eng">Captain Hook</editor><editor xmlns="http://purl.org/dc/elements/1.1//" xml:lang="fre">Capitaine Crochet</editor><desc xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">Omelette</desc><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="eng">ttl</title><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">titre</title>
+    <editor xmlns="http://purl.org/dc/elements/1.1/" xml:lang="eng">Captain Hook</editor><editor xmlns="http://purl.org/dc/elements/1.1/" xml:lang="fre">Capitaine Crochet</editor><desc xml:lang="fre">Omelette</desc><title xml:lang="eng">ttl</title><title xml:lang="fre">titre</title>
+  </rdf:Description>
+</rdf:RDF>""",
+            "XML/RDF Expression should take into account prefixes"
+        )
+
+    def test_export_xmlRDF_withNs(self):
+        b = Metadata()
+        m3 = Metadatum("desc", [("fre", "Omelette")], namespace=NAMESPACES.CTS)
+        m4 = Metadatum("title", [("eng", "ttl"), ("fre", "titre")], namespace=NAMESPACES.CTS)
+        m5 = Metadatum("dc:editor", [("eng", "Captain Hook"), ("fre", "Capitaine Crochet")])
+        b[("desc", "title", "dc:editor")] = (m3, m4, m5)
+        self.assertEqual(
+            b.export(Mimetypes.XML.RDF),
+            """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description>
+    <editor xmlns="http://purl.org/dc/elements/1.1/" xml:lang="eng">Captain Hook</editor><editor xmlns="http://purl.org/dc/elements/1.1/" xml:lang="fre">Capitaine Crochet</editor><desc xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">Omelette</desc><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="eng">ttl</title><title xmlns="http://chs.harvard.edu/xmlns/cts/" xml:lang="fre">titre</title>
   </rdf:Description>
 </rdf:RDF>""",
             "XML/RDF Expression should take into account prefixes"

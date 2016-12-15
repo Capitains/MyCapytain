@@ -11,16 +11,24 @@ from __future__ import unicode_literals
 from six import text_type
 from functools import reduce
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from lxml import etree
 from io import IOBase, StringIO
 import re
 from copy import copy
 from lxml.objectify import ObjectifiedElement, parse
 
-
 __strip = re.compile("([ ]{2,})+")
 __parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
+
+""" Namespace """
+Namespace = namedtuple("Namespace", ["uri", "prefix"])
+
+
+class NAMESPACES:
+    CTS = Namespace("http://chs.harvard.edu/xmlns/cts/", "ti")
+    TEI = Namespace("http://www.tei-c.org/ns/1.0/", "tei")
+    DC = Namespace("http://purl.org/dc/elements/1.1/", "dc")
 
 
 def xmliter(node):
@@ -79,12 +87,12 @@ RDF_PREFIX = {
   "dbpedia": "http://dbpedia.org/resource/",
 
   "tei": "http://www.tei-c.org/ns/1.0/",
-  "cts": "http://chs.harvard.edu/xmlns/cts/"
+  "ti": "http://chs.harvard.edu/xmlns/cts/"
 }
 
 #: Mapping of known domains to RDF Classical Prefixes
 RDF_MAPPING = {
-    'http://chs.harvard.edu/xmlns/cts/': 'cts',
+    'http://chs.harvard.edu/xmlns/cts/': 'ti',
     'http://dbpedia.org/ontology/': 'dbo',
     'http://dbpedia.org/property/': 'dbp',
     'http://dbpedia.org/resource/': 'dbpedia',

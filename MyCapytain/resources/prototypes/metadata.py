@@ -9,7 +9,7 @@
 from copy import deepcopy
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import RDF_PREFIX, Mimetypes
+from MyCapytain.common.utils import RDF_PREFIX, Mimetypes, NAMESPACES
 
 
 class Collection(object):
@@ -33,14 +33,19 @@ class Collection(object):
 
         :rtype: Metadata
         """
+        if self.__title__ is not None:
+            return self.__title__
         if hasattr(type(self), "DC_TITLE_KEY") and self.DC_TITLE_KEY:
-            __title = Metadata(keys="dc:title")
-            __title["dc:title"] = deepcopy(self.metadata[type(self).DC_TITLE_KEY])
-            return __title
+            self.__title__ = Metadata(keys=["dc:title"])
+            self.__title__["dc:title"] = deepcopy(self.metadata[type(self).DC_TITLE_KEY])
+            self.__title__["dc:title"].namespace = NAMESPACES.DC
+            self.__title__["dc:title"].name = "title"
+            return self.__title__
 
     def __init__(self):
         self.metadata = Metadata()
         self.__id__ = None
+        self.__title__ = None
         self.properties = {
             RDF_PREFIX["dts"]+"model": "http://w3id.org/dts-ontology/collection",
             RDF_PREFIX["rdf"]+"type": self.TYPE_URI

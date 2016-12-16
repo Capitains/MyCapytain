@@ -20,7 +20,7 @@ The following code block is a mere example of how to implement Exportable and wh
 typically loops over all the parents class of the current class until it find one exportable system matching the \
 required one.
 
-.. literalinclude:: Exportabke.py
+.. literalinclude:: Exportable.py
    :language: python
    :linenos:
 

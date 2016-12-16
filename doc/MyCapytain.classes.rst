@@ -1,6 +1,30 @@
 MyCapytain's Main Objects Explained
 ===================================
 
+Important "Abstract" Parent Classes
+###################################
+
+Exportable
+**********
+
+:class:`MyCapytain.common.constants.Exportable`
+
+The Exportable class is visible all across the library. It provides a common, standardized way to retrieve in an API \
+fashion to what can an object be exported and to exports it. Any exportable object should have an EXPORT_TO constant \
+variable and include a __export__(output, **kwargs) methods if it provides an export type.
+
+Example
+-------
+
+The following code block is a mere example of how to implement Exportable and what are its responsibilities. Exportable\
+typically loops over all the parents class of the current class until it find one exportable system matching the \
+required one.
+
+.. literalinclude:: Exportabke.py
+   :language: python
+   :linenos:
+
+
 Retrievers
 ##########
 
@@ -43,8 +67,7 @@ Example of implementation : CTS 5
 Text and Passages
 #################
 
-Needs to be written
-
+Text and Passages have been divided into a lot of different object
 
 Collection
 ##########

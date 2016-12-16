@@ -32,3 +32,4 @@ Getting all passages from a text
         # We print the passage from which we retrieve <note> nodes
         print("\t".join([ref, psg.text(exclude=["note"])]))
 
+

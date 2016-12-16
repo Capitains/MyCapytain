@@ -401,14 +401,14 @@ class TestAPIText(unittest.TestCase):
             retriever=self.endpoint
         )
         passage = text.getTextualNode("1.1")
+        self.assertEqual(
+            passage.siblingsId, ("1.pr", "1.2"),
+            "SiblingsId should resolve"
+        )
 
         # When next does not exist from the original resource
         self.endpoint.getPrevNextUrn.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
-        )
-        self.assertEqual(
-            passage.siblingsId, ("1.pr", "1.2"),
-            "SiblingsId should resolve"
         )
 
     def test_get_last_id(self):

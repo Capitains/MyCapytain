@@ -1,11 +1,11 @@
 MyCapytain's Main Objects Explained
 ===================================
 
-Important "Abstract" Parent Classes
-###################################
+Exportable Parent Classes
+#########################
 
-Exportable
-**********
+Description
+***********
 
 :class:`MyCapytain.common.constants.Exportable`
 
@@ -14,7 +14,7 @@ fashion to what can an object be exported and to exports it. Any exportable obje
 variable and include a __export__(output, **kwargs) methods if it provides an export type.
 
 Example
--------
+*******
 
 The following code block is a mere example of how to implement Exportable and what are its responsibilities. Exportable\
 typically loops over all the parents class of the current class until it find one exportable system matching the \
@@ -23,7 +23,6 @@ required one.
 .. literalinclude:: Exportable.py
    :language: python
    :linenos:
-
 
 Retrievers
 ##########

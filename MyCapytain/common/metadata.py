@@ -10,6 +10,7 @@
 from __future__ import unicode_literals
 from six import text_type
 from random import randint
+from copy import deepcopy
 from types import GeneratorType
 from collections import defaultdict, OrderedDict
 from MyCapytain.common.constants import Namespace, RDF_PREFIX, RDF_MAPPING, Mimetypes, Exportable
@@ -356,7 +357,6 @@ class Metadata(Exportable):
             >>> b = Metadata(name="title")
             >>> a + b == Metadata(name=["label", "title"])
         """
-        from copy import deepcopy
         result = deepcopy(self)
         for metadata_key, metadatum in other:
             if metadata_key in self.__keys__:
@@ -395,7 +395,7 @@ class Metadata(Exportable):
 
     def __setstate__(self, dic):
         """ Unpickling method
-        :param dic: Dictionary with request valied
+        :param dic: Dictionary with request value
         :return:
         """
         self.metadata = defaultdict(Metadatum)

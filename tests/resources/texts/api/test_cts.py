@@ -391,6 +391,26 @@ class TestAPIText(unittest.TestCase):
             "FirstId should resolve"
         )
 
+    def test_get_siblings(self):
+        self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
+        self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
+        self.endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
+        self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF_1_1)
+        text = Text(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2",
+            retriever=self.endpoint
+        )
+        passage = text.getTextualNode("1.1")
+
+        # When next does not exist from the original resource
+        self.endpoint.getPrevNextUrn.assert_called_with(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
+        )
+        self.assertEqual(
+            passage.siblingsId, ("1.pr", "1.2"),
+            "SiblingsId should resolve"
+        )
+
     def test_get_last_id(self):
         self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
@@ -553,6 +573,7 @@ class TestCTSPassage(unittest.TestCase):
         # When next does not exist from the original resource
         self.assertEqual(passage.prevId, "1.pr")
         self.assertEqual(passage.nextId, "1.2")
+        self.assertEqual(passage.siblingsId, ("1.pr", "1.2"))
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
 
     def test_prev_resource(self):

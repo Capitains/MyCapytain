@@ -9,10 +9,10 @@
 from copy import deepcopy
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import RDF_PREFIX, Mimetypes
+from MyCapytain.common.constants import NAMESPACES, RDF_PREFIX, Mimetypes, Exportable
 
 
-class Collection(object):
+class Collection(Exportable):
     """ Collection represents any resource's metadata. It has members and parents
 
     :ivar properties: Properties of the collection
@@ -26,6 +26,7 @@ class Collection(object):
     """
     DC_TITLE_KEY = None
     TYPE_URI = "http://w3id.org/dts-ontology/collection"
+    EXPORT_TO = [Mimetypes.JSON.DTS.NoParents, Mimetypes.JSON.DTS.Std]
 
     @property
     def title(self):
@@ -33,14 +34,19 @@ class Collection(object):
 
         :rtype: Metadata
         """
+        if self.__title__ is not None:
+            return self.__title__
         if hasattr(type(self), "DC_TITLE_KEY") and self.DC_TITLE_KEY:
-            __title = Metadata(keys="dc:title")
-            __title["dc:title"] = deepcopy(self.metadata[type(self).DC_TITLE_KEY])
-            return __title
+            self.__title__ = Metadata(keys=["dc:title"])
+            self.__title__["dc:title"] = deepcopy(self.metadata[type(self).DC_TITLE_KEY])
+            self.__title__["dc:title"].namespace = NAMESPACES.DC
+            self.__title__["dc:title"].name = "title"
+            return self.__title__
 
     def __init__(self):
         self.metadata = Metadata()
         self.__id__ = None
+        self.__title__ = None
         self.properties = {
             RDF_PREFIX["dts"]+"model": "http://w3id.org/dts-ontology/collection",
             RDF_PREFIX["rdf"]+"type": self.TYPE_URI
@@ -90,18 +96,7 @@ class Collection(object):
         """
         return [member for member in self.descendants if member.readable]
 
-    def default_export(self, output=Mimetypes.JSON.DTS.Std, domain=""):
-        """ Export the collection item in the Mimetype required
-
-        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
-        :type output: str
-        :param domain: Domain (Necessary sometime to express some IDs)
-        :type domain: str
-        :return: Object using a different representation
-        """
-        raise NotImplementedError
-
-    def export(self, output=None, domain=""):
+    def __export__(self, output=None, domain=""):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
@@ -136,7 +131,7 @@ class Collection(object):
             }
             if len(self.members):
                 o[RDF_PREFIX["dts"] + "members"] = [
-                    member.export(Mimetypes.JSON.DTS.NoParents, domain) for member in self.members
+                    member.export(Mimetypes.JSON.DTS.NoParents, domain=domain) for member in self.members
                 ]
             if output != Mimetypes.JSON.DTS.NoParents and len(self.parents):
                 o[RDF_PREFIX["dts"] + "capabilities"]\

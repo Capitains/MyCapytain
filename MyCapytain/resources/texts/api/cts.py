@@ -11,7 +11,8 @@
 from __future__ import unicode_literals
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import xmlparser, NS
+from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.resources.collections import cts as CTSCollection
 from MyCapytain.resources.prototypes import text as prototypes
@@ -25,6 +26,16 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
     :param retriever: Retriever used to retrieve other data
     :type retriever: MyCapytain.retrievers.prototypes.CitableTextServiceRetriever
     """
+
+    @property
+    def depth(self):
+        """ Depth of the current opbject
+
+        :return: Int representation of the depth based on URN information
+        :rtype: int
+        """
+        if self.urn.reference:
+            return len(self.urn.reference)
 
     def __init__(self, retriever=None, *args, **kwargs):
         super(__SharedMethod__, self).__init__(*args, **kwargs)
@@ -74,28 +85,29 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         xml = xmlparser(xml)
         self.__parse_request__(xml.xpath("//ti:request", namespaces=NS)[0])
 
-        return [ref for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=NS)]
+        return [ref.split(":")[-1] for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=NS)]
 
-    def getPassage(self, reference=None):
+    def getTextualNode(self, subreference=None):
         """ Retrieve a passage and store it in the object
 
-        :param reference: Reference of the passage
-        :type reference: Reference, or URN, or str or list(str)
+        :param subreference: Reference of the passage (Note : if given a list, this should be a list of string that \
+        compose the reference)
+        :type subreference: Union[Reference, URN, str, list]
         :rtype: Passage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
         """
-        if isinstance(reference, URN):
-            urn = str(reference)
-        elif isinstance(reference, Reference):
-            urn = "{0}:{1}".format(self.urn, str(reference))
-        elif isinstance(reference, str):
-            if ":" in reference:
-                urn = reference
+        if isinstance(subreference, URN):
+            urn = str(subreference)
+        elif isinstance(subreference, Reference):
+            urn = "{0}:{1}".format(self.urn, str(subreference))
+        elif isinstance(subreference, str):
+            if ":" in subreference:
+                urn = subreference
             else:
-                urn = "{0}:{1}".format(self.urn, reference)
-        elif isinstance(reference, list):
-            urn = "{0}:{1}".format(self.urn, ".".join(reference))
+                urn = "{0}:{1}".format(self.urn.upTo(URN.NO_PASSAGE), subreference)
+        elif isinstance(subreference, list):
+            urn = "{0}:{1}".format(self.urn, ".".join(subreference))
         else:
             urn = str(self.urn)
 
@@ -104,20 +116,20 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         self.__parse_request__(response.xpath("//ti:request", namespaces=NS)[0])
         return Passage(urn=urn, resource=response, retriever=self.retriever)
 
-    def getReffs(self, level=1, reference=None):
+    def getReffs(self, level=1, subreference=None):
         """ Reference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param passage: Subreference (optional)
-        :type passage: Reference
+        :param subreference: Subreference (optional)
+        :type subreference: Reference
         :rtype: [text_type]
         :returns: List of levels
         """
-        if hasattr(self, "__depth__"):
-            level = level + self.depth
+        if self.depth is not None:
+            level += self.depth
 
-        return self.getValidReff(level, reference)
+        return self.getValidReff(level, subreference)
 
     def getPassagePlus(self, reference=None):
         """ Retrieve a passage and informations around it and store it in the object
@@ -264,7 +276,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         if len(urn) > 0:
             urn = str(urn[0])
-            return urn
+            return urn.split(":")[-1]
 
     @staticmethod
     def prevnext(resource):
@@ -286,10 +298,10 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
             _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=NS, smart_strings=False)
 
             if len(_next_xpath):
-                _next = _next_xpath[0]
+                _next = _next_xpath[0].split(":")[-1]
 
             if len(_prev_xpath):
-                _prev = _prev_xpath[0]
+                _prev = _prev_xpath[0].split(":")[-1]
 
         return _prev, _next
 
@@ -345,7 +357,7 @@ class Text(__SharedMethod__, prototypes.CitableText):
     def siblingsId(self):
         raise NotImplementedError
 
-    def export(self, output=None, exclude=None):
+    def export(self, output=Mimetypes.PLAINTEXT, exclude=None, **kwargs):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
@@ -356,7 +368,7 @@ class Text(__SharedMethod__, prototypes.CitableText):
         :type exclude: [str]
         :return: Object using a different representation
         """
-        return self.getPassage().export(output, exclude)
+        return self.getTextualNode().export(output, exclude)
 
 
 class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
@@ -416,7 +428,7 @@ class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
 
         self.__prev__, self.__next__ = __SharedMethod__.prevnext(self.response)
 
-        if self.citation.isEmpty():
+        if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=NS)):
             self.citation = CTSCollection.Citation.ingest(
                 self.response,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"

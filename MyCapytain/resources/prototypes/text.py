@@ -10,11 +10,11 @@
 from six import text_type
 from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import Mimetypes
+from MyCapytain.common.constants import Mimetypes, Exportable
 from MyCapytain.resources.prototypes.metadata import Collection
 
 
-class TextualElement(object):
+class TextualElement(Exportable):
     """ Node representing a text passage.
 
     :param identifier: Identifier of the text
@@ -93,31 +93,18 @@ class TextualElement(object):
         else:
             raise TypeError(".metadata should be an instance of Metadata")
 
-    def default_export(self, output=Mimetypes.JSON.DTS, exclude=None):
-        """ Export the textual node item in the Mimetype required
-
-        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
-        :type output: str
-        :param exclude: Informations to exclude. Specific to implementations
-        :type exclude: [str]
-        :return: Object using a different representation
-        """
-        raise NotImplementedError
-
     def export(self, output=None, exclude=None, **kwargs):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
 
-        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
+        :param output: Mimetype to export to (Uses MyCapytain.common.constants.Mimetypes)
         :type output: str
-        :param exclude: Informations to exclude. Specific to implementations
+        :param exclude: Information to exclude. Specific to implementations
         :type exclude: [str]
         :return: Object using a different representation
         """
-        raise NotImplementedError(
-            "Mimetype {} has not been implemented for this resource".format(output or "(No Mimetype)")
-        )
+        return Exportable.export(self, output, exclude=exclude, **kwargs)
 
 
 class TextualNode(TextualElement, NodeId):
@@ -185,11 +172,11 @@ class TextualGraph(TextualNode):
     def __init__(self, identifier=None, **kwargs):
         super(TextualGraph, self).__init__(identifier=identifier, **kwargs)
 
-    def getPassage(self, reference):
+    def getTextualNode(self, subreference):
         """ Retrieve a passage and store it in the object
 
-        :param reference: Reference of the passage to retrieve
-        :type reference: str or Node or Reference
+        :param subreference: Reference of the passage to retrieve
+        :type subreference: str or Node or Reference
         :rtype: TextualNode
         :returns: Object representing the passage
 
@@ -198,7 +185,7 @@ class TextualGraph(TextualNode):
 
         raise NotImplementedError()
 
-    def getReffs(self, level=1, reference=None):
+    def getReffs(self, level=1, subreference=None):
         """ Reference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
@@ -243,7 +230,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.prevId is not None:
-            return self.getPassage(self.prevId)
+            return self.getTextualNode(self.prevId)
 
     @property
     def next(self):
@@ -252,7 +239,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.nextId is not None:
-            return self.getPassage(self.nextId)
+            return self.getTextualNode(self.nextId)
 
     @property
     def children(self):
@@ -261,7 +248,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: iterator(Passage)
         """
         for ID in self.childIds:
-            yield self.getPassage(ID)
+            yield self.getTextualNode(ID)
 
     @property
     def parent(self):
@@ -269,7 +256,7 @@ class InteractiveTextualNode(TextualGraph):
 
         :rtype: Passage
         """
-        return self.getPassage(self.parentId)
+        return self.getTextualNode(self.parentId)
 
     @property
     def first(self):
@@ -278,7 +265,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.firstId is not None:
-            return self.getPassage(self.firstId)
+            return self.getTextualNode(self.firstId)
 
     @property
     def last(self):
@@ -287,7 +274,7 @@ class InteractiveTextualNode(TextualGraph):
         :rtype: Passage
         """
         if self.lastId is not None:
-            return self.getPassage(self.lastId)
+            return self.getTextualNode(self.lastId)
 
     @property
     def childIds(self):
@@ -430,7 +417,6 @@ class Passage(CTSNode):
     @property
     def reference(self):
         return self.urn.reference
-
 
 
 class CitableText(CTSNode):

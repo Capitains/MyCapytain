@@ -9,8 +9,9 @@ Shared elements for TEI Citation
 from __future__ import unicode_literals
 from six import text_type
 
-from MyCapytain.common.utils import NS, Mimetypes, normalize, xmlparser, \
+from MyCapytain.common.utils import normalize, xmlparser, \
     nested_set, nested_ordered_dictionary
+from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 
 from lxml.etree import tostring
@@ -21,7 +22,12 @@ class TEIResource(InteractiveTextualNode):
 
     :param resource: XML Resource that needs to be parsed into a Passage/Text
     :type resource: Union[str,_Element]
+    :cvar EXPORT_TO: List of exportable supported formats
+    :cvar DEFAULT_EXPORT: Default export (Plain/Text)
     """
+    EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT]
+    DEFAULT_EXPORT = Mimetypes.PLAINTEXT
+
     def __init__(self, resource, **kwargs):
         super(TEIResource, self).__init__(**kwargs)
         self.resource = xmlparser(resource)
@@ -34,7 +40,7 @@ class TEIResource(InteractiveTextualNode):
         """
         return self.export(output=Mimetypes.XML.Std)
 
-    def export(self, output=Mimetypes.PLAINTEXT, exclude=None, _preformatted=False):
+    def __export__(self, output=Mimetypes.PLAINTEXT, exclude=None, _preformatted=False):
         """ Text content of the passage
 
         :param output: Mimetype (From MyCapytian.common.utils.Mimetypes) to output
@@ -42,7 +48,7 @@ class TEIResource(InteractiveTextualNode):
         :param exclude: Remove some nodes from text
         :type exclude: list
         :param _preformatted: This parameter is used when export loops on itself
-        :type _preformatted: booln
+        :type _preformatted: boolean
         :rtype: basestring
         :returns: Text of the xml node
 
@@ -80,7 +86,7 @@ class TEIResource(InteractiveTextualNode):
             text = nested_ordered_dictionary()
             for reff in reffs:
                 _r = reff.split(".")
-                nested_set(text, _r, self.getPassage(_r, simple=True).export(
+                nested_set(text, _r, self.getTextualNode(_r).export(
                     Mimetypes.PLAINTEXT,
                     exclude=exclude,
                     _preformatted=True

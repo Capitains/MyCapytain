@@ -11,8 +11,8 @@ from six import text_type
 
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.common.reference import URN
-from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import RDF_PREFIX
+from MyCapytain.common.metadata import Metadata, Metadatum
+from MyCapytain.common.constants import NAMESPACES, RDF_PREFIX, Mimetypes
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
 from copy import copy, deepcopy
@@ -32,7 +32,7 @@ class CTSCollection(Collection):
         super(CTSCollection, self).__init__()
 
         if hasattr(type(self), "CTSMODEL"):
-            self.properties[RDF_PREFIX["cts"]+"model"] = RDF_PREFIX["cts"] + type(self).CTSMODEL
+            self.properties[RDF_PREFIX["ti"]+"model"] = RDF_PREFIX["ti"] + type(self).CTSMODEL
 
         self.resource = None
         if resource is not None:
@@ -165,7 +165,7 @@ class Text(CTSCollection):
         :return: CTS Ontology Edition or Translation object
         :rtype: str
         """
-        return RDF_PREFIX["cts"] + self.subtype
+        return RDF_PREFIX["ti"] + self.subtype
 
     def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
         super(Text, self).__init__()
@@ -177,7 +177,10 @@ class Text(CTSCollection):
         self.parents = list()
         self.subtype = subtype
         self.validate = None
-        self.metadata = Metadata(keys=["label", "description", "namespaceMapping"])
+        self.metadata = Metadata()
+        self.metadata["label"] = Metadatum(name="label", namespace=NAMESPACES.CTS)
+        self.metadata["description"] = Metadatum(name="description", namespace=NAMESPACES.CTS)
+        self.metadata["namespaceMapping"] = Metadatum(name="namespaceMapping", namespace=NAMESPACES.CTS)
 
         if urn is not None:
             self.urn = URN(urn)
@@ -264,7 +267,7 @@ class Work(CTSCollection):
     """
 
     DC_TITLE_KEY = "title"
-    TYPE_URI = RDF_PREFIX["cts"] + "Work"
+    TYPE_URI = RDF_PREFIX["ti"] + "Work"
 
     def __init__(self, resource=None, urn=None, parents=None):
         super(Work, self).__init__()
@@ -273,7 +276,8 @@ class Work(CTSCollection):
         self.urn = None
         self.texts = defaultdict(Text)
         self.parents = list()
-        self.metadata = Metadata(keys=["title"])
+        self.metadata = Metadata()
+        self.metadata["title"] = Metadatum(name="title", namespace=NAMESPACES.CTS)
 
         if urn is not None:
             self.urn = URN(urn)
@@ -356,7 +360,7 @@ class TextGroup(CTSCollection):
     :type parents: Tuple.<TextInventory>
     """
     DC_TITLE_KEY = "groupname"
-    TYPE_URI = RDF_PREFIX["cts"] + "TextGroup"
+    TYPE_URI = RDF_PREFIX["ti"] + "TextGroup"
 
     @property
     def members(self):
@@ -368,7 +372,8 @@ class TextGroup(CTSCollection):
         self.urn = None
         self.works = defaultdict(Work)
         self.parents = list()
-        self.metadata = Metadata(keys=["groupname"])
+        self.metadata = Metadata()
+        self.metadata["groupname"] = Metadatum(name="groupname", namespace=NAMESPACES.CTS)
 
         if urn is not None:
             self.urn = URN(urn)
@@ -428,7 +433,7 @@ class TextInventory(CTSCollection):
     :param id: Identifier of the TextInventory
     :type id: str
     """
-    TYPE_URI = RDF_PREFIX["cts"] + "TextInventory"
+    TYPE_URI = RDF_PREFIX["ti"] + "TextInventory"
 
     @property
     def members(self):

@@ -1,6 +1,7 @@
 from MyCapytain.resolvers.cts.api import HttpCTSResolver
 from MyCapytain.retrievers.cts5 import CTS
-from MyCapytain.common.utils import xmlparser, Mimetypes, NS
+from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.common.metadata import Metadatum
 from MyCapytain.resources.prototypes.text import Passage
 from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Text
@@ -28,6 +29,8 @@ with open("tests/testing_data/cts/getCapabilities.xml") as f:
     GET_CAPABILITIES = xmlparser(f)
 with open("tests/testing_data/cts/getCapabilities1294002.xml") as f:
     GET_CAPABILITIES_FILTERED = xmlparser(f)
+with open("tests/testing_data/cts/getPassageOtherTest.xml") as f:
+    GET_PASSAGE_CITATION_FAILURE = f.read()
 
 
 class TestHttpCTSResolver(TestCase):
@@ -41,7 +44,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_full(self):
         """ Test that we can get a full text """
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassage.assert_called_with(
@@ -60,7 +63,7 @@ class TestHttpCTSResolver(TestCase):
             level=1
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -77,7 +80,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_subreference(self):
         """ Test that we can get a subreference text passage"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassage.assert_called_with(
@@ -93,10 +96,10 @@ class TestHttpCTSResolver(TestCase):
         # We check the passage is able to perform further requests and is well instantiated
         self.resolver.endpoint.getValidReff.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
-            level=1
+            level=3
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -113,7 +116,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_full_metadata(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", metadata=True)
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", metadata=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -155,7 +158,7 @@ class TestHttpCTSResolver(TestCase):
             level=1
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -172,7 +175,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", metadata=True)
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -183,11 +186,11 @@ class TestHttpCTSResolver(TestCase):
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            passage.prevId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            passage.prevId, "1.pr",
             "Previous Passage ID should be parsed"
         )
         self.assertEqual(
-            passage.nextId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            passage.nextId, "1.2",
             "Next Passage ID should be parsed"
         )
         children = list(passage.getReffs())
@@ -204,10 +207,10 @@ class TestHttpCTSResolver(TestCase):
         # We check the passage is able to perform further requests and is well instantiated
         self.resolver.endpoint.getValidReff.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
-            level=1
+            level=3
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -224,7 +227,7 @@ class TestHttpCTSResolver(TestCase):
 
     def test_getPassage_metadata_prevnext(self):
         """ Test that we can get a full text with its metadata"""
-        passage = self.resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", metadata=True, prevnext=True)
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True, prevnext=True)
 
         # We check we made a reroute to GetPassage request
         self.resolver.endpoint.getPassagePlus.assert_called_with(
@@ -258,11 +261,11 @@ class TestHttpCTSResolver(TestCase):
             "CTS API Remote HTTP Response should be correctly parsed"
         )
         self.assertEqual(
-            passage.prevId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            passage.prevId, "1.pr",
             "Previous Passage ID should be parsed"
         )
         self.assertEqual(
-            passage.nextId, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            passage.nextId, "1.2",
             "Next Passage ID should be parsed"
         )
         children = list(passage.getReffs())
@@ -279,10 +282,10 @@ class TestHttpCTSResolver(TestCase):
         # We check the passage is able to perform further requests and is well instantiated
         self.resolver.endpoint.getValidReff.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
-            level=1
+            level=3
         )
         self.assertEqual(
-            children[0], 'urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1',
+            children[0], '1.1.1',
             "Resource should be string identifiers"
         )
 
@@ -322,9 +325,7 @@ class TestHttpCTSResolver(TestCase):
             "There should be 14 editions + 1 translations in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(
-                output=Mimetypes.PYTHON.ETREE
-            ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -340,11 +341,11 @@ class TestHttpCTSResolver(TestCase):
         self.resolver.endpoint.getCapabilities.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002")
         self.assertIsInstance(
             metadata, Collection,
-            "Resolver should return a collection object"
+            "Resolver should return a collection object (specifically here a Work)"
         )
         self.assertIsInstance(
             metadata.members[0], Text,
-            "Members of Inventory should be TextGroups"
+            "Members of Work should be TextGroups"
         )
         self.assertEqual(
             len(metadata.descendants), 2,
@@ -359,9 +360,7 @@ class TestHttpCTSResolver(TestCase):
             "There should be 1 edition + 1 translation in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(
-                output=Mimetypes.PYTHON.ETREE
-            ).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -372,11 +371,11 @@ class TestHttpCTSResolver(TestCase):
         self.assertCountEqual(
             [
                 x["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]
-                for x in metadata.export(output=Mimetypes.JSON.DTS.Std)\
+                for x in metadata.export(output=Mimetypes.JSON.DTS.Std) \
                     ["http://w3id.org/dts-ontology/capabilities"]\
                     ["http://w3id.org/dts-ontology/navigation"]\
                     ["http://w3id.org/dts-ontology/parents"]
-             ],
+                ],
             ["http://chs.harvard.edu/xmlns/cts/TextGroup", "http://chs.harvard.edu/xmlns/cts/TextInventory"],
             "There should be one member in DTS JSON"
         )
@@ -390,11 +389,11 @@ class TestHttpCTSResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertEqual(
-            previous, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr",
+            previous, "1.pr",
             "Previous should be well computed"
         )
         self.assertEqual(
-            nextious, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2",
+            nextious, "1.2",
             "Previous should be well computed"
         )
 
@@ -412,7 +411,7 @@ class TestHttpCTSResolver(TestCase):
             "Previous Should not exist"
         )
         self.assertEqual(
-            nextious, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            nextious, "1.1",
             "Next should be well computed"
         )
 
@@ -426,7 +425,7 @@ class TestHttpCTSResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.6"
         )
         self.assertEqual(
-            previous, "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.5",
+            previous, "1.1.5",
             "Previous should be well computed"
         )
         self.assertEqual(
@@ -446,7 +445,7 @@ class TestHttpCTSResolver(TestCase):
             "There should be 9462 references"
         )
         self.assertEqual(
-            reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr.1"
+            reffs[0], "1.pr.1"
         )
         self.resolver.endpoint.getValidReff = MagicMock(return_value=GET_VALID_REFF_FULL)
         self.resolver.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", level=2)
@@ -457,12 +456,28 @@ class TestHttpCTSResolver(TestCase):
         self.resolver.endpoint.getValidReff = MagicMock(return_value=GET_VALID_REFF)
         reffs = self.resolver.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=1)
         self.resolver.endpoint.getValidReff.assert_called_with(
-            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=1
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1", level=3
         )
         self.assertEqual(
             len(reffs), 6,
             "There should be 6 references"
         )
         self.assertEqual(
-            reffs[0], "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1.1"
+            reffs[0], "1.1.1"
+        )
+
+    def test_citation_failure(self):
+        """ Example for Resolver failed : some response have an issue with not available Citations ?
+        """
+        retriever = CTS("http://cts.dh.uni-leipzig.de/api/cts/")
+        retriever.getPassage = MagicMock(return_value=GET_PASSAGE_CITATION_FAILURE)
+        resolver = HttpCTSResolver(retriever)
+        # We require a passage : passage is now a Passage object
+        passage = resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+        # We need an export as plaintext
+        self.assertEqual(
+            passage.export(output=Mimetypes.PLAINTEXT),
+            "I Hic est quem legis ille, quem requiris, Toto notus in orbe Martialis Argutis epigrammaton libellis: \n"\
+                " Cui, lector studiose, quod dedisti Viventi decus atque sentienti, Rari post cineres habent poetae. ",
+            "Parsing should be successful"
         )

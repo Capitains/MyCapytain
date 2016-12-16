@@ -1,5 +1,58 @@
-MyCapytain's Objects Explained
-==============================
+MyCapytain's Main Objects Explained
+===================================
+
+Retrievers
+##########
+
+Description
+***********
+
+Retrievers are classes that help build requests to API and return standardized responses from them. There is no real \
+perfect prototypes. The only requirements for a Retriever is that its query function should returns string only. It is \
+not the role of the retrievers to parse response. It is merely to facilitate the communication to remote API most of \
+the time.
+
+Recommendations
+***************
+
+For Textual API, it is recommended to implement the following requests
+
+- getTextualNode(textId[str], subreference[str], prevnext[bool], metadata[bool])
+- getMetadata(objectId[str], \*\*kwargs)
+- getSiblings(textId[str], subreference[str])
+- getReffs(textId[str], subreference[str], depth[int])
+
+
+Example of implementation : CTS 5
+*********************************
+
+.. code-block:: python
+    :linenos:
+    :caption: Retrieving a CTS API Reply
+
+    from MyCapytain.retrievers.cts5 import CTS
+
+    # We set up a retriever which communicates with an API available in Leipzig
+    retriever = CTS("http://cts.dh.uni-leipzig.de/api/cts/")
+    # We require a passage : passage is now a Passage object
+    passage = retriever.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
+    # Passage is now equal to the string content of http://cts.dh.uni-leipzig.de/api/cts/?request=GetPassage&urn=urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1
+    print(passage)
+
+
+Text and Passages
+#################
+
+Needs to be written
+
+
+Collection
+##########
+
+CTS Collections
+***************
+
+Needs to be written
 
 Resolvers
 #########
@@ -12,10 +65,10 @@ can seamlessly switch a resolver for another and not changing your code, join to
 The principle behind resolver is to provide native python object based on API-Like methods which are restricted to \
 four simple commands :
 
-- getPassage
-- getMetadata
-- getSiblings
-- getReffs
+- getTextualNode(textId[str], subreference[str], prevnext[bool], metadata[bool]) -> Passage
+- getMetadata(objectId[str], \*\*kwargs) -> Collection
+- getSiblings(textId[str], subreference[str]) -> tuple([str, str])
+- getReffs(textId[str], subreference[str], depth[int]) -> list([str])
 
 These function will always return objects derived from the major classes, *i.e.* Passage and Collection for the two \
 firsts and simple collections of strings for the two others. Resolvers fills the hole between these base objects \
@@ -50,8 +103,8 @@ standard type (CTS, DTS, Proprietary, etc.).
     :alt: Diagram of operations with resolvers : duplicated steps have been removed
 
 
-Trait
-*****
+Prototype
+*********
 
 .. autoclass:: MyCapytain.resolvers.prototypes.Resolver
     :members:
@@ -65,29 +118,29 @@ Example
 
     from MyCapytain.resolvers.cts.api import HttpCTSResolver
     from MyCapytain.retrievers.cts5 import CTS
-    from MyCapytain.common.utils import Mimetypes
+    from MyCapytain.common.utils import Mimetypes, NS
 
     # We set up a resolver which communicates with an API available in Leipzig
     resolver = HttpCTSResolver(CTS("http://cts.dh.uni-leipzig.de/api/cts/"))
     # We require a passage : passage is now a Passage object
-    passage = resolver.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
+    # This is an entry from the Smith Myth Dictionary
+    # The inner methods will resolve to the URI http://cts.dh.uni-leipzig.de/api/cts/?request=GetPassage&urn=urn:cts:pdlrefwk:viaf88890045.003.perseus-eng1:A.abaeus_1
+    # And parse it into interactive objects
+    passage = resolver.getTextualNode("urn:cts:pdlrefwk:viaf88890045.003.perseus-eng1", "A.abaeus_1")
     # We need an export as plaintext
     print(passage.export(
         output=Mimetypes.PLAINTEXT
     ))
     """
-        I
-        Hic est quem legis ille, quem requiris,
-        Toto notus in orbe Martialis
-        Argutis epigrammaton libellis:
-        Cui, lector studiose, quod dedisti
-        Viventi decus atque sentienti,
-        Rari post cineres habent poetae.
+        Abaeus ( Ἀβαῖος ), a surname of Apollo
+         derived from the town of Abae in Phocis, where the god had a rich temple. (Hesych. s. v.
+         Ἄβαι ; Hdt. 8.33 ; Paus. 10.35.1 , &c.) [ L.S ]
     """
+    # We want to find bibliographic information in the passage of this dictionary
     # We need an export as LXML ETREE object to perform XPath
     print(
         passage.export(
             output=Mimetypes.PYTHON.ETREE
-        ).xpath(".//tei:l[@n='1']/text()", namespaces=NS, magic_string=False)
+        ).xpath(".//tei:bibl/text()", namespaces=NS, magic_string=False)
     )
-    ["Hic est quem legis ille, quem requiris, "]
+    ["Hdt. 8.33", "Paus. 10.35.1"]

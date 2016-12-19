@@ -27,6 +27,8 @@ required one.
 Retrievers
 ##########
 
+:class:`MyCapytain.retrievers.prototypes.API`
+
 Description
 ***********
 
@@ -48,6 +50,8 @@ For Textual API, it is recommended to implement the following requests
 
 Example of implementation : CTS 5
 *********************************
+
+:class:`MyCapytain.retrievers.cts5.CTS`
 
 .. code-block:: python
     :linenos:
@@ -71,10 +75,44 @@ Text and Passages have been divided into a lot of different object
 Collection
 ##########
 
-CTS Collections
+Description
+***********
+
+Collections are the metadata containers object in MyCapytain. Unlike other object, they will never contain textual \
+content such as Texts and Passages but will in return help you browse through the catalog of one APIs collection and \
+identify manually or automatically texts that are of relevant interests to you.
+
+The main informations that you should be interested in are :
+- Collections are children from Exportable. As of 2.0.0, any collection can be exported to JSON DTS.
+- Collections are built on a hierarchy. They have children and descendants
+- Collections have identifiers and title (Main name of what the collection represents : if it's an author, it's her \
+name, a title for a book, a volume label for a specific edition, etc.)
+- Collections can inform the machine if it represents a readable object : if it is readable, it means that using its \
+identifier, you can query for passages or references on the same API.
+
+Main Properties
 ***************
 
-Needs to be written
+- Collection().id : Identifier of the object
+- Collection().title : Title of the object
+- Collection().readable : If True, means that the Collection().id can be used in GetReffs or GetTextualNode queries
+- Collection().members : Direct children of the object
+- Collection().descendants : Direct and Indirect children of the objects
+- Collection().readableDescendants : Descendants that have .readable as True
+- Collection().export() : Export Method
+- Collection().metadata : Metadata object that contain flat descriptive localized informations about the object.
+
+
+Implementation : CTS Collections
+********************************
+
+CTS Collections are divided in 4 kinds : TextInventory, TextGroup, Work, Text. Their specificity is that the hierarchy\
+of these objects are predefined and always follow the same order.
+
+
+.. image:: _static/images/Collections.svg
+    :target: _static/images/Collections.dia
+    :alt: Diagram of collections prototypes
 
 Resolvers
 #########

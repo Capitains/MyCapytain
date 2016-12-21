@@ -1,5 +1,5 @@
 from MyCapytain.retrievers.cts5 import CTS
-from MyCapytain.resources.collections.cts import TextInventory
+from MyCapytain.resources.collections.cts import TextInventory, Work
 from MyCapytain.common.constants import Mimetypes
 from pprint import pprint
 
@@ -24,6 +24,8 @@ parse the whole response.
 inventory = TextInventory(resource=response)
 # What we are gonna do is print the title of each descendant :
 for descendant in inventory.descendants:
+    # Metadatum resolve any non-existing language ("eng", "lat") to a default one
+    # Putting default is just making that clear
     print(descendant.title["default"])
 
 """
@@ -33,11 +35,12 @@ You should see in there things such as
 -   "de Ira, Moral essays Vol 2" (The Edition specific Title)
 
 We can now see other functions, such as the export to JSON DTS.
-CTS Collection have a uniquely feature built in : they allow for
+Collections have a unique feature built in : they allow for
 accessing an item using its key as if it were a dictionary :
 The identifier of a De Ira is urn:cts:latinLit:stoa0255.stoa0110
 """
 deIra = inventory["urn:cts:latinLit:stoa0255.stoa010"]
+assert isinstance(deIra, Work)
 pprint(deIra.export(output=Mimetypes.JSON.DTS.Std))
 # you should see a DTS representation of the work
 

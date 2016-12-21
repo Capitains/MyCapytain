@@ -57,15 +57,22 @@ class Collection(Exportable):
         """
         return self.__id__
 
+    def __getitem__(self, item):
+        """ Retrieve an item by its ID in the tree of a collection
+
+        :param item:
+        :return: Collection identified by the item
+        """
+        for obj in self.descendants + [self]:
+            if obj.id == item:
+                return obj
+        raise KeyError("%s is not part of this object" % item)
+
     @property
     def readable(self):
         """ Readable property should return elements where the element can be queried for getPassage / getReffs
         """
         return False
-
-    @id.setter
-    def id(self, value):
-        self.__id__ = value
 
     @property
     def members(self):

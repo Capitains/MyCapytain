@@ -222,12 +222,12 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         tg = TI["urn:cts:latinLit:phi1294"]
         wk = TI["urn:cts:latinLit:phi1294.phi002"]
         tx = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
-        self.assertEqual(tg[1], TI)
-        self.assertEqual(wk[1], tg)
-        self.assertEqual(wk[2], TI)
-        self.assertEqual(tx[1], wk)
-        self.assertEqual(tx[2], tg)
-        self.assertEqual(tx[3], TI)
+        self.assertEqual(tg.parents[0], TI)
+        self.assertEqual(wk.parents[0], tg)
+        self.assertEqual(wk.parents[1], TI)
+        self.assertEqual(tx.parents[0], wk)
+        self.assertEqual(tx.parents[1], tg)
+        self.assertEqual(tx.parents[2], TI)
 
     def test_translation(self):
         TI = TextInventory(resource=self.getCapabilities, name="TestInv")
@@ -327,19 +327,19 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertXmlEquivalentOutputs(*compareSTR(str(ti), t))
 
         # Test individual :
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294"]), tg))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002"]), wk))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"]), ed))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294"]), tg))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294.phi002"]), wk))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
+        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]), ed))
 
         # Test export :
         self.assertXmlEquivalentOutputs(*compareXML(ti.export(), t))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294"].export(), tg))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002"].export(), wk))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
-        self.assertEqual(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"].lang, "lat")
-        self.assertEqual(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2"].lang, "eng")
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294"].export(), tg))
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294.phi002"].export(), wk))
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
+        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
+        self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].lang, "lat")
+        self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].lang, "eng")
 
     def test_export_to_text(self):
         """ Test export to Text object """
@@ -358,7 +358,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def test_partial_str(self):
         ti = TextInventory(resource=self.t, name="annotsrc")
 
-        e = deepcopy(ti["urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
+        e = deepcopy(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
         e.urn = None
         self.assertXmlEquivalentOutputs(
             *compareSTR(
@@ -378,7 +378,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             )
         )
 
-        wk = deepcopy(ti["urn='urn:cts:latinLit:phi1294.phi002"])
+        wk = deepcopy(ti["urn:cts:latinLit:phi1294.phi002"])
         wk.urn = None
         self.assertXmlEquivalentOutputs(
             *compareSTR(
@@ -398,7 +398,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             )
         )
 
-        tg = deepcopy(ti["urn='urn:cts:latinLit:phi1294"])
+        tg = deepcopy(ti["urn:cts:latinLit:phi1294"])
         tg.urn = None
         self.assertXmlEquivalentOutputs(
             *compareSTR(

@@ -106,13 +106,29 @@ Main Properties
 Implementation : CTS Collections
 ********************************
 
+.. note:: For a recap on what Textgroup means or any CTS jargon, go to http://capitains.github.io/pages/vocabulary
+
 CTS Collections are divided in 4 kinds : TextInventory, TextGroup, Work, Text. Their specificity is that the hierarchy\
-of these objects are predefined and always follow the same order.
+of these objects are predefined and always follow the same order. They implement a special export (\
+:code:`MyCapytain.common.constants.Mimetypes.XML.CTS`) which basically exports to the XML Text Inventory Format\
+that one would find making a GetCapabilities request.
+
+CapiTainS CTS Collections implement a parents property which represent a list of parents where .parents' order is equal\
+to :code:`Text.parents = [Work(), TextGroup(), TextInventory()]`).
+
+Their finale implementation accepts to parse resources through the :code:`resource=` named argument.
 
 
 .. image:: _static/images/Collections.svg
     :target: _static/images/Collections.dia
     :alt: Diagram of collections prototypes
+
+Example
+*******
+
+.. literalinclude:: Collections.py
+   :language: python
+   :linenos:
 
 Resolvers
 #########

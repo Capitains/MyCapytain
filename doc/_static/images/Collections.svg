@@ -40,11 +40,11 @@ Work</text>
 <rect x="37.000" y="22.000" width="12.050" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
 <rect x="37.000" y="22.000" width="12.050" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
 <text x="43.025" y="22.950"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
-Edition</text>
+Text</text>
 <rect x="37.000" y="23.400" width="12.050" height="4.200" fill="#FFFFFF" stroke="none" stroke-width="0"/>
 <rect x="37.000" y="23.400" width="12.050" height="4.200" fill="none" stroke="#000000" stroke-width="0.100" />
 <text x="37.150" y="24.100"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
-+subtype = Edition,Translation</text>
++subtype = edition,translation</text>
 <text x="37.150" y="24.900"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
 +label</text>
 <text x="37.150" y="25.700"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">

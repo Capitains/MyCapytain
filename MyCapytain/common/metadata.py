@@ -104,7 +104,7 @@ class Metadatum(object):
         if isinstance(key, int):
             items = list(self.children.keys())
             if key + 1 > len(items):
-                raise KeyError()
+                raise KeyError("Unknown key %s" % key)
             else:
                 key = items[key]
         elif isinstance(key, tuple):
@@ -112,7 +112,7 @@ class Metadatum(object):
 
         if key not in self.children:
             if self.default is None:
-                raise KeyError()
+                raise KeyError("Unknown key %s" % key)
             else:
                 return self.children[self.default]
         else:
@@ -186,10 +186,8 @@ class Metadatum(object):
             >>> for key, value in a:
             >>>     print(key, value) # Print ("lat", "Amores") and then ("fre", "Les Amours")
         """
-        i = 0
         for key in self.children:
             yield (key, self.children[key])
-            i += 1
 
     def __len__(self):
         """ Get the length of the current Metadatum object

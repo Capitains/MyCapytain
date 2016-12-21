@@ -156,7 +156,7 @@ class Text(CTSCollection):
     :type subtype: str
     """
 
-    DC_TITLE = "label"
+    DC_TITLE_KEY = "label"
 
     @property
     def TEXT_URI(self):

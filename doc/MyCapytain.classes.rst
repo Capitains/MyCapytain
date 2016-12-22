@@ -70,16 +70,12 @@ Hierarchy
 The generic idea of both Text and Passage's classes is that they inherit from a longer trail of text bearing object \
 that complexified over different features. The basic is
 
-- *TextualElement* is an object which can bear Metadata and Collection information. It has a .text property \
-and is exportable
-- *TextualNode* inherits from NodeId and unlike TextualElement, TextualNode is part of a graph of CitableObject. It bears\
-informations about its siblings, parents, children.
+- *TextualElement* is an object which can bear Metadata and Collection information. It has a .text property and is exportable
+- *TextualNode* inherits from NodeId and unlike TextualElement, TextualNode is part of a graph of CitableObject. It bears informations about its siblings, parents, children.
 - *TextualGraph* is a bit interactive : you can query for children nodes and get descendant references of the object.
-- *InteractiveTextualNode* is completely interative . You can browse the graph by accessing the :code:`.next` property\
-for example : it should then return an InteractiveTextualNode as well
+- *InteractiveTextualNode* is completely interative . You can browse the graph by accessing the :code:`.next` property for example : it should then return an InteractiveTextualNode as well
 - *CTSNode* has two unique methods more as well as a :code:`urn` property.
-- From *CTSNode* we find *CitableText* and *Passage*, which represents complete and portion of a Text. The main \
-difference is that CitableText has no parents, no siblings.
+- From *CTSNode* we find *CitableText* and *Passage*, which represents complete and portion of a Text. The main difference is that CitableText has no parents, no siblings.
 
 
 .. figure:: _static/pyreverse/classes_MyCapytain_texts.svg
@@ -149,12 +145,11 @@ content such as Texts and Passages but will in return help you browse through th
 identify manually or automatically texts that are of relevant interests to you.
 
 The main informations that you should be interested in are :
+
 - Collections are children from Exportable. As of 2.0.0, any collection can be exported to JSON DTS.
 - Collections are built on a hierarchy. They have children and descendants
-- Collections have identifiers and title (Main name of what the collection represents : if it's an author, it's her \
-name, a title for a book, a volume label for a specific edition, etc.)
-- Collections can inform the machine if it represents a readable object : if it is readable, it means that using its \
-identifier, you can query for passages or references on the same API.
+- Collections have identifiers and title (Main name of what the collection represents : if it's an author, it's her name, a title for a book, a volume label for a specific edition, etc.)
+- Collections can inform the machine if it represents a readable object : if it is readable, it means that using its identifier, you can query for passages or references on the same API.
 
 Main Properties
 ***************

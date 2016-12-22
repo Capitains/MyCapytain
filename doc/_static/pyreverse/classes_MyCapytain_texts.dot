@@ -1,0 +1,26 @@
+digraph "classes_MyCapytain_texts" {
+charset="utf-8"
+rankdir=BT
+"0" [label="CTSNode", shape="record"];
+"1" [label="CitableText", shape="record"];
+"2" [label="Collection", shape="record"];
+"3" [label="InteractiveTextualNode", shape="record"];
+"4" [label="Metadata", shape="record"];
+"5" [label="Passage", shape="record"];
+"6" [label="TextualElement", shape="record"];
+"7" [label="TextualGraph", shape="record"];
+"8" [label="TextualNode", shape="record"];
+"9" [label="URN", shape="record"];
+"10" [label="defaultdict", shape="record"];
+"0" -> "3" [arrowhead="empty", arrowtail="none"];
+"1" -> "0" [arrowhead="empty", arrowtail="none"];
+"3" -> "7" [arrowhead="empty", arrowtail="none"];
+"5" -> "0" [arrowhead="empty", arrowtail="none"];
+"7" -> "8" [arrowhead="empty", arrowtail="none"];
+"8" -> "6" [arrowhead="empty", arrowtail="none"];
+"2" -> "6" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="__about__", style="solid"];
+"4" -> "2" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="metadata", style="solid"];
+"9" -> "0" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="__urn__", style="solid"];
+"10" -> "4" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="metadata", style="solid"];
+"10" -> "4" [arrowhead="diamond", arrowtail="none", fontcolor="green", label="metadata", style="solid"];
+}

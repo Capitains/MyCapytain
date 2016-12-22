@@ -21,3 +21,8 @@ HookTest
 
 `HookTest <https://github.com/Capitains/Hook/>`_ is a library and command line tools for checking resources against the Capitains Guidelines
 You'll find uses mainly in `units.py <https://github.com/Capitains/HookTest/blob/master/HookTest/units.py>`_
+
+CLTK Corpora Converter
+**********************
+
+`Capitains Corpora Converter <https://github.com/Capitains/Hook/>`_ Converts CapiTainS-based Repository ( http://capitains.github.io ) to JSON for CLTK

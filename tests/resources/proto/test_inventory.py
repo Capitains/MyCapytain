@@ -11,8 +11,16 @@ from MyCapytain.common.reference import URN
 
 
 class Resource(cts.CTSCollection):
+    def __init__(self, *args, **kwargs):
+        super(Resource, self).__init__(*args, **kwargs)
+        self.urn = None
+
     def parse(self, resource):
         return resource
+
+    @property
+    def id(self):
+        return str(self.urn)
 
 
 class TIV(cts.TextInventory):
@@ -28,8 +36,8 @@ class TestRepoProto(unittest.TestCase):
 
     def test_implementation(self):
         a = Resource(resource="hello")
-        self.assertEqual(a[0], a)
-        self.assertIsNone(a[3.4])
+        with self.assertRaises(KeyError):
+            self.assertEqual(a[0], a)
 
     def test_equality(self):
         a = Resource(resource="hello")
@@ -40,7 +48,7 @@ class TestRepoProto(unittest.TestCase):
         self.assertNotEqual(a, b)
         self.assertNotEqual(a, 5)
         self.assertEqual((a == "i"), False)
-        self.assertNotEqual(c, d)
+        self.assertEqual(c, d)
         c.urn = "hello"
         d.urn = c.urn 
         self.assertEqual(c, d)
@@ -56,12 +64,12 @@ class TestRepoProto(unittest.TestCase):
 
         b = TIV(resource="hello")
 
-        with six.assertRaisesRegex(self, ValueError, "Not valid urn"):
+        with six.assertRaisesRegex(self, KeyError, "urn:cts:greekLit is not part of this object"):
             a["urn:cts:greekLit"]
 
         self.assertEqual(a["urn:cts:greekLit:tg"], a)
 
-        with six.assertRaisesRegex(self, ValueError, "Unrecognized urn at URN Textgroup"):
+        with six.assertRaisesRegex(self, KeyError, "urn:cts:greekLit:tg2 is not part of this object"):
             b["urn:cts:greekLit:tg2"]
         
     def test_edit_trans(self):

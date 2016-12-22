@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by diasvg.py -->
+<svg width="42.150cm" height="20.100cm" viewBox="6.950 7.950 49.100 28.050"
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="7.000" y="22.000" width="6.732" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="7.000" y="22.000" width="6.732" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="10.366" y="22.950"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+TextInventory</text>
+<rect x="7.000" y="23.400" width="6.732" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="7.000" y="23.400" width="6.732" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="7.000" y="23.800" width="6.732" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="7.000" y="23.800" width="6.732" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="18.300" y="22.000" width="7.430" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="18.300" y="22.000" width="7.430" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="22.015" y="22.950"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+TextGroup</text>
+<rect x="18.300" y="23.400" width="7.430" height="2.600" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="18.300" y="23.400" width="7.430" height="2.600" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="18.450" y="24.100"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++groupname</text>
+<text x="18.450" y="24.900"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++title = groupname</text>
+<text x="18.450" y="25.700"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++parents</text>
+<rect x="18.300" y="26.000" width="7.430" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="18.300" y="26.000" width="7.430" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="29.400" y="22.000" width="3.580" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="29.400" y="22.000" width="3.580" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="31.190" y="22.950"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+Work</text>
+<rect x="29.400" y="23.400" width="3.580" height="1.800" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="29.400" y="23.400" width="3.580" height="1.800" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="29.550" y="24.100"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++title</text>
+<text x="29.550" y="24.900"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++parents</text>
+<rect x="29.400" y="25.200" width="3.580" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="29.400" y="25.200" width="3.580" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="37.000" y="22.000" width="12.050" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="37.000" y="22.000" width="12.050" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="43.025" y="22.950"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+Text</text>
+<rect x="37.000" y="23.400" width="12.050" height="4.200" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="37.000" y="23.400" width="12.050" height="4.200" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="37.150" y="24.100"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++subtype = edition,translation</text>
+<text x="37.150" y="24.900"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++label</text>
+<text x="37.150" y="25.700"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++description</text>
+<text x="37.150" y="26.500"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++title = label</text>
+<text x="37.150" y="27.300"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++parents</text>
+<rect x="37.000" y="27.600" width="12.050" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="37.000" y="27.600" width="12.050" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="14.991,22.700 14.482,22.700 18.250,22.700 18.300,22.700 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="13.732,22.700 14.432,22.460 15.132,22.700 14.432,22.940 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="13.732,22.700 14.432,22.460 15.132,22.700 14.432,22.940 "/>
+<text x="15.332" y="22.550"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+*</text>
+<text x="18.100" y="22.550"  fill="#000000" text-anchor="end" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+*</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="26.989,22.700 26.480,22.700 29.350,22.700 29.400,22.700 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="25.730,22.700 26.430,22.460 27.130,22.700 26.430,22.940 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="25.730,22.700 26.430,22.460 27.130,22.700 26.430,22.940 "/>
+<text x="27.330" y="22.550"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<text x="29.200" y="22.550"  fill="#000000" text-anchor="end" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+n</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="34.239,22.700 35.340,22.700 35.340,22.700 37.000,22.700 "/>
+<polygon fill="#000000" stroke="none" stroke-width="0.100" points="32.980,22.700 33.680,22.460 34.380,22.700 33.680,22.940 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="32.980,22.700 33.680,22.460 34.380,22.700 33.680,22.940 "/>
+<text x="34.580" y="22.550"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+1</text>
+<text x="36.800" y="22.550"  fill="#000000" text-anchor="end" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+n</text>
+<rect x="23.000" y="8.000" width="7.815" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="23.000" y="8.000" width="7.815" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="26.907" y="8.950"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+Collection</text>
+<rect x="23.000" y="9.400" width="7.815" height="5.800" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="23.000" y="9.400" width="7.815" height="5.800" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="23.150" y="10.100"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++metadata</text>
+<text x="23.150" y="10.900"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++title</text>
+<text x="23.150" y="11.700"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++members</text>
+<text x="23.150" y="12.500"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++descendants</text>
+<text x="23.150" y="13.300"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++readable</text>
+<text x="23.150" y="14.100"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++readableDescendant</text>
+<text x="23.150" y="14.900"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
+#DC_TYPE</text>
+<rect x="23.000" y="15.200" width="7.815" height="1.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="23.000" y="15.200" width="7.815" height="1.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="23.150" y="15.900"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++export()</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.40,0.40" points="26.907,17.112 26.907,19.500 10.366,19.500 10.366,22.000 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.40,0.40" points="26.907,17.112 26.907,19.500 22.015,19.500 22.015,22.000 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.40,0.40" points="26.907,17.112 26.907,19.500 31.190,19.500 31.190,22.000 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.40,0.40" points="26.907,17.112 26.907,19.500 43.025,19.500 43.025,22.000 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="27.307,17.112 26.907,16.312 26.508,17.112 "/>
+</svg>

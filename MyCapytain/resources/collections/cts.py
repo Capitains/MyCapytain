@@ -228,7 +228,7 @@ class Text(cts.Text):
             return str(self)
 
     def __findCitations(self, xml, xpath="ti:citation"):
-        """ Find citation in current xml. Used as a loop for self.xmlparser()
+        """ Find citation in current xml. Used as a loop for xmlparser()
         
         :param xml: Xml resource to be parsed
         :param xpath: Xpath to use to retrieve the xml node
@@ -242,31 +242,31 @@ class Text(cts.Text):
         :type resource: basestring or lxml.etree._Element
         :returns: None
         """
-        self.xml = xmlparser(resource)
-        self.urn = URN(self.xml.get("urn"))
+        xml = xmlparser(resource)
+        self.urn = URN(xml.get("urn"))
         self.id = str(self.urn)
 
         if self.subtype == "Translation":
-            lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
+            lang = xml.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lang is not None:
                 self.lang = lang
 
-        for child in self.xml.xpath("ti:description", namespaces=NS):
+        for child in xml.xpath("ti:description", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["description"][lg] = child.text
 
-        for child in self.xml.xpath("ti:label", namespaces=NS):
+        for child in xml.xpath("ti:label", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["label"][lg] = child.text
 
         self.__findCitations(
-            xml=self.xml,
+            xml=xml,
             xpath="ti:online/ti:citationMapping/ti:citation"
         )
 
-        online = self.xml.xpath("ti:online", namespaces=NS)
+        online = xml.xpath("ti:online", namespaces=NS)
         if len(online) > 0:
             online = online[0]
             self.docname = online.get("docname")
@@ -376,27 +376,27 @@ class Work(cts.Work):
         :param resource: Element rerpresenting a work
         :param type: basestring, etree._Element
         """
-        self.xml = xmlparser(resource)
-        self.urn = URN(self.xml.get("urn"))
+        xml = xmlparser(resource)
+        self.urn = URN(xml.get("urn"))
         self.id = str(self.urn)
 
-        lang = self.xml.get("{http://www.w3.org/XML/1998/namespace}lang")
+        lang = xml.get("{http://www.w3.org/XML/1998/namespace}lang")
         if lang is not None:
             self.lang = lang
 
-        for child in self.xml.xpath("ti:title", namespaces=NS):
+        for child in xml.xpath("ti:title", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["title"][lg] = child.text
 
         self.__editions = xpathDict(
-            xml=self.xml,
+            xml=xml,
             xpath='ti:edition',
             children=Edition,
             parents=[self] + self.parents
         )
         self.__translations = xpathDict(
-            xml=self.xml,
+            xml=xml,
             xpath='ti:translation',
             children=Translation,
             parents=[self] + self.parents
@@ -467,18 +467,18 @@ class TextGroup(cts.TextGroup):
         :param resource: Element representing the textgroup
         :param type: basestring or etree._Element
         """
-        self.xml = xmlparser(resource)
+        xml = xmlparser(resource)
 
-        self.urn = URN(self.xml.get("urn"))
+        self.urn = URN(xml.get("urn"))
         self.id = str(self.urn)
 
-        for child in self.xml.xpath("ti:groupname", namespaces=NS):
+        for child in xml.xpath("ti:groupname", namespaces=NS):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 self.metadata["groupname"][lg] = child.text
 
         self.works = xpathDict(
-            xml=self.xml,
+            xml=xml,
             xpath='ti:work',
             children=Work,
             parents=[self] + self.parents
@@ -537,10 +537,10 @@ class TextInventory(cts.TextInventory):
         :param resource: Element representing the text inventory
         :param type: basestring, etree._Element
         """
-        self.xml = xmlparser(resource)
+        xml = xmlparser(resource)
 
         self.textgroups = xpathDict(
-            xml=self.xml,
+            xml=xml,
             xpath='//ti:textgroup',
             children=TextGroup,
             parents=[self]

@@ -12,7 +12,7 @@ from six import text_type
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.common.reference import URN
 from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.constants import NAMESPACES, RDF_PREFIX, Mimetypes
+from MyCapytain.common.constants import NAMESPACES, RDF_PREFIX
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
 from copy import copy, deepcopy
@@ -38,21 +38,6 @@ class CTSCollection(Collection):
         if resource is not None:
             self.setResource(resource)
 
-    def __getitem__(self, key):
-        """ Direct key access function for Text objects """
-        if key == 0:
-            return self
-        elif isinstance(key, int) and 1 <= key <= len(self.parents):
-            r = self.parents[key - 1]
-            if isinstance(r, (list, tuple)):
-                return r[0]
-            else:
-                return r
-        elif isinstance(key, text_type):
-            return self.__urnitem__(key)
-        else:
-            return None
-
     def __eq__(self, other):
         if self is other:
             return True
@@ -65,37 +50,6 @@ class CTSCollection(Collection):
 
     def __str__(self):
         raise NotImplementedError()
-
-    def __urnitem__(self, key):
-        urn = URN(key)
-
-        if len(urn) <= 2:
-            raise ValueError("Not valid urn")
-        elif hasattr(self, "urn") and self.urn == urn:
-            return self
-        else:
-            if hasattr(self, "urn"):
-                i = len(self.urn)
-            else:
-                i = 2
-
-            if isinstance(self, TextInventory):
-                children = self.textgroups
-            elif isinstance(self, TextGroup):
-                children = self.works
-            elif isinstance(self, Work):
-                children = self.texts
-
-            order = ["", "", URN.TEXTGROUP, URN.WORK, URN.VERSION]
-            while i <= len(urn) - 1:
-                children = children[urn.upTo(order[i])]
-                if not hasattr(children, "urn") or str(children.urn) != urn.upTo(order[i]):
-                    error = "Unrecognized urn at " + [
-                        "URN namespace", "CTS Namespace", "URN Textgroup", "URN Work", "URN Version"
-                    ][i]
-                    raise ValueError(error)
-                i += 1
-            return children
 
     def setResource(self, resource):
         """ Set the object property resource
@@ -154,9 +108,13 @@ class Text(CTSCollection):
     :type parents: [CTSCollection]
     :param subtype: Subtype of the object (Edition, Translation)
     :type subtype: str
+
+    :ivar urn: URN Identifier
+    :type urn: URN
+    :ivar parents: List of ancestors, from parent to furthest
     """
 
-    DC_TITLE = "label"
+    DC_TITLE_KEY = "label"
 
     @property
     def TEXT_URI(self):
@@ -184,7 +142,6 @@ class Text(CTSCollection):
 
         if urn is not None:
             self.urn = URN(urn)
-            self.id = str(self.urn)
 
         if parents is not None:
             self.parents = parents
@@ -225,6 +182,14 @@ class Text(CTSCollection):
                 if self.parents[0].texts[urn].subtype == "Edition"
             ]
 
+    @property
+    def id(self):
+        return str(self.urn)
+
+    @id.setter
+    def id(self, value):
+        self.urn = URN(value)
+
 
 def Edition(resource=None, urn=None, parents=None):
     """ Represents a CTS Edition
@@ -264,6 +229,10 @@ class Work(CTSCollection):
     :type urn: str
     :param parents: List of parents for current object
     :type parents: Tuple.<TextInventory>
+
+    :ivar urn: URN Identifier
+    :type urn: URN
+    :ivar parents: List of ancestors, from parent to furthest
     """
 
     DC_TITLE_KEY = "title"
@@ -345,6 +314,14 @@ class Work(CTSCollection):
     def members(self):
         return list(self.texts.values())
 
+    @property
+    def id(self):
+        return str(self.urn)
+
+    @id.setter
+    def id(self, value):
+        self.urn = URN(value)
+
 
 class TextGroup(CTSCollection):
     """ Represents a CTS Textgroup
@@ -358,6 +335,10 @@ class TextGroup(CTSCollection):
     :type urn: str
     :param parents: List of parents for current object
     :type parents: Tuple.<TextInventory>
+
+    :ivar urn: URN Identifier
+    :type urn: URN
+    :ivar parents: List of ancestors, from parent to furthest
     """
     DC_TITLE_KEY = "groupname"
     TYPE_URI = RDF_PREFIX["ti"] + "TextGroup"
@@ -377,7 +358,6 @@ class TextGroup(CTSCollection):
 
         if urn is not None:
             self.urn = URN(urn)
-            self.id = str(self.urn)
 
         if parents:
             self.parents = parents
@@ -424,6 +404,14 @@ class TextGroup(CTSCollection):
             for text in work.texts.values()
         ])
 
+    @property
+    def id(self):
+        return str(self.urn)
+
+    @id.setter
+    def id(self, value):
+        self.urn = URN(value)
+
 
 class TextInventory(CTSCollection):
     """ Initiate a TextInventory resource
@@ -447,6 +435,14 @@ class TextInventory(CTSCollection):
         self.parents = list()
         if resource is not None:
             self.setResource(resource)
+
+    @property
+    def id(self):
+        return self.__id__
+
+    @id.setter
+    def id(self, value):
+        self.__id__ = value
 
     def __len__(self):
         """ Get the number of text in the Inventory

@@ -178,49 +178,53 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
         filters.update({"urn": objectId})
         return self.getCapabilities(**filters)
 
-    def getText(self, textId, reference=None, prevnext=False, metadata=False):
+    def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
         :param textId: Text Identifier
-        :param reference: Passage Reference
+        :param subreference: Passage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
         :return: GetPassage or GetPassagePlus CTS API request response
         """
-        if reference:
-            textId = "{}:{}".format(textId, reference)
+        if  subreference:
+            textId = "{}:{}".format(textId, subreference)
 
         if prevnext or metadata:
             return self.getPassagePlus(urn=textId)
         else:
             return self.getPassage(urn=textId)
 
-    def getSiblings(self, textId, reference):
+    def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
         :param textId: Text Identifier
         :param reference: Passage Reference
         :return: GetPrevNextUrn request response from the endpoint
         """
-        textId = "{}:{}".format(textId, reference)
+        textId = "{}:{}".format(textId, subreference)
         return self.getPrevNextUrn(urn=textId)
 
-    def getChildren(self, textId, reference=None, depth=1):
+    def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
         :param textId: Text Identifier
-        :param reference: Passage Reference
-        :param depth: Depth of the children reference to retrieve
-        :return: GetValidReff request response from the endpoint
+        :type textId: str
+        :param level: Depth for retrieval
+        :type level: int
+        :param subreference: Passage Reference
+        :type subreference: str
+        :return: List of references
+        :rtype: [str]
         """
-        if reference:
-            textId = "{}:{}".format(textId, reference)
-        level = depth
-        if reference:
-            if isinstance(reference, Reference):
-                level += len(reference)
+        depth = level
+        if subreference:
+            textId = "{}:{}".format(textId, subreference)
+        if subreference:
+            if isinstance(subreference, Reference):
+                depth += len(subreference)
             else:
-                level += len(Reference(reference))
-        if depth:
+                depth += len(Reference(subreference))
+        if level:
             level = max(depth, level)
         return self.getValidReff(urn=textId, level=level)

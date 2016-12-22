@@ -1,8 +1,33 @@
 MyCapytain's Main Objects Explained
 ===================================
 
+Exportable Parent Classes
+#########################
+
+Description
+***********
+
+:class:`MyCapytain.common.constants.Exportable`
+
+The Exportable class is visible all across the library. It provides a common, standardized way to retrieve in an API \
+fashion to what can an object be exported and to exports it. Any exportable object should have an EXPORT_TO constant \
+variable and include a __export__(output, **kwargs) methods if it provides an export type.
+
+Example
+*******
+
+The following code block is a mere example of how to implement Exportable and what are its responsibilities. Exportable\
+typically loops over all the parents class of the current class until it find one exportable system matching the \
+required one.
+
+.. literalinclude:: Exportable.py
+   :language: python
+   :linenos:
+
 Retrievers
 ##########
+
+:class:`MyCapytain.retrievers.prototypes.API`
 
 Description
 ***********
@@ -26,33 +51,145 @@ For Textual API, it is recommended to implement the following requests
 Example of implementation : CTS 5
 *********************************
 
-.. code-block:: python
-    :linenos:
-    :caption: Retrieving a CTS API Reply
+:class:`MyCapytain.retrievers.cts5.CTS`
 
-    from MyCapytain.retrievers.cts5 import CTS
-
-    # We set up a retriever which communicates with an API available in Leipzig
-    retriever = CTS("http://cts.dh.uni-leipzig.de/api/cts/")
-    # We require a passage : passage is now a Passage object
-    passage = retriever.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
-    # Passage is now equal to the string content of http://cts.dh.uni-leipzig.de/api/cts/?request=GetPassage&urn=urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1
-    print(passage)
+.. literalinclude:: Retriever.py
+   :language: python
+   :linenos:
 
 
 Text and Passages
 #################
 
-Needs to be written
+Description
+***********
 
+Hierarchy
+---------
+
+The generic idea of both Text and Passage's classes is that they inherit from a longer trail of text bearing object \
+that complexified over different features. The basic is
+
+- *TextualElement* is an object which can bear Metadata and Collection information. It has a .text property and is exportable
+- *TextualNode* inherits from NodeId and unlike TextualElement, TextualNode is part of a graph of CitableObject. It bears informations about its siblings, parents, children.
+- *TextualGraph* is a bit interactive : you can query for children nodes and get descendant references of the object.
+- *InteractiveTextualNode* is completely interative . You can browse the graph by accessing the :code:`.next` property for example : it should then return an InteractiveTextualNode as well
+- *CTSNode* has two unique methods more as well as a :code:`urn` property.
+- From *CTSNode* we find *CitableText* and *Passage*, which represents complete and portion of a Text. The main difference is that CitableText has no parents, no siblings.
+
+
+.. figure:: _static/pyreverse/classes_MyCapytain_texts.svg
+    :alt: MyCapytain Texts Prototypes
+
+    Prototype of Texts from :module:`MyCapytain.resources.prototypes.text`. \
+    :class:`NodeId` and :class:`Exportable` are respectively from :module:`MyCapytain.common.reference` and \
+    :module:`MyCapytain.common.constants`.
+
+Objectives
+----------
+
+Text and Passages object have been built around InteractiveTextualNode which fills the main purpose of MyCapytain :\
+being able to interact with citable, in-graph texts that are retrieve through web API or local files. Any \
+implementation should make sure that the whole set of navigation tool are covered. Those are :
+
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| Tree Identifiers(Returns str Identifiers)   | Tree Navigations (Returns InteractiveTextualNode or children class)  | Retrieval Methods                 | Other                                                       |
++=============================================+======================================================================+===================================+=============================================================+
+| prevId                                      | prev                                                                 | .getTextualNode(subreference)     | id : TextualNode Identifier [str]                           |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| nextId                                      | nextId                                                               | .getReffs(subreference[optional]) | metadata : Metadata informations [Metadata]                 |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| siblingsId [tuple[str]]                     | siblings [tuple[InteractiveTextualNode]]                             |                                   | about : Collection Information [Collection]                 |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| parentId                                    | parent                                                               |                                   | citation : Citation Information [Citation]                  |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| childIds [list[str]]                        | children [list[InteractiveTextualNode]]                              |                                   | text : String Representation of the text without annotation |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| firstId                                     | first                                                                |                                   | .export()                                                   |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| lastId                                      | last                                                                 |                                   |                                                             |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+
+
+The encodings module
+********************
+
+The encoding module contains special implementations : they technically do not support interactive methods but \
+provides generic parsing and export methods for specific type of contents such as TEI XML object or other formats \
+such as json, csv, treebank objects in the future.
+
+The :class:`TEIResource` for example requires the object to be set up with a resource parameters that will be further\
+parsed using lxml. From there, it provides export such as plain/text, TEI XML, nested dictionaries or even an\
+lxml etree interface.
+
+Implementation example : HTTP API Passage work
+**********************************************
+
+.. literalinclude:: DistantText.py
+   :language: python
+   :linenos:
+
+Other Example
+*************
+
+See :ref:`MyCapytain.local`
 
 Collection
 ##########
 
-CTS Collections
+Description
+***********
+
+Collections are the metadata containers object in MyCapytain. Unlike other object, they will never contain textual \
+content such as Texts and Passages but will in return help you browse through the catalog of one APIs collection and \
+identify manually or automatically texts that are of relevant interests to you.
+
+The main informations that you should be interested in are :
+
+- Collections are children from Exportable. As of 2.0.0, any collection can be exported to JSON DTS.
+- Collections are built on a hierarchy. They have children and descendants
+- Collections have identifiers and title (Main name of what the collection represents : if it's an author, it's her name, a title for a book, a volume label for a specific edition, etc.)
+- Collections can inform the machine if it represents a readable object : if it is readable, it means that using its identifier, you can query for passages or references on the same API.
+
+Main Properties
 ***************
 
-Needs to be written
+- Collection().id : Identifier of the object
+- Collection().title : Title of the object
+- Collection().readable : If True, means that the Collection().id can be used in GetReffs or GetTextualNode queries
+- Collection().members : Direct children of the object
+- Collection().descendants : Direct and Indirect children of the objects
+- Collection().readableDescendants : Descendants that have .readable as True
+- Collection().export() : Export Method
+- Collection().metadata : Metadata object that contain flat descriptive localized informations about the object.
+
+
+Implementation : CTS Collections
+********************************
+
+.. note:: For a recap on what Textgroup means or any CTS jargon, go to http://capitains.github.io/pages/vocabulary
+
+CTS Collections are divided in 4 kinds : TextInventory, TextGroup, Work, Text. Their specificity is that the hierarchy\
+of these objects are predefined and always follow the same order. They implement a special export (\
+:code:`MyCapytain.common.constants.Mimetypes.XML.CTS`) which basically exports to the XML Text Inventory Format\
+that one would find making a GetCapabilities request.
+
+CapiTainS CTS Collections implement a parents property which represent a list of parents where .parents' order is equal\
+to :code:`Text.parents = [Work(), TextGroup(), TextInventory()]`).
+
+Their finale implementation accepts to parse resources through the :code:`resource=` named argument.
+
+
+.. image:: _static/images/Collections.svg
+    :target: _static/images/Collections.dia
+    :alt: Diagram of collections prototypes
+
+Example
+*******
+
+.. literalinclude:: Collections.py
+   :language: python
+   :linenos:
 
 Resolvers
 #########
@@ -112,35 +249,8 @@ Prototype
 Example
 *******
 
-.. code-block:: python
-    :linenos:
-    :caption: Retrieving a passage and manipulating it
+.. literalinclude:: Resolver.py
+   :language: python
+   :linenos:
 
-    from MyCapytain.resolvers.cts.api import HttpCTSResolver
-    from MyCapytain.retrievers.cts5 import CTS
-    from MyCapytain.common.utils import Mimetypes, NS
 
-    # We set up a resolver which communicates with an API available in Leipzig
-    resolver = HttpCTSResolver(CTS("http://cts.dh.uni-leipzig.de/api/cts/"))
-    # We require a passage : passage is now a Passage object
-    # This is an entry from the Smith Myth Dictionary
-    # The inner methods will resolve to the URI http://cts.dh.uni-leipzig.de/api/cts/?request=GetPassage&urn=urn:cts:pdlrefwk:viaf88890045.003.perseus-eng1:A.abaeus_1
-    # And parse it into interactive objects
-    passage = resolver.getTextualNode("urn:cts:pdlrefwk:viaf88890045.003.perseus-eng1", "A.abaeus_1")
-    # We need an export as plaintext
-    print(passage.export(
-        output=Mimetypes.PLAINTEXT
-    ))
-    """
-        Abaeus ( Ἀβαῖος ), a surname of Apollo
-         derived from the town of Abae in Phocis, where the god had a rich temple. (Hesych. s. v.
-         Ἄβαι ; Hdt. 8.33 ; Paus. 10.35.1 , &c.) [ L.S ]
-    """
-    # We want to find bibliographic information in the passage of this dictionary
-    # We need an export as LXML ETREE object to perform XPath
-    print(
-        passage.export(
-            output=Mimetypes.PYTHON.ETREE
-        ).xpath(".//tei:bibl/text()", namespaces=NS, magic_string=False)
-    )
-    ["Hdt. 8.33", "Paus. 10.35.1"]

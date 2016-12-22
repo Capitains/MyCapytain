@@ -387,7 +387,7 @@ class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
         self.urn = urn
 
         # Could be set during parsing
-        self.__next__ = False
+        self.__nextId__ = False
         self.__prev__ = False
         self.__first__ = False
         self.__last__ = False
@@ -395,38 +395,62 @@ class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
         self.__parse__()
 
     @property
+    def id(self):
+        return str(self.urn.reference)
+
+    @property
     def prevId(self):
-        """ Previous passage
+        """ Previous passage Identifier
 
         :rtype: Passage
         :returns: Previous passage at same level
         """
         if self.__prev__ is False:
             # Request the next urn
-            self.__prev__, self.__next__ = self.getPrevNextUrn(reference=self.urn.reference)
+            self.__prev__, self.__nextId__ = self.getPrevNextUrn(reference=self.urn.reference)
         return self.__prev__
 
     @property
-    def nextId(self):
-        """ Shortcut for getting the following passage
+    def parentId(self):
+        """ Shortcut for getting the parent passage identifier
 
         :rtype: Reference
         :returns: Following passage reference
         """
-        if self.__next__ is False:
+        return str(self.urn.reference.parent)
+
+    @property
+    def nextId(self):
+        """ Shortcut for getting the following passage identifier
+
+        :rtype: Reference
+        :returns: Following passage reference
+        """
+        if self.__nextId__ is False:
             # Request the next urn
-            self.__prev__, self.__next__ = self.getPrevNextUrn(reference=self.urn.reference)
-        return self.__next__
+            self.__prev__, self.__nextId__ = self.getPrevNextUrn(reference=self.urn.reference)
+        return self.__nextId__
+
+    @property
+    def siblingsId(self):
+        """ Shortcut for getting the previous and next passage identifier
+
+        :rtype: Reference
+        :returns: Following passage reference
+        """
+        if self.__nextId__ is False or self.__prev__ is False:
+            self.__prev__, self.__nextId__ = self.getPrevNextUrn(reference=self.urn.reference)
+        return self.__prev__, self.__nextId__
 
     def __parse__(self):
-        """ Given self.resource, split informations from the CTS API
+        """ Given self.resource, split information from the CTS API
 
         :return: None
         """
         self.response = self.resource
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=NS)[0]
 
-        self.__prev__, self.__next__ = __SharedMethod__.prevnext(self.response)
+        self.__prev__, self.__nextId__ = __SharedMethod__.prevnext(self.response)
 
         if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=NS)):
             self.citation = CTSCollection.Citation.ingest(

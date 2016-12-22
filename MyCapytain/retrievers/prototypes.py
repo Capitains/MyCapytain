@@ -41,32 +41,37 @@ class CitableTextServiceRetriever(API):
         """
         raise NotImplementedError
 
-    def getText(self, textId, reference=None, prevnext=False, metadata=False):
+    def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
         :param textId: Text Identifier
-        :param reference: Passage Reference
+        :param subreference: Passage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
         :return: Text of a Passage from an API or the likes as bytes
         """
         raise NotImplementedError
 
-    def getSiblings(self, textId, reference):
+    def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
         :param textId: Text Identifier
-        :param reference: Passage Reference
+        :param subreference: Passage Reference
         :return: Siblings references from an API or the likes as bytes
         """
         raise NotImplementedError
 
-    def getChildren(self, textId, reference=None, depth=None):
+    def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
         :param textId: Text Identifier
-        :param reference: Passage Reference
-        :return: Children references from an API or the likes as bytes
+        :type textId: str
+        :param level: Depth for retrieval
+        :type level: int
+        :param subreference: Passage Reference
+        :type subreference: str
+        :return: List of references
+        :rtype: [str]
         """
         raise NotImplementedError
 

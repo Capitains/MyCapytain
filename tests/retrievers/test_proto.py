@@ -39,11 +39,11 @@ class TestEndpointsProto(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             Proto.getMetadata(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         with self.assertRaises(NotImplementedError):
-            Proto.getText(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+            Proto.getTextualNode(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         with self.assertRaises(NotImplementedError):
-            Proto.getChildren(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+            Proto.getReffs(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         with self.assertRaises(NotImplementedError):
-            Proto.getSiblings(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", reference="1.1")
+            Proto.getSiblings(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1")
 
     def test_raise_CTS_getCapabilities_arguments(self):
         """ Tests that methods getCapabilities have consistent arguments"""

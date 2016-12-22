@@ -18,7 +18,6 @@ Contents
    MyCapytain.classes
    MyCapytain.uses
    MyCapytain.local
-   MyCapytain.endpoint
    MyCapytain.workarounds
    MyCapytain.api
    MyCapytain.benchmark

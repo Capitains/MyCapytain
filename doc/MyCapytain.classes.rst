@@ -61,24 +61,79 @@ Example of implementation : CTS 5
 Text and Passages
 #################
 
-Description of the Hierarchy
-****************************
+Description
+***********
+
+Hierarchy
+---------
+
+The generic idea of both Text and Passage's classes is that they inherit from a longer trail of text bearing object \
+that complexified over different features. The basic is
+
+- *TextualElement* is an object which can bear Metadata and Collection information. It has a .text property \
+and is exportable
+- *TextualNode* inherits from NodeId and unlike TextualElement, TextualNode is part of a graph of CitableObject. It bears\
+informations about its siblings, parents, children.
+- *TextualGraph* is a bit interactive : you can query for children nodes and get descendant references of the object.
+- *InteractiveTextualNode* is completely interative . You can browse the graph by accessing the :code:`.next` property\
+for example : it should then return an InteractiveTextualNode as well
+- *CTSNode* has two unique methods more as well as a :code:`urn` property.
+- From *CTSNode* we find *CitableText* and *Passage*, which represents complete and portion of a Text. The main \
+difference is that CitableText has no parents, no siblings.
+
 
 .. figure:: _static/pyreverse/classes_MyCapytain_texts.svg
-   :alt: MyCapytain Texts Prototypes
+    :alt: MyCapytain Texts Prototypes
 
     Prototype of Texts from :module:`MyCapytain.resources.prototypes.text`. \
     :class:`NodeId` and :class:`Exportable` are respectively from :module:`MyCapytain.common.reference` and \
     :module:`MyCapytain.common.constants`.
 
-Objectives of Text and Passages
-*******************************
+Objectives
+----------
 
-Implementations : the encodings module
-**************************************
+Text and Passages object have been built around InteractiveTextualNode which fills the main purpose of MyCapytain :\
+being able to interact with citable, in-graph texts that are retrieve through web API or local files. Any \
+implementation should make sure that the whole set of navigation tool are covered. Those are :
+
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| Tree Identifiers
+(Returns str Identifiers)  | Tree Navigations
+(Returns InteractiveTextualNode or children class)  | Retrieval Methods                 | Other                                                       |
++=============================================+======================================================================+===================================+=============================================================+
+| prevId                                      | prev                                                                 | .getTextualNode(subreference)     | id : TextualNode Identifier [str]                           |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| nextId                                      | nextId                                                               | .getReffs(subreference[optional]) | metadata : Metadata informations [Metadata]                 |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| siblingsId [tuple[str]]                     | siblings [tuple[InteractiveTextualNode]]                             |                                   | about : Collection Information [Collection]                 |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| parentId                                    | parent                                                               |                                   | citation : Citation Information [Citation]                  |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| childIds [list[str]]                        | children [list[InteractiveTextualNode]]                              |                                   | text : String Representation of the text without annotation |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| firstId                                     | first                                                                |                                   | .export()                                                   |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+| lastId                                      | last                                                                 |                                   |                                                             |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+|                                             |                                                                      |                                   |                                                             |
++---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
+
+
+The encodings module
+********************
+
+The encoding module contains special implementations : they technically do not support interactive methods but \
+provides generic parsing and export methods for specific type of contents such as TEI XML object or other formats \
+such as json, csv, treebank objects in the future.
+
+The :class:`TEIResource` for example requires the object to be set up with a resource parameters that will be further\
+parsed using lxml. From there, it provides export such as plain/text, TEI XML, nested dictionaries or even an\
+lxml etree interface.
 
 Implementation example : HTTP API Passage work
 **********************************************
+
+
 
 Other Example
 *************

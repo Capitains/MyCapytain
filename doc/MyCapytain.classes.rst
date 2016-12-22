@@ -97,9 +97,7 @@ being able to interact with citable, in-graph texts that are retrieve through we
 implementation should make sure that the whole set of navigation tool are covered. Those are :
 
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
-| Tree Identifiers
-(Returns str Identifiers)  | Tree Navigations
-(Returns InteractiveTextualNode or children class)  | Retrieval Methods                 | Other                                                       |
+| Tree Identifiers(Returns str Identifiers)   | Tree Navigations (Returns InteractiveTextualNode or children class)  | Retrieval Methods                 | Other                                                       |
 +=============================================+======================================================================+===================================+=============================================================+
 | prevId                                      | prev                                                                 | .getTextualNode(subreference)     | id : TextualNode Identifier [str]                           |
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
@@ -114,8 +112,6 @@ implementation should make sure that the whole set of navigation tool are covere
 | firstId                                     | first                                                                |                                   | .export()                                                   |
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
 | lastId                                      | last                                                                 |                                   |                                                             |
-+---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
-|                                             |                                                                      |                                   |                                                             |
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
 
 
@@ -133,7 +129,9 @@ lxml etree interface.
 Implementation example : HTTP API Passage work
 **********************************************
 
-
+.. literalinclude:: DistantText.py
+   :language: python
+   :linenos:
 
 Other Example
 *************

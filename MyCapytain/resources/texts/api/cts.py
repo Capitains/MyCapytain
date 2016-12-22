@@ -395,8 +395,12 @@ class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
         self.__parse__()
 
     @property
+    def id(self):
+        return str(self.urn.reference)
+
+    @property
     def prevId(self):
-        """ Previous passage
+        """ Previous passage Identifier
 
         :rtype: Passage
         :returns: Previous passage at same level
@@ -407,8 +411,17 @@ class Passage(__SharedMethod__, prototypes.Passage, TEIResource):
         return self.__prev__
 
     @property
+    def parentId(self):
+        """ Shortcut for getting the parent passage identifier
+
+        :rtype: Reference
+        :returns: Following passage reference
+        """
+        return str(self.urn.reference.parent)
+
+    @property
     def nextId(self):
-        """ Shortcut for getting the following passage
+        """ Shortcut for getting the following passage identifier
 
         :rtype: Reference
         :returns: Following passage reference

@@ -662,6 +662,27 @@ class TestCTSPassage(unittest.TestCase):
             "FirstId should resolve"
         )
 
+    def test_parentId(self):
+        """ Test next property, given that next information already exists or not)
+        """
+
+        passage = Passage(
+            urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1",
+            resource=GET_PASSAGE,
+            retriever=self.endpoint
+        )
+
+        self.assertEqual(
+            passage.parentId, "1",
+            "ParentId should resolve"
+        )
+        self.assertIsInstance(
+            passage.parent, Passage,
+            "Parent Passage should be a passage"
+        )
+        self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1")
+
+
     def test_prev_id(self):
         """ Test next property, given that next information already exists or not)
         """

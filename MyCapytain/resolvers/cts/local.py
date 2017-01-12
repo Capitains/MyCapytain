@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 
 class CTSCapitainsLocalResolver(Resolver):
-    """ XML Folder Based resolver. Text and metadata resolver based on local directories
+    """ XML Folder Based resolver. PrototypeText and metadata resolver based on local directories
 
     :param resource: Resource should be a list of folders retaining data as Capitains Guidelines Repositories
     :type resource: [str]
@@ -27,7 +27,7 @@ class CTSCapitainsLocalResolver(Resolver):
     :param logger: Logging object
     :type logger: logging
 
-    :cvar TEXT_CLASS: Text Class [not instantiated] to be used to parse Texts. Can be changed to support Cache for example
+    :cvar TEXT_CLASS: PrototypeText Class [not instantiated] to be used to parse Texts. Can be changed to support Cache for example
     :type TEXT_CLASS: class
     :cvar DEFAULT_PAGE: Default Page to show
     :cvar PER_PAGE: Tuple representing the minimal number of texts returned, the default number and the maximum number of texts returned
@@ -76,7 +76,7 @@ class CTSCapitainsLocalResolver(Resolver):
         """ Parse a list of directories ans
         :param resource: List of folders
         :param cache: Auto cache the results
-        :return: An inventory resource and a list of Text metadata-objects
+        :return: An inventory resource and a list of PrototypeText metadata-objects
         """
         for folder in resource:
             textgroups = glob("{base_folder}/data/*/__cts__.xml".format(base_folder=folder))
@@ -150,7 +150,7 @@ class CTSCapitainsLocalResolver(Resolver):
         return self.inventory, self.texts
 
     def __getText__(self, urn):
-        """ Returns a Text object
+        """ Returns a PrototypeText object
         :param urn: URN of a text to retrieve
         :type urn: str, URN
         :return: Textual resource and metadata
@@ -188,7 +188,7 @@ class CTSCapitainsLocalResolver(Resolver):
         :param pagination: Activate pagination
         :type pagination: bool
         :return: ([Matches], Page, Count)
-        :rtype: ([Text], int, int)
+        :rtype: ([PrototypeText], int, int)
         """
         __PART = None
         if urn is not None:
@@ -286,7 +286,7 @@ class CTSCapitainsLocalResolver(Resolver):
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param subreference: Passage Reference
         :type subreference: str
@@ -309,7 +309,7 @@ class CTSCapitainsLocalResolver(Resolver):
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param subreference: Passage Reference
         :type subreference: str
@@ -323,7 +323,7 @@ class CTSCapitainsLocalResolver(Resolver):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int

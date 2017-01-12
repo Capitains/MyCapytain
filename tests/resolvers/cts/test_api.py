@@ -2,7 +2,6 @@ from MyCapytain.resolvers.cts.api import HttpCTSResolver
 from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import NS, Mimetypes
-from MyCapytain.common.metadata import Metadatum
 from MyCapytain.resources.prototypes.text import Passage
 from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Text
 from MyCapytain.resources.prototypes.metadata import Collection
@@ -69,7 +68,7 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -105,7 +104,7 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -164,7 +163,7 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -216,7 +215,7 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -291,7 +290,7 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -341,11 +340,11 @@ class TestHttpCTSResolver(TestCase):
         self.resolver.endpoint.getCapabilities.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002")
         self.assertIsInstance(
             metadata, Collection,
-            "Resolver should return a collection object (specifically here a Work)"
+            "Resolver should return a collection object (specifically here a PrototypeWork)"
         )
         self.assertIsInstance(
             metadata.members[0], Text,
-            "Members of Work should be TextGroups"
+            "Members of PrototypeWork should be TextGroups"
         )
         self.assertEqual(
             len(metadata.descendants), 2,
@@ -376,7 +375,7 @@ class TestHttpCTSResolver(TestCase):
                     ["http://w3id.org/dts-ontology/navigation"]\
                     ["http://w3id.org/dts-ontology/parents"]
                 ],
-            ["http://chs.harvard.edu/xmlns/cts/TextGroup", "http://chs.harvard.edu/xmlns/cts/TextInventory"],
+            ["http://chs.harvard.edu/xmlns/cts/PrototypeTextGroup", "http://chs.harvard.edu/xmlns/cts/PrototypeTextInventory"],
             "There should be one member in DTS JSON"
         )
 

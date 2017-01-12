@@ -10,7 +10,7 @@ from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import URN
 
 
-class Resource(cts.CTSCollection):
+class Resource(cts.PrototypeCTSCollection):
     def __init__(self, *args, **kwargs):
         super(Resource, self).__init__(*args, **kwargs)
         self.urn = None
@@ -23,16 +23,16 @@ class Resource(cts.CTSCollection):
         return str(self.urn)
 
 
-class TIV(cts.TextInventory):
+class TIV(cts.PrototypeTextInventory):
     def parse(self, resource):
-        self.textgroups = defaultdict(cts.TextGroup)
+        self.textgroups = defaultdict(cts.PrototypeTextGroup)
         return resource
 
 
 class TestRepoProto(unittest.TestCase):
     def test_resource_proto(self):
         with self.assertRaises(NotImplementedError):
-            a = cts.CTSCollection(resource="hello")
+            a = cts.PrototypeCTSCollection(resource="hello")
 
     def test_implementation(self):
         a = Resource(resource="hello")
@@ -73,10 +73,10 @@ class TestRepoProto(unittest.TestCase):
             b["urn:cts:greekLit:tg2"]
         
     def test_edit_trans(self):
-        a = cts.Edition()
-        b = cts.Translation()
-        self.assertIsInstance(a, cts.Text)
-        self.assertIsInstance(b, cts.Text)
+        a = cts.PrototypeEdition()
+        b = cts.PrototypeTranslation()
+        self.assertIsInstance(a, cts.PrototypeText)
+        self.assertIsInstance(b, cts.PrototypeText)
         self.assertEqual(a.subtype, "Edition")
         self.assertEqual(b.subtype, "Translation")
 

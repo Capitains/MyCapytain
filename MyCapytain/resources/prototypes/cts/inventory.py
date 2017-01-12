@@ -11,32 +11,43 @@ from six import text_type
 
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.common.reference import URN
-from MyCapytain.common.metadata import Metadata, Metadatum
-from MyCapytain.common.constants import NAMESPACES, RDF_PREFIX
+from MyCapytain.common.utils import make_xml_node
+from MyCapytain.common.constants import NAMESPACES, Mimetypes
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
-from copy import copy, deepcopy
-from lxml import etree
+from copy import deepcopy
+
+from rdflib import RDF, Literal, URIRef
+from rdflib.collection import Collection as RDFLibCollection
+from rdflib.namespace import DC
 
 
-class CTSCollection(Collection):
+class PrototypeCTSCollection(Collection):
     """ Resource represents any resource from the inventory
 
-    :param resource: Resource representing the TextInventory
+    :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
     :cvar CTSMODEL: String Representation of the type of collection
     """
     CTSMODEL = "CTSCollection"
+    DC_TITLE_KEY = None
+    CTS_PROPERTIES = []
 
-    def __init__(self, resource=None):
-        super(CTSCollection, self).__init__()
+    def __init__(self, identifier="", resource=None):
+        super(PrototypeCTSCollection, self).__init__(identifier)
 
         if hasattr(type(self), "CTSMODEL"):
-            self.properties[RDF_PREFIX["ti"]+"model"] = RDF_PREFIX["ti"] + type(self).CTSMODEL
+            self.graph.set((self.asNode(), RDF.type, NAMESPACES.CTS.term(self.CTSMODEL)))
+            self.graph.set((self.asNode(), NAMESPACES.CTS.isA, NAMESPACES.CTS.term(self.CTSMODEL)))
 
         self.resource = None
+        self.__urn__ = ""
         if resource is not None:
             self.setResource(resource)
+
+    @property
+    def urn(self):
+        return self.__urn__
 
     def __eq__(self, other):
         if self is other:
@@ -48,13 +59,10 @@ class CTSCollection(Collection):
             return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn
         return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn and self.resource == other.resource
 
-    def __str__(self):
-        raise NotImplementedError()
-
     def setResource(self, resource):
         """ Set the object property resource
 
-        :param resource: Resource representing the TextInventory
+        :param resource: Resource representing the PrototypeTextInventory
         :type resource: Any
         :rtype: Any
         :returns: Input resource
@@ -66,46 +74,73 @@ class CTSCollection(Collection):
     def parse(self, resource):
         """ Parse the object resource
 
-        :param resource: Resource representing the TextInventory
+        :param resource: Resource representing the PrototypeTextInventory
         :type resource: Any
         :rtype: List
         """
         raise NotImplementedError()
 
-    def __getstate__(self, children=True):
-        """ Pickling method to be called upon dumping object
+    def set_cts_property(self, property, value, lang=None):
+        if not isinstance(value, Literal):
+            value = Literal(value, lang=lang)
+        property = NAMESPACES.CTS.term(property)
 
-        :return:
-        """
+        if property == self.DC_TITLE_KEY:
+            self.set_label(value, lang)
 
-        dic = copy(self.__dict__)
-        if "xml" in dic:
-            dic["xml"] = etree.tostring(dic["xml"], encoding=str)
-        if "resource" in dic:
-            del dic["resource"]
-        return dic
+        self.graph.add(
+            (self.metadata, property, value)
+        )
 
-    def __setstate__(self, dic):
-        """
+    def __namespaces_header__(self):
+        nm = self.graph.namespace_manager
+        bindings = {}
+        for predicate in set(self.graph.predicates()):
+            prefix, namespace, name = nm.compute_qname(predicate)
+            if prefix != "":
+                bindings["xmlns:" + prefix] = str(URIRef(namespace))
+            else:
+                bindings["xmlns"] = str(URIRef(namespace))
 
-        :param dic:
-        :return:
-        """
-        self.__dict__ = dic
-        if "xml" in dic:
-            self.xml = etree.fromstring(dic["xml"])
-        return self
+        return bindings
+
+    def __xml_export_generic__(self, attrs, namespaces=False, lines="\n"):
+        if namespaces is True:
+            attrs.update(self.__namespaces_header__())
+
+        strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
+
+        #additional = [make_xml_node(self.graph, NAMESPACES.CTS.extra)]
+        for pred in self.CTS_PROPERTIES:
+            for obj in self.graph.objects(self.metadata, pred):
+                strings.append(
+                    make_xml_node(
+                        self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
+                    )
+                )
+
+        #c = RDFLibCollection(self.graph, self.asNode())
+        #additional.append(c.graph.serialize(format="xml").decode())
+        #additional.append(make_xml_node(self.graph, NAMESPACES.CTS.extra, close=True))
+        #strings = strings + additional
+
+        for object in self.members:
+            strings.append(object.export(Mimetypes.XML.CTS, namespaces=False))
+
+        strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
+
+        return lines.join(strings)
 
 
-class Text(CTSCollection):
-    """ Represents a CTS Text
+class PrototypeText(PrototypeCTSCollection):
+    """ Represents a CTS PrototypeText
 
-    :param resource: Resource representing the TextInventory
+    :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
-    :param urn: Identifier of the Text
+    :param urn: Identifier of the PrototypeText
     :type urn: str
     :param parents: Item parents of the current collection
-    :type parents: [CTSCollection]
+    :type parents: [PrototypeCTSCollection]
     :param subtype: Subtype of the object (Edition, Translation)
     :type subtype: str
 
@@ -114,34 +149,19 @@ class Text(CTSCollection):
     :ivar parents: List of ancestors, from parent to furthest
     """
 
-    DC_TITLE_KEY = "label"
+    DC_TITLE_KEY = NAMESPACES.CTS.term("label")
+    EXPORT_TO = [Mimetypes.XML.CTS]
+    CTS_PROPERTIES = [NAMESPACES.CTS.label, NAMESPACES.CTS.description]
 
-    @property
-    def TEXT_URI(self):
-        """ Ontology URI of the text
-
-        :return: CTS Ontology Edition or Translation object
-        :rtype: str
-        """
-        return RDF_PREFIX["ti"] + self.subtype
-
-    def __init__(self, resource=None, urn=None, parents=None, subtype="Edition"):
-        super(Text, self).__init__()
+    def __init__(self, urn="", resource=None, parents=None, subtype="Edition"):
+        self.subtype = subtype
+        super(PrototypeText, self).__init__(identifier=str(urn))
         self.resource = None
         self.citation = None
-        self.lang = None
-        self.urn = None
+        self.__urn__ = URN(urn)
         self.docname = None
         self.parents = list()
-        self.subtype = subtype
         self.validate = None
-        self.metadata = Metadata()
-        self.metadata["label"] = Metadatum(name="label", namespace=NAMESPACES.CTS)
-        self.metadata["description"] = Metadatum(name="description", namespace=NAMESPACES.CTS)
-        self.metadata["namespaceMapping"] = Metadatum(name="namespaceMapping", namespace=NAMESPACES.CTS)
-
-        if urn is not None:
-            self.urn = URN(urn)
 
         if parents is not None:
             self.parents = parents
@@ -149,6 +169,14 @@ class Text(CTSCollection):
 
         if resource is not None:
             self.setResource(resource)
+
+    @property
+    def lang(self):
+        return str(self.graph.value(self.asNode(), DC.language))
+
+    @lang.setter
+    def lang(self, lang):
+        self.graph.set((self.asNode(), DC.language, Literal(lang)))
 
     @property
     def readable(self):
@@ -174,7 +202,7 @@ class Text(CTSCollection):
         """ Get all editions of the texts
 
         :return: List of editions
-        :rtype: [Text]
+        :rtype: [PrototypeText]
         """
         return [
                 self.parents[0].texts[urn]
@@ -182,75 +210,108 @@ class Text(CTSCollection):
                 if self.parents[0].texts[urn].subtype == "Edition"
             ]
 
-    @property
-    def id(self):
-        return str(self.urn)
+    def __export__(self, output=None, domain="", namespaces=True, lines="\n"):
+        """ Create a {output} version of the Text
 
-    @id.setter
-    def id(self, value):
-        self.urn = URN(value)
+        :param output: Format to be chosen
+        :type output: basestring
+        :param domain: Domain to prefix IDs when necessary
+        :type domain: str
+        :returns: Desired output formated resource
+        """
+        if output == Mimetypes.XML.CTS:
+            attrs = {"urn": self.id}
+            if namespaces is True:
+                attrs.update(self.__namespaces_header__())
+
+            strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
+
+            # additional = [make_xml_node(self.graph, NAMESPACES.CTS.extra)]
+            for pred in self.CTS_PROPERTIES:
+                for obj in self.graph.objects(self.metadata, pred):
+                    strings.append(
+                        make_xml_node(
+                            self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
+                        )
+                    )
+
+            # Citation !
+            strings.append(
+                # Online
+                make_xml_node(
+                    self.graph, NAMESPACES.CTS.term("online"), complete=True,
+                    # Citation Mapping
+                    innerXML=make_xml_node(
+                        self.graph, NAMESPACES.CTS.term("citationMapping"), complete=True,
+                        innerXML=self.citation.export(Mimetypes.XML.CTS)
+                    )
+                )
+            )
+            strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
+
+            return lines.join(strings)
 
 
-def Edition(resource=None, urn=None, parents=None):
+class PrototypeEdition(PrototypeText):
     """ Represents a CTS Edition
 
-    :param resource: Resource representing the TextInventory
+    :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
-    :param urn: Identifier of the Text
+    :param urn: Identifier of the PrototypeText
     :type urn: str
     :param parents: Item parents of the current collection
-    :type parents: [CTSCollection]
+    :type parents: [PrototypeCTSCollection]
     """
-    return Text(resource=resource, urn=urn, parents=parents, subtype="Edition")
+    TYPE_URI = NAMESPACES.CTS.term("edition")
+
+    def __init__(self, urn=None, resource=None, parents=None):
+        super(PrototypeEdition, self).__init__(urn=urn, resource=resource, parents=parents, subtype="Edition")
 
 
-def Translation(resource=None, urn=None, parents=None):
+class PrototypeTranslation(PrototypeText):
     """ Represents a CTS Translation
 
-    :param resource: Resource representing the TextInventory
+    :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
-    :param urn: Identifier of the Text
+    :param urn: Identifier of the PrototypeText
     :type urn: str
     :param parents: Item parents of the current collection
-    :type parents: [CTSCollection]
+    :type parents: [PrototypeCTSCollection]
     """
-    return Text(resource=resource, urn=urn, parents=parents, subtype="Translation")
+    TYPE_URI = NAMESPACES.CTS.term("translation")
+
+    def __init__(self, urn=None, resource=None, parents=None):
+        super(PrototypeTranslation, self).__init__(urn=urn, resource=resource, parents=parents, subtype="Translation")
 
 
-class Work(CTSCollection):
-    """ Represents a CTS Work
+class PrototypeWork(PrototypeCTSCollection):
+    """ Represents a CTS PrototypeWork
 
-    CTS Work can be added to each other which would most likely happen if you take your data from multiple API or \
+    CTS PrototypeWork can be added to each other which would most likely happen if you take your data from multiple API or \
     Textual repository. This works close to dictionary update in Python. See update
 
-    :param resource: Resource representing the TextInventory
+    :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
-    :param urn: Identifier of the Work
+    :param urn: Identifier of the PrototypeWork
     :type urn: str
     :param parents: List of parents for current object
-    :type parents: Tuple.<TextInventory>
+    :type parents: Tuple.<PrototypeTextInventory>
 
     :ivar urn: URN Identifier
     :type urn: URN
     :ivar parents: List of ancestors, from parent to furthest
     """
 
-    DC_TITLE_KEY = "title"
-    TYPE_URI = RDF_PREFIX["ti"] + "Work"
+    DC_TITLE_KEY = NAMESPACES.CTS.term("title")
+    TYPE_URI = NAMESPACES.CTS.term("work")
+    EXPORT_TO = [Mimetypes.XML.CTS]
+    CTS_PROPERTIES = [NAMESPACES.CTS.term("title")]
 
     def __init__(self, resource=None, urn=None, parents=None):
-        super(Work, self).__init__()
-        self.resource = None
-        self.lang = None
-        self.urn = None
-        self.texts = defaultdict(Text)
+        super(PrototypeWork, self).__init__(identifier=str(urn))
+        self.__urn__ = URN(urn)
+        self.texts = defaultdict(PrototypeText)
         self.parents = list()
-        self.metadata = Metadata()
-        self.metadata["title"] = Metadatum(name="title", namespace=NAMESPACES.CTS)
-
-        if urn is not None:
-            self.urn = URN(urn)
-            self.id = str(self.urn)
 
         if parents is not None:
             self.parents = parents
@@ -259,8 +320,12 @@ class Work(CTSCollection):
             self.setResource(resource)
 
     @property
-    def readable(self):
-        return True
+    def lang(self):
+        return [str(x) for x in self.graph.objects(self.asNode(), DC.language)]
+
+    @lang.setter
+    def lang(self, lang):
+        self.graph.add((self.asNode(), DC.language, Literal(lang)))
 
     def update(self, other):
         """ Merge two Work Objects.
@@ -269,22 +334,18 @@ class Work(CTSCollection):
         - Added document overwrite text if it already exists
 
         :param other: Work object
-        :type other: Work
+        :type other: PrototypeWork
         :return: Work Object
         :rtype Work:
         """
-        if not isinstance(other, Work):
-            raise TypeError("Cannot add %s to Work" % type(other))
+        if not isinstance(other, PrototypeWork):
+            raise TypeError("Cannot add %s to PrototypeWork" % type(other))
         elif self.urn != other.urn:
-            raise InvalidURN("Cannot add Work %s to Work %s " % (self.urn, other.urn))
+            raise InvalidURN("Cannot add PrototypeWork %s to PrototypeWork %s " % (self.urn, other.urn))
 
-        self.metadata += other.metadata
         parents = [self] + self.parents
         for urn, text in other.texts.items():
-            if urn in self.texts:
-                self.texts[urn] = deepcopy(text)
-            else:
-                self.texts[urn] = deepcopy(text)
+            self.texts[urn] = deepcopy(text)
             self.texts[urn].parents = parents
             self.texts[urn].resource = None
 
@@ -295,7 +356,7 @@ class Work(CTSCollection):
 
         :param key: Language to find
         :type key: text_type
-        :rtype: [Text]
+        :rtype: [PrototypeText]
         :returns: List of availables translations
         """
         if key is not None:
@@ -304,7 +365,7 @@ class Work(CTSCollection):
             return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation"]
 
     def __len__(self):
-        """ Get the number of text in the Work
+        """ Get the number of text in the PrototypeWork
 
         :return: Number of texts available in the inventory
         """
@@ -314,50 +375,52 @@ class Work(CTSCollection):
     def members(self):
         return list(self.texts.values())
 
-    @property
-    def id(self):
-        return str(self.urn)
+    def __export__(self, output=None, domain="", namespaces=True):
+        """ Create a {output} version of the Work
 
-    @id.setter
-    def id(self, value):
-        self.urn = URN(value)
+        :param output: Format to be chosen
+        :type output: basestring
+        :param domain: Domain to prefix IDs when necessary
+        :type domain: str
+        :returns: Desired output formated resource
+        """
+        if output == Mimetypes.XML.CTS:
+            attrs = {"urn": self.id}
+            return self.__xml_export_generic__(attrs, namespaces=False)
 
 
-class TextGroup(CTSCollection):
+class PrototypeTextGroup(PrototypeCTSCollection):
     """ Represents a CTS Textgroup
 
-    CTS TextGroup can be added to each other which would most likely happen if you take your data from multiple API or \
+    CTS PrototypeTextGroup can be added to each other which would most likely happen if you take your data from multiple API or \
     Textual repository. This works close to dictionary update in Python. See update
 
-    :param resource: Resource representing the TextInventory
+    :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
-    :param urn: Identifier of the TextGroup
+    :param urn: Identifier of the PrototypeTextGroup
     :type urn: str
     :param parents: List of parents for current object
-    :type parents: Tuple.<TextInventory>
+    :type parents: Tuple.<PrototypeTextInventory>
 
     :ivar urn: URN Identifier
     :type urn: URN
     :ivar parents: List of ancestors, from parent to furthest
     """
-    DC_TITLE_KEY = "groupname"
-    TYPE_URI = RDF_PREFIX["ti"] + "TextGroup"
+    DC_TITLE_KEY = NAMESPACES.CTS.term("groupname")
+    TYPE_URI = NAMESPACES.CTS.term("textgroup")
+    EXPORT_TO = [Mimetypes.XML.CTS]
+    CTS_PROPERTIES = [NAMESPACES.CTS.groupname]
 
     @property
     def members(self):
         return list(self.works.values())
 
-    def __init__(self, resource=None, urn=None, parents=None):
-        super(TextGroup, self).__init__()
+    def __init__(self, urn="", resource=None, parents=None):
+        super(PrototypeTextGroup, self).__init__(identifier=str(urn))
+        self.__urn__ = URN(urn)
         self.resource = None
-        self.urn = None
-        self.works = defaultdict(Work)
+        self.works = defaultdict(PrototypeWork)
         self.parents = list()
-        self.metadata = Metadata()
-        self.metadata["groupname"] = Metadatum(name="groupname", namespace=NAMESPACES.CTS)
-
-        if urn is not None:
-            self.urn = URN(urn)
 
         if parents:
             self.parents = parents
@@ -372,16 +435,15 @@ class TextGroup(CTSCollection):
         - Added document merges with work if it already exists
 
         :param other: Textgroup object
-        :type other: TextGroup
+        :type other: PrototypeTextGroup
         :return: Textgroup Object
-        :rtype: TextGroup
+        :rtype: PrototypeTextGroup
         """
-        if not isinstance(other, TextGroup):
-            raise TypeError("Cannot add %s to TextGroup" % type(other))
+        if not isinstance(other, PrototypeTextGroup):
+            raise TypeError("Cannot add %s to PrototypeTextGroup" % type(other))
         elif str(self.urn) != str(other.urn):
-            raise InvalidURN("Cannot add TextGroup %s to TextGroup %s " % (self.urn, other.urn))
+            raise InvalidURN("Cannot add PrototypeTextGroup %s to PrototypeTextGroup %s " % (self.urn, other.urn))
 
-        self.metadata += other.metadata
         parents = [self] + self.parents
         for urn, work in other.works.items():
             if urn in self.works:
@@ -404,45 +466,43 @@ class TextGroup(CTSCollection):
             for text in work.texts.values()
         ])
 
-    @property
-    def id(self):
-        return str(self.urn)
+    def __export__(self, output=None, domain="", namespaces=True):
+        """ Create a {output} version of the TextGroup
 
-    @id.setter
-    def id(self, value):
-        self.urn = URN(value)
+        :param output: Format to be chosen
+        :type output: basestring
+        :param domain: Domain to prefix IDs when necessary
+        :type domain: str
+        :returns: Desired output formated resource
+        """
+        if output == Mimetypes.XML.CTS:
+            attrs = {"urn": self.id}
+            return self.__xml_export_generic__(attrs, namespaces=False)
 
 
-class TextInventory(CTSCollection):
-    """ Initiate a TextInventory resource
+class PrototypeTextInventory(PrototypeCTSCollection):
+    """ Initiate a PrototypeTextInventory resource
 
-    :param resource: Resource representing the TextInventory
+    :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
-    :param id: Identifier of the TextInventory
+    :param id: Identifier of the PrototypeTextInventory
     :type id: str
     """
-    TYPE_URI = RDF_PREFIX["ti"] + "TextInventory"
+    DC_TITLE_KEY = NAMESPACES.CTS.term("name")
+    TYPE_URI = NAMESPACES.CTS.term("TextInventory")
+    EXPORT_TO = [Mimetypes.XML.CTS]
 
     @property
     def members(self):
         return list(self.textgroups.values())
 
-    def __init__(self, resource=None, name=None):
-        super(TextInventory, self).__init__()
+    def __init__(self, resource=None, name="defaultInventory"):
+        super(PrototypeTextInventory, self).__init__(identifier=name)
         self.resource = None
-        self.textgroups = defaultdict(TextGroup)
-        self.__id__ = name
+        self.textgroups = defaultdict(PrototypeTextGroup)
         self.parents = list()
         if resource is not None:
             self.setResource(resource)
-
-    @property
-    def id(self):
-        return self.__id__
-
-    @id.setter
-    def id(self, value):
-        self.__id__ = value
 
     def __len__(self):
         """ Get the number of text in the Inventory
@@ -455,3 +515,20 @@ class TextInventory(CTSCollection):
             for work in tg.works.values()
             for text in work.texts.values()
         ])
+
+    def __export__(self, output=None, domain="", namespaces=True):
+        """ Create a {output} version of the PrototypeTextInventory
+
+        :param output: Format to be chosen
+        :type output: basestring
+        :param domain: Domain to prefix IDs when necessary
+        :type domain: str
+        :param namespaces: List namespaces in main node
+        :returns: Desired output formated resource
+        """
+        if output == Mimetypes.XML.CTS:
+            attrs = {}
+            if self.id:
+                attrs["tiid"] = self.id
+
+            return self.__xml_export_generic__(attrs, namespaces=namespaces)

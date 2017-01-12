@@ -137,7 +137,7 @@ class TestEndpointsCTS5(unittest.TestCase):
             )
 
     def test_get_siblings(self):
-        """ Ensure Citable Text Service getMetadata is correctly routed """
+        """ Ensure Citable PrototypeText Service getMetadata is correctly routed """
         with patch('requests.get') as patched_get:
             self.cts.getSiblings("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
             patched_get.assert_called_once_with(
@@ -148,7 +148,7 @@ class TestEndpointsCTS5(unittest.TestCase):
             )
 
     def test_get_children(self):
-        """ Ensure Citable Text Service getMetadata is correctly routed """
+        """ Ensure Citable PrototypeText Service getMetadata is correctly routed """
         with patch('requests.get') as patched_get:
             self.cts.getReffs("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
             patched_get.assert_called_once_with(
@@ -179,7 +179,7 @@ class TestEndpointsCTS5(unittest.TestCase):
             )
 
     def test_get_metadata(self):
-        """ Ensure Citable Text Service getMetadata is correctly routed """
+        """ Ensure Citable PrototypeText Service getMetadata is correctly routed """
         with patch('requests.get') as patched_get:
             self.cts.getMetadata()
             patched_get.assert_called_once_with(
@@ -197,7 +197,7 @@ class TestEndpointsCTS5(unittest.TestCase):
             )
 
     def test_get_text(self):
-        """ Ensure Citable Text Service getText is correctly routed """
+        """ Ensure Citable PrototypeText Service getText is correctly routed """
         with patch('requests.get') as patched_get:
             self.cts.getTextualNode(textId="urn", metadata=True)
             patched_get.assert_called_once_with(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 .. module:: MyCapytain.resources.texts.api.cts
-   :synopsis: Text and Passage implementation for dealing with CTS API Responses
+   :synopsis: PrototypeText and Passage implementation for dealing with CTS API Responses
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
@@ -21,7 +21,7 @@ from MyCapytain.errors import MissingAttribute
 
 
 class __SharedMethod__(prototypes.InteractiveTextualNode):
-    """ Set of methods shared by Text and Passage
+    """ Set of methods shared by PrototypeText and Passage
 
     :param retriever: Retriever used to retrieve other data
     :type retriever: MyCapytain.retrievers.prototypes.CitableTextServiceRetriever
@@ -307,7 +307,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
 
 class Text(__SharedMethod__, prototypes.CitableText):
-    """ API Text object
+    """ API PrototypeText object
 
     :param urn: A URN identifier
     :type urn: Union[URN, str, unicode]

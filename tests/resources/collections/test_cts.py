@@ -134,19 +134,19 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:groupname xml:lang='eng'>Martial</ti:groupname>
 <ti:groupname xml:lang='lat'>Martialis</ti:groupname>""" + self.wk + """</ti:textgroup>""".replace("\n", "")
 
-        self.t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + self.tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
+        self.t = """<ti:PrototypeTextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + self.tg + """</ti:PrototypeTextInventory>""".replace("\n", "").strip("\n")
         self.maxDiff = None
 
     def tearDown(self):
         self.getCapabilities.close()
 
     def test_xml_TextInventoryLength(self):
-        """ Tests TextInventory parses without errors """
+        """ Tests PrototypeTextInventory parses without errors """
         TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         self.assertEqual(len(TI), 15)
 
     def test_xml_TextInventoryParsing(self):
-        """ Tests TextInventory parses without errors """
+        """ Tests PrototypeTextInventory parses without errors """
         TI = TextInventory(resource=self.getCapabilities, name="TestInv")
         self.assertGreater(len(TI.textgroups), 0)
 
@@ -239,7 +239,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         TI = TextInventory(
             name="TestInv",
             resource="""
-<ti:TextInventory xmlns:ti="http://chs.harvard.edu/xmlns/cts" tiid="thibault3">
+<ti:PrototypeTextInventory xmlns:ti="http://chs.harvard.edu/xmlns/cts" tiid="thibault3">
     <ti:textgroup urn="urn:cts:greekLit:tlg0003">
         <ti:groupname xml:lang="en">Thucydides</ti:groupname>
         <ti:groupname xml:lang="eng">Thucydides</ti:groupname>
@@ -249,7 +249,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             <ti:title xml:lang="eng">The Peloponnesian War</ti:title>
         </ti:work>
     </ti:textgroup>
-</ti:TextInventory>
+</ti:PrototypeTextInventory>
             """
         )
         self.assertEqual(str(TI["urn:cts:greekLit:tlg0003.tlg001"].urn), "urn:cts:greekLit:tlg0003.tlg001")
@@ -262,7 +262,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             )
 
     def test_Inventory_pickle(self):
-        """ Tests TextInventory parses without errors """
+        """ Tests PrototypeTextInventory parses without errors """
         TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
         from pickle import dumps, loads
 
@@ -277,7 +277,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
 
     def test_Inventory_metadata(self):
-        """ Tests TextInventory parses without errors """
+        """ Tests PrototypeTextInventory parses without errors """
         TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
         self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["eng"], "Martial")
         self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["lat"], "Martialis")
@@ -321,7 +321,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:groupname xml:lang='eng'>Martial</ti:groupname>
 <ti:groupname xml:lang='lat'>Martialis</ti:groupname>""" + wk + """</ti:textgroup>""".replace("\n", "")
 
-        t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
+        t = """<ti:PrototypeTextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ti:PrototypeTextInventory>""".replace("\n", "").strip("\n")
 
         ti = TextInventory(resource=t, name="annotsrc")
         self.assertXmlEquivalentOutputs(*compareSTR(str(ti), t))
@@ -342,7 +342,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].lang, "eng")
 
     def test_export_to_text(self):
-        """ Test export to Text object """
+        """ Test export to PrototypeText object """
         TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
@@ -512,12 +512,12 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertRaises(
             TypeError,
             lambda x: Work(urn="urn:cts:latinLit:phi1294.phi002").update(TextGroup(urn="urn:cts:latinLit:phi1297")),
-            "Addition of different type should fail for Work"
+            "Addition of different type should fail for PrototypeWork"
         )
         self.assertRaises(
             TypeError,
             lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(Work(urn="urn:cts:latinLit:phi1297.phi002")),
-            "Addition of different type should fail for TextGroup"
+            "Addition of different type should fail for PrototypeTextGroup"
         )
 
     def test_export_jsonld(self):
@@ -602,7 +602,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                         ],
                         'http://w3id.org/dts-ontology/properties': {
                             'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
-                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
+                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/PrototypeWork'
                         }
                     },
                     {
@@ -623,13 +623,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                         'http://w3id.org/dts-ontology/description': None,
                         'http://w3id.org/dts-ontology/properties': {
                             'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
-                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
+                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/PrototypeWork'
                         }
                     }
                 ],
                 'http://w3id.org/dts-ontology/properties': {
                     'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
-                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/TextGroup'
+                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/PrototypeTextGroup'
                 }
             },
             tg.export(Mimetypes.JSON.DTS.Std, domain="http://capitain.github.io/domain/"),

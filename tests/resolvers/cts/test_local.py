@@ -5,9 +5,8 @@ from __future__ import unicode_literals
 from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
 from MyCapytain.common.constants import NS, Mimetypes
 from MyCapytain.common.reference import URN, Reference
-from MyCapytain.common.metadata import Metadatum
 from MyCapytain.resources.prototypes.metadata import Collection
-from MyCapytain.resources.prototypes.cts.inventory import TextGroup, Text as TextMetadata
+from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup, PrototypeText as TextMetadata
 from MyCapytain.resources.prototypes.text import Passage
 from unittest import TestCase
 
@@ -166,7 +165,7 @@ class TextXMLFolderResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -198,7 +197,7 @@ class TextXMLFolderResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -252,7 +251,7 @@ class TextXMLFolderResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -305,7 +304,7 @@ class TextXMLFolderResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -379,7 +378,7 @@ class TextXMLFolderResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export Text should work correctly"
+            "Export PrototypeText should work correctly"
         )
 
         self.assertEqual(
@@ -396,7 +395,7 @@ class TextXMLFolderResolver(TestCase):
             "Resolver should return a collection object"
         )
         self.assertIsInstance(
-            metadata.members[0], TextGroup,
+            metadata.members[0], PrototypeTextGroup,
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
@@ -412,12 +411,14 @@ class TextXMLFolderResolver(TestCase):
             "There should be 14 editions + 1 translations in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
+                "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["http://w3id.org/dts-ontology/members"]],
-            ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959", "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
+            ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959",
+             "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
             "There should be 4 Members in DTS JSON"
         )
 
@@ -430,7 +431,7 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertIsInstance(
             metadata.members[0], TextMetadata,
-            "Members of Work should be Texts"
+            "Members of PrototypeWork should be Texts"
         )
         self.assertEqual(
             len(metadata.descendants), 1,
@@ -445,11 +446,12 @@ class TextXMLFolderResolver(TestCase):
             "There should be 1 edition in readableDescendants"
         )
         self.assertIsInstance(
-            metadata.parents[1], TextGroup,
-            "First parent should be TextGroup"
+            metadata.parents[1], PrototypeTextGroup,
+            "First parent should be PrototypeTextGroup"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
+                "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertEqual(
@@ -465,7 +467,7 @@ class TextXMLFolderResolver(TestCase):
                     ["http://w3id.org/dts-ontology/navigation"]\
                     ["http://w3id.org/dts-ontology/parents"]
                 ],
-            ["http://chs.harvard.edu/xmlns/cts/TextGroup", "http://chs.harvard.edu/xmlns/cts/TextInventory"],
+            ["http://chs.harvard.edu/xmlns/cts/PrototypeTextGroup", "http://chs.harvard.edu/xmlns/cts/PrototypeTextInventory"],
             "There should be one member in DTS JSON"
         )
 

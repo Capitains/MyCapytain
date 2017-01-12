@@ -138,7 +138,7 @@ class __SharedMethods__:
     def textObject(self):
         """ Textual Object with full capacities (Unlike Simple Passage)
 
-        :rtype: Text, Passage
+        :rtype: PrototypeText, Passage
         :return: Textual Object with full capacities (Unlike Simple Passage)
         """
         text = None
@@ -177,7 +177,7 @@ class __SharedMethods__:
         :returns: List of levels
         :rtype: list(basestring, str)
 
-        .. note:: GetValidReff works for now as a loop using Passage, subinstances of Text, to retrieve the valid \
+        .. note:: GetValidReff works for now as a loop using Passage, subinstances of PrototypeText, to retrieve the valid \
         informations. Maybe something is more powerfull ?
         """
         depth = 0
@@ -283,7 +283,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
     :type urn: URN
     :param citation: Citation scheme of the text
     :type citation: Citation
-    :param text: Text containing the passage
+    :param text: PrototypeText containing the passage
     :type text: Text
     """
     def __init__(self, resource, reference, citation, text, urn=None):
@@ -379,7 +379,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         """
 
         if not self.__text__:
-            raise MissingAttribute("Passage was iniated without Text object")
+            raise MissingAttribute("Passage was iniated without PrototypeText object")
         if self.__prevnext__ is not None:
             return self.__prevnext__
 
@@ -411,7 +411,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
 
     @property
     def textObject(self):
-        """ Text Object. Required for NextPrev
+        """ PrototypeText Object. Required for NextPrev
 
         :rtype: Text
         """
@@ -500,8 +500,8 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
         :type citation: Citation
         :param resource: Element representing the passage
         :type resource: etree._Element
-        :param text: Text containing the passage
-        :type text: Text
+        :param text: PrototypeText containing the passage
+        :type text: PrototypeText
 
         .. note::
             .prev, .next, .first and .last won't run on passage with a range made of two different level, such as
@@ -588,7 +588,7 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
         self.__raiseDepth__()
 
         if not self.__text__:
-            raise MissingAttribute("Passage was initiated without Text object")
+            raise MissingAttribute("Passage was initiated without PrototypeText object")
         if self.__prevnext__:
             return self.__prevnext__
 
@@ -657,7 +657,7 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
 
     @property
     def textObject(self):
-        """ Text Object. Required for NextPrev
+        """ PrototypeText Object. Required for NextPrev
 
         :rtype: Text
         """

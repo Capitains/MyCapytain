@@ -1,5 +1,7 @@
-from collections import namedtuple
 from inspect import getmro
+from rdflib import Namespace, Graph
+from rdflib.namespace import SKOS
+
 
 #: List of XPath Namespaces used in guidelines
 NS = {
@@ -63,9 +65,6 @@ RDF_MAPPING = {
     'http://xmlns.com/wot/0.1/': 'wot'
 }
 
-#: Namespace tuple that can be used to express namespace information
-Namespace = namedtuple("Namespace", ["uri", "prefix"])
-
 
 class NAMESPACES:
     """ Namespaces Constants used to provide Namespace capacities across the library
@@ -77,9 +76,9 @@ class NAMESPACES:
     :cvar DC: DC Elements
     :type DC: Namespace
     """
-    CTS = Namespace("http://chs.harvard.edu/xmlns/cts/", "ti")
-    TEI = Namespace("http://www.tei-c.org/ns/1.0/", "tei")
-    DC = Namespace("http://purl.org/dc/elements/1.1/", "dc")
+    CTS = Namespace("http://chs.harvard.edu/xmlns/cts/")
+    DTS = Namespace("http://w3id.org/dts-ontology/")
+    TEI = Namespace("http://www.tei-c.org/ns/1.0/")
 
 
 class Mimetypes:
@@ -100,6 +99,7 @@ class Mimetypes:
         """
         Std = "application/text"
         CTS = "application/ld+json:CTS"
+        LD = "application/ld+json"
 
         class DTS:
             """ JSON DTS Expression
@@ -116,10 +116,13 @@ class Mimetypes:
         :cvar Std: Standard XML Export
         :cvar RDF: RDF XML Expression Export
         :cvar CTS: CTS API XML Expression Export
+        :cvar TEI: TEI XML Expression Export
         """
         Std = "text/xml"
         RDF = "application/rdf+xml"
+        RDFa = "application/rdfa+xml"
         CTS = "text/xml:CTS"
+        TEI = "text/xml:tei"
 
     class PYTHON:
         """ Python Native Objects
@@ -147,6 +150,9 @@ class Exportable(object):
     """
     EXPORT_TO = []
     DEFAULT_EXPORT = None
+
+    def __init__(self, *args, **kwargs):
+        pass
 
     @property
     def export_capacities(self):
@@ -179,3 +185,16 @@ class Exportable(object):
         raise NotImplementedError(
             "Mimetype {} has not been implemented for this resource".format(output or "(No Mimetype)")
         )
+
+
+GRAPH = Graph()
+GRAPH.bind("", NAMESPACES.CTS)
+GRAPH.bind("dts", NAMESPACES.DTS)
+GRAPH.bind("tei", NAMESPACES.TEI)
+GRAPH.bind("skos", SKOS)
+
+RDFLIB_MAPPING = {
+    Mimetypes.XML.RDF: "xml",
+    Mimetypes.JSON.LD: "json-ld",
+    Mimetypes.JSON.DTS.Std: "json-ld"
+}

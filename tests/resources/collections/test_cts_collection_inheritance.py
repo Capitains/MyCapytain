@@ -1,6 +1,5 @@
 from unittest import TestCase
 from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Text
-from MyCapytain.common.metadata import Metadatum
 
 with open("tests/testing_data/examples/getcapabilities.seneca.xml") as f:
     SENECA = f.read()

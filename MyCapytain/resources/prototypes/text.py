@@ -134,9 +134,9 @@ class TextualNode(TextualElement, NodeId):
 
     @property
     def citation(self):
-        """ Citation Object of the Text
+        """ Citation Object of the PrototypeText
 
-        :return: Citation Object of the Text
+        :return: Citation Object of the PrototypeText
         :rtype: Citation
         """
         return self.__citation__

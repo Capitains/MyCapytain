@@ -28,14 +28,14 @@ class API(object):
 
 
 class CitableTextServiceRetriever(API):
-    """ Citable Text Service retrievers should have at least have some of the following properties
+    """ Citable PrototypeText Service retrievers should have at least have some of the following properties
 
     """
 
     def getMetadata(self, objectId=None, **filters):
         """ Request metadata about a text or a collection
 
-        :param objectId: Text Identifier
+        :param objectId: PrototypeText Identifier
         :param filters: Kwargs parameters. URN and Inv are available
         :return: Metadata of text from an API or the likes as bytes
         """
@@ -44,18 +44,18 @@ class CitableTextServiceRetriever(API):
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :param subreference: Passage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
-        :return: Text of a Passage from an API or the likes as bytes
+        :return: PrototypeText of a Passage from an API or the likes as bytes
         """
         raise NotImplementedError
 
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :param subreference: Passage Reference
         :return: Siblings references from an API or the likes as bytes
         """
@@ -64,7 +64,7 @@ class CitableTextServiceRetriever(API):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int

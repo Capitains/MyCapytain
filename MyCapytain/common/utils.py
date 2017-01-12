@@ -18,13 +18,46 @@ from io import IOBase, StringIO
 from lxml import etree
 from lxml.objectify import ObjectifiedElement, parse
 from six import text_type
+from xml.sax.saxutils import escape
 
 from MyCapytain.common.constants import NS
 
 __strip = re.compile("([ ]{2,})+")
 __parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
 
-""" Namespace """
+
+def make_xml_node(graph, name, close=False, attributes=None, text="", complete=False, innerXML=""):
+
+    name = graph.namespace_manager.qname(name)
+    if complete:
+        if attributes is not None:
+            return "<{0} {1}>{2}{3}</{0}>".format(
+                name,
+                " ".join(
+                    [
+                        "{}=\"{}\"".format(attr_name, attr_value)
+                        for attr_name, attr_value in attributes.items()
+                    ]
+                ),
+                escape(text),
+                innerXML
+            )
+        return "<{0}>{1}{2}</{0}>".format(name, escape(text), innerXML)
+    elif close is True:
+        return "</{}>".format(name)
+    elif attributes is not None:
+        return "<{} {}>".format(
+            name,
+            " ".join(
+                [
+                    "{}=\"{}\"".format(attr_name, attr_value)
+                    for attr_name, attr_value in attributes.items()
+                ]
+            )
+        )
+    return "<{}>".format(name)
+
+
 
 
 def xmliter(node):

@@ -10,7 +10,7 @@ import MyCapytain.common.metadata
 
 
 class TestProtoResource(unittest.TestCase):
-    """ Test for resource, mother class of Text and Passage """
+    """ Test for resource, mother class of PrototypeText and Passage """
     def test_init(self):
         a = CTSNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.id, "urn:cts:latinLit:phi1294.phi002.perseus-lat2")

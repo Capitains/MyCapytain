@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 
 import re
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from copy import copy
 from functools import reduce
 from io import IOBase, StringIO
@@ -19,6 +19,7 @@ from lxml import etree
 from lxml.objectify import ObjectifiedElement, parse
 from six import text_type
 from xml.sax.saxutils import escape
+from rdflib import BNode, Graph
 
 from MyCapytain.common.constants import NS
 
@@ -57,6 +58,63 @@ def make_xml_node(graph, name, close=False, attributes=None, text="", complete=F
         )
     return "<{}>".format(name)
 
+
+class Subgraph(object):
+    def __init__(self, namespace_manager):
+        self.graph = Graph()
+        self.graph.namespace_manager = namespace_manager
+        self.downwards = defaultdict(lambda: True)
+        self.updwards = defaultdict(lambda: True)
+
+    def graphiter(self, graph, target, ascendants=0, descendants=1):
+        """ Iter on a graph to finds object connected
+
+        :param graph: Graph to serialize
+        :type graph: Graph
+        :param target: Node to iterate over
+        :type target: Node
+        :param ascendants: Number of level to iter over upwards (-1 = No Limit)
+        :param descendants: Number of level to iter over downwards (-1 = No limit)
+        :return:
+        """
+
+        asc = 0 + ascendants
+        if asc != 0:
+            asc -= 1
+
+        desc = 0 + descendants
+        if desc != 0:
+            desc -= 1
+
+        t = str(target)
+
+        if descendants != 0 and self.downwards[t] is True:
+            self.downwards[t] = False
+            for pred, obj in graph.predicate_objects(target):
+                if desc == 0 and isinstance(obj, BNode):
+                    continue
+                self.add((target, pred, obj))
+
+                # Retrieve triples about the object
+                if desc != 0 and self.downwards[str(obj)] is True:
+                    self.graphiter(graph, target=obj, ascendants=0, descendants=desc)
+
+        if ascendants != 0 and self.updwards[t] is True:
+            self.updwards[t] = False
+            for s, p in graph.subject_predicates(object=target):
+                if desc == 0 and isinstance(s, BNode):
+                    continue
+                self.add((s, p, target))
+
+                # Retrieve triples about the parent as object
+                if asc != 0 and self.updwards[str(s)] is True:
+                    self.graphiter(graph, target=s, ascendants=asc, descendants=0)
+
+    def serialize(self, *args, **kwargs):
+        return self.graph.serialize(*args, **kwargs)
+
+    def add(self, *args, **kwargs):
+        self.graph.add(*args, **kwargs)
 
 
 

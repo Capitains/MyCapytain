@@ -8,11 +8,10 @@
 """
 
 from MyCapytain.common.metadata import Metadata
+from MyCapytain.common.utils import Subgraph
 from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, GRAPH
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
-from rdflib.collection import Collection as RDFlibCollection
 from rdflib.namespace import SKOS
-from rdflib.graph import ConjunctiveGraph
 
 
 class Collection(Exportable):
@@ -149,7 +148,7 @@ class Collection(Exportable):
             return None
         else:
             self.children[member.id] = member
-            self.graph.add((self.asNode(), NAMESPACES.DTS.child, member.asNode()))
+            #self.graph.add((self.asNode(), NAMESPACES.DTS.child, member.asNode()))
 
     def __getitem__(self, item):
         """ Retrieve an item by its ID in the tree of a collection
@@ -193,16 +192,6 @@ class Collection(Exportable):
         """
         return [member for member in self.descendants if member.readable]
 
-    def refresh(self):
-        """ Updates current Collection with subproperties
-
-        :return:
-        """
-        # We update parents properties
-        self.graph.remove((self.asNode(), NAMESPACES.DTS.parents, None))
-        for parent in self.parents:
-            self.graph.add((self.asNode(), NAMESPACES.DTS.parents, parent.asNode()))
-
     def __export__(self, output=None, domain=""):
         """ Export the collection item in the Mimetype required.
 
@@ -218,18 +207,11 @@ class Collection(Exportable):
         if output == Mimetypes.JSON.DTS.Std \
                 or output == Mimetypes.JSON.LD\
                 or output == Mimetypes.XML.RDF:
-            self.refresh()
 
             # We create a temp graph
-            graph = Graph()
-            graph.namespace_manager = GRAPH.namespace_manager
-            for pred, obj in self.graph[self.asNode()]:
-                graph.add((self.asNode(), pred, obj))
-                for _, p2, o2 in self.graph.triples((obj, None, None)):
-                    graph.add((obj, p2, o2))
-                    for _, p3, o3 in self.graph.triples((o2, None, None)):
-                        graph.add((o2, p3, o3))
+            store = Subgraph(GRAPH.namespace_manager)
+            store.graphiter(self.graph, self.asNode(), ascendants=1, descendants=-1)
 
-            o = graph.serialize(format=RDFLIB_MAPPING[output], auto_compact=True)
-            del graph
+            o = store.serialize(format=RDFLIB_MAPPING[output], auto_compact=True, indent="")
+            del store
             return o

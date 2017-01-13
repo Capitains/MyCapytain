@@ -81,10 +81,11 @@ c.update(e)
 from MyCapytain.retrievers.cts5 import CTS
 c = CTS("http://cts.perseids.org/api/cts/")
 
-a = TextInventory.parse(resource=c.getCapabilities(urn="urn:cts:greekLit:tlg0007"))
+a = TextInventory.parse(resource=c.getCapabilities(urn="urn:cts:latinLit:phi0959"))
 
 #with open("tests/testing_data/cts/getCapabilities.xml") as f:
 #    a = TextInventory.parse(resource=f)
-print(a.export(Mimetypes.JSON.LD).decode())
-print(a.export(Mimetypes.XML.RDF).decode())
-print(a.export(Mimetypes.XML.CTS))
+print(a["urn:cts:latinLit:phi0959.phi005"])
+print(a["urn:cts:latinLit:phi0959.phi005"].export(Mimetypes.JSON.LD).decode())
+#print(a.export(Mimetypes.XML.RDF).decode())
+#print(a.export(Mimetypes.XML.CTS))

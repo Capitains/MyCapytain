@@ -299,7 +299,7 @@ class TextInventory(cts.PrototypeTextInventory):
         :param type: basestring, etree._Element
         """
         xml = xmlparser(resource)
-        o = TextInventory(name=xml.get("tiid") or "")
+        o = TextInventory(name=xml.xpath("//ti:TextInventory", namespaces=NS)[0].get("tiid") or "")
         # Parse textgroups
         xpathDict(xml=xml, xpath='//ti:textgroup', cls=TextGroup, parent=o)
         return o

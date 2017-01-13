@@ -114,6 +114,14 @@ class Metadata(BNode, Exportable):
 
     @staticmethod
     def getOr(subject, predicate, *args, **kwargs):
+        """ Retrieve a metadata node or generate a new one
+
+        :param subject: Subject to which the metadata node should be connected
+        :param predicate: Predicate by which the metadata node should be connected
+        :return: Metadata for given node
+        :rtype: Metadata
+
+        """
         if (subject, predicate, None) in GRAPH:
             return GRAPH.objects(subject, predicate).__next__()
         return Metadata(*args, **kwargs)

@@ -18,32 +18,28 @@ from collections import defaultdict
 from copy import deepcopy
 
 from rdflib import RDF, Literal, URIRef
-from rdflib.collection import Collection as RDFLibCollection
 from rdflib.namespace import DC
 
 
 class PrototypeCTSCollection(Collection):
     """ Resource represents any resource from the inventory
 
-    :param resource: Resource representing the PrototypeTextInventory
-    :type resource: Any
+    :param identifier: Identifier representing the PrototypeTextInventory
+    :type identifier: str,URN
     :cvar CTSMODEL: String Representation of the type of collection
     """
     CTSMODEL = "CTSCollection"
     DC_TITLE_KEY = None
     CTS_PROPERTIES = []
 
-    def __init__(self, identifier="", resource=None):
+    def __init__(self, identifier=""):
         super(PrototypeCTSCollection, self).__init__(identifier)
 
         if hasattr(type(self), "CTSMODEL"):
             self.graph.set((self.asNode(), RDF.type, NAMESPACES.CTS.term(self.CTSMODEL)))
             self.graph.set((self.asNode(), NAMESPACES.CTS.isA, NAMESPACES.CTS.term(self.CTSMODEL)))
 
-        self.resource = None
         self.__urn__ = ""
-        if resource is not None:
-            self.setResource(resource)
 
     @property
     def urn(self):
@@ -54,45 +50,34 @@ class PrototypeCTSCollection(Collection):
             return True
         elif not isinstance(other, self.__class__):
             return False
-        elif self.resource is None:
-            # Not totally true
-            return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn
-        return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn and self.resource == other.resource
+        return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn
 
-    def setResource(self, resource):
-        """ Set the object property resource
+    def set_cts_property(self, prop, value, lang=None):
+        """ Set given property in CTS Namespace
 
-        :param resource: Resource representing the PrototypeTextInventory
-        :type resource: Any
-        :rtype: Any
-        :returns: Input resource
+        .. example::
+            collection.set_cts_property("groupname", "MyCapytain", "eng")
+
+        :param prop: Property to set (Without namespace)
+        :param value: Value to set for given property
+        :param lang: Language to set for given value
         """
-        self.resource = resource
-        self.parse(resource)
-        return self.resource
-
-    def parse(self, resource):
-        """ Parse the object resource
-
-        :param resource: Resource representing the PrototypeTextInventory
-        :type resource: Any
-        :rtype: List
-        """
-        raise NotImplementedError()
-
-    def set_cts_property(self, property, value, lang=None):
         if not isinstance(value, Literal):
             value = Literal(value, lang=lang)
-        property = NAMESPACES.CTS.term(property)
+        prop = NAMESPACES.CTS.term(prop)
 
-        if property == self.DC_TITLE_KEY:
+        if prop == self.DC_TITLE_KEY:
             self.set_label(value, lang)
 
         self.graph.add(
-            (self.metadata, property, value)
+            (self.metadata, prop, value)
         )
 
     def __namespaces_header__(self):
+        """ Generates Namespaces Header given the graph
+
+        :return: Dictionary with XMLNS prefix and uri as key and values
+        """
         nm = self.graph.namespace_manager
         bindings = {}
         for predicate in set(self.graph.predicates()):
@@ -105,12 +90,18 @@ class PrototypeCTSCollection(Collection):
         return bindings
 
     def __xml_export_generic__(self, attrs, namespaces=False, lines="\n"):
+        """ Shared method for Mimetypes.XML.CTS Export
+
+        :param attrs: Dictionary of attributes for the node
+        :param namespaces: Add namespaces to the node
+        :param lines: New Line Character (Can be empty)
+        :return: String representation of XML Nodes
+        """
         if namespaces is True:
             attrs.update(self.__namespaces_header__())
 
         strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
 
-        #additional = [make_xml_node(self.graph, NAMESPACES.CTS.extra)]
         for pred in self.CTS_PROPERTIES:
             for obj in self.graph.objects(self.metadata, pred):
                 strings.append(
@@ -119,13 +110,8 @@ class PrototypeCTSCollection(Collection):
                     )
                 )
 
-        #c = RDFLibCollection(self.graph, self.asNode())
-        #additional.append(c.graph.serialize(format="xml").decode())
-        #additional.append(make_xml_node(self.graph, NAMESPACES.CTS.extra, close=True))
-        #strings = strings + additional
-
-        for object in self.members:
-            strings.append(object.export(Mimetypes.XML.CTS, namespaces=False))
+        for obj in self.members:
+            strings.append(obj.export(Mimetypes.XML.CTS, namespaces=False))
 
         strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
 
@@ -135,47 +121,56 @@ class PrototypeCTSCollection(Collection):
 class PrototypeText(PrototypeCTSCollection):
     """ Represents a CTS PrototypeText
 
-    :param resource: Resource representing the PrototypeTextInventory
-    :type resource: Any
     :param urn: Identifier of the PrototypeText
     :type urn: str
-    :param parents: Item parents of the current collection
-    :type parents: [PrototypeCTSCollection]
-    :param subtype: Subtype of the object (Edition, Translation)
-    :type subtype: str
+    :param parent: Item parents of the current collection
+    :type parent: [PrototypeCTSCollection]
 
     :ivar urn: URN Identifier
     :type urn: URN
-    :ivar parents: List of ancestors, from parent to furthest
     """
 
     DC_TITLE_KEY = NAMESPACES.CTS.term("label")
     EXPORT_TO = [Mimetypes.XML.CTS]
     CTS_PROPERTIES = [NAMESPACES.CTS.label, NAMESPACES.CTS.description]
+    SUBTYPE = "unknown"
 
-    def __init__(self, urn="", resource=None, parents=None, subtype="Edition"):
-        self.subtype = subtype
+    def __init__(self, urn="", parent=None):
+        self.__subtype__ = self.SUBTYPE
         super(PrototypeText, self).__init__(identifier=str(urn))
         self.resource = None
         self.citation = None
         self.__urn__ = URN(urn)
         self.docname = None
-        self.parents = list()
         self.validate = None
 
-        if parents is not None:
-            self.parents = parents
-            self.lang = self.parents[0].lang
+        if parent is not None:
+            self.parent = parent
+            self.lang = self.parent.lang
 
-        if resource is not None:
-            self.setResource(resource)
+    @property
+    def subtype(self):
+        """ Subtype of the object
+
+        :return: string representation of subtype
+        """
+        return self.__subtype__
 
     @property
     def lang(self):
+        """ Languages this text is in
+
+        :return: List of available languages
+        """
         return str(self.graph.value(self.asNode(), DC.language))
 
     @lang.setter
     def lang(self, lang):
+        """ Language this text is available in
+
+        :param lang: Language to add
+        :type lang: str
+        """
         self.graph.set((self.asNode(), DC.language, Literal(lang)))
 
     @property
@@ -184,10 +179,22 @@ class PrototypeText(PrototypeCTSCollection):
 
     @property
     def members(self):
+        """ Children of the collection's item
+
+        .. warning:: Text has no children
+
+        :rtype: list
+        """
         return []
 
     @property
     def descendants(self):
+        """ Descendants of the collection's item
+
+        .. warning:: Text has no Descendants
+
+        :rtype: list
+        """
         return []
 
     def translations(self, key=None):
@@ -196,7 +203,7 @@ class PrototypeText(PrototypeCTSCollection):
         :param key: Language ISO Code to filter on
         :return:
         """
-        return self.parents[0].getLang(key)
+        return self.parent.get_translation_in(key)
 
     def editions(self):
         """ Get all editions of the texts
@@ -220,7 +227,7 @@ class PrototypeText(PrototypeCTSCollection):
         :returns: Desired output formated resource
         """
         if output == Mimetypes.XML.CTS:
-            attrs = {"urn": self.id}
+            attrs = {"urn": self.id, "xml:lang": self.lang}
             if namespaces is True:
                 attrs.update(self.__namespaces_header__())
 
@@ -236,17 +243,18 @@ class PrototypeText(PrototypeCTSCollection):
                     )
 
             # Citation !
-            strings.append(
-                # Online
-                make_xml_node(
-                    self.graph, NAMESPACES.CTS.term("online"), complete=True,
-                    # Citation Mapping
-                    innerXML=make_xml_node(
-                        self.graph, NAMESPACES.CTS.term("citationMapping"), complete=True,
-                        innerXML=self.citation.export(Mimetypes.XML.CTS)
+            if self.citation is not None:
+                strings.append(
+                    # Online
+                    make_xml_node(
+                        self.graph, NAMESPACES.CTS.term("online"), complete=True,
+                        # Citation Mapping
+                        innerXML=make_xml_node(
+                            self.graph, NAMESPACES.CTS.term("citationMapping"), complete=True,
+                            innerXML=self.citation.export(Mimetypes.XML.CTS)
+                        )
                     )
                 )
-            )
             strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
 
             return lines.join(strings)
@@ -255,33 +263,25 @@ class PrototypeText(PrototypeCTSCollection):
 class PrototypeEdition(PrototypeText):
     """ Represents a CTS Edition
 
-    :param resource: Resource representing the PrototypeTextInventory
-    :type resource: Any
     :param urn: Identifier of the PrototypeText
     :type urn: str
-    :param parents: Item parents of the current collection
-    :type parents: [PrototypeCTSCollection]
+    :param parent: Parent of current item
+    :type parent: PrototypeWork
     """
     TYPE_URI = NAMESPACES.CTS.term("edition")
-
-    def __init__(self, urn=None, resource=None, parents=None):
-        super(PrototypeEdition, self).__init__(urn=urn, resource=resource, parents=parents, subtype="Edition")
+    SUBTYPE = "edition"
 
 
 class PrototypeTranslation(PrototypeText):
     """ Represents a CTS Translation
 
-    :param resource: Resource representing the PrototypeTextInventory
-    :type resource: Any
     :param urn: Identifier of the PrototypeText
     :type urn: str
-    :param parents: Item parents of the current collection
-    :type parents: [PrototypeCTSCollection]
+    :param parent: Parent of current item
+    :type parent: PrototypeWork
     """
     TYPE_URI = NAMESPACES.CTS.term("translation")
-
-    def __init__(self, urn=None, resource=None, parents=None):
-        super(PrototypeTranslation, self).__init__(urn=urn, resource=resource, parents=parents, subtype="Translation")
+    SUBTYPE = "translation"
 
 
 class PrototypeWork(PrototypeCTSCollection):
@@ -290,16 +290,13 @@ class PrototypeWork(PrototypeCTSCollection):
     CTS PrototypeWork can be added to each other which would most likely happen if you take your data from multiple API or \
     Textual repository. This works close to dictionary update in Python. See update
 
-    :param resource: Resource representing the PrototypeTextInventory
-    :type resource: Any
     :param urn: Identifier of the PrototypeWork
     :type urn: str
-    :param parents: List of parents for current object
-    :type parents: Tuple.<PrototypeTextInventory>
+    :param parent: Parent of current object
+    :type parent: PrototypeTextGroup
 
     :ivar urn: URN Identifier
     :type urn: URN
-    :ivar parents: List of ancestors, from parent to furthest
     """
 
     DC_TITLE_KEY = NAMESPACES.CTS.term("title")
@@ -307,25 +304,39 @@ class PrototypeWork(PrototypeCTSCollection):
     EXPORT_TO = [Mimetypes.XML.CTS]
     CTS_PROPERTIES = [NAMESPACES.CTS.term("title")]
 
-    def __init__(self, resource=None, urn=None, parents=None):
+    def __init__(self, urn=None, parent=None):
         super(PrototypeWork, self).__init__(identifier=str(urn))
         self.__urn__ = URN(urn)
-        self.texts = defaultdict(PrototypeText)
-        self.parents = list()
+        self.__children__ = defaultdict(PrototypeText)
 
-        if parents is not None:
-            self.parents = parents
+        if parent is not None:
+            self.parent = parent
 
-        if resource is not None:
-            self.setResource(resource)
+    @property
+    def texts(self):
+        """ Texts
+
+        :return: Dictionary of texts
+        :rtype: defaultdict(:class:`PrototypeTexts`)
+        """
+        return self.__children__
 
     @property
     def lang(self):
-        return [str(x) for x in self.graph.objects(self.asNode(), DC.language)]
+        """ Languages this text is in
+
+        :return: List of available languages
+        """
+        return str(self.graph.value(self.asNode(), DC.language))
 
     @lang.setter
     def lang(self, lang):
-        self.graph.add((self.asNode(), DC.language, Literal(lang)))
+        """ Language this text is available in
+
+        :param lang: Language to add
+        :type lang: str
+        """
+        self.graph.set((self.asNode(), DC.language, Literal(lang)))
 
     def update(self, other):
         """ Merge two Work Objects.
@@ -343,15 +354,14 @@ class PrototypeWork(PrototypeCTSCollection):
         elif self.urn != other.urn:
             raise InvalidURN("Cannot add PrototypeWork %s to PrototypeWork %s " % (self.urn, other.urn))
 
-        parents = [self] + self.parents
         for urn, text in other.texts.items():
             self.texts[urn] = deepcopy(text)
-            self.texts[urn].parents = parents
+            self.texts[urn].parent = self
             self.texts[urn].resource = None
 
         return self
 
-    def getLang(self, key=None):
+    def get_translation_in(self, key=None):
         """ Find a translation with given language
 
         :param key: Language to find
@@ -371,10 +381,6 @@ class PrototypeWork(PrototypeCTSCollection):
         """
         return len(self.texts)
 
-    @property
-    def members(self):
-        return list(self.texts.values())
-
     def __export__(self, output=None, domain="", namespaces=True):
         """ Create a {output} version of the Work
 
@@ -385,7 +391,7 @@ class PrototypeWork(PrototypeCTSCollection):
         :returns: Desired output formated resource
         """
         if output == Mimetypes.XML.CTS:
-            attrs = {"urn": self.id}
+            attrs = {"urn": self.id, "xml:lang": self.lang}
             return self.__xml_export_generic__(attrs, namespaces=False)
 
 
@@ -395,38 +401,35 @@ class PrototypeTextGroup(PrototypeCTSCollection):
     CTS PrototypeTextGroup can be added to each other which would most likely happen if you take your data from multiple API or \
     Textual repository. This works close to dictionary update in Python. See update
 
-    :param resource: Resource representing the PrototypeTextInventory
-    :type resource: Any
     :param urn: Identifier of the PrototypeTextGroup
     :type urn: str
-    :param parents: List of parents for current object
-    :type parents: Tuple.<PrototypeTextInventory>
+    :param parent: Parent of the current object
+    :type parent: PrototypeTextInventory
 
     :ivar urn: URN Identifier
     :type urn: URN
-    :ivar parents: List of ancestors, from parent to furthest
     """
     DC_TITLE_KEY = NAMESPACES.CTS.term("groupname")
     TYPE_URI = NAMESPACES.CTS.term("textgroup")
     EXPORT_TO = [Mimetypes.XML.CTS]
     CTS_PROPERTIES = [NAMESPACES.CTS.groupname]
 
-    @property
-    def members(self):
-        return list(self.works.values())
-
-    def __init__(self, urn="", resource=None, parents=None):
+    def __init__(self, urn="", parent=None):
         super(PrototypeTextGroup, self).__init__(identifier=str(urn))
         self.__urn__ = URN(urn)
-        self.resource = None
-        self.works = defaultdict(PrototypeWork)
-        self.parents = list()
+        self.__children__ = defaultdict(PrototypeWork)
 
-        if parents:
-            self.parents = parents
+        if parent is not None:
+            self.parent = parent
 
-        if resource is not None:
-            self.setResource(resource)
+    @property
+    def works(self):
+        """ Works
+
+        :return: Dictionary of works
+        :rtype: defaultdict(:class:`PrototypeWorks`)
+        """
+        return self.__children__
 
     def update(self, other):
         """ Merge two Textgroup Objects.
@@ -444,13 +447,12 @@ class PrototypeTextGroup(PrototypeCTSCollection):
         elif str(self.urn) != str(other.urn):
             raise InvalidURN("Cannot add PrototypeTextGroup %s to PrototypeTextGroup %s " % (self.urn, other.urn))
 
-        parents = [self] + self.parents
         for urn, work in other.works.items():
             if urn in self.works:
                 self.works[urn].update(deepcopy(work))
             else:
                 self.works[urn] = deepcopy(work)
-            self.works[urn].parents = parents
+            self.works[urn].parent = self
             self.works[urn].resource = None
 
         return self
@@ -485,24 +487,25 @@ class PrototypeTextInventory(PrototypeCTSCollection):
 
     :param resource: Resource representing the PrototypeTextInventory
     :type resource: Any
-    :param id: Identifier of the PrototypeTextInventory
-    :type id: str
+    :param name: Identifier of the PrototypeTextInventory
+    :type name: str
     """
     DC_TITLE_KEY = NAMESPACES.CTS.term("name")
     TYPE_URI = NAMESPACES.CTS.term("TextInventory")
     EXPORT_TO = [Mimetypes.XML.CTS]
 
-    @property
-    def members(self):
-        return list(self.textgroups.values())
-
-    def __init__(self, resource=None, name="defaultInventory"):
+    def __init__(self, name="defaultInventory"):
         super(PrototypeTextInventory, self).__init__(identifier=name)
-        self.resource = None
-        self.textgroups = defaultdict(PrototypeTextGroup)
-        self.parents = list()
-        if resource is not None:
-            self.setResource(resource)
+        self.__children__ = defaultdict(PrototypeTextGroup)
+
+    @property
+    def textgroups(self):
+        """ Textgroups
+
+        :return: Dictionary of textgroups
+        :rtype: defaultdict(:class:`PrototypeTextGroup`)
+        """
+        return self.__children__
 
     def __len__(self):
         """ Get the number of text in the Inventory

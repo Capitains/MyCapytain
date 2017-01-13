@@ -9,8 +9,10 @@
 
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, GRAPH
-from rdflib import URIRef, RDF, Literal, Graph, BNode, RDFS
-from rdflib.namespace import SKOS, DC
+from rdflib import URIRef, RDF, Literal, Graph, RDFS
+from rdflib.collection import Collection as RDFlibCollection
+from rdflib.namespace import SKOS
+from rdflib.graph import ConjunctiveGraph
 
 
 class Collection(Exportable):
@@ -25,6 +27,27 @@ class Collection(Exportable):
     """
     TYPE_URI = URIRef(NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.JSON.LD, Mimetypes.JSON.DTS.Std, Mimetypes.XML.RDF]
+
+    def __init__(self, identifier="", *args, **kwargs):
+        super(Collection, self).__init__(identifier, *args, **kwargs)
+        self.__graph__ = GRAPH
+
+        self.__node__ = URIRef(identifier)
+        self.__metadata__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.metadata)
+        self.__capabilities__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.capabilities)
+
+        self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
+        self.graph.set((self.asNode(), NAMESPACES.DTS.model, self.TYPE_URI))
+
+        self.graph.addN(
+            [
+                (self.asNode(), NAMESPACES.DTS.capabilities, self.capabilities, self.graph),
+                (self.asNode(), NAMESPACES.DTS.metadata, self.__metadata__, self.graph)
+            ]
+        )
+
+        self.__parent__ = None
+        self.__children__ = {}
 
     # Graph Related Properties
     @property
@@ -55,35 +78,78 @@ class Collection(Exportable):
         return str(self.asNode())
 
     def label(self, lang=None):
+        """ Return label for given lang or any default
+
+        :param lang: Language to request
+        :return: Label value
+        :rtype: Literal
+        """
         return self.graph.label(self.asNode(), lang)
 
     def set_label(self, label, lang):
+        """ Add the label of the collection in given lang
+
+        :param label: Label Value
+        :param lang:  Language code
+        """
         self.graph.addN([
             (self.asNode(), RDFS.label, Literal(label, lang=lang), self.graph),
             (self.metadata, SKOS.prefLabel, Literal(label, lang=lang), self.graph),
         ])
 
-    def __init__(self, identifier="", *args, **kwargs):
-        super(Collection, self).__init__(identifier, *args, **kwargs)
-        self.__graph__ = GRAPH
+    @property
+    def children(self):
+        """ Dictionary of childrens {Identifier: Collection}
 
-        self.__node__ = URIRef(identifier)
-        self.__metadata__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.metadata)
-        self.__capabilities__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.capabilities)
-        self.__parentsNode__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.parents)
+        :rtype: dict
+        """
+        return self.__children__
 
-        self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
-        self.graph.set((self.asNode(), NAMESPACES.DTS.model, self.TYPE_URI))
+    @property
+    def parents(self):
+        """ Iterator to find parents of current collection, from closest to furthest
 
-        self.graph.addN(
-            [
-                (self.asNode(), NAMESPACES.DTS.capabilities, self.capabilities, self.graph),
-                (self.asNode(), NAMESPACES.DTS.metadata, self.__metadata__, self.graph),
-                (self.asNode(), NAMESPACES.DTS.parents, self.__parentsNode__, self.graph)
-            ]
+        :rtype: Generator[:class:`Collection`]
+        """
+        p = self.parent
+        while p is not None:
+            yield p
+            p = p.parent
+
+    @property
+    def parent(self):
+        """ Parent of current object
+
+        :rtype: Collection
+        """
+        return self.__parent__
+
+    @parent.setter
+    def parent(self, parent):
+        """ Parents
+
+        :param parent: Parent to set for the object
+        :type parent: Collection
+        :return:
+        """
+        self.__parent__ = parent
+        self.graph.set(
+            (self.asNode(), NAMESPACES.DTS.parent, parent.asNode())
         )
+        parent.__add_member__(self)
 
-        self.parents = []
+    def __add_member__(self, member):
+        """ Does not add member if it already knows it.
+
+        .. warning:: It should not be called !
+
+        :param member: Collection to add to members
+        """
+        if member.id in self.children:
+            return None
+        else:
+            self.children[member.id] = member
+            self.graph.add((self.asNode(), NAMESPACES.DTS.child, member.asNode()))
 
     def __getitem__(self, item):
         """ Retrieve an item by its ID in the tree of a collection
@@ -108,7 +174,7 @@ class Collection(Exportable):
 
         :rtype: [Collection]
         """
-        return []
+        return list(self.children.values())
 
     @property
     def descendants(self):
@@ -153,13 +219,16 @@ class Collection(Exportable):
                 or output == Mimetypes.JSON.LD\
                 or output == Mimetypes.XML.RDF:
             self.refresh()
+
             # We create a temp graph
             graph = Graph()
             graph.namespace_manager = GRAPH.namespace_manager
-            for predicate, object in self.graph[self.asNode()]:
-                graph.add((self.asNode(), predicate, object))
-                for p2, o2 in self.graph[object]:
-                    graph.add((object, p2, o2))
+            for pred, obj in self.graph[self.asNode()]:
+                graph.add((self.asNode(), pred, obj))
+                for _, p2, o2 in self.graph.triples((obj, None, None)):
+                    graph.add((obj, p2, o2))
+                    for _, p3, o3 in self.graph.triples((o2, None, None)):
+                        graph.add((o2, p3, o3))
 
             o = graph.serialize(format=RDFLIB_MAPPING[output], auto_compact=True)
             del graph

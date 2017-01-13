@@ -870,29 +870,6 @@ class Citation(Exportable):
         """
         return self.refsDecl is None and self.scope is None and self.xpath is None
 
-    def __str__(self):
-        """ Returns a string refsDecl version of the object
-
-        :Example:
-            >>>    a = Citation(name="book", xpath="/tei:TEI/tei:body/tei:text/tei:div", scope="/tei:div[@n=\"1\"]")
-            >>>    str(a) == "<tei:refsDecl n='book' xpath='/tei:TEI/tei:body/tei:text/tei:div' scope='/tei:div[@n=\"1\"]'>"
-            >>>         "<tei:p>This Citation extracts Book from the text</tei:p>"
-            >>>    "</tei:refsDecl>"
-        """
-        if self.refsDecl is None:
-            return ""
-
-        label = ""
-        if self.name is not None:
-            label = self.name
-
-        return "<tei:cRefPattern n=\"{label}\" matchPattern=\"{regexp}\" replacementPattern=\"#xpath({refsDecl})\">" \
-               "<tei:p>This pointer pattern extracts {label}</tei:p></tei:cRefPattern>".format(
-                   refsDecl=self.refsDecl,
-                   label=label,
-                   regexp="\.".join(["(\w+)" for i in range(0, self.refsDecl.count("$"))])
-               )
-
     def __export__(self, output=None, **kwargs):
         if output == Mimetypes.XML.CTS:
             if self.xpath is None and self.scope is None and self.refsDecl is None:
@@ -913,6 +890,21 @@ class Citation(Exportable):
                     "label": label
                 }, innerXML=child, complete=True
             )
+        elif output == Mimetypes.XML.TEI:
+            if self.refsDecl is None:
+                return ""
+
+            label = ""
+            if self.name is not None:
+                label = self.name
+
+            return \
+                "<tei:cRefPattern n=\"{label}\" matchPattern=\"{regexp}\" replacementPattern=\"#xpath({refsDecl})\">" \
+                "<tei:p>This pointer pattern extracts {label}</tei:p></tei:cRefPattern>".format(
+                    refsDecl=self.refsDecl,
+                    label=label,
+                    regexp="\.".join(["(\w+)"]*self.refsDecl.count("$"))
+                )
 
     @staticmethod
     def ingest(resource, xpath=".//tei:cRefPattern"):

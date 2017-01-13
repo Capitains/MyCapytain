@@ -54,27 +54,37 @@ from MyCapytain.common.constants import NAMESPACES, Mimetypes
 from MyCapytain.common.reference import Citation
 from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextInventory, PrototypeTextGroup, \
     PrototypeWork, PrototypeEdition
-
+from MyCapytain.resources.collections.cts import TextInventory
+"""
 a = PrototypeTextInventory(name="superFreak")
 
-b = PrototypeTextGroup(urn="urn:cts:latinLit:phi1294")
+b = PrototypeTextGroup(urn="urn:cts:latinLit:phi1294", parent=a)
 b.set_cts_property("groupname", "Martial", "eng")
 b.set_cts_property("groupname", "Martialis", "lat")
-a.textgroups[b.id] = b
 
-c = PrototypeWork(urn="urn:cts:latinLit:phi1294.phi002")
+c = PrototypeWork(urn="urn:cts:latinLit:phi1294.phi002", parent=b)
 c.set_cts_property("title", "Epigrams", "eng")
 c.set_cts_property("title", "Epigrammata", "lat")
-b.works[c.id] = c
 
-d = PrototypeEdition(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+d = PrototypeEdition(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2", parent=c)
 d.set_cts_property("label", "Epigrams [Ed 1978]", "eng")
 d.set_cts_property("description", "Some wonderful edition", "eng")
-c.texts[d.id] = d
 d.citation = Citation(name="book", scope="/tei:TEI/tei:text/tei:body/tei:div", xpath="/tei:div[@n='?']")
 d.citation.child = Citation(name="poem", scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']", xpath="/tei:div[@n='?']")
 
 e = PrototypeWork(urn="urn:cts:latinLit:phi1294.phi002")
 e.set_cts_property("title", "Epigrammes", "fre")
+e.set_cts_property("title", "Epigrammes", "fre")
+c.update(e)
+"""
 
+from MyCapytain.retrievers.cts5 import CTS
+c = CTS("http://cts.perseids.org/api/cts/")
+
+a = TextInventory.parse(resource=c.getCapabilities(urn="urn:cts:greekLit:tlg0007"))
+
+#with open("tests/testing_data/cts/getCapabilities.xml") as f:
+#    a = TextInventory.parse(resource=f)
+print(a.export(Mimetypes.JSON.LD).decode())
+print(a.export(Mimetypes.XML.RDF).decode())
 print(a.export(Mimetypes.XML.CTS))

@@ -73,22 +73,6 @@ class PrototypeCTSCollection(Collection):
             (self.metadata, prop, value)
         )
 
-    def __namespaces_header__(self):
-        """ Generates Namespaces Header given the graph
-
-        :return: Dictionary with XMLNS prefix and uri as key and values
-        """
-        nm = self.graph.namespace_manager
-        bindings = {}
-        for predicate in set(self.graph.predicates()):
-            prefix, namespace, name = nm.compute_qname(predicate)
-            if prefix != "":
-                bindings["xmlns:" + prefix] = str(URIRef(namespace))
-            else:
-                bindings["xmlns"] = str(URIRef(namespace))
-
-        return bindings
-
     def __xml_export_generic__(self, attrs, namespaces=False, lines="\n"):
         """ Shared method for Mimetypes.XML.CTS Export
 

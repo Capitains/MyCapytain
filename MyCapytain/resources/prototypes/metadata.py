@@ -8,7 +8,7 @@
 """
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import Subgraph
+from MyCapytain.common.utils import Subgraph, LiteralToDict
 from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, GRAPH
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
 from rdflib.namespace import SKOS
@@ -192,6 +192,22 @@ class Collection(Exportable):
         """
         return [member for member in self.descendants if member.readable]
 
+    def __namespaces_header__(self):
+        """ Generates Namespaces Header given the graph
+
+        :return: Dictionary with XMLNS prefix and uri as key and values
+        """
+        nm = self.graph.namespace_manager
+        bindings = {}
+        for predicate in set(self.graph.predicates()):
+            prefix, namespace, name = nm.compute_qname(predicate)
+            if prefix != "":
+                bindings["xmlns:" + prefix] = str(URIRef(namespace))
+            else:
+                bindings["xmlns"] = str(URIRef(namespace))
+
+        return bindings
+
     def __export__(self, output=None, domain=""):
         """ Export the collection item in the Mimetype required.
 
@@ -204,8 +220,56 @@ class Collection(Exportable):
         :return: Object using a different representation
         """
 
-        if output == Mimetypes.JSON.DTS.Std \
-                or output == Mimetypes.JSON.LD\
+        if output == Mimetypes.JSON.DTS.Std:
+            nm = self.graph.namespace_manager
+            bindings = {}
+            for predicate in set(self.graph.predicates()):
+                prefix, namespace, name = nm.compute_qname(predicate)
+                bindings[prefix] = str(URIRef(namespace))
+
+            RDFSLabel = self.graph.qname(RDFS.label)
+            store = Subgraph(GRAPH.namespace_manager)
+            store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
+            metadata = {}
+            for _, predicate, obj in store.graph:
+                k = self.graph.qname(predicate)
+                if k in metadata:
+                    if isinstance(metadata[k], list):
+                        metadata[k].append(LiteralToDict(obj))
+                    else:
+                        metadata[k] = [metadata[k], LiteralToDict(obj)]
+                else:
+                    metadata[k] = LiteralToDict(obj)
+            o = {
+                "@context": bindings,
+                "@graph": {
+                    "@id": self.id,
+                    RDFSLabel: LiteralToDict(self.label()) or self.id,
+                    self.graph.qname(NAMESPACES.DTS.size): len(self.members),
+                    self.graph.qname(NAMESPACES.DTS.metadata): metadata
+                }
+            }
+            if len(self.members):
+                o["@graph"][self.graph.qname(NAMESPACES.DTS.members)] = [
+                    {
+                        "@id": member.id,
+                        RDFSLabel: LiteralToDict(member.label()) or member.id,
+                        self.graph.qname(NAMESPACES.DTS.url): domain+member.id
+                    }
+                    for member in self.members
+                ]
+            if self.parent:
+                o["@graph"][self.graph.qname(NAMESPACES.DTS.parents)] = [
+                    {
+                        "@id": member.id,
+                        RDFSLabel: LiteralToDict(member.label()) or member.id,
+                        self.graph.qname(NAMESPACES.DTS.url): domain+member.id
+                    }
+                    for member in self.parents
+                ]
+            del store
+            return o
+        elif output == Mimetypes.JSON.LD\
                 or output == Mimetypes.XML.RDF:
 
             # We create a temp graph

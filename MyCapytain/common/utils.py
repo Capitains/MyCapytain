@@ -19,7 +19,7 @@ from lxml import etree
 from lxml.objectify import ObjectifiedElement, parse
 from six import text_type
 from xml.sax.saxutils import escape
-from rdflib import BNode, Graph
+from rdflib import BNode, Graph, Literal, URIRef
 
 from MyCapytain.common.constants import NS
 
@@ -28,7 +28,18 @@ __parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
 
 
 def make_xml_node(graph, name, close=False, attributes=None, text="", complete=False, innerXML=""):
+    """ Create an XML Node
 
+    :param graph: Graph used to geneates prefixes
+    :param name: Name of the tag
+    :param close: Produce closing tag (close=False -> "<tag>", close=True -> "</tag>")
+    :param attributes: Dictionary of attributes
+    :param text: Text to put inside the node
+    :param complete: Complete node (node with opening and closing tag)
+    :param innerXML: XML to append to the node
+    :return: String representation of the node
+    :rtype: str
+    """
     name = graph.namespace_manager.qname(name)
     if complete:
         if attributes is not None:
@@ -59,7 +70,28 @@ def make_xml_node(graph, name, close=False, attributes=None, text="", complete=F
     return "<{}>".format(name)
 
 
+def LiteralToDict(value):
+    """ Transform an object value into a dict readable value
+
+    :param value: Object of a triple which is not a BNode
+    :type value: Literal or URIRef
+    :return: dict or str or list
+    """
+    if isinstance(value, Literal):
+        if value.language is not None:
+            return {"@value": str(value), "@lang": value.language}
+        return value.toPython()
+    elif isinstance(value, URIRef):
+        return {"@id": str(value)}
+    elif value is None:
+        return None
+    return str(value)
+
 class Subgraph(object):
+    """ Utility class to generate subgraph around one or more items
+
+    :param
+    """
     def __init__(self, namespace_manager):
         self.graph = Graph()
         self.graph.namespace_manager = namespace_manager

@@ -50,11 +50,6 @@ g.add((b, NAMESPACES.CTS.groupname, Literal("Epigrammata", lang="eng")))
 print(g.serialize(format="xml", decl=False).decode())
 """
 
-from MyCapytain.common.constants import NAMESPACES, Mimetypes
-from MyCapytain.common.reference import Citation
-from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextInventory, PrototypeTextGroup, \
-    PrototypeWork, PrototypeEdition
-from MyCapytain.resources.collections.cts import TextInventory
 """
 a = PrototypeTextInventory(name="superFreak")
 
@@ -79,13 +74,19 @@ c.update(e)
 """
 
 from MyCapytain.retrievers.cts5 import CTS
+from MyCapytain.common.constants import Mimetypes
+from MyCapytain.resources.collections.cts import TextInventory
 c = CTS("http://cts.perseids.org/api/cts/")
 
 a = TextInventory.parse(resource=c.getCapabilities(urn="urn:cts:latinLit:phi0959"))
 
 #with open("tests/testing_data/cts/getCapabilities.xml") as f:
 #    a = TextInventory.parse(resource=f)
-print(a["urn:cts:latinLit:phi0959.phi005"])
-print(a["urn:cts:latinLit:phi0959.phi005"].export(Mimetypes.JSON.LD).decode())
+from pprint import pprint
+pprint(a.export(Mimetypes.JSON.DTS.Std))
+from json import dump
+with open("./inv", "w") as f:
+    dump(a["urn:cts:latinLit:phi0959.phi005"].export(Mimetypes.JSON.DTS.Std), f)
+#print(a["urn:cts:latinLit:phi0959.phi005"].export(Mimetypes.JSON.LD).decode())
 #print(a.export(Mimetypes.XML.RDF).decode())
 #print(a.export(Mimetypes.XML.CTS))

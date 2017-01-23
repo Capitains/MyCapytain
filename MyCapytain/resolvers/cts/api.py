@@ -106,8 +106,7 @@ class HttpCTSResolver(Resolver):
         if objectId is not None:
             filters["urn"] = objectId
 
-        ti = TextInventory()
-        ti.parse(self.endpoint.getCapabilities(**filters))
+        ti = TextInventory.parse(self.endpoint.getCapabilities(**filters))
         if objectId:
             return [x for x in [ti] + ti.descendants if x.id == objectId][0]
         return ti

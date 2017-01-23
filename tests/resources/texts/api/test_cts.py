@@ -10,7 +10,7 @@ from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, Citation, URN
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import NS, Mimetypes
+from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES
 from MyCapytain.errors import MissingAttribute
 import mock
 
@@ -312,7 +312,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_LABEL
 
         collection = text.getLabel()
-        self.assertEqual(collection.metadata["title"]["eng"], "Epigrammata")
+        self.assertEqual(str(collection.metadata.get(NAMESPACES.CTS.label, "eng")), "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):

@@ -6,7 +6,6 @@ from rdflib.namespace import SKOS
 #: List of XPath Namespaces used in guidelines
 NS = {
     "tei": "http://www.tei-c.org/ns/1.0",
-    "ahab": "http://localhost.local",
     "ti": "http://chs.harvard.edu/xmlns/cts",
     "xml": "http://www.w3.org/XML/1998/namespace"
 }

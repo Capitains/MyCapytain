@@ -404,7 +404,7 @@ class PrototypeWork(PrototypeCTSCollection):
         """
         if output == Mimetypes.XML.CTS:
             attrs = {"urn": self.id, "xml:lang": self.lang}
-            return self.__xml_export_generic__(attrs, namespaces=False)
+            return self.__xml_export_generic__(attrs, namespaces=namespaces)
 
 
 class PrototypeTextGroup(PrototypeCTSCollection):
@@ -491,7 +491,7 @@ class PrototypeTextGroup(PrototypeCTSCollection):
         """
         if output == Mimetypes.XML.CTS:
             attrs = {"urn": self.id}
-            return self.__xml_export_generic__(attrs, namespaces=False)
+            return self.__xml_export_generic__(attrs, namespaces=namespaces)
 
 
 class PrototypeTextInventory(PrototypeCTSCollection):

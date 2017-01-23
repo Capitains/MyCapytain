@@ -212,9 +212,9 @@ class Collection(Exportable):
         for predicate in set(self.graph.predicates()):
             prefix, namespace, name = nm.compute_qname(predicate)
             if prefix != "":
-                bindings["xmlns:" + prefix] = str(URIRef(namespace))
+                bindings["xmlns:" + prefix] = str(URIRef(namespace))[:-1]
             else:
-                bindings["xmlns"] = str(URIRef(namespace))
+                bindings["xmlns"] = str(URIRef(namespace))[:-1]
 
         return bindings
 
@@ -237,7 +237,7 @@ class Collection(Exportable):
                 prefix, namespace, name = nm.compute_qname(predicate)
                 bindings[prefix] = str(URIRef(namespace))
 
-            RDFSLabel = self.graph.qname(RDFS.get_label)
+            RDFSLabel = self.graph.qname(RDFS.label)
             store = Subgraph(GRAPH.namespace_manager)
             store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
             metadata = {}

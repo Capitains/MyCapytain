@@ -8,9 +8,11 @@
 
 """
 from six import text_type
+from rdflib.namespace import DC
+from rdflib import BNode, URIRef
 from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.constants import Mimetypes, Exportable
+from MyCapytain.common.constants import Mimetypes, Exportable, GRAPH, NAMESPACES
 from MyCapytain.resources.prototypes.metadata import Collection
 
 
@@ -28,10 +30,24 @@ class TextualElement(Exportable):
     default_exclude = []
 
     def __init__(self, identifier=None, metadata=None):
-        self.__about__ = Collection()
+        self.__graph__ = GRAPH
         self.__identifier__ = identifier
-        if metadata:
-            self.metadata = metadata
+
+        self.__node__ = BNode()
+        self.__metadata__ = metadata or Metadata()
+
+        self.__graph__.addN([
+            (self.__node__, NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__),
+            (self.__node__, NAMESPACES.DTS.metadata, self.__metadata__, self.__graph__)
+        ])
+
+    @property
+    def graph(self):
+        return self.__graph__
+
+    @property
+    def asNode(self):
+        return self.__node__
 
     @property
     def text(self):
@@ -52,46 +68,38 @@ class TextualElement(Exportable):
         return self.__identifier__
 
     @property
-    def about(self):
-        """ Metadata information about the text
-
-        :return: Collection object with metadata about the text
-        :rtype Collection:
-        """
-        return self.__about__
-
-    @about.setter
-    def about(self, value):
-        """ Set the metadata collection attribute
-
-        :param value: Collection of metadata
-        :type value: Collection
-        """
-        if isinstance(value, Collection):
-            self.__about__ = value
-        else:
-            raise TypeError(".about should be an instance of Collection")
-
-    @property
     def metadata(self):
         """ Metadata information about the text
 
         :return: Collection object with metadata about the text
         :rtype: Metadata
         """
-        return self.about.metadata
+        return self.__metadata__
 
-    @metadata.setter
-    def metadata(self, value):
-        """ Set the metadata collection attribute
+    def get_creator(self, lang=None):
+        return self.metadata.get(key=DC.creator, lang=lang)
 
-        :param value: Collection of metadata
-        :type value: Collection
-        """
-        if isinstance(value, Metadata):
-            self.about.metadata = value
-        else:
-            raise TypeError(".metadata should be an instance of Metadata")
+    def set_creator(self, value, lang=None):
+        return self.metadata.add(key=DC.creator, value=value, lang=lang)
+
+    def get_title(self, lang=None):
+        return self.metadata.get(key=DC.title, lang=lang)
+
+    def set_title(self, value, lang=None):
+        print(value)
+        return self.metadata.add(key=DC.title, value=value, lang=lang)
+
+    def get_description(self, lang=None):
+        return self.metadata.get(key=DC.description, lang=lang)
+
+    def set_description(self, value, lang=None):
+        return self.metadata.add(key=DC.description, value=value, lang=lang)
+
+    def get_subject(self, lang=None):
+        return self.metadata.get(key=DC.subject, lang=lang)
+
+    def set_subject(self, value, lang=None):
+        return self.metadata.add(key=DC.subject, value=value, lang=lang)
 
     def export(self, output=None, exclude=None, **kwargs):
         """ Export the collection item in the Mimetype required.
@@ -367,6 +375,9 @@ class CTSNode(InteractiveTextualNode):
         elif not isinstance(value, URN):
             raise TypeError()
         self.__urn__ = value
+
+    def get_cts_metadata(self, key, lang=None):
+        return self.metadata.get(NAMESPACES.CTS.term(key), lang)
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, CitableText will compute valid reffs

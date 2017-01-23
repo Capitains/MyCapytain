@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import NS, Mimetypes
+from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.resources.collections import cts as CTSCollection
 from MyCapytain.resources.prototypes import text as prototypes
@@ -44,13 +44,6 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         self.__last__ = False
         if retriever is None:
             raise MissingAttribute("Object has not retriever")
-
-        if "metadata" in kwargs and isinstance(kwargs["metadata"], Metadata):
-            self.metadata = kwargs["metadata"]
-        else:
-            self.metadata = Metadata(keys=[
-                "groupname", "label", "title"
-            ])
 
     @property
     def retriever(self):
@@ -147,9 +140,8 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         response = xmlparser(self.retriever.getPassagePlus(urn=urn))
 
-        self.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
         passage = Passage(urn=urn, resource=response, retriever=self.retriever)
-        passage.metadata, passage.citation = self.metadata, self.citation
+        passage.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
         return passage
 
     def __parse_request__(self, xml):
@@ -160,15 +152,23 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         """
         for node in xml.xpath(".//ti:groupname", namespaces=NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
-            self.metadata["groupname"][lang] = node.text
+            self.metadata.add(NAMESPACES.CTS.groupname, lang=lang, value=node.text)
+            self.set_creator(node.text, lang)
 
         for node in xml.xpath(".//ti:title", namespaces=NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
-            self.metadata["title"][lang] = node.text
+            self.metadata.add(NAMESPACES.CTS.title, lang=lang, value=node.text)
+            self.set_title(node.text, lang)
 
         for node in xml.xpath(".//ti:label", namespaces=NS):
             lang = node.get("xml:lang") or Text.DEFAULT_LANG
-            self.metadata["label"][lang] = node.text
+            self.metadata.add(NAMESPACES.CTS.label, lang=lang, value=node.text)
+            self.set_subject(node.text, lang)
+
+        for node in xml.xpath(".//ti:description", namespaces=NS):
+            lang = node.get("xml:lang") or Text.DEFAULT_LANG
+            self.metadata.add(NAMESPACES.CTS.description, lang=lang, value=node.text)
+            self.set_description(node.text, lang)
 
         # Need to code that p
         if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=NS):

@@ -326,7 +326,6 @@ class TestHttpCTSResolver(TestCase):
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
-        print(metadata.export(output=Mimetypes.JSON.DTS.Std))
         self.assertCountEqual(
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959", "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
@@ -358,8 +357,6 @@ class TestHttpCTSResolver(TestCase):
             len([x for x in metadata.readableDescendants if isinstance(x, Text)]), 2,
             "There should be 1 edition + 1 translation in readableDescendants"
         )
-        from lxml.etree import tostring
-        print(tostring(metadata.export(output=Mimetypes.PYTHON.ETREE)))
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"

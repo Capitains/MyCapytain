@@ -530,7 +530,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         <ti:title xml:lang='ger'>De spectaculis</ti:title>
         </ti:work>
         </ti:textgroup>"""
-        tg = TextGroup.parse(urn="urn:cts:latinLit:phi1294", resource=tg)
+        tg = TextGroup.parse(resource=tg)
 
         six.assertCountEqual(
             self,

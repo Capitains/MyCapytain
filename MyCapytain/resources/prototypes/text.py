@@ -86,7 +86,6 @@ class TextualElement(Exportable):
         return self.metadata.get(key=DC.title, lang=lang)
 
     def set_title(self, value, lang=None):
-        print(value)
         return self.metadata.add(key=DC.title, value=value, lang=lang)
 
     def get_description(self, lang=None):

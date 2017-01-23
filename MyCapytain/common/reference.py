@@ -657,6 +657,7 @@ class Citation(Exportable):
     """
 
     EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.TEI]
+    DEFAULT_EXPORT = Mimetypes.XML.CTS
 
     escape = re.compile('(")')
 

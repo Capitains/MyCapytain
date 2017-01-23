@@ -60,18 +60,18 @@ class CapitainsXmlTextTest(TestCase):
 
     def testFindCitation(self):
         self.assertEqual(
-            str(self.TEI.citation),
+            self.TEI.citation.export(Mimetypes.XML.TEI),
             '<tei:cRefPattern n="book" matchPattern="(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/'
             'tei:div/tei:div[@n=\\\'$1\\\'])"><tei:p>This pointer pattern extracts book</tei:p></tei:cRefPattern>'
         )
         self.assertEqual(
-            str(self.TEI.citation.child),
+            self.TEI.citation.child.export(Mimetypes.XML.TEI),
             '<tei:cRefPattern n="poem" matchPattern="(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text'
             '/tei:body/tei:div/tei:div[@n=\\\'$1\\\']/tei:div[@n=\\\'$2\\\'])"><tei:p>This pointer pattern extracts '
             'poem</tei:p></tei:cRefPattern>'
         )
         self.assertEqual(
-            str(self.TEI.citation.child.child),
+            self.TEI.citation.child.child.export(Mimetypes.XML.TEI),
             '<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/'
             'tei:text/tei:body/tei:div/tei:div[@n=\\\'$1\\\']/tei:div[@n=\\\'$2\\\']/tei:l[@n=\\\'$3\\\'])"><tei:p>'
             'This pointer pattern extracts line</tei:p></tei:cRefPattern>'

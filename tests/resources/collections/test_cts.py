@@ -287,7 +287,6 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         # Load back
         ti = loads(dp)
         tixml = ti.export(Mimetypes.XML.CTS)
-        print(list(ti.graph.triples((None, None, None))))
         self.assertEqual(
             len(list(ti.graph.triples(
                 (ti["urn:cts:latinLit:phi1294"].asNode(), constants.NAMESPACES.DTS.term("metadata"), None)
@@ -295,12 +294,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             1,
             "There should be one node for the child 1294 which is metadata"
         )
-        self.assertEqual(
-            *compareSTR(
-                tixml, xml
-            ),
-            msg="CTS XML Export should remain the same"
-        )
+        self.assertXmlEquivalentOutputs(*compareSTR(tixml, xml))
 
     def test_Inventory_metadata(self):
         """ Tests PrototypeTextInventory parses without errors """

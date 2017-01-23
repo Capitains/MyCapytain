@@ -11,10 +11,9 @@ from __future__ import unicode_literals
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
-from MyCapytain.common.reference import Citation as CitationPrototype, URN
+from MyCapytain.common.reference import Citation as CitationPrototype
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import NS, Mimetypes
-from collections import defaultdict
 
 
 class Citation(CitationPrototype):

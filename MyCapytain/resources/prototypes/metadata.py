@@ -76,14 +76,22 @@ class Collection(Exportable):
     def id(self):
         return str(self.asNode())
 
-    def label(self, lang=None):
+    def get_label(self, lang=None):
         """ Return label for given lang or any default
 
         :param lang: Language to request
         :return: Label value
         :rtype: Literal
         """
-        return self.graph.label(self.asNode(), lang)
+        x= None
+        if lang is None:
+            for obj in self.graph.objects(self.asNode(), RDFS.label):
+                return obj
+        for obj in self.graph.objects(self.asNode(), RDFS.label):
+            x = obj
+            if x.language == lang:
+                return x
+        return x
 
     def set_label(self, label, lang):
         """ Add the label of the collection in given lang
@@ -111,9 +119,11 @@ class Collection(Exportable):
         :rtype: Generator[:class:`Collection`]
         """
         p = self.parent
+        parents = []
         while p is not None:
-            yield p
+            parents.append(p)
             p = p.parent
+        return parents
 
     @property
     def parent(self):
@@ -227,7 +237,7 @@ class Collection(Exportable):
                 prefix, namespace, name = nm.compute_qname(predicate)
                 bindings[prefix] = str(URIRef(namespace))
 
-            RDFSLabel = self.graph.qname(RDFS.label)
+            RDFSLabel = self.graph.qname(RDFS.get_label)
             store = Subgraph(GRAPH.namespace_manager)
             store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
             metadata = {}
@@ -244,7 +254,7 @@ class Collection(Exportable):
                 "@context": bindings,
                 "@graph": {
                     "@id": self.id,
-                    RDFSLabel: LiteralToDict(self.label()) or self.id,
+                    RDFSLabel: LiteralToDict(self.get_label()) or self.id,
                     self.graph.qname(NAMESPACES.DTS.size): len(self.members),
                     self.graph.qname(NAMESPACES.DTS.metadata): metadata
                 }
@@ -253,7 +263,7 @@ class Collection(Exportable):
                 o["@graph"][self.graph.qname(NAMESPACES.DTS.members)] = [
                     {
                         "@id": member.id,
-                        RDFSLabel: LiteralToDict(member.label()) or member.id,
+                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
                         self.graph.qname(NAMESPACES.DTS.url): domain+member.id
                     }
                     for member in self.members
@@ -262,7 +272,7 @@ class Collection(Exportable):
                 o["@graph"][self.graph.qname(NAMESPACES.DTS.parents)] = [
                     {
                         "@id": member.id,
-                        RDFSLabel: LiteralToDict(member.label()) or member.id,
+                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
                         self.graph.qname(NAMESPACES.DTS.url): domain+member.id
                     }
                     for member in self.parents

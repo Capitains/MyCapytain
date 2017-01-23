@@ -80,13 +80,15 @@ c = CTS("http://cts.perseids.org/api/cts/")
 
 a = TextInventory.parse(resource=c.getCapabilities(urn="urn:cts:latinLit:phi0959"))
 
+print(a["urn:cts:latinLit:phi0959.phi005"].get_label())
+print(a["urn:cts:latinLit:phi0959.phi005"].get_label("eng"))
 #with open("tests/testing_data/cts/getCapabilities.xml") as f:
 #    a = TextInventory.parse(resource=f)
-from pprint import pprint
-pprint(a.export(Mimetypes.JSON.DTS.Std))
-from json import dump
-with open("./inv", "w") as f:
-    dump(a["urn:cts:latinLit:phi0959.phi005"].export(Mimetypes.JSON.DTS.Std), f)
+#from pprint import pprint
+#pprint(a.export(Mimetypes.JSON.DTS.Std))
+#from json import dump
+#with open("./inv", "w") as f:
+#    dump(a["urn:cts:latinLit:phi0959.phi005"].export(Mimetypes.JSON.DTS.Std), f)
 #print(a["urn:cts:latinLit:phi0959.phi005"].export(Mimetypes.JSON.LD).decode())
 #print(a.export(Mimetypes.XML.RDF).decode())
 #print(a.export(Mimetypes.XML.CTS))

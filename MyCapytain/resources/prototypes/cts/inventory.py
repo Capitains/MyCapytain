@@ -52,6 +52,26 @@ class PrototypeCTSCollection(Collection):
             return False
         return hasattr(self, "urn") and hasattr(other, "urn") and self.urn == other.urn
 
+    def get_cts_property(self, prop, lang=None):
+        """ Set given property in CTS Namespace
+
+        .. example::
+            collection.get_cts_property("groupname", "eng")
+
+        :param prop: Property to get (Without namespace)
+        :param lang: Language to get for given value
+        :return: Value or default if lang is set, else whole set of values
+        :rtype: dict or Literal
+        """
+        x = {
+            value.language: value for _, _, value in self.graph.triples((self.metadata, NAMESPACES.CTS.term(prop), None))
+        }
+        if lang is not None:
+            if lang in x:
+                return x[lang]
+            return next(x.values())
+        return x
+
     def set_cts_property(self, prop, value, lang=None):
         """ Set given property in CTS Namespace
 
@@ -196,9 +216,9 @@ class PrototypeText(PrototypeCTSCollection):
         :rtype: [PrototypeText]
         """
         return [
-                self.parents[0].texts[urn]
-                for urn in self.parents[0].texts
-                if self.parents[0].texts[urn].subtype == "Edition"
+                item
+                for urn, item in self.parent.children.items()
+                if isinstance(item, PrototypeEdition)
             ]
 
     def __export__(self, output=None, domain="", namespaces=True, lines="\n"):
@@ -354,9 +374,17 @@ class PrototypeWork(PrototypeCTSCollection):
         :returns: List of availables translations
         """
         if key is not None:
-            return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation" and self.texts[urn].lang == key]
+            return [
+                item
+                for item in self.texts.values()
+                if isinstance(item, PrototypeTranslation) and item.lang == key
+            ]
         else:
-            return [self.texts[urn] for urn in self.texts if self.texts[urn].subtype == "Translation"]
+            return [
+                item
+                for item in self.texts.values()
+                if isinstance(item, PrototypeTranslation)
+            ]
 
     def __len__(self):
         """ Get the number of text in the PrototypeWork

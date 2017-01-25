@@ -295,7 +295,7 @@ class CTSCapitainsLocalResolver(Resolver):
         passage = text.getTextualNode(subreference)
         if metadata:
             for descendant in [inventory] + inventory.parents:
-                passage.about.metadata += descendant.metadata
+                passage.metadata += descendant.metadata
         return passage
 
     def getSiblings(self, textId, subreference):

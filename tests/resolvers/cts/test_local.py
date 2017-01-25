@@ -416,7 +416,7 @@ class TextXMLFolderResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["http://w3id.org/dts-ontology/members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959",
              "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
             "There should be 4 Members in DTS JSON"
@@ -446,7 +446,11 @@ class TextXMLFolderResolver(TestCase):
             "There should be 1 edition in readableDescendants"
         )
         self.assertIsInstance(
-            metadata.parents[1], PrototypeTextGroup,
+            metadata.parent, PrototypeTextGroup,
+            "First parent should be PrototypeTextGroup"
+        )
+        self.assertIsInstance(
+            metadata.parents[0], PrototypeTextGroup,
             "First parent should be PrototypeTextGroup"
         )
         self.assertEqual(
@@ -455,19 +459,8 @@ class TextXMLFolderResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["http://w3id.org/dts-ontology/members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
             ["urn:cts:latinLit:phi1294.phi002.perseus-lat2"],
-            "There should be one member in DTS JSON"
-        )
-        self.assertCountEqual(
-            [
-                x["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"]
-                for x in metadata.export(output=Mimetypes.JSON.DTS.Std) \
-                    ["http://w3id.org/dts-ontology/capabilities"]\
-                    ["http://w3id.org/dts-ontology/navigation"]\
-                    ["http://w3id.org/dts-ontology/parents"]
-                ],
-            ["http://chs.harvard.edu/xmlns/cts/PrototypeTextGroup", "http://chs.harvard.edu/xmlns/cts/PrototypeTextInventory"],
             "There should be one member in DTS JSON"
         )
 

@@ -83,7 +83,7 @@ class Collection(Exportable):
         :return: Label value
         :rtype: Literal
         """
-        x= None
+        x = None
         if lang is None:
             for obj in self.graph.objects(self.asNode(), RDFS.label):
                 return obj
@@ -122,7 +122,6 @@ class Collection(Exportable):
         parents = []
         while p is not None:
             parents.append(p)
-            print(p.id)
             p = p.parent
         return parents
 

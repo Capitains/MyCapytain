@@ -4,7 +4,8 @@
 import io
 
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Citation, Text as InventoryText
+from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Citation, Text as InventoryText, \
+    Translation, Edition
 from MyCapytain.resources.texts.locals.tei import Text
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.errors import InvalidURN
@@ -13,8 +14,6 @@ from glob import glob
 import os.path
 from math import ceil
 import logging
-from copy import copy
-from collections import OrderedDict
 
 
 class CTSCapitainsLocalResolver(Resolver):
@@ -266,13 +265,16 @@ class CTSCapitainsLocalResolver(Resolver):
             txt_urn = str(text.urn)
             # If we need to generate a textgroup object
             if tg_urn not in inventory.textgroups:
-                text.parent.parent.parent = inventory
+                TextGroup(urn=tg_urn, parent=inventory)
             # If we need to generate a work object
-            elif wk_urn not in inventory.textgroups[tg_urn].works:
-                text.parent.parent = inventory.textgroups[tg_urn]
+            if wk_urn not in inventory.textgroups[tg_urn].works:
+                Work(urn=wk_urn, parent=inventory.textgroups[tg_urn])
 
-            __text = text
-            __text.parent = inventory.textgroups[tg_urn].works[wk_urn].texts[txt_urn]
+            if isinstance(text, Edition):
+                Edition(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+            elif isinstance(text, Translation):
+                Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+
         return inventory[objectId]
 
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
@@ -289,13 +291,13 @@ class CTSCapitainsLocalResolver(Resolver):
         :return: Passage
         :rtype: Passage
         """
-        text, inventory = self.__getText__(textId)
+        text, text_metadata = self.__getText__(textId)
         if subreference is not None:
             subreference = Reference(subreference)
         passage = text.getTextualNode(subreference)
         if metadata:
-            for descendant in [inventory] + inventory.parents:
-                passage.metadata += descendant.metadata
+            for lang in text_metadata:
+                passage.set_creator()
         return passage
 
     def getSiblings(self, textId, subreference):

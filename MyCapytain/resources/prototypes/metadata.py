@@ -122,6 +122,7 @@ class Collection(Exportable):
         parents = []
         while p is not None:
             parents.append(p)
+            print(p.id)
             p = p.parent
         return parents
 

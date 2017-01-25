@@ -142,6 +142,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         passage = Passage(urn=urn, resource=response, retriever=self.retriever)
         passage.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=NS)[0])
+        self.citation = passage.citation
         return passage
 
     def __parse_request__(self, xml):

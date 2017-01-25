@@ -403,12 +403,12 @@ class TextXMLFolderResolver(TestCase):
             "There should be as many descendants as there is edition, translation, works and textgroup"
         )
         self.assertEqual(
-            len(metadata.readableDescendants), 38,
-            "There should be as many readable descendants as there is edition, translation(25 ed+tr), works (13)"
+            len(metadata.readableDescendants), 25,
+            "There should be as many readable descendants as there is edition, translation(25 ed+tr)"
         )
         self.assertEqual(
             len([x for x in metadata.readableDescendants if isinstance(x, TextMetadata)]), 25,
-            "There should be 14 editions + 1 translations in readableDescendants"
+            "There should be 24 editions + 1 translations in readableDescendants"
         )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(

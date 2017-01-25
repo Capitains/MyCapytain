@@ -62,9 +62,8 @@ class TestAPIText(unittest.TestCase):
         self.assertEqual(text.retriever, self.endpoint)
         self.assertEqual(text.citation, self.citation)
 
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation,
-                    metadata=Metadata(keys=["testing_init"]))
-        self.assertIsInstance(text.metadata.metadata["testing_init"], Metadatum)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
+        self.assertIsInstance(text.metadata, Metadata)
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getvalidreff(self, requests):
@@ -311,8 +310,9 @@ class TestAPIText(unittest.TestCase):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = GET_LABEL
 
-        collection = text.getLabel()
-        self.assertEqual(str(collection.metadata.get(NAMESPACES.CTS.label, "eng")), "Epigrammata")
+        metadata = text.getLabel()
+        print(list(metadata.graph.triples((metadata, None, None))))
+        self.assertEqual(str(metadata.get(NAMESPACES.CTS.label, "eng")), "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):

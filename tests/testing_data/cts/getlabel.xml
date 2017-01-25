@@ -13,6 +13,7 @@
         <CTS:label xmlns:ti="http://chs.harvard.edu/xmlns/cts">
             <ti:groupname xml:lang="eng">Martial</ti:groupname>
             <ti:title xml:lang="eng">Epigrammata</ti:title>
+            <ti:label xml:lang="eng">Epigrammata</ti:label>
             <ti:work>urn:cts:latinLit:phi1294.phi002</ti:work>
             <ti:version xml:lang="eng">
         M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus

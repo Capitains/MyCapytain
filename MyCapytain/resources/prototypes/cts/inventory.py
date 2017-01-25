@@ -359,7 +359,7 @@ class PrototypeWork(PrototypeCTSCollection):
             raise InvalidURN("Cannot add PrototypeWork %s to PrototypeWork %s " % (self.urn, other.urn))
 
         for urn, text in other.texts.items():
-            self.texts[urn] = deepcopy(text)
+            self.texts[urn] = text
             self.texts[urn].parent = self
             self.texts[urn].resource = None
 

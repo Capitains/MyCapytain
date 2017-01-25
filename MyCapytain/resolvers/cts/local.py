@@ -83,7 +83,7 @@ class CTSCapitainsLocalResolver(Resolver):
             for __cts__ in textgroups:
                 try:
                     with io.open(__cts__) as __xml__:
-                        textgroup = TextGroup(
+                        textgroup = TextGroup.parse(
                             resource=__xml__
                         )
                         str_urn = str(textgroup.urn)
@@ -94,9 +94,9 @@ class CTSCapitainsLocalResolver(Resolver):
 
                     for __subcts__ in glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(__cts__))):
                         with io.open(__subcts__) as __xml__:
-                            work = Work(
+                            work = Work.parse(
                                 resource=__xml__,
-                                parents=[self.inventory.textgroups[str_urn]]
+                                parent=self.inventory.textgroups[str_urn]
                             )
                             work_urn = str(work.urn)
                             if work_urn in self.inventory.textgroups[str_urn].works:
@@ -131,6 +131,7 @@ class CTSCapitainsLocalResolver(Resolver):
                                                     scope=cite.scope.replace("'", '"'),
                                                     name=cite.name
                                                 ))
+                                        del t
                                     __text__.citation = cites[-1]
                                     self.logger.info("%s has been parsed ", __text__.path)
                                     if __text__.citation:
@@ -260,27 +261,18 @@ class CTSCapitainsLocalResolver(Resolver):
         inventory = TextInventory()
         # For each text we found using the filter
         for text in texts:
-            tg_urn = str(text.parents[1].urn)
-            wk_urn = str(text.parents[0].urn)
+            tg_urn = str(text.parent.parent.urn)
+            wk_urn = str(text.parent.urn)
             txt_urn = str(text.urn)
             # If we need to generate a textgroup object
             if tg_urn not in inventory.textgroups:
-                inventory.textgroups[tg_urn] = copy(text.parents[1])
-                inventory.textgroups[tg_urn].works = OrderedDict()
+                text.parent.parent.parent = inventory
             # If we need to generate a work object
-            if wk_urn not in inventory.textgroups[tg_urn].works:
-                inventory.textgroups[tg_urn].works[wk_urn] = copy(text.parents[0])
-                inventory.textgroups[tg_urn].works[wk_urn].parents = tuple(
-                    [inventory, inventory.textgroups[tg_urn]]
-                )
-                inventory.textgroups[tg_urn].works[wk_urn].texts = OrderedDict()
-            __text = copy(text)
-            inventory.textgroups[tg_urn].works[wk_urn].texts[txt_urn] = __text
-            __text.parents = tuple([
-                inventory,
-                inventory.textgroups[tg_urn],
-                inventory.textgroups[tg_urn].works[wk_urn]
-            ])
+            elif wk_urn not in inventory.textgroups[tg_urn].works:
+                text.parent.parent = inventory.textgroups[tg_urn]
+
+            __text = text
+            __text.parent = inventory.textgroups[tg_urn].works[wk_urn].texts[txt_urn]
         return inventory[objectId]
 
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):

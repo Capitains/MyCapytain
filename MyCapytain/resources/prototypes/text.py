@@ -77,10 +77,20 @@ class TextualElement(Exportable):
         return self.__metadata__
 
     def get_creator(self, lang=None):
+        """ Get the DC Creator literal value
+
+        :param lang: Language to retrieve
+        :return: Creator string representation
+        :rtype: Literal
+        """
         return self.metadata.get(key=DC.creator, lang=lang)
 
-    def set_creator(self, value, lang=None):
-        return self.metadata.add(key=DC.creator, value=value, lang=lang)
+    def set_creator(self, value, lang):
+        """ Set the DC Creator literal value
+
+        :param lang: Language in which the value is
+        """
+        self.metadata.add(key=DC.creator, value=value, lang=lang)
 
     def get_title(self, lang=None):
         return self.metadata.get(key=DC.title, lang=lang)

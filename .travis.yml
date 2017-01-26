@@ -22,5 +22,5 @@ after_success:
 branches:
   only:
     - master
-    - 0.1.0dev
+    - rdflib-shift
     - dts-dev

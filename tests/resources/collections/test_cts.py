@@ -387,11 +387,12 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             "Epigrammes",
             "Check inheritance of work metadata"
         )
-        self.assertEqual(
-            str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("description"), "fre")),
-            "G. Heraeus",
-            "Check inheritance of work metadata"
-        )
+        for i in range(0, 100):
+            self.assertEqual(
+                str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("description"), "fre")),
+                "G. Heraeus",
+                "Check inheritance of work metadata"
+            )
         self.assertEqual(txt_text.citation, ti_text.citation)
         self.assertEqual(txt_text.citation.scope, "/tei:TEI/tei:text/tei:body/tei:div")
 

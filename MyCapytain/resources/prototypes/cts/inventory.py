@@ -232,8 +232,6 @@ class PrototypeText(PrototypeCTSCollection):
         """
         if output == Mimetypes.XML.CTS:
             attrs = {"urn": self.id, "xml:lang": self.lang}
-            if self.parent is not None and self.parent.id:
-                attrs["workUrn"] = self.parent.id
             if namespaces is True:
                 attrs.update(self.__namespaces_header__())
 

@@ -433,7 +433,7 @@ class CTSNode(InteractiveTextualNode):
 
         for node in edition.metadata.get_all(NAMESPACES.CTS.description):
             lang = node.language
-            self.metadata.add(NAMESPACES.CTS.description, value=str(node))
+            self.metadata.add(NAMESPACES.CTS.description, lang=lang, value=str(node))
             self.set_description(str(node), lang)
 
         if self.citation.isEmpty() and not edition.citation.isEmpty():

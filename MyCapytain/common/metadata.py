@@ -66,6 +66,15 @@ class Metadata(BNode, Exportable):
             for o in self.graph.objects(self, key):
                 return o
 
+    def get_all(self, key):
+        """ Returns a triple related to this node
+
+        :param key: Predicate of the triple
+        :rtype: List of [Literal or BNode or URIRef]
+        """
+        for o in self.graph.objects(self, key):
+            yield o
+
     def __getitem__(self, item):
         """ Quick access method. If
 

@@ -296,8 +296,7 @@ class CTSCapitainsLocalResolver(Resolver):
             subreference = Reference(subreference)
         passage = text.getTextualNode(subreference)
         if metadata:
-            for lang in text_metadata:
-                passage.set_creator()
+            passage.set_metadata_from_collection(text_metadata)
         return passage
 
     def getSiblings(self, textId, subreference):

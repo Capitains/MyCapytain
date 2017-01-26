@@ -232,6 +232,8 @@ class PrototypeText(PrototypeCTSCollection):
         """
         if output == Mimetypes.XML.CTS:
             attrs = {"urn": self.id, "xml:lang": self.lang}
+            if self.parent is not None and self.parent.id:
+                attrs["workUrn"] = self.parent.id
             if namespaces is True:
                 attrs.update(self.__namespaces_header__())
 
@@ -404,6 +406,8 @@ class PrototypeWork(PrototypeCTSCollection):
         """
         if output == Mimetypes.XML.CTS:
             attrs = {"urn": self.id, "xml:lang": self.lang}
+            if self.parent is not None and self.parent.id:
+                attrs["groupUrn"] = self.parent.id
             return self.__xml_export_generic__(attrs, namespaces=namespaces)
 
 

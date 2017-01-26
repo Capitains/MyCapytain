@@ -408,6 +408,37 @@ class CTSNode(InteractiveTextualNode):
         """
         raise NotImplementedError()
 
+    def set_metadata_from_collection(self, text_metadata):
+        """ Set the object metadata using its collections recursively
+
+        :param text_metadata: Object representing the current text as a collection
+        :type text_metadata: PrototypeEdition or PrototypeTranslation
+        """
+        edition, work, textgroup = tuple(([text_metadata] + text_metadata.parents)[:3])
+
+        for node in textgroup.metadata.get_all(NAMESPACES.CTS.groupname):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.groupname, lang=lang, value=str(node))
+            self.set_creator(str(node), lang)
+
+        for node in work.metadata.get_all(NAMESPACES.CTS.title):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.title, lang=lang, value=str(node))
+            self.set_title(str(node), lang)
+
+        for node in edition.metadata.get_all(NAMESPACES.CTS.label):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.label, lang=lang, value=str(node))
+            self.set_subject(str(node), lang)
+
+        for node in edition.metadata.get_all(NAMESPACES.CTS.description):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.description, value=str(node))
+            self.set_description(str(node), lang)
+
+        if self.citation.isEmpty() and not edition.citation.isEmpty():
+            self.citation = edition.citation
+
 
 class Passage(CTSNode):
     """ Passage objects possess metadata informations

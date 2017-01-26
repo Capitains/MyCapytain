@@ -311,7 +311,6 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_LABEL
 
         metadata = text.getLabel()
-        print(list(metadata.graph.triples((metadata, None, None))))
         self.assertEqual(str(metadata.get(NAMESPACES.CTS.label, "eng")), "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)

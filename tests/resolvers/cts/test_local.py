@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
-from MyCapytain.common.constants import NS, Mimetypes
+from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES, GRAPH
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup, PrototypeText as TextMetadata
@@ -145,7 +145,9 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
 
 class TextXMLFolderResolver(TestCase):
     """ Ensure working state of resolver """
-    resolver = CTSCapitainsLocalResolver(["./tests/testing_data/latinLit2"])
+    def setUp(self):
+        GRAPH.remove((None, None, None))
+        self.resolver = CTSCapitainsLocalResolver(["./tests/testing_data/latinLit2"])
 
     def test_getPassage_full(self):
         """ Test that we can get a full text """
@@ -214,23 +216,21 @@ class TextXMLFolderResolver(TestCase):
             passage, Passage,
             "GetPassage should always return passages objects"
         )
-        self.assertIsInstance(
-            passage.about.metadata["title"], Metadatum
-        )
         self.assertEqual(
-            passage.metadata["title"]["eng"], "Epigrammata",
+            str(passage.metadata[NAMESPACES.CTS.term("title"), "eng"]), "Epigrammata",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            passage.metadata["groupname"]["eng"], "Martial",
+            str(passage.metadata[NAMESPACES.CTS.term("groupname"),"eng"]), "Martial",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            passage.metadata["label"]["eng"], "Epigrams",
+            str(passage.metadata[NAMESPACES.CTS.term("label"), "eng"]), "Epigrams",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            passage.metadata["description"]["eng"], "M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus",
+            str(passage.metadata[NAMESPACES.CTS.term("description"), "eng"]),
+            "M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
@@ -322,23 +322,21 @@ class TextXMLFolderResolver(TestCase):
             passage, Passage,
             "GetPassage should always return passages objects"
         )
-        self.assertIsInstance(
-            passage.about.metadata["title"], Metadatum
-        )
         self.assertEqual(
-            passage.metadata["title"]["eng"], "Epigrammata",
+            str(passage.metadata[NAMESPACES.CTS.term("title"), "eng"]), "Epigrammata",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            passage.metadata["groupname"]["eng"], "Martial",
+            str(passage.metadata[NAMESPACES.CTS.term("groupname"), "eng"]), "Martial",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            passage.metadata["label"]["eng"], "Epigrams",
+            str(passage.metadata[NAMESPACES.CTS.term("label"), "eng"]), "Epigrams",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            passage.metadata["description"]["eng"], "M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus",
+            str(passage.metadata[NAMESPACES.CTS.term("description"), "eng"]),
+            "M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(

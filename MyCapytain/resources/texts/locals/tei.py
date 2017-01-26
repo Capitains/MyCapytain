@@ -13,7 +13,7 @@ import warnings
 
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
-from MyCapytain.common.constants import NS
+from MyCapytain.common.constants import NS, NAMESPACES
 from MyCapytain.common.reference import URN, Citation, Reference
 
 from MyCapytain.resources.prototypes import text

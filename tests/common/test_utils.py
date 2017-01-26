@@ -31,17 +31,17 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(
             etree.tostring(copied_node),
             etree.tostring(no_text),
-            "Text without children should have no text nor xml nodes"
+            "PrototypeText without children should have no text nor xml nodes"
         )
         self.assertNotIn(
             "<b>",
             etree.tostring(copied_node, encoding=str),
-            "Text without children should have no text nor xml nodes"
+            "PrototypeText without children should have no text nor xml nodes"
         )
         self.assertNotIn(
             "M",
             etree.tostring(copied_node, encoding=str),
-            "Text without children should have no text nor xml nodes"
+            "PrototypeText without children should have no text nor xml nodes"
         )
 
     def test_copy_node_with_children(self):
@@ -52,10 +52,10 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(
             etree.tostring(copied_node),
             etree.tostring(comparison),
-            "Text without children should have no text nor xml nodes"
+            "PrototypeText without children should have no text nor xml nodes"
         )
         self.assertIn(
             "<b>",
             etree.tostring(copied_node, encoding=str),
-            "Text without children should have no text nor xml nodes"
+            "PrototypeText without children should have no text nor xml nodes"
         )

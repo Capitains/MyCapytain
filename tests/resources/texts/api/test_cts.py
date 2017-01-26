@@ -8,9 +8,9 @@ from io import open
 from MyCapytain.resources.texts.api.cts import Passage, Text
 from MyCapytain.retrievers.cts5 import CTS
 from MyCapytain.common.reference import Reference, Citation, URN
-from MyCapytain.common.metadata import Metadata, Metadatum
+from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import NS, Mimetypes
+from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES
 from MyCapytain.errors import MissingAttribute
 import mock
 
@@ -33,7 +33,7 @@ with open("tests/testing_data/cts/getValidReff.1.1.xml") as f:
 
 
 class TestAPIText(unittest.TestCase):
-    """ Test CTS API implementation of Text
+    """ Test CTS API implementation of PrototypeText
     """
     def setUp(self):
         a = Citation(
@@ -53,7 +53,7 @@ class TestAPIText(unittest.TestCase):
         self.endpoint = CTS("http://services.perseids.org/api/cts")
 
     def test_init(self):
-        """ Test the __init__ parameters of Text
+        """ Test the __init__ parameters of PrototypeText
         """
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
         with self.assertRaises(MissingAttribute):
@@ -62,9 +62,8 @@ class TestAPIText(unittest.TestCase):
         self.assertEqual(text.retriever, self.endpoint)
         self.assertEqual(text.citation, self.citation)
 
-        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation,
-                    metadata=Metadata(keys=["testing_init"]))
-        self.assertIsInstance(text.metadata.metadata["testing_init"], Metadatum)
+        text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", self.endpoint, citation=self.citation)
+        self.assertIsInstance(text.metadata, Metadata)
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_getvalidreff(self, requests):
@@ -311,8 +310,8 @@ class TestAPIText(unittest.TestCase):
         text = Text("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=self.endpoint)
         requests.return_value.text = GET_LABEL
 
-        collection = text.getLabel()
-        self.assertEqual(collection.metadata["title"]["eng"], "Epigrammata")
+        metadata = text.getLabel()
+        self.assertEqual(str(metadata.get(NAMESPACES.CTS.label, "eng")), "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):
@@ -481,7 +480,7 @@ class TestAPIText(unittest.TestCase):
 
 
 class TestCTSPassage(unittest.TestCase):
-    """ Test CTS API implementation of Text
+    """ Test CTS API implementation of PrototypeText
     """
 
     def setUp(self):

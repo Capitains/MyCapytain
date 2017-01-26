@@ -8,9 +8,11 @@
 
 """
 from six import text_type
+from rdflib.namespace import DC
+from rdflib import BNode, URIRef
 from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.constants import Mimetypes, Exportable
+from MyCapytain.common.constants import Mimetypes, Exportable, GRAPH, NAMESPACES
 from MyCapytain.resources.prototypes.metadata import Collection
 
 
@@ -28,10 +30,24 @@ class TextualElement(Exportable):
     default_exclude = []
 
     def __init__(self, identifier=None, metadata=None):
-        self.__about__ = Collection()
+        self.__graph__ = GRAPH
         self.__identifier__ = identifier
-        if metadata:
-            self.metadata = metadata
+
+        self.__node__ = BNode()
+        self.__metadata__ = metadata or Metadata()
+
+        self.__graph__.addN([
+            (self.__node__, NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__),
+            (self.__node__, NAMESPACES.DTS.metadata, self.__metadata__, self.__graph__)
+        ])
+
+    @property
+    def graph(self):
+        return self.__graph__
+
+    @property
+    def asNode(self):
+        return self.__node__
 
     @property
     def text(self):
@@ -52,46 +68,47 @@ class TextualElement(Exportable):
         return self.__identifier__
 
     @property
-    def about(self):
-        """ Metadata information about the text
-
-        :return: Collection object with metadata about the text
-        :rtype Collection:
-        """
-        return self.__about__
-
-    @about.setter
-    def about(self, value):
-        """ Set the metadata collection attribute
-
-        :param value: Collection of metadata
-        :type value: Collection
-        """
-        if isinstance(value, Collection):
-            self.__about__ = value
-        else:
-            raise TypeError(".about should be an instance of Collection")
-
-    @property
     def metadata(self):
         """ Metadata information about the text
 
         :return: Collection object with metadata about the text
         :rtype: Metadata
         """
-        return self.about.metadata
+        return self.__metadata__
 
-    @metadata.setter
-    def metadata(self, value):
-        """ Set the metadata collection attribute
+    def get_creator(self, lang=None):
+        """ Get the DC Creator literal value
 
-        :param value: Collection of metadata
-        :type value: Collection
+        :param lang: Language to retrieve
+        :return: Creator string representation
+        :rtype: Literal
         """
-        if isinstance(value, Metadata):
-            self.about.metadata = value
-        else:
-            raise TypeError(".metadata should be an instance of Metadata")
+        return self.metadata.get(key=DC.creator, lang=lang)
+
+    def set_creator(self, value, lang):
+        """ Set the DC Creator literal value
+
+        :param lang: Language in which the value is
+        """
+        self.metadata.add(key=DC.creator, value=value, lang=lang)
+
+    def get_title(self, lang=None):
+        return self.metadata.get(key=DC.title, lang=lang)
+
+    def set_title(self, value, lang=None):
+        return self.metadata.add(key=DC.title, value=value, lang=lang)
+
+    def get_description(self, lang=None):
+        return self.metadata.get(key=DC.description, lang=lang)
+
+    def set_description(self, value, lang=None):
+        return self.metadata.add(key=DC.description, value=value, lang=lang)
+
+    def get_subject(self, lang=None):
+        return self.metadata.get(key=DC.subject, lang=lang)
+
+    def set_subject(self, value, lang=None):
+        return self.metadata.add(key=DC.subject, value=value, lang=lang)
 
     def export(self, output=None, exclude=None, **kwargs):
         """ Export the collection item in the Mimetype required.
@@ -134,9 +151,9 @@ class TextualNode(TextualElement, NodeId):
 
     @property
     def citation(self):
-        """ Citation Object of the Text
+        """ Citation Object of the PrototypeText
 
-        :return: Citation Object of the Text
+        :return: Citation Object of the PrototypeText
         :rtype: Citation
         """
         return self.__citation__
@@ -368,6 +385,9 @@ class CTSNode(InteractiveTextualNode):
             raise TypeError()
         self.__urn__ = value
 
+    def get_cts_metadata(self, key, lang=None):
+        return self.metadata.get(NAMESPACES.CTS.term(key), lang)
+
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, CitableText will compute valid reffs
 
@@ -387,6 +407,37 @@ class CTSNode(InteractiveTextualNode):
         :returns: Retrieve Label informations in a Collection format
         """
         raise NotImplementedError()
+
+    def set_metadata_from_collection(self, text_metadata):
+        """ Set the object metadata using its collections recursively
+
+        :param text_metadata: Object representing the current text as a collection
+        :type text_metadata: PrototypeEdition or PrototypeTranslation
+        """
+        edition, work, textgroup = tuple(([text_metadata] + text_metadata.parents)[:3])
+
+        for node in textgroup.metadata.get_all(NAMESPACES.CTS.groupname):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.groupname, lang=lang, value=str(node))
+            self.set_creator(str(node), lang)
+
+        for node in work.metadata.get_all(NAMESPACES.CTS.title):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.title, lang=lang, value=str(node))
+            self.set_title(str(node), lang)
+
+        for node in edition.metadata.get_all(NAMESPACES.CTS.label):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.label, lang=lang, value=str(node))
+            self.set_subject(str(node), lang)
+
+        for node in edition.metadata.get_all(NAMESPACES.CTS.description):
+            lang = node.language
+            self.metadata.add(NAMESPACES.CTS.description, lang=lang, value=str(node))
+            self.set_description(str(node), lang)
+
+        if self.citation.isEmpty() and not edition.citation.isEmpty():
+            self.citation = edition.citation
 
 
 class Passage(CTSNode):

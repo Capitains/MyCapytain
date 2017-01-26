@@ -13,14 +13,14 @@ class TestTEICitation(unittest.TestCase):
     def test_str(self):
         a = Citation(name="book", xpath="/tei:div[@n=\"?\"]", scope="/tei:TEI/tei:body/tei:text/tei:div")
         self.assertEqual(
-            str(a),"<tei:cRefPattern n=\"book\" matchPattern=\"(\\w+)\" replacementPattern=\"#xpath(/tei:TEI/tei:body/tei:text/tei:div/tei:div[@n=\"$1\"])\"><tei:p>This pointer pattern extracts book</tei:p></tei:cRefPattern>"
+            a.export(Mimetypes.XML.TEI),"<tei:cRefPattern n=\"book\" matchPattern=\"(\\w+)\" replacementPattern=\"#xpath(/tei:TEI/tei:body/tei:text/tei:div/tei:div[@n=\"$1\"])\"><tei:p>This pointer pattern extracts book</tei:p></tei:cRefPattern>"
         )
         b = Citation(name="chapter", xpath="/tei:div[@n=\"?\"]", scope="/tei:TEI/tei:body/tei:text/tei:div/tei:div[@n=\"?\"]")
         self.assertEqual(
-            str(b),"<tei:cRefPattern n=\"chapter\" matchPattern=\"(\\w+)\.(\\w+)\" replacementPattern=\"#xpath(/tei:TEI/tei:body/tei:text/tei:div/tei:div[@n=\"$1\"]/tei:div[@n=\"$2\"])\"><tei:p>This pointer pattern extracts chapter</tei:p></tei:cRefPattern>"
+            b.export(Mimetypes.XML.TEI),"<tei:cRefPattern n=\"chapter\" matchPattern=\"(\\w+)\.(\\w+)\" replacementPattern=\"#xpath(/tei:TEI/tei:body/tei:text/tei:div/tei:div[@n=\"$1\"]/tei:div[@n=\"$2\"])\"><tei:p>This pointer pattern extracts chapter</tei:p></tei:cRefPattern>"
         )
         a = Citation()
-        self.assertEqual(str(a), "")
+        self.assertEqual(a.export(Mimetypes.XML.TEI), "")
 
     def test_ingest_none(self):
         """ When list of node is empty or when not a list nor a node """
@@ -53,15 +53,15 @@ class TestTEICitation(unittest.TestCase):
         a = Citation.ingest(b)
 
         self.assertEqual(
-            str(a),
+            a.export(Mimetypes.XML.TEI),
             """<tei:cRefPattern n="book" matchPattern="(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\'])"><tei:p>This pointer pattern extracts book</tei:p></tei:cRefPattern>"""
         )
         self.assertEqual(
-            str(a.child),
+            a.child.export(Mimetypes.XML.TEI),
             """<tei:cRefPattern n="poem" matchPattern="(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\']/tei:div[@n=\'$2\'])"><tei:p>This pointer pattern extracts poem</tei:p></tei:cRefPattern>"""
         )
         self.assertEqual(
-            str(a.child.child),
+            a.child.child.export(Mimetypes.XML.TEI),
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\' and @type=\'section\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
         self.assertEqual(
@@ -82,7 +82,7 @@ class TestTEICitation(unittest.TestCase):
         a = Citation.ingest(b)
 
         self.assertEqual(
-            str(a),
+            a.export(Mimetypes.XML.TEI),
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
 
@@ -95,7 +95,7 @@ class TestTEICitation(unittest.TestCase):
         citation = Citation.ingest(text)
         self.maxDiff = None
         self.assertEqual(
-            str(citation),
+            citation.export(Mimetypes.XML.TEI),
             """<tei:cRefPattern n="section" matchPattern="(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='edition']/tei:div[@n=\'$1\' and @type='section'])"><tei:p>This pointer pattern extracts section</tei:p></tei:cRefPattern>"""
         )
         self.assertEqual(citation.scope, "/tei:TEI/tei:text/tei:body/tei:div[@type='edition']")
@@ -106,7 +106,10 @@ class TestTEICitation(unittest.TestCase):
 class TestTEIPassage(unittest.TestCase):
     def test_text(self):
         """ Test text attribute """
-        P = TEIResource(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
+        P = TEIResource(
+            identifier="dummy",
+            resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+        )
         # Without exclusion0
         self.assertEqual(P.export(output=Mimetypes.PLAINTEXT), "Ibis hello b ab excusso missus in astra sago. ")
         # With Exclusion
@@ -114,17 +117,26 @@ class TestTEIPassage(unittest.TestCase):
 
     def test_str(self):
         """ Test STR conversion of xml """
-        P = TEIResource(resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>'))
-        self.assertEqual(str(P), '<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+        P = TEIResource(
+            identifier="dummy",
+            resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+        )
+        self.assertEqual(P.export(Mimetypes.XML.Std), '<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
 
     def test_xml(self):
         X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
-        P = TEIResource(resource=X)
+        P = TEIResource(
+            identifier="dummy",
+            resource=X
+        )
         self.assertIs(X, P.xml)
 
     def test_exportable_capacities(self):
         X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
-        P = TEIResource(resource=X)
+        P = TEIResource(
+            identifier="dummy",
+            resource=X
+        )
         self.assertEqual(
             P.export_capacities,
             [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT],

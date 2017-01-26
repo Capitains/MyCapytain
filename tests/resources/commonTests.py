@@ -60,18 +60,18 @@ class CapitainsXmlTextTest(TestCase):
 
     def testFindCitation(self):
         self.assertEqual(
-            str(self.TEI.citation),
+            self.TEI.citation.export(Mimetypes.XML.TEI),
             '<tei:cRefPattern n="book" matchPattern="(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/'
             'tei:div/tei:div[@n=\\\'$1\\\'])"><tei:p>This pointer pattern extracts book</tei:p></tei:cRefPattern>'
         )
         self.assertEqual(
-            str(self.TEI.citation.child),
+            self.TEI.citation.child.export(Mimetypes.XML.TEI),
             '<tei:cRefPattern n="poem" matchPattern="(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text'
             '/tei:body/tei:div/tei:div[@n=\\\'$1\\\']/tei:div[@n=\\\'$2\\\'])"><tei:p>This pointer pattern extracts '
             'poem</tei:p></tei:cRefPattern>'
         )
         self.assertEqual(
-            str(self.TEI.citation.child.child),
+            self.TEI.citation.child.child.export(Mimetypes.XML.TEI),
             '<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/'
             'tei:text/tei:body/tei:div/tei:div[@n=\\\'$1\\\']/tei:div[@n=\\\'$2\\\']/tei:l[@n=\\\'$3\\\'])"><tei:p>'
             'This pointer pattern extracts line</tei:p></tei:cRefPattern>'
@@ -181,7 +181,7 @@ class CapitainsXmlTextTest(TestCase):
             self.TEI.getValidReff(reference=Reference("2.hellno"), level=3)
 
     def test_nested_dict(self):
-        """ Check the nested dict export of a local.Text object """
+        """ Check the nested dict export of a local.PrototypeText object """
         nested = self.TEI.export(output=Mimetypes.PYTHON.NestedDict, exclude=["tei:note"])
         self.assertEqual(nested["1"]["3"]["8"], "Ibis ab excusso missus in astra sago. ",
                          "Check that notes are removed ")
@@ -256,7 +256,7 @@ class CapitainsXmlTextTest(TestCase):
         a = self.TEI.getTextualNode(Reference("2.5.5"), simple=simple)
         self.assertEqual(
             a.export(output=Mimetypes.PLAINTEXT), "Saepe domi non es, cum sis quoque, saepe negaris: ",
-            "Text are automatically parsed in GetPassage hypercontext = False"
+            "PrototypeText are automatically parsed in GetPassage hypercontext = False"
         )
 
     def test_get_Passage_context_no_double_slash(self):
@@ -443,7 +443,7 @@ class CapitainsXmlTextTest(TestCase):
         self.assertEqual(
             text.export(output=Mimetypes.PLAINTEXT, exclude=["tei:note"]).strip(),
             "Di coniugales tuque genialis tori,",
-            "Ensure text methods works on Text object"
+            "Ensure text methods works on PrototypeText object"
         )
 
     def test_get_passage_hyper_context_double_slash_xpath(self):

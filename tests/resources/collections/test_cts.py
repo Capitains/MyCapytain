@@ -2,21 +2,22 @@
 from __future__ import unicode_literals
 
 import unittest
-from copy import deepcopy
 from io import open, StringIO
 from operator import attrgetter
 
 import lxml.etree as etree
-import six
 import xmlunittest
 
 from MyCapytain.resources.collections.cts import *
+from MyCapytain.resources.prototypes.text import CTSNode
+from MyCapytain.common import constants
 
 
 class XML_Compare(object):
     """
     Original https://gist.github.com/dalelane/a0514b2e283a882d9ef3
     """
+
     @staticmethod
     def sortbyid(elem):
         id = elem.get('urn') or elem.get("xml:lang")
@@ -107,10 +108,11 @@ def compareXML(one, other):
 
 
 class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
-
     """ Test XML Implementation of resources Endpoint request making """
 
     def setUp(self):
+        constants.GRAPH.remove((None, None, None))
+
         self.getCapabilities = open("tests/testing_data/cts/getCapabilities.xml", "r")
         self.ed = """<ti:edition urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
 <ti:label xml:lang='eng'>Epigrammata Label</ti:label>
@@ -134,41 +136,44 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:groupname xml:lang='eng'>Martial</ti:groupname>
 <ti:groupname xml:lang='lat'>Martialis</ti:groupname>""" + self.wk + """</ti:textgroup>""".replace("\n", "")
 
-        self.t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + self.tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
+        self.t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + self.tg + """</ti:TextInventory>""".replace(
+            "\n", "").strip("\n")
         self.maxDiff = None
 
     def tearDown(self):
         self.getCapabilities.close()
 
     def test_xml_TextInventoryLength(self):
-        """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
+        """ Tests PrototypeTextInventory parses without errors """
+        TI = TextInventory.parse(resource=self.getCapabilities)
         self.assertEqual(len(TI), 15)
 
     def test_xml_TextInventoryParsing(self):
-        """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
+        """ Tests PrototypeTextInventory parses without errors """
+        TI = TextInventory.parse(resource=self.getCapabilities)
         self.assertGreater(len(TI.textgroups), 0)
 
     def test_xml_TextInventory_GetItem(self):
         """ Test access through getItem obj[urn] """
-        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
+        TI = TextInventory.parse(resource=self.getCapabilities)
         self.assertIsInstance(TI["urn:cts:latinLit:phi1294"], TextGroup)
         self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002"], Work)
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].urn), "urn:cts:latinLit:phi1294.phi002")
         self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], Text)
-        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn),
+                         "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].lang, "lat")
         self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].lang, "lat")
 
     def test_xml_Work_GetItem(self):
         """ Test access through getItem obj[urn] """
-        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
+        TI = TextInventory.parse(resource=self.getCapabilities)
         tg = TI["urn:cts:latinLit:phi1294"]
         self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002"], Work)
         self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002"].urn), "urn:cts:latinLit:phi1294.phi002")
         self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], Text)
-        self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn),
+                         "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
     def test_xml_work_getLang(self):
         """ Test access to translation """
@@ -185,12 +190,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 </ti:translation>
             </ti:work>
         """
-        W = Work(resource=xml, urn="urn:cts:latinLit:phi1294.phi002")
-        self.assertEqual(len(W.getLang("eng")), 2)
-        self.assertEqual(len(W.getLang()), 3)
+        W = Work.parse(resource=xml)
+        self.assertEqual(len(W.get_translation_in("eng")), 2)
+        self.assertEqual(len(W.get_translation_in()), 3)
         self.assertEqual(
-            W.metadata.export(output=Mimetypes.JSON.DTS.Std),
-            [{'http://chs.harvard.edu/xmlns/cts/title': 'Epigrammata', '@language': 'eng'}],
+            W.metadata.export(output=Mimetypes.JSON.Std),
+            {'http://www.w3.org/2004/02/skos/core#prefLabel': {'eng': 'Epigrammata'},
+             'http://chs.harvard.edu/xmlns/cts/title': {'eng': 'Epigrammata'}},
             "Default export should work well"
         )
 
@@ -209,7 +215,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 </ti:translation>
             </ti:work>
         """
-        W = Work(resource=xml, urn="urn:cts:latinLit:phi1294.phi002")
+        W = Work.parse(resource=xml)
         E = W["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
         T = W["urn:cts:latinLit:phi1294.phi002.perseus-fre1"]
 
@@ -218,7 +224,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(T.editions(), [E])
 
     def test_get_parent(self):
-        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
+        TI = TextInventory.parse(resource=self.getCapabilities)
         tg = TI["urn:cts:latinLit:phi1294"]
         wk = TI["urn:cts:latinLit:phi1294.phi002"]
         tx = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
@@ -230,14 +236,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(tx.parents[2], TI)
 
     def test_translation(self):
-        TI = TextInventory(resource=self.getCapabilities, name="TestInv")
+        TI = TextInventory.parse(resource=self.getCapabilities)
         tr = TI["urn:cts:latinLit:phi1294.phi002.perseus-eng2"]
-        self.assertIsInstance(tr, Text)
-        self.assertEqual(tr.subtype, "Translation")
+        self.assertIsInstance(tr, Translation)
+        self.assertEqual(tr.subtype, "translation")
 
     def test_parse_string(self):
-        TI = TextInventory(
-            name="TestInv",
+        TI = TextInventory.parse(
             resource="""
 <ti:TextInventory xmlns:ti="http://chs.harvard.edu/xmlns/cts" tiid="thibault3">
     <ti:textgroup urn="urn:cts:greekLit:tlg0003">
@@ -256,165 +261,140 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     def test_parse_error(self):
         with self.assertRaises(TypeError):
-            TI = TextInventory(
-                name="TestInv",
+            TI = TextInventory.parse(
                 resource=5
             )
 
     def test_Inventory_pickle(self):
-        """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
+        """ Tests PrototypeTextInventory parses without errors """
+        TI = TextInventory.parse(resource=self.getCapabilities)
         from pickle import dumps, loads
 
         dp = dumps(TI)
-        ti = str(loads(dp))
+        # We save to xml and delete graph and instance to make sure things are working out
+        xml = TI.export(Mimetypes.XML.CTS)
+        TI.graph.remove((None, None, None))
+        del TI
 
         self.assertEqual(
-            *compareSTR(
-                ti,
-                str(TI)
-            )
+            len(list(constants.GRAPH.triples((None, None, None)))),
+            0,
+            "There should be 0 metadata node for the child 1294 because everything is gone"
         )
+        # Load back
+        ti = loads(dp)
+        tixml = ti.export(Mimetypes.XML.CTS)
+        self.assertEqual(
+            len(list(ti.graph.triples(
+                (ti["urn:cts:latinLit:phi1294"].asNode(), constants.NAMESPACES.DTS.term("metadata"), None)
+            ))),
+            1,
+            "There should be one node for the child 1294 which is metadata"
+        )
+        self.assertEqual(*compareSTR(tixml, xml))
 
     def test_Inventory_metadata(self):
-        """ Tests TextInventory parses without errors """
-        TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["eng"], "Martial")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294"].metadata["groupname"]["lat"], "Martialis")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["eng"], "Epigrammata")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["fre"], "Epigrammes")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["label"]["eng"], "Epigrammata Label")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["label"]["fre"], "Epigrammes Label")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["fre"], "G. Heraeus")
-        self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].metadata["description"]["eng"], "W. Heraeus")
+        """ Tests PrototypeTextInventory parses without errors """
+        TI = TextInventory.parse(resource=self.getCapabilities)
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "eng")), "Martial")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "lat")), "Martialis")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "eng")), "Epigrammata")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "fre")), "Epigrammes")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "eng")),
+                         "Epigrammata Label")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "fre")),
+                         "Epigrammes Label")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "fre")),
+                         "G. Heraeus")
+        self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "eng")),
+                         "W. Heraeus")
 
     def test_export(self):
-        ed = """<ti:edition urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
-<ti:label xml:lang='eng'>Epigrammata Label</ti:label>
-<ti:label xml:lang='fre'>Epigrammes Label</ti:label>
-<ti:description xml:lang='eng'>W. Heraeus</ti:description>
-<ti:description xml:lang='fre'>G. Heraeus</ti:description>
-<ti:online docname='/db/apps/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml'>
-<ti:validate schema='tei-epidoc.rng'/>
-<ti:namespaceMapping abbreviation='tei' nsURI='http://www.tei-c.org/ns/1.0'/>
-<ti:citationMapping>
-<ti:citation label='book' xpath="/tei:div[@n='?']" scope='/tei:TEI/tei:text/tei:body/tei:div'>
-<ti:citation label='poem' xpath="/tei:div[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
-<ti:citation label='line' xpath="/tei:l[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"></ti:citation>
-</ti:citation>
-</ti:citation>
-</ti:citationMapping>
-</ti:online
-></ti:edition>""".replace("\n", "")
+        # <ns0:validate schema='tei-epidoc.rng'/>
+        ed = """<ns0:edition urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xml:lang="lat" xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>
+        <ns0:label xml:lang='eng'>Epigrammata Label</ns0:label>
+        <ns0:label xml:lang='fre'>Epigrammes Label</ns0:label>
+        <ns0:description xml:lang='eng'>W. Heraeus</ns0:description>
+        <ns0:description xml:lang='fre'>G. Heraeus</ns0:description>
+        <ns0:online>
+        <ns0:citationMapping>
+        <ns0:citation label='book' xpath="/tei:div[@n='?']" scope='/tei:TEI/tei:text/tei:body/tei:div'>
+        <ns0:citation label='poem' xpath="/tei:div[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+        <ns0:citation label='line' xpath="/tei:l[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"></ns0:citation>
+        </ns0:citation>
+        </ns0:citation>
+        </ns0:citationMapping>
+        </ns0:online>
+        </ns0:edition>""".replace("\n", "")
 
-        tr = """<ti:translation xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
-<ti:label xml:lang='eng'>Epigrammata</ti:label>
-<ti:description xml:lang='eng'>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ti:description>
-<ti:online></ti:online>
-</ti:translation>""".replace("\n", "")
+        tr = """<ns0:translation xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>
+        <ns0:label xml:lang='eng'>Epigrammata</ns0:label>
+        <ns0:description xml:lang='eng'>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ns0:description>
+        </ns0:translation>""".replace("\n", "")
 
-        wk = """<ti:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts' xml:lang='lat'>
-<ti:title xml:lang='eng'>Epigrammata</ti:title>
-<ti:title xml:lang='fre'>Epigrammes</ti:title>""" + tr + ed + """</ti:work>""".replace("\n", "")
+        wk = """<ns0:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ns0='http://chs.harvard.edu/xmlns/cts' xml:lang='lat'>
+        <ns0:title xml:lang='eng'>Epigrammata</ns0:title>
+        <ns0:title xml:lang='fre'>Epigrammes</ns0:title>""" + tr + ed + """</ns0:work>""".replace("\n", "")
 
-        tg = """<ti:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
-<ti:groupname xml:lang='eng'>Martial</ti:groupname>
-<ti:groupname xml:lang='lat'>Martialis</ti:groupname>""" + wk + """</ti:textgroup>""".replace("\n", "")
+        tg = """<ns0:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>
+        <ns0:groupname xml:lang='eng'>Martial</ns0:groupname>
+        <ns0:groupname xml:lang='lat'>Martialis</ns0:groupname>""" + wk + """</ns0:textgroup>""".replace("\n", "")
 
-        t = """<ti:TextInventory tiid='annotsrc' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ti:TextInventory>""".replace("\n", "").strip("\n")
-
-        ti = TextInventory(resource=t, name="annotsrc")
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti), t))
+        t = """<ns0:TextInventory tiid='annotsrc' xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ns0:TextInventory>""".replace(
+            "\n", "").strip("\n")
+        # compareSTR
+        ti = TextInventory.parse(resource=t)
+        self.assertEqual(*compareSTR(ti.export(Mimetypes.XML.CTS), t))
 
         # Test individual :
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294"]), tg))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294.phi002"]), wk))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"]), tr))
-        self.assertXmlEquivalentOutputs(*compareSTR(str(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]), ed))
+        self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294"].export(Mimetypes.XML.CTS), tg))
+        self.assertEqual(
+            *compareSTR(ti["urn:cts:latinLit:phi1294.phi002"].export(Mimetypes.XML.CTS), wk))
+        self.assertEqual(
+            *compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(Mimetypes.XML.CTS), tr))
+        self.assertEqual(
+            *compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(Mimetypes.XML.CTS), ed))
 
         # Test export :
-        self.assertXmlEquivalentOutputs(*compareXML(ti.export(), t))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294"].export(), tg))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294.phi002"].export(), wk))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(), tr))
-        self.assertXmlEquivalentOutputs(*compareXML(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(), ed))
+        self.assertEqual(*compareSTR(ti.export(Mimetypes.XML.CTS), t))
+        self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294"].export(Mimetypes.XML.CTS), tg))
+        self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294.phi002"].export(Mimetypes.XML.CTS), wk))
+        self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(Mimetypes.XML.CTS), tr))
+        self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(Mimetypes.XML.CTS), ed))
         self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].lang, "lat")
         self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].lang, "eng")
 
-    def test_export_to_text(self):
-        """ Test export to Text object """
-        TI = TextInventory(resource=self.getCapabilities, name="annotsrc")
+    def test_import_to_text(self):
+        """ Test export to PrototypeText object """
+        TI = TextInventory.parse(resource=self.getCapabilities)
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
-        txt_text = ti_text.export(output=Mimetypes.PYTHON.MyCapytain.ReadableText)
+        txt_text = CTSNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        self.assertEqual(txt_text.metadata["groupname"]["eng"], "Martial")  # Check inheritance of textgroup metadata
-        self.assertEqual(txt_text.metadata["title"]["eng"], "Epigrammata")  # Check inheritance of work metadata
-        self.assertEqual(txt_text.metadata["title"]["fre"], "Epigrammes")  # Check inheritance of work metadata
-        self.assertEqual(txt_text.metadata["description"]["fre"], "G. Heraeus")  # Check inheritance of work metadata
+        self.assertEqual(
+            str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("groupname"), "eng")),
+            "Martial",
+            "Check inheritance of textgroup metadata"
+        )
+        self.assertEqual(
+            str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("title"), "eng")),
+            "Epigrammata",
+            "Check inheritance of work metadata"
+        )
+        self.assertEqual(
+            str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("title"), "fre")),
+            "Epigrammes",
+            "Check inheritance of work metadata"
+        )
+        for i in range(0, 100):
+            self.assertEqual(
+                str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("description"), "fre")),
+                "G. Heraeus",
+                "Check inheritance of work metadata"
+            )
         self.assertEqual(txt_text.citation, ti_text.citation)
         self.assertEqual(txt_text.citation.scope, "/tei:TEI/tei:text/tei:body/tei:div")
-
-    def test_partial_str(self):
-        ti = TextInventory(resource=self.t, name="annotsrc")
-
-        e = deepcopy(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
-        e.urn = None
-        self.assertXmlEquivalentOutputs(
-            *compareSTR(
-                str(e),
-                self.ed.replace("urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", "")
-            )
-        )
-        e.parents = ()
-        self.assertXmlEquivalentOutputs(
-            *compareSTR(
-                str(e),
-                self.ed.replace(
-                    "urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' ", ""
-                ).replace(
-                    "workUrn='urn:cts:latinLit:phi1294.phi002' ", ""
-                )
-            )
-        )
-
-        wk = deepcopy(ti["urn:cts:latinLit:phi1294.phi002"])
-        wk.urn = None
-        self.assertXmlEquivalentOutputs(
-            *compareSTR(
-                str(wk),
-                self.wk.replace("urn='urn:cts:latinLit:phi1294.phi002' ", "")
-            )
-        )
-        wk.parents = ()
-        self.assertXmlEquivalentOutputs(
-            *compareSTR(
-                str(wk),
-                self.wk.replace(
-                    "urn='urn:cts:latinLit:phi1294.phi002' ", ""
-                ).replace(
-                    "groupUrn='urn:cts:latinLit:phi1294' ", ""
-                )
-            )
-        )
-
-        tg = deepcopy(ti["urn:cts:latinLit:phi1294"])
-        tg.urn = None
-        self.assertXmlEquivalentOutputs(
-            *compareSTR(
-                str(tg),
-                self.tg.replace("urn='urn:cts:latinLit:phi1294' ", "")
-            )
-        )
-
-        ti = deepcopy(ti)
-        ti.id = None
-        self.assertXmlEquivalentOutputs(
-            *compareSTR(
-                str(ti),
-                self.t.replace("tiid='annotsrc' ", "")
-            )
-        )
 
     def test_addition_work(self):
         """ Test merging two Works together
@@ -438,8 +418,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:title xml:lang='ger'>De spectaculis</ti:title>
 </ti:work>
 </ti:textgroup>""".replace("\n", "")
-        TG1 = TextGroup(resource=self.tg)
-        TG2 = TextGroup(resource=tg)
+        TG1 = TextGroup.parse(resource=self.tg)
+        TG2 = TextGroup.parse(resource=tg)
         self.assertEqual(
             len(TG1), 2,
             "There is two edition/translations in TG1"
@@ -455,8 +435,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(str(TG3), str(TG1), "Addition in equal or incremental should have same result")
         self.assertEqual(
-            TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].parents,
-            TG1["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].parents,
+            list(TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].parents),
+            list(TG1["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].parents),
             "Edition OPP should be added to textgroup and original kept"
         )
         self.assertListEqual(
@@ -467,11 +447,12 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             ], key=lambda x: str(x.urn)),
             "New text gets access to siblings"
         )
+
         self.assertEqual(
             (
-                TG3["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["ger"],
-                TG3["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["eng"],
-                TG3["urn:cts:latinLit:phi1294.phi002"].metadata["title"]["fre"]
+                str(TG3["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "ger")),
+                str(TG3["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "eng")),
+                str(TG3["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "fre"))
             ),
             ("Epigrammen", "Epigrammata", "Epigrammes"),
             "Metadata are shared"
@@ -486,8 +467,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(
             (
-                TG3["urn:cts:latinLit:phi1294.phi001"].metadata["title"]["ger"],
-                TG3["urn:cts:latinLit:phi1294.phi001"].metadata["title"]["eng"]
+                str(TG3["urn:cts:latinLit:phi1294.phi001"].get_cts_property("title", "ger")),
+                str(TG3["urn:cts:latinLit:phi1294.phi001"].get_cts_property("title", "eng"))
             ),
             ("De spectaculis", "On the Spectacles"),
             "Metadata are shared"
@@ -503,7 +484,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertRaises(
             InvalidURN,
-            lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(TextGroup(urn="urn:cts:latinLit:phi1297")),
+            lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(
+                TextGroup(urn="urn:cts:latinLit:phi1297")),
             "Addition of different work with different URN should fail"
         )
 
@@ -511,133 +493,19 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         """ Checks that we cannot add work or textgroup with different URN"""
         self.assertRaises(
             TypeError,
-            lambda x: Work(urn="urn:cts:latinLit:phi1294.phi002").update(TextGroup(urn="urn:cts:latinLit:phi1297")),
-            "Addition of different type should fail for Work"
+            lambda x: Work(urn="urn:cts:latinLit:phi1294.phi002").update(
+                TextGroup.parse(urn="urn:cts:latinLit:phi1297")),
+            "Addition of different type should fail for PrototypeWork"
         )
         self.assertRaises(
             TypeError,
-            lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(Work(urn="urn:cts:latinLit:phi1297.phi002")),
-            "Addition of different type should fail for TextGroup"
-        )
-
-    def test_export_jsonld(self):
-        tg = """<ti:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
-        <ti:groupname xml:lang='eng'>Martial</ti:groupname>
-        <ti:groupname xml:lang='lat'>Martialis</ti:groupname>
-        <ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
-        <ti:title xml:lang='eng'>Epigrammata</ti:title>
-        <ti:title xml:lang='ger'>Epigrammen</ti:title>
-        <ti:edition urn='urn:cts:latinLit:phi1294.phi002.opp-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
-        <ti:label xml:lang='eng'>Epigrammata Label</ti:label>
-        <ti:label xml:lang='fre'>Epigrammes Label</ti:label>
-        <ti:description xml:lang='eng'>W. Heraeus</ti:description>
-        <ti:description xml:lang='fre'>G. Heraeus</ti:description>
-        <ti:online></ti:online>
-        </ti:edition>
-        </ti:work>
-        <ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi001' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
-        <ti:title xml:lang='eng'>On the Spectacles</ti:title>
-        <ti:title xml:lang='ger'>De spectaculis</ti:title>
-        </ti:work>
-        </ti:textgroup>"""
-        tg = TextGroup(urn="urn:cts:latinLit:phi1294", resource=tg)
-
-        six.assertCountEqual(
-            self,
-            {
-                '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294',
-                'http://w3id.org/dts-ontology/capabilities': {
-                    'http://w3id.org/dts-ontology/navigation': {
-                        'http://w3id.org/dts-ontology/parents': [
-
-                        ],
-                        'http://w3id.org/dts-ontology/siblings': {
-
-                        }
-                    },
-                    'http://w3id.org/dts-ontology/ordered': False,
-                    'http://w3id.org/dts-ontology/static': True,
-                    'http://w3id.org/dts-ontology/supportsRole': False
-                },
-                'http://w3id.org/dts-ontology/description': None,
-                'http://w3id.org/dts-ontology/members': [
-                    {
-                        '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002',
-                        'http://w3id.org/dts-ontology/capabilities': {
-                            'http://w3id.org/dts-ontology/navigation': {
-                                'http://w3id.org/dts-ontology/parents': [
-
-                                ],
-                                'http://w3id.org/dts-ontology/siblings': {
-
-                                }
-                            },
-                            'http://w3id.org/dts-ontology/ordered': False,
-                            'http://w3id.org/dts-ontology/static': True,
-                            'http://w3id.org/dts-ontology/supportsRole': False
-                        },
-                        'http://w3id.org/dts-ontology/description': None,
-                        'http://w3id.org/dts-ontology/members': [
-                            {
-                                '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi002.opp-lat2',
-                                'http://w3id.org/dts-ontology/capabilities': {
-                                    'http://w3id.org/dts-ontology/navigation': {
-                                        'http://w3id.org/dts-ontology/parents': [
-
-                                        ],
-                                        'http://w3id.org/dts-ontology/siblings': {
-
-                                        }
-                                    },
-                                    'http://w3id.org/dts-ontology/ordered': False,
-                                    'http://w3id.org/dts-ontology/static': True,
-                                    'http://w3id.org/dts-ontology/supportsRole': False
-                                },
-                                'http://w3id.org/dts-ontology/description': None,
-                                'http://w3id.org/dts-ontology/properties': {
-                                    'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
-                                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://w3id.org/dts-ontology/collection'
-                                }
-                            }
-                        ],
-                        'http://w3id.org/dts-ontology/properties': {
-                            'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
-                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
-                        }
-                    },
-                    {
-                        '@id': 'http://capitain.github.io/domain/urn:cts:latinLit:phi1294.phi001',
-                        'http://w3id.org/dts-ontology/capabilities': {
-                            'http://w3id.org/dts-ontology/navigation': {
-                                'http://w3id.org/dts-ontology/parents': [
-
-                                ],
-                                'http://w3id.org/dts-ontology/siblings': {
-
-                                }
-                            },
-                            'http://w3id.org/dts-ontology/ordered': False,
-                            'http://w3id.org/dts-ontology/static': True,
-                            'http://w3id.org/dts-ontology/supportsRole': False
-                        },
-                        'http://w3id.org/dts-ontology/description': None,
-                        'http://w3id.org/dts-ontology/properties': {
-                            'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
-                            'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/Work'
-                        }
-                    }
-                ],
-                'http://w3id.org/dts-ontology/properties': {
-                    'http://w3id.org/dts-ontology/model': 'http://w3id.org/dts-ontology/collection',
-                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': 'http://chs.harvard.edu/xmlns/cts/TextGroup'
-                }
-            },
-            tg.export(Mimetypes.JSON.DTS.Std, domain="http://capitain.github.io/domain/"),
-            "JSON DTS export should be stable"
+            lambda x: TextGroup.parse(urn="urn:cts:latinLit:phi1294").update(
+                Work(urn="urn:cts:latinLit:phi1297.phi002")),
+            "Addition of different type should fail for PrototypeTextGroup"
         )
 
 
 class TestCitation(unittest.TestCase):
     def test_empty(self):
         a = Citation(name="none")
-        self.assertEqual(str(a), "")
+        self.assertEqual(a.export(), "")

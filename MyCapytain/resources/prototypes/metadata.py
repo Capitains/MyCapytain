@@ -6,10 +6,12 @@
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
 """
-from copy import deepcopy
 
-from MyCapytain.common.metadata import Metadatum, Metadata
-from MyCapytain.common.constants import NAMESPACES, RDF_PREFIX, Mimetypes, Exportable
+from MyCapytain.common.metadata import Metadata
+from MyCapytain.common.utils import Subgraph, LiteralToDict
+from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, GRAPH
+from rdflib import URIRef, RDF, Literal, Graph, RDFS
+from rdflib.namespace import SKOS
 
 
 class Collection(Exportable):
@@ -21,41 +23,142 @@ class Collection(Exportable):
     :type parents: [Collection]
     :ivar metadata: Metadata
     :type metadata: Metadata
-    :cvar DC_TITLE_KEY: Key representing the object title in the Metadata property
-    :type DC_TITLE_KEY: str
     """
-    DC_TITLE_KEY = None
-    TYPE_URI = "http://w3id.org/dts-ontology/collection"
-    EXPORT_TO = [Mimetypes.JSON.DTS.NoParents, Mimetypes.JSON.DTS.Std]
+    TYPE_URI = URIRef(NAMESPACES.DTS.collection)
+    EXPORT_TO = [Mimetypes.JSON.LD, Mimetypes.JSON.DTS.Std, Mimetypes.XML.RDF]
+
+    def __init__(self, identifier="", *args, **kwargs):
+        super(Collection, self).__init__(identifier, *args, **kwargs)
+        self.__graph__ = GRAPH
+
+        self.__node__ = URIRef(identifier)
+        self.__metadata__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.metadata)
+        self.__capabilities__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.capabilities)
+
+        self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
+        self.graph.set((self.asNode(), NAMESPACES.DTS.model, self.TYPE_URI))
+
+        self.graph.addN(
+            [
+                (self.asNode(), NAMESPACES.DTS.capabilities, self.capabilities, self.graph),
+                (self.asNode(), NAMESPACES.DTS.metadata, self.__metadata__, self.graph)
+            ]
+        )
+
+        self.__parent__ = None
+        self.__children__ = {}
+
+    # Graph Related Properties
+    @property
+    def graph(self):
+        """ RDFLib Graph space
+
+        :rtype: Graph
+        """
+        return self.__graph__
 
     @property
-    def title(self):
-        """ Title of the collection Item
+    def metadata(self):
+        return self.__metadata__
 
-        :rtype: Metadatum
+    @property
+    def capabilities(self):
+        return self.__capabilities__
+
+    def asNode(self):
+        """ Node representation of the collection in the graph
+
+        :rtype: URIRef
         """
-        if hasattr(type(self), "DC_TITLE_KEY") and self.DC_TITLE_KEY:
-            return Metadatum(
-                "title", namespace=NAMESPACES.DC,
-                children=[(lang, value) for lang, value in self.metadata[type(self).DC_TITLE_KEY]]
-            )
-
-    def __init__(self):
-        self.metadata = Metadata()
-        self.__id__ = None
-        self.properties = {
-            RDF_PREFIX["dts"]+"model": "http://w3id.org/dts-ontology/collection",
-            RDF_PREFIX["rdf"]+"type": self.TYPE_URI
-        }
-        self.parents = []
+        return self.__node__
 
     @property
     def id(self):
-        """ Identifier of the collection item
+        return str(self.asNode())
 
-        :rtype: str
+    def get_label(self, lang=None):
+        """ Return label for given lang or any default
+
+        :param lang: Language to request
+        :return: Label value
+        :rtype: Literal
         """
-        return self.__id__
+        x = None
+        if lang is None:
+            for obj in self.graph.objects(self.asNode(), RDFS.label):
+                return obj
+        for obj in self.graph.objects(self.asNode(), RDFS.label):
+            x = obj
+            if x.language == lang:
+                return x
+        return x
+
+    def set_label(self, label, lang):
+        """ Add the label of the collection in given lang
+
+        :param label: Label Value
+        :param lang:  Language code
+        """
+        self.graph.addN([
+            (self.asNode(), RDFS.label, Literal(label, lang=lang), self.graph),
+            (self.metadata, SKOS.prefLabel, Literal(label, lang=lang), self.graph),
+        ])
+
+    @property
+    def children(self):
+        """ Dictionary of childrens {Identifier: Collection}
+
+        :rtype: dict
+        """
+        return self.__children__
+
+    @property
+    def parents(self):
+        """ Iterator to find parents of current collection, from closest to furthest
+
+        :rtype: Generator[:class:`Collection`]
+        """
+        p = self.parent
+        parents = []
+        while p is not None:
+            parents.append(p)
+            p = p.parent
+        return parents
+
+    @property
+    def parent(self):
+        """ Parent of current object
+
+        :rtype: Collection
+        """
+        return self.__parent__
+
+    @parent.setter
+    def parent(self, parent):
+        """ Parents
+
+        :param parent: Parent to set for the object
+        :type parent: Collection
+        :return:
+        """
+        self.__parent__ = parent
+        self.graph.set(
+            (self.asNode(), NAMESPACES.DTS.parent, parent.asNode())
+        )
+        parent.__add_member__(self)
+
+    def __add_member__(self, member):
+        """ Does not add member if it already knows it.
+
+        .. warning:: It should not be called !
+
+        :param member: Collection to add to members
+        """
+        if member.id in self.children:
+            return None
+        else:
+            self.children[member.id] = member
+            #self.graph.add((self.asNode(), NAMESPACES.DTS.child, member.asNode()))
 
     def __getitem__(self, item):
         """ Retrieve an item by its ID in the tree of a collection
@@ -80,7 +183,7 @@ class Collection(Exportable):
 
         :rtype: [Collection]
         """
-        return []
+        return list(self.children.values())
 
     @property
     def descendants(self):
@@ -99,6 +202,22 @@ class Collection(Exportable):
         """
         return [member for member in self.descendants if member.readable]
 
+    def __namespaces_header__(self):
+        """ Generates Namespaces Header given the graph
+
+        :return: Dictionary with XMLNS prefix and uri as key and values
+        """
+        nm = self.graph.namespace_manager
+        bindings = {}
+        for predicate in set(self.graph.predicates()):
+            prefix, namespace, name = nm.compute_qname(predicate)
+            if prefix != "":
+                bindings["xmlns:" + prefix] = str(URIRef(namespace))[:-1]
+            else:
+                bindings["xmlns"] = str(URIRef(namespace))[:-1]
+
+        return bindings
+
     def __export__(self, output=None, domain=""):
         """ Export the collection item in the Mimetype required.
 
@@ -110,43 +229,63 @@ class Collection(Exportable):
         :type domain: str
         :return: Object using a different representation
         """
-        if output == Mimetypes.JSON.DTS.Std or output == Mimetypes.JSON.DTS.NoParents:
-            identifier = self.id
-            if self.id is None:
-                identifier = ""
-            if self.title:
-                m = Metadata(keys="dc:title")
-                m["dc:title"] = self.title
-                m += self.metadata
-            else:
-                m = self.metadata
+
+        if output == Mimetypes.JSON.DTS.Std:
+            nm = self.graph.namespace_manager
+            bindings = {}
+            for predicate in set(self.graph.predicates()):
+                prefix, namespace, name = nm.compute_qname(predicate)
+                bindings[prefix] = str(URIRef(namespace))
+
+            RDFSLabel = self.graph.qname(RDFS.label)
+            store = Subgraph(GRAPH.namespace_manager)
+            store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
+            metadata = {}
+            for _, predicate, obj in store.graph:
+                k = self.graph.qname(predicate)
+                if k in metadata:
+                    if isinstance(metadata[k], list):
+                        metadata[k].append(LiteralToDict(obj))
+                    else:
+                        metadata[k] = [metadata[k], LiteralToDict(obj)]
+                else:
+                    metadata[k] = LiteralToDict(obj)
             o = {
-                "@id": domain+identifier,
-                RDF_PREFIX["dts"] + "description": m.export(Mimetypes.JSON.DTS.Std),
-                RDF_PREFIX["dts"] + "properties": self.properties,
-                RDF_PREFIX["dts"] + "capabilities": {
-                    RDF_PREFIX["dts"] + "ordered": False,
-                    RDF_PREFIX["dts"] + "supportsRole": False,
-                    RDF_PREFIX["dts"] + "static": True,
-                    RDF_PREFIX["dts"] + "navigation": {
-                        RDF_PREFIX["dts"] + "parents": [],
-                        RDF_PREFIX["dts"] + "siblings": {}
-                    }
-                },
+                "@context": bindings,
+                "@graph": {
+                    "@id": self.id,
+                    RDFSLabel: LiteralToDict(self.get_label()) or self.id,
+                    self.graph.qname(NAMESPACES.DTS.size): len(self.members),
+                    self.graph.qname(NAMESPACES.DTS.metadata): metadata
+                }
             }
             if len(self.members):
-                o[RDF_PREFIX["dts"] + "members"] = [
-                    member.export(Mimetypes.JSON.DTS.NoParents, domain=domain) for member in self.members
-                ]
-            if output != Mimetypes.JSON.DTS.NoParents and len(self.parents):
-                o[RDF_PREFIX["dts"] + "capabilities"]\
-                 [RDF_PREFIX["dts"] + "navigation"]\
-                 [RDF_PREFIX["dts"] + "parents"] = [
+                o["@graph"][self.graph.qname(NAMESPACES.DTS.members)] = [
                     {
-                        "@id": domain+(parent.id or ""),
-                        RDF_PREFIX["rdf"] + "type": parent.TYPE_URI,
-                        RDF_PREFIX["dts"] + "model": "http://w3id.org/dts-ontology/collection",
+                        "@id": member.id,
+                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
+                        self.graph.qname(NAMESPACES.DTS.url): domain+member.id
                     }
-                    for parent in self.parents
+                    for member in self.members
                 ]
+            if self.parent:
+                o["@graph"][self.graph.qname(NAMESPACES.DTS.parents)] = [
+                    {
+                        "@id": member.id,
+                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
+                        self.graph.qname(NAMESPACES.DTS.url): domain+member.id
+                    }
+                    for member in self.parents
+                ]
+            del store
+            return o
+        elif output == Mimetypes.JSON.LD\
+                or output == Mimetypes.XML.RDF:
+
+            # We create a temp graph
+            store = Subgraph(GRAPH.namespace_manager)
+            store.graphiter(self.graph, self.asNode(), ascendants=1, descendants=-1)
+
+            o = store.serialize(format=RDFLIB_MAPPING[output], auto_compact=True, indent="")
+            del store
             return o

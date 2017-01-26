@@ -15,7 +15,8 @@ setup(
     "requests>=2.8.1",
     "six>=1.10.0",
     "lxml>=3.6.4",
-    "future>=0.16.0"
+    "future>=0.16.0",
+    "rdflib-jsonld>=0.4.0"
   ],
   tests_require=[
     "mock>=2.0.0",
@@ -34,7 +35,7 @@ setup(
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Topic :: Software Development :: Libraries",
-    "Topic :: Text Processing :: Markup :: XML",
-    "Topic :: Text Processing :: General"
+    "Topic :: PrototypeText Processing :: Markup :: XML",
+    "Topic :: PrototypeText Processing :: General"
   ]
 )

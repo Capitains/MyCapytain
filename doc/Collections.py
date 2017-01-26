@@ -21,12 +21,12 @@ From here, we actually have the necessary data, we can now
 play with collections. TextInventory is the main collection type that is needed to
 parse the whole response.
 """
-inventory = TextInventory(resource=response)
+inventory = TextInventory.parse(resource=response)
 # What we are gonna do is print the title of each descendant :
 for descendant in inventory.descendants:
     # Metadatum resolve any non-existing language ("eng", "lat") to a default one
     # Putting default is just making that clear
-    print(descendant.title["default"])
+    print(descendant.get_label())
 
 """
 You should see in there things such as

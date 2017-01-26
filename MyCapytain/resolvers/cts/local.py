@@ -4,7 +4,8 @@
 import io
 
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Citation, Text as InventoryText
+from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Citation, Text as InventoryText, \
+    Translation, Edition
 from MyCapytain.resources.texts.locals.tei import Text
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.errors import InvalidURN
@@ -13,12 +14,10 @@ from glob import glob
 import os.path
 from math import ceil
 import logging
-from copy import copy
-from collections import OrderedDict
 
 
 class CTSCapitainsLocalResolver(Resolver):
-    """ XML Folder Based resolver. Text and metadata resolver based on local directories
+    """ XML Folder Based resolver. PrototypeText and metadata resolver based on local directories
 
     :param resource: Resource should be a list of folders retaining data as Capitains Guidelines Repositories
     :type resource: [str]
@@ -27,7 +26,7 @@ class CTSCapitainsLocalResolver(Resolver):
     :param logger: Logging object
     :type logger: logging
 
-    :cvar TEXT_CLASS: Text Class [not instantiated] to be used to parse Texts. Can be changed to support Cache for example
+    :cvar TEXT_CLASS: PrototypeText Class [not instantiated] to be used to parse Texts. Can be changed to support Cache for example
     :type TEXT_CLASS: class
     :cvar DEFAULT_PAGE: Default Page to show
     :cvar PER_PAGE: Tuple representing the minimal number of texts returned, the default number and the maximum number of texts returned
@@ -76,14 +75,14 @@ class CTSCapitainsLocalResolver(Resolver):
         """ Parse a list of directories ans
         :param resource: List of folders
         :param cache: Auto cache the results
-        :return: An inventory resource and a list of Text metadata-objects
+        :return: An inventory resource and a list of PrototypeText metadata-objects
         """
         for folder in resource:
             textgroups = glob("{base_folder}/data/*/__cts__.xml".format(base_folder=folder))
             for __cts__ in textgroups:
                 try:
                     with io.open(__cts__) as __xml__:
-                        textgroup = TextGroup(
+                        textgroup = TextGroup.parse(
                             resource=__xml__
                         )
                         str_urn = str(textgroup.urn)
@@ -94,9 +93,9 @@ class CTSCapitainsLocalResolver(Resolver):
 
                     for __subcts__ in glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(__cts__))):
                         with io.open(__subcts__) as __xml__:
-                            work = Work(
+                            work = Work.parse(
                                 resource=__xml__,
-                                parents=[self.inventory.textgroups[str_urn]]
+                                parent=self.inventory.textgroups[str_urn]
                             )
                             work_urn = str(work.urn)
                             if work_urn in self.inventory.textgroups[str_urn].works:
@@ -131,6 +130,7 @@ class CTSCapitainsLocalResolver(Resolver):
                                                     scope=cite.scope.replace("'", '"'),
                                                     name=cite.name
                                                 ))
+                                        del t
                                     __text__.citation = cites[-1]
                                     self.logger.info("%s has been parsed ", __text__.path)
                                     if __text__.citation:
@@ -150,7 +150,7 @@ class CTSCapitainsLocalResolver(Resolver):
         return self.inventory, self.texts
 
     def __getText__(self, urn):
-        """ Returns a Text object
+        """ Returns a PrototypeText object
         :param urn: URN of a text to retrieve
         :type urn: str, URN
         :return: Textual resource and metadata
@@ -188,7 +188,7 @@ class CTSCapitainsLocalResolver(Resolver):
         :param pagination: Activate pagination
         :type pagination: bool
         :return: ([Matches], Page, Count)
-        :rtype: ([Text], int, int)
+        :rtype: ([PrototypeText], int, int)
         """
         __PART = None
         if urn is not None:
@@ -260,33 +260,27 @@ class CTSCapitainsLocalResolver(Resolver):
         inventory = TextInventory()
         # For each text we found using the filter
         for text in texts:
-            tg_urn = str(text.parents[1].urn)
-            wk_urn = str(text.parents[0].urn)
+            tg_urn = str(text.parent.parent.urn)
+            wk_urn = str(text.parent.urn)
             txt_urn = str(text.urn)
             # If we need to generate a textgroup object
             if tg_urn not in inventory.textgroups:
-                inventory.textgroups[tg_urn] = copy(text.parents[1])
-                inventory.textgroups[tg_urn].works = OrderedDict()
+                TextGroup(urn=tg_urn, parent=inventory)
             # If we need to generate a work object
             if wk_urn not in inventory.textgroups[tg_urn].works:
-                inventory.textgroups[tg_urn].works[wk_urn] = copy(text.parents[0])
-                inventory.textgroups[tg_urn].works[wk_urn].parents = tuple(
-                    [inventory, inventory.textgroups[tg_urn]]
-                )
-                inventory.textgroups[tg_urn].works[wk_urn].texts = OrderedDict()
-            __text = copy(text)
-            inventory.textgroups[tg_urn].works[wk_urn].texts[txt_urn] = __text
-            __text.parents = tuple([
-                inventory,
-                inventory.textgroups[tg_urn],
-                inventory.textgroups[tg_urn].works[wk_urn]
-            ])
+                Work(urn=wk_urn, parent=inventory.textgroups[tg_urn])
+
+            if isinstance(text, Edition):
+                Edition(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+            elif isinstance(text, Translation):
+                Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+
         return inventory[objectId]
 
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param subreference: Passage Reference
         :type subreference: str
@@ -297,19 +291,18 @@ class CTSCapitainsLocalResolver(Resolver):
         :return: Passage
         :rtype: Passage
         """
-        text, inventory = self.__getText__(textId)
+        text, text_metadata = self.__getText__(textId)
         if subreference is not None:
             subreference = Reference(subreference)
         passage = text.getTextualNode(subreference)
         if metadata:
-            for descendant in [inventory] + inventory.parents:
-                passage.about.metadata += descendant.metadata
+            passage.set_metadata_from_collection(text_metadata)
         return passage
 
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param subreference: Passage Reference
         :type subreference: str
@@ -323,7 +316,7 @@ class CTSCapitainsLocalResolver(Resolver):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int

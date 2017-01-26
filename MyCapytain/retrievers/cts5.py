@@ -181,7 +181,7 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :param subreference: Passage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
@@ -198,7 +198,7 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :param reference: Passage Reference
         :return: GetPrevNextUrn request response from the endpoint
         """
@@ -208,7 +208,7 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int

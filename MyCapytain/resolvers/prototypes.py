@@ -28,7 +28,7 @@ class Resolver(object):
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param subreference: Passage Reference
         :type subreference: str
@@ -44,7 +44,7 @@ class Resolver(object):
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param subreference: Passage Reference
         :type subreference: str
@@ -56,7 +56,7 @@ class Resolver(object):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: Text Identifier
+        :param textId: PrototypeText Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int

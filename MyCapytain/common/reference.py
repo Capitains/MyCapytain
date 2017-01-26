@@ -11,7 +11,8 @@ from six import text_type
 from copy import copy
 import re
 from lxml.etree import _Element
-from MyCapytain.common.constants import NS
+from MyCapytain.common.constants import NS, Exportable, Mimetypes, GRAPH, NAMESPACES
+from MyCapytain.common.utils import make_xml_node
 
 REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
 REFSDECL_REPLACER = re.compile(r"\$[0-9]+")
@@ -357,10 +358,10 @@ class URN(object):
 
     @property
     def work(self):
-        """ Work element of the URN
+        """ PrototypeWork element of the URN
 
         :rtype: str
-        :return: Work part of the URN
+        :return: PrototypeWork part of the URN
         """
         return self.__parsed["work"]
 
@@ -629,7 +630,7 @@ class URN(object):
         return parsed
 
 
-class Citation(object):
+class Citation(Exportable):
     """ A citation object gives informations about the scheme
         
     :param name: Name of the citation (e.g. "book")
@@ -654,6 +655,11 @@ class Citation(object):
     :type child: Citation
 
     """
+
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.TEI]
+    DEFAULT_EXPORT = Mimetypes.XML.CTS
+
+    escape = re.compile('(")')
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
         """ Initialize a Citation object
@@ -687,7 +693,7 @@ class Citation(object):
 
     @property
     def xpath(self):
-        """ TextInventory xpath property of a citation (ie. identifier of the last element of the citation)
+        """ PrototypeTextInventory xpath property of a citation (ie. identifier of the last element of the citation)
         
         :type: basestring
         :Example: //tei:l[@n="?"]
@@ -702,7 +708,7 @@ class Citation(object):
 
     @property
     def scope(self):
-        """ TextInventory scope property of a citation (ie. identifier of all element but the last of the citation)
+        """ PrototypeTextInventory scope property of a citation (ie. identifier of all element but the last of the citation)
         
         :type: basestring
         :Example: /tei:TEI/tei:text/tei:body/tei:div
@@ -865,28 +871,41 @@ class Citation(object):
         """
         return self.refsDecl is None and self.scope is None and self.xpath is None
 
-    def __str__(self):
-        """ Returns a string refsDecl version of the object
+    def __export__(self, output=None, **kwargs):
+        if output == Mimetypes.XML.CTS:
+            if self.xpath is None and self.scope is None and self.refsDecl is None:
+                return ""
 
-        :Example:
-            >>>    a = Citation(name="book", xpath="/tei:TEI/tei:body/tei:text/tei:div", scope="/tei:div[@n=\"1\"]")
-            >>>    str(a) == "<tei:refsDecl n='book' xpath='/tei:TEI/tei:body/tei:text/tei:div' scope='/tei:div[@n=\"1\"]'>"
-            >>>         "<tei:p>This Citation extracts Book from the text</tei:p>"
-            >>>    "</tei:refsDecl>"
-        """
-        if self.refsDecl is None:
-            return ""
+            child = ""
+            if isinstance(self.child, Citation):
+                child = self.child.export(output=output)
 
-        label = ""
-        if self.name is not None:
-            label = self.name
+            label = ""
+            if self.name is not None:
+                label = self.name
 
-        return "<tei:cRefPattern n=\"{label}\" matchPattern=\"{regexp}\" replacementPattern=\"#xpath({refsDecl})\">" \
-               "<tei:p>This pointer pattern extracts {label}</tei:p></tei:cRefPattern>".format(
-                   refsDecl=self.refsDecl,
-                   label=label,
-                   regexp="\.".join(["(\w+)" for i in range(0, self.refsDecl.count("$"))])
-               )
+            return make_xml_node(
+                GRAPH, NAMESPACES.CTS.citation, attributes={
+                    "xpath": re.sub(Citation.escape, "'", self.xpath),
+                    "scope": re.sub(Citation.escape, "'", self.scope),
+                    "label": label
+                }, innerXML=child, complete=True
+            )
+        elif output == Mimetypes.XML.TEI:
+            if self.refsDecl is None:
+                return ""
+
+            label = ""
+            if self.name is not None:
+                label = self.name
+
+            return \
+                "<tei:cRefPattern n=\"{label}\" matchPattern=\"{regexp}\" replacementPattern=\"#xpath({refsDecl})\">" \
+                "<tei:p>This pointer pattern extracts {label}</tei:p></tei:cRefPattern>".format(
+                    refsDecl=self.refsDecl,
+                    label=label,
+                    regexp="\.".join(["(\w+)"]*self.refsDecl.count("$"))
+                )
 
     @staticmethod
     def ingest(resource, xpath=".//tei:cRefPattern"):

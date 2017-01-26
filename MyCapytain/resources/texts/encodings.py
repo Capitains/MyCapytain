@@ -20,10 +20,10 @@ from lxml.etree import tostring
 class TEIResource(InteractiveTextualNode):
     """ TEI Encoded Resource
 
-    :param resource: XML Resource that needs to be parsed into a Passage/Text
+    :param resource: XML Resource that needs to be parsed into a Passage/PrototypeText
     :type resource: Union[str,_Element]
     :cvar EXPORT_TO: List of exportable supported formats
-    :cvar DEFAULT_EXPORT: Default export (Plain/Text)
+    :cvar DEFAULT_EXPORT: Default export (Plain/PrototypeText)
     """
     EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT]
     DEFAULT_EXPORT = Mimetypes.PLAINTEXT
@@ -33,7 +33,7 @@ class TEIResource(InteractiveTextualNode):
         self.resource = xmlparser(resource)
 
     def __str__(self):
-        """ Text based representation of the passage
+        """ PrototypeText based representation of the passage
     
         :rtype: basestring
         :returns: XML of the passage in string form
@@ -41,7 +41,7 @@ class TEIResource(InteractiveTextualNode):
         return self.export(output=Mimetypes.XML.Std)
 
     def __export__(self, output=Mimetypes.PLAINTEXT, exclude=None, _preformatted=False):
-        """ Text content of the passage
+        """ PrototypeText content of the passage
 
         :param output: Mimetype (From MyCapytian.common.utils.Mimetypes) to output
         :type output: str
@@ -50,7 +50,7 @@ class TEIResource(InteractiveTextualNode):
         :param _preformatted: This parameter is used when export loops on itself
         :type _preformatted: boolean
         :rtype: basestring
-        :returns: Text of the xml node
+        :returns: PrototypeText of the xml node
 
         :Example:
             >>>    P = Passage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')

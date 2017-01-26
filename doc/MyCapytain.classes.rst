@@ -99,7 +99,7 @@ implementation should make sure that the whole set of navigation tool are covere
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
 | nextId                                      | nextId                                                               | .getReffs(subreference[optional]) | metadata : Metadata informations [Metadata]                 |
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
-| siblingsId [tuple[str]]                     | siblings [tuple[InteractiveTextualNode]]                             |                                   | about : Collection Information [Collection]                 |
+| siblingsId [tuple[str]]                     | siblings [tuple[InteractiveTextualNode]]                             |                                   |                                                             |
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
 | parentId                                    | parent                                                               |                                   | citation : Citation Information [Citation]                  |
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
@@ -155,7 +155,7 @@ Main Properties
 ***************
 
 - Collection().id : Identifier of the object
-- Collection().title : Title of the object
+- Collection().get_label(lang[Optional]) : Title of the object
 - Collection().readable : If True, means that the Collection().id can be used in GetReffs or GetTextualNode queries
 - Collection().members : Direct children of the object
 - Collection().descendants : Direct and Indirect children of the objects

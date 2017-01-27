@@ -37,6 +37,14 @@ class XML_Compare(object):
             return ''
 
     @staticmethod
+    def sortbyattr(elem):
+        attrkeys = sorted(elem.keys())
+        if len(attrkeys):
+            return elem.get(attrkeys[0])
+        else:
+            return ""
+
+    @staticmethod
     def sortAttrs(item, sorteditem):
         attrkeys = sorted(item.keys())
         for key in attrkeys:
@@ -57,6 +65,7 @@ class XML_Compare(object):
         # We do this by performing three sorts in the reverse order
         items = sorted(items, key=XML_Compare.sortbyid)
         items = sorted(items, key=XML_Compare.sortbytext)
+        items = sorted(items, key=XML_Compare.sortbyattr)
         items = sorted(items, key=attrgetter('tag'))
 
         # Once sorted, we sort each of the items

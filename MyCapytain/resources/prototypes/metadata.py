@@ -48,6 +48,27 @@ class Collection(Exportable):
         self.__parent__ = None
         self.__children__ = {}
 
+    @property
+    def version(self):
+        for x in self.graph.objects(self.asNode(), NAMESPACES.DTS.version):
+            return x
+
+    @version.setter
+    def version(self, value):
+        if not isinstance(value, Literal):
+            value = Literal(value)
+        self.graph.set((self.asNode(), NAMESPACES.DTS.version, value))
+
+    @property
+    def type(self):
+        return list(self.graph.objects(self.asNode(), RDF.type))[0]
+
+    @type.setter
+    def type(self, value):
+        if not isinstance(value, URIRef):
+            value = URIRef(value)
+        self.graph.set((self.asNode(), RDF.type, value))
+
     # Graph Related Properties
     @property
     def graph(self):
@@ -238,6 +259,7 @@ class Collection(Exportable):
                 bindings[prefix] = str(URIRef(namespace))
 
             RDFSLabel = self.graph.qname(RDFS.label)
+            RDFType = self.graph.qname(RDF.type)
             store = Subgraph(GRAPH.namespace_manager)
             store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
             metadata = {}
@@ -254,11 +276,15 @@ class Collection(Exportable):
                 "@context": bindings,
                 "@graph": {
                     "@id": self.id,
+                    RDFType: str(self.type),
                     RDFSLabel: LiteralToDict(self.get_label()) or self.id,
                     self.graph.qname(NAMESPACES.DTS.size): len(self.members),
                     self.graph.qname(NAMESPACES.DTS.metadata): metadata
                 }
             }
+            version = self.version
+            if version is not None:
+                o["@graph"]["version"] = str(version)
             if len(self.members):
                 o["@graph"][self.graph.qname(NAMESPACES.DTS.members)] = [
                     {

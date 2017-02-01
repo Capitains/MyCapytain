@@ -393,12 +393,13 @@ class TextXMLFolderResolver(TestCase):
             "Resolver should return a collection object"
         )
         self.assertIsInstance(
-            metadata.members[0], PrototypeTextGroup,
+            metadata.members[0], Collection,
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
-            len(metadata.descendants), 42,
-            "There should be as many descendants as there is edition, translation, works and textgroup"
+            len(metadata.descendants), 43,
+            "There should be as many descendants as there is edition, translation, works and textgroup + 1 for "
+            "default inventory"
         )
         self.assertEqual(
             len(metadata.readableDescendants), 25,

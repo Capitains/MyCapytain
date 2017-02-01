@@ -1,0 +1,26 @@
+class CollectionDispatcher:
+    def __init__(self, collection, default_inventory_name=None):
+        self.collection = collection
+        if default_inventory_name is None:
+            default_inventory_name = self.collection.members[0].id
+        self.__methods__ = [(default_inventory_name, lambda x: True)]
+
+    @property
+    def methods(self):
+        return self.__methods__
+
+    def add(self, func, inventory_name=None):
+        self.methods.append((inventory_name, func))
+
+    def inventory(self, inventory_name):
+        def decorator(f):
+            self.add(func=f, inventory_name=inventory_name)
+            return f
+        return decorator
+
+    def dispatch(self, collection):
+        for inventory, method in self.methods[::-1]:
+            if method(collection) is True:
+                collection.parent = self.collection.children[inventory]
+                return
+        raise Exception("Text not dispatched %s" % collection.id)

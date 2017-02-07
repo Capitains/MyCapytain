@@ -2,18 +2,20 @@
 
 """
 import io
+import logging
+import os.path
+from glob import glob
+from math import ceil
 
+from MyCapytain.common.reference import URN, Reference
 from MyCapytain.common.utils import xmlparser
+from MyCapytain.errors import InvalidURN
+from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Citation, Text as InventoryText, \
     Translation, Edition
+from MyCapytain.resources.prototypes.cts.inventory import TextInventoryCollection
 from MyCapytain.resources.texts.locals.tei import Text
-from MyCapytain.resolvers.prototypes import Resolver
-from MyCapytain.errors import InvalidURN
-from MyCapytain.common.reference import URN, Reference
-from glob import glob
-import os.path
-from math import ceil
-import logging
+from MyCapytain.resolvers.utils import CollectionDispatcher
 
 
 class CTSCapitainsLocalResolver(Resolver):
@@ -45,10 +47,18 @@ class CTSCapitainsLocalResolver(Resolver):
     def texts(self):
         return self.__texts__
 
-    def __init__(self, resource, name=None, logger=None):
+    def __init__(self, resource, name=None, logger=None, dispatcher=None):
         """ Initiate the XMLResolver
         """
-        self.__inventory__ = TextInventory()
+        if dispatcher is None:
+            inventory_collection = TextInventoryCollection(identifier="defaultTic")
+            ti = TextInventory("default")
+            ti.parent = inventory_collection
+            ti.set_label("Default collection", "eng")
+            self.dispatcher = CollectionDispatcher(inventory_collection)
+        else:
+            self.dispatcher = dispatcher
+        self.__inventory__ = self.dispatcher.collection
         self.__texts__ = []
         self.name = name
 
@@ -85,26 +95,24 @@ class CTSCapitainsLocalResolver(Resolver):
                         textgroup = TextGroup.parse(
                             resource=__xml__
                         )
-                        str_urn = str(textgroup.urn)
-                    if str_urn in self.inventory.textgroups:
-                        self.inventory.textgroups[str_urn].update(textgroup)
+                        tg_urn = str(textgroup.urn)
+                    if tg_urn in self.inventory:
+                        self.inventory[tg_urn].update(textgroup)
                     else:
-                        self.inventory.textgroups[str_urn] = textgroup
+                        self.dispatcher.dispatch(textgroup, path=__cts__)
 
                     for __subcts__ in glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(__cts__))):
                         with io.open(__subcts__) as __xml__:
                             work = Work.parse(
                                 resource=__xml__,
-                                parent=self.inventory.textgroups[str_urn]
+                                parent=self.inventory[tg_urn]
                             )
                             work_urn = str(work.urn)
-                            if work_urn in self.inventory.textgroups[str_urn].works:
-                                self.inventory.textgroups[str_urn].works[work_urn].update(work)
-                            else:
-                                self.inventory.textgroups[str_urn].works[work_urn] = work
+                            if work_urn in self.inventory[tg_urn].works:
+                                self.inventory[work_urn].update(work)
 
                         for __textkey__ in work.texts:
-                            __text__ = self.inventory.textgroups[str_urn].works[work_urn].texts[__textkey__]
+                            __text__ = self.inventory[__textkey__]
                             __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
                                 directory=os.path.dirname(__subcts__),
                                 textgroup=__text__.urn.textgroup,
@@ -133,7 +141,7 @@ class CTSCapitainsLocalResolver(Resolver):
                                         del t
                                     __text__.citation = cites[-1]
                                     self.logger.info("%s has been parsed ", __text__.path)
-                                    if __text__.citation:
+                                    if __text__.citation.isEmpty() is False:
                                         self.texts.append(__text__)
                                     else:
                                         self.logger.error("%s has no passages", __text__.path)
@@ -256,8 +264,16 @@ class CTSCapitainsLocalResolver(Resolver):
         """
         if objectId is None:
             return self.inventory
+        elif objectId in self.inventory.children.keys():
+            return self.inventory[objectId]
         texts, _, _ = self.__getTextMetadata__(urn=objectId)
-        inventory = TextInventory()
+
+        # We store inventory names and if there is only one we recreate the inventory
+        inv_names = [text.parent.parent.parent.id for text in texts]
+        if len(set(inv_names)) == 1:
+            inventory = TextInventory(name=inv_names[0])
+        else:
+            inventory = TextInventory()
         # For each text we found using the filter
         for text in texts:
             tg_urn = str(text.parent.parent.urn)
@@ -271,9 +287,11 @@ class CTSCapitainsLocalResolver(Resolver):
                 Work(urn=wk_urn, parent=inventory.textgroups[tg_urn])
 
             if isinstance(text, Edition):
-                Edition(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+                x = Edition(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+                x.citation = text.citation
             elif isinstance(text, Translation):
-                Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+                x = Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+                x.citation = text.citation
 
         return inventory[objectId]
 

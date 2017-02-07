@@ -11,7 +11,7 @@ from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import Subgraph, LiteralToDict
 from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, GRAPH
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
-from rdflib.namespace import SKOS
+from rdflib.namespace import SKOS, DC
 
 
 class Collection(Exportable):
@@ -25,6 +25,7 @@ class Collection(Exportable):
     :type metadata: Metadata
     """
     TYPE_URI = URIRef(NAMESPACES.DTS.collection)
+    MODEL_URI = URIRef(NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.JSON.LD, Mimetypes.JSON.DTS.Std, Mimetypes.XML.RDF]
 
     def __init__(self, identifier="", *args, **kwargs):
@@ -36,7 +37,7 @@ class Collection(Exportable):
         self.__capabilities__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.capabilities)
 
         self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
-        self.graph.set((self.asNode(), NAMESPACES.DTS.model, self.TYPE_URI))
+        self.graph.set((self.asNode(), NAMESPACES.DTS.model, self.MODEL_URI))
 
         self.graph.addN(
             [
@@ -47,6 +48,44 @@ class Collection(Exportable):
 
         self.__parent__ = None
         self.__children__ = {}
+
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, self.id)
+
+    @property
+    def version(self):
+        for x in self.graph.objects(self.asNode(), NAMESPACES.DTS.version):
+            return x
+
+    @version.setter
+    def version(self, value):
+        if not isinstance(value, Literal):
+            value = Literal(value)
+        self.graph.set((self.asNode(), NAMESPACES.DTS.version, value))
+
+    @property
+    def type(self):
+        return list(self.graph.objects(self.asNode(), RDF.type))[0]
+
+    @type.setter
+    def type(self, value):
+        if not isinstance(value, URIRef):
+            value = URIRef(value)
+        self.graph.set((self.asNode(), RDF.type, value))
+
+    @property
+    def model(self):
+        return list(self.graph.objects(self.asNode(), NAMESPACES.DTS.model))[0]
+
+    @model.setter
+    def model(self, value):
+        if not isinstance(value, URIRef):
+            value = URIRef(value)
+        self.graph.set((self.asNode(), NAMESPACES.DTS.model, value))
+
+    @property
+    def size(self):
+        return len(self.members)
 
     # Graph Related Properties
     @property
@@ -171,6 +210,17 @@ class Collection(Exportable):
                 return obj
         raise KeyError("%s is not part of this object" % item)
 
+    def __contains__(self, item):
+        """ Retrieve an item by its ID in the tree of a collection
+
+        :param item:
+        :return: Collection identified by the item
+        """
+        for obj in self.descendants + [self]:
+            if obj.id == item:
+                return True
+        return False
+
     @property
     def readable(self):
         """ Readable property should return elements where the element can be queried for getPassage / getReffs
@@ -238,6 +288,7 @@ class Collection(Exportable):
                 bindings[prefix] = str(URIRef(namespace))
 
             RDFSLabel = self.graph.qname(RDFS.label)
+            RDFType = self.graph.qname(RDF.type)
             store = Subgraph(GRAPH.namespace_manager)
             store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
             metadata = {}
@@ -254,11 +305,15 @@ class Collection(Exportable):
                 "@context": bindings,
                 "@graph": {
                     "@id": self.id,
+                    RDFType: str(self.type),
                     RDFSLabel: LiteralToDict(self.get_label()) or self.id,
                     self.graph.qname(NAMESPACES.DTS.size): len(self.members),
                     self.graph.qname(NAMESPACES.DTS.metadata): metadata
                 }
             }
+            version = self.version
+            if version is not None:
+                o["@graph"]["version"] = str(version)
             if len(self.members):
                 o["@graph"][self.graph.qname(NAMESPACES.DTS.members)] = [
                     {
@@ -289,3 +344,58 @@ class Collection(Exportable):
             o = store.serialize(format=RDFLIB_MAPPING[output], auto_compact=True, indent="")
             del store
             return o
+
+
+class ResourceCollection(Collection):
+    @property
+    def lang(self):
+        """ Languages this text is in
+
+        :return: List of available languages
+        """
+        return str(self.graph.value(self.asNode(), DC.language))
+
+    @lang.setter
+    def lang(self, lang):
+        """ Language this text is available in
+
+        :param lang: Language to add
+        :type lang: str
+        """
+        self.graph.set((self.asNode(), DC.language, Literal(lang)))
+
+    def get_creator(self, lang=None):
+        """ Get the DC Creator literal value
+
+        :param lang: Language to retrieve
+        :return: Creator string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.creator, lang=lang)
+
+    def get_title(self, lang=None):
+        """ Get the title of the object
+
+        :param lang: Lang to retrieve
+        :return: Title string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.title, lang=lang)
+
+    def get_description(self, lang=None):
+        """ Get the description of the object
+
+        :param lang: Lang to retrieve
+        :return: Description string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.description, lang=lang)
+
+    def get_subject(self, lang=None):
+        """ Get the subject of the object
+
+        :param lang: Lang to retrieve
+        :return: Subject string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.subject, lang=lang)

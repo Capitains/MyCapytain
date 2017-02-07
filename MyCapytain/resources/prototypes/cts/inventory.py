@@ -9,9 +9,9 @@
 from __future__ import unicode_literals
 from six import text_type
 
-from MyCapytain.resources.prototypes.metadata import Collection
+from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
 from MyCapytain.common.reference import URN
-from MyCapytain.common.utils import make_xml_node
+from MyCapytain.common.utils import make_xml_node, xmlparser
 from MyCapytain.common.constants import NAMESPACES, Mimetypes
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
@@ -31,6 +31,9 @@ class PrototypeCTSCollection(Collection):
     CTSMODEL = "CTSCollection"
     DC_TITLE_KEY = None
     CTS_PROPERTIES = []
+
+    EXPORT_TO = [Mimetypes.PYTHON.ETREE]
+    DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
 
     def __init__(self, identifier=""):
         super(PrototypeCTSCollection, self).__init__(identifier)
@@ -93,7 +96,7 @@ class PrototypeCTSCollection(Collection):
             (self.metadata, prop, value)
         )
 
-    def __xml_export_generic__(self, attrs, namespaces=False, lines="\n"):
+    def __xml_export_generic__(self, attrs, namespaces=False, lines="\n", members=None):
         """ Shared method for Mimetypes.XML.CTS Export
 
         :param attrs: Dictionary of attributes for the node
@@ -114,15 +117,21 @@ class PrototypeCTSCollection(Collection):
                     )
                 )
 
-        for obj in self.members:
+        if members is None:
+            members = self.members
+        for obj in members:
             strings.append(obj.export(Mimetypes.XML.CTS, namespaces=False))
 
         strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
 
         return lines.join(strings)
 
+    def __export__(self, output=None, domain=""):
+        if output == Mimetypes.PYTHON.ETREE:
+            return xmlparser(self.export(output=Mimetypes.XML.CTS))
 
-class PrototypeText(PrototypeCTSCollection):
+
+class PrototypeText(ResourceCollection, PrototypeCTSCollection):
     """ Represents a CTS PrototypeText
 
     :param urn: Identifier of the PrototypeText
@@ -135,6 +144,8 @@ class PrototypeText(PrototypeCTSCollection):
     """
 
     DC_TITLE_KEY = NAMESPACES.CTS.term("label")
+    TYPE_URI = NAMESPACES.CTS.term("text")
+    MODEL_URI = URIRef(NAMESPACES.DTS.resource)
     EXPORT_TO = [Mimetypes.XML.CTS]
     CTS_PROPERTIES = [NAMESPACES.CTS.label, NAMESPACES.CTS.description]
     SUBTYPE = "unknown"
@@ -159,23 +170,6 @@ class PrototypeText(PrototypeCTSCollection):
         :return: string representation of subtype
         """
         return self.__subtype__
-
-    @property
-    def lang(self):
-        """ Languages this text is in
-
-        :return: List of available languages
-        """
-        return str(self.graph.value(self.asNode(), DC.language))
-
-    @lang.setter
-    def lang(self, lang):
-        """ Language this text is available in
-
-        :param lang: Language to add
-        :type lang: str
-        """
-        self.graph.set((self.asNode(), DC.language, Literal(lang)))
 
     @property
     def readable(self):
@@ -265,6 +259,42 @@ class PrototypeText(PrototypeCTSCollection):
 
             return lines.join(strings)
 
+    def get_creator(self, lang=None):
+        """ Get the DC Creator literal value
+
+        :param lang: Language to retrieve
+        :return: Creator string representation
+        :rtype: Literal
+        """
+        return self.parent.parent.metadata.get_label(lang=lang)
+
+    def get_title(self, lang=None):
+        """ Get the DC Title of the object
+
+        :param lang: Lang to retrieve
+        :return: Title string representation
+        :rtype: Literal
+        """
+        return self.parent.metadata.get_label(lang=lang)
+
+    def get_description(self, lang=None):
+        """ Get the DC description of the object
+
+        :param lang: Lang to retrieve
+        :return: Description string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=NAMESPACES.CTS.description, lang=lang)
+
+    def get_subject(self, lang=None):
+        """ Get the DC subject of the object
+
+        :param lang: Lang to retrieve
+        :return: Subject string representation
+        :rtype: Literal
+        """
+        return self.get_label(lang=lang)
+
 
 class PrototypeEdition(PrototypeText):
     """ Represents a CTS Edition
@@ -275,6 +305,7 @@ class PrototypeEdition(PrototypeText):
     :type parent: PrototypeWork
     """
     TYPE_URI = NAMESPACES.CTS.term("edition")
+    MODEL_URI = URIRef(NAMESPACES.DTS.resource)
     SUBTYPE = "edition"
 
 
@@ -287,6 +318,7 @@ class PrototypeTranslation(PrototypeText):
     :type parent: PrototypeWork
     """
     TYPE_URI = NAMESPACES.CTS.term("translation")
+    MODEL_URI = URIRef(NAMESPACES.DTS.resource)
     SUBTYPE = "translation"
 
 
@@ -307,6 +339,7 @@ class PrototypeWork(PrototypeCTSCollection):
 
     DC_TITLE_KEY = NAMESPACES.CTS.term("title")
     TYPE_URI = NAMESPACES.CTS.term("work")
+    MODEL_URI = URIRef(NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS]
     CTS_PROPERTIES = [NAMESPACES.CTS.term("title")]
 
@@ -427,6 +460,7 @@ class PrototypeTextGroup(PrototypeCTSCollection):
     """
     DC_TITLE_KEY = NAMESPACES.CTS.term("groupname")
     TYPE_URI = NAMESPACES.CTS.term("textgroup")
+    MODEL_URI = URIRef(NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS]
     CTS_PROPERTIES = [NAMESPACES.CTS.groupname]
 
@@ -508,11 +542,15 @@ class PrototypeTextInventory(PrototypeCTSCollection):
     """
     DC_TITLE_KEY = NAMESPACES.CTS.term("name")
     TYPE_URI = NAMESPACES.CTS.term("TextInventory")
+    MODEL_URI = URIRef(NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS]
 
-    def __init__(self, name="defaultInventory"):
+    def __init__(self, name="defaultInventory", parent=None):
         super(PrototypeTextInventory, self).__init__(identifier=name)
         self.__children__ = defaultdict(PrototypeTextGroup)
+
+        if parent is not None:
+            self.parent = parent
 
     @property
     def textgroups(self):
@@ -551,3 +589,63 @@ class PrototypeTextInventory(PrototypeCTSCollection):
                 attrs["tiid"] = self.id
 
             return self.__xml_export_generic__(attrs, namespaces=namespaces)
+
+
+class TextInventoryCollection(PrototypeCTSCollection):
+    """ Initiate a PrototypeTextInventory resource
+
+    :param resource: Resource representing the PrototypeTextInventory
+    :type resource: Any
+    :param name: Identifier of the PrototypeTextInventory
+    :type name: str
+    """
+    DC_TITLE_KEY = NAMESPACES.CTS.term("name")
+    TYPE_URI = NAMESPACES.CTS.term("TextInventoryCollection")
+    MODEL_URI = URIRef(NAMESPACES.DTS.collection)
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.JSON.DTS.Std]
+
+    def __init__(self, identifier="default"):
+        super(TextInventoryCollection, self).__init__(identifier=identifier)
+        self.__children__ = dict()
+
+    def __len__(self):
+        """ Get the number of text in the Inventory
+
+        :return: Number of texts available in the inventory
+        """
+        return len([
+            text
+            for inv in self.members
+            for tg in inv.textgroups.values()
+            for work in tg.works.values()
+            for text in work.texts.values()
+        ])
+
+    def __export__(self, output=None, domain="", namespaces=True):
+        """ Create a {output} version of the PrototypeTextInventory
+
+        :param output: Format to be chosen
+        :type output: basestring
+        :param domain: Domain to prefix IDs when necessary
+        :type domain: str
+        :param namespaces: List namespaces in main node
+        :returns: Desired output formated resource
+        """
+        if output == Mimetypes.XML.CTS:
+            attrs = {}
+            if self.id:
+                attrs["tiid"] = self.id
+
+            return self.__xml_export_generic__(
+                attrs,
+                namespaces=namespaces,
+                members=[
+                    m for inv in self.members for m in inv.members
+                ]
+            )
+        elif output == Mimetypes.JSON.DTS.Std:
+            if len(self.members) > 1:
+                return Collection.__export__(self, output=output, domain=domain)
+            else:
+                return self.members[0].export(output=output, domain=domain)
+

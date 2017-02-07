@@ -137,7 +137,7 @@ class Mimetypes:
 
             :cvar ReadableText: MyCapytain.resources.prototypes.text.CitableText
             """
-            ReadableText = "Capitains/ReadableText"
+            TextualElement = "Capitains/TextualElement"
 
     PLAINTEXT = "text/plain"
 

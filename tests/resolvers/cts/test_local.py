@@ -393,12 +393,13 @@ class TextXMLFolderResolver(TestCase):
             "Resolver should return a collection object"
         )
         self.assertIsInstance(
-            metadata.members[0], PrototypeTextGroup,
+            metadata.members[0], Collection,
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
-            len(metadata.descendants), 42,
-            "There should be as many descendants as there is edition, translation, works and textgroup"
+            len(metadata.descendants), 43,
+            "There should be as many descendants as there is edition, translation, works and textgroup + 1 for "
+            "default inventory"
         )
         self.assertEqual(
             len(metadata.readableDescendants), 25,
@@ -413,6 +414,7 @@ class TextXMLFolderResolver(TestCase):
                 "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
+        print(metadata.export(output=Mimetypes.JSON.DTS.Std))
         self.assertCountEqual(
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959",

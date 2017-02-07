@@ -414,6 +414,7 @@ class TextXMLFolderResolver(TestCase):
                 "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
+        print(metadata.export(output=Mimetypes.JSON.DTS.Std))
         self.assertCountEqual(
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959",

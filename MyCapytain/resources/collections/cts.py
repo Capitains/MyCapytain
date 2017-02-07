@@ -84,25 +84,7 @@ class Text(cts.PrototypeText):
     """ Represents a CTS PrototypeText
 
     """
-    EXPORT_TO = [Mimetypes.PYTHON.MyCapytain.ReadableText]
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
-
-    def __export__(self, output=Mimetypes.PYTHON.ETREE, domain="", **kwargs):
-        """ Create a {format} version of the PrototypeWork
-        
-        :param output: Format to be chosen (Only XML for now)
-        :type output: basestring, citation
-        :param domain: Domain to prefix IDs
-        :type domain: str
-        :rtype: lxml.etree._Element
-        :returns: XML representation of the object
-        """
-        if output == Mimetypes.PYTHON.MyCapytain.ReadableText:
-            complete_metadata = self.metadata
-            for parent in self.parents:
-                if isinstance(parent, cts.PrototypeCTSCollection) and hasattr(parent, "metadata"):
-                    complete_metadata = complete_metadata + parent.metadata
-            return text.CitableText(urn=self.urn, citation=self.citation, metadata=complete_metadata, **kwargs)
 
     @staticmethod
     def __findCitations(obj, xml, xpath="ti:citation"):

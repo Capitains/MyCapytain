@@ -49,6 +49,9 @@ class Collection(Exportable):
         self.__parent__ = None
         self.__children__ = {}
 
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, self.id)
+
     @property
     def version(self):
         for x in self.graph.objects(self.asNode(), NAMESPACES.DTS.version):
@@ -360,3 +363,39 @@ class ResourceCollection(Collection):
         :type lang: str
         """
         self.graph.set((self.asNode(), DC.language, Literal(lang)))
+
+    def get_creator(self, lang=None):
+        """ Get the DC Creator literal value
+
+        :param lang: Language to retrieve
+        :return: Creator string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.creator, lang=lang)
+
+    def get_title(self, lang=None):
+        """ Get the title of the object
+
+        :param lang: Lang to retrieve
+        :return: Title string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.title, lang=lang)
+
+    def get_description(self, lang=None):
+        """ Get the description of the object
+
+        :param lang: Lang to retrieve
+        :return: Description string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.description, lang=lang)
+
+    def get_subject(self, lang=None):
+        """ Get the subject of the object
+
+        :param lang: Lang to retrieve
+        :return: Subject string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=DC.subject, lang=lang)

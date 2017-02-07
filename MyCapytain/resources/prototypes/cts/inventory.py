@@ -131,7 +131,7 @@ class PrototypeCTSCollection(Collection):
             return xmlparser(self.export(output=Mimetypes.XML.CTS))
 
 
-class PrototypeText(PrototypeCTSCollection, ResourceCollection):
+class PrototypeText(ResourceCollection, PrototypeCTSCollection):
     """ Represents a CTS PrototypeText
 
     :param urn: Identifier of the PrototypeText
@@ -258,6 +258,42 @@ class PrototypeText(PrototypeCTSCollection, ResourceCollection):
             strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
 
             return lines.join(strings)
+
+    def get_creator(self, lang=None):
+        """ Get the DC Creator literal value
+
+        :param lang: Language to retrieve
+        :return: Creator string representation
+        :rtype: Literal
+        """
+        return self.parent.parent.metadata.get_label(lang=lang)
+
+    def get_title(self, lang=None):
+        """ Get the DC Title of the object
+
+        :param lang: Lang to retrieve
+        :return: Title string representation
+        :rtype: Literal
+        """
+        return self.parent.metadata.get_label(lang=lang)
+
+    def get_description(self, lang=None):
+        """ Get the DC description of the object
+
+        :param lang: Lang to retrieve
+        :return: Description string representation
+        :rtype: Literal
+        """
+        return self.metadata.get(key=NAMESPACES.CTS.description, lang=lang)
+
+    def get_subject(self, lang=None):
+        """ Get the DC subject of the object
+
+        :param lang: Lang to retrieve
+        :return: Subject string representation
+        :rtype: Literal
+        """
+        return self.get_label(lang=lang)
 
 
 class PrototypeEdition(PrototypeText):
@@ -509,9 +545,12 @@ class PrototypeTextInventory(PrototypeCTSCollection):
     MODEL_URI = URIRef(NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS]
 
-    def __init__(self, name="defaultInventory"):
+    def __init__(self, name="defaultInventory", parent=None):
         super(PrototypeTextInventory, self).__init__(identifier=name)
         self.__children__ = defaultdict(PrototypeTextGroup)
+
+        if parent is not None:
+            self.parent = parent
 
     @property
     def textgroups(self):
@@ -563,11 +602,11 @@ class TextInventoryCollection(PrototypeCTSCollection):
     DC_TITLE_KEY = NAMESPACES.CTS.term("name")
     TYPE_URI = NAMESPACES.CTS.term("TextInventoryCollection")
     MODEL_URI = URIRef(NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS]
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.JSON.DTS.Std]
 
     def __init__(self, identifier="default"):
         super(TextInventoryCollection, self).__init__(identifier=identifier)
-        self.__children__ = defaultdict(PrototypeTextInventory)
+        self.__children__ = dict()
 
     def __len__(self):
         """ Get the number of text in the Inventory
@@ -604,3 +643,9 @@ class TextInventoryCollection(PrototypeCTSCollection):
                     m for inv in self.members for m in inv.members
                 ]
             )
+        elif output == Mimetypes.JSON.DTS.Std:
+            if len(self.members) > 1:
+                return Collection.__export__(self, output=output, domain=domain)
+            else:
+                return self.members[0].export(output=output, domain=domain)
+

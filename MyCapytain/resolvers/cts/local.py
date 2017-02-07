@@ -51,7 +51,7 @@ class CTSCapitainsLocalResolver(Resolver):
         """ Initiate the XMLResolver
         """
         if dispatcher is None:
-            inventory_collection = TextInventoryCollection(identifier="default")
+            inventory_collection = TextInventoryCollection(identifier="defaultTic")
             ti = TextInventory("default")
             ti.parent = inventory_collection
             ti.set_label("Default collection", "eng")
@@ -99,7 +99,7 @@ class CTSCapitainsLocalResolver(Resolver):
                     if tg_urn in self.inventory:
                         self.inventory[tg_urn].update(textgroup)
                     else:
-                        self.dispatcher.dispatch(textgroup)
+                        self.dispatcher.dispatch(textgroup, path=__cts__)
 
                     for __subcts__ in glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(__cts__))):
                         with io.open(__subcts__) as __xml__:
@@ -155,8 +155,6 @@ class CTSCapitainsLocalResolver(Resolver):
                 except Exception as E:
                     self.logger.error("Error parsing %s ", __cts__)
 
-        with open("data.txt", "w") as f:
-            f.write(self.inventory.export("text/xml:CTS"))
         return self.inventory, self.texts
 
     def __getText__(self, urn):
@@ -269,7 +267,13 @@ class CTSCapitainsLocalResolver(Resolver):
         elif objectId in self.inventory.children.keys():
             return self.inventory[objectId]
         texts, _, _ = self.__getTextMetadata__(urn=objectId)
-        inventory = TextInventory()
+
+        # We store inventory names and if there is only one we recreate the inventory
+        inv_names = [text.parent.parent.parent.id for text in texts]
+        if len(set(inv_names)) == 1:
+            inventory = TextInventory(name=inv_names[0])
+        else:
+            inventory = TextInventory()
         # For each text we found using the filter
         for text in texts:
             tg_urn = str(text.parent.parent.urn)

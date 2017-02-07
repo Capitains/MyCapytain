@@ -41,6 +41,9 @@ class TextualElement(Exportable):
             (self.__node__, NAMESPACES.DTS.metadata, self.__metadata__, self.__graph__)
         ])
 
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, self.id)
+
     @property
     def graph(self):
         return self.__graph__
@@ -93,21 +96,51 @@ class TextualElement(Exportable):
         self.metadata.add(key=DC.creator, value=value, lang=lang)
 
     def get_title(self, lang=None):
+        """ Get the title of the object
+
+        :param lang: Lang to retrieve
+        :return: Title string representation
+        :rtype: Literal
+        """
         return self.metadata.get(key=DC.title, lang=lang)
 
     def set_title(self, value, lang=None):
+        """ Set the DC Title literal value
+
+        :param lang: Language in which the value is
+        """
         return self.metadata.add(key=DC.title, value=value, lang=lang)
 
     def get_description(self, lang=None):
+        """ Get the description of the object
+
+        :param lang: Lang to retrieve
+        :return: Description string representation
+        :rtype: Literal
+        """
         return self.metadata.get(key=DC.description, lang=lang)
 
     def set_description(self, value, lang=None):
+        """ Set the DC Description literal value
+
+        :param lang: Language in which the value is
+        """
         return self.metadata.add(key=DC.description, value=value, lang=lang)
 
     def get_subject(self, lang=None):
+        """ Get the subject of the object
+
+        :param lang: Lang to retrieve
+        :return: Subject string representation
+        :rtype: Literal
+        """
         return self.metadata.get(key=DC.subject, lang=lang)
 
     def set_subject(self, value, lang=None):
+        """ Set the DC Subject literal value
+
+        :param lang: Language in which the value is
+        """
         return self.metadata.add(key=DC.subject, value=value, lang=lang)
 
     def export(self, output=None, exclude=None, **kwargs):

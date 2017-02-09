@@ -9,7 +9,7 @@ from math import ceil
 
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.errors import InvalidURN
+from MyCapytain.errors import InvalidURN, UnknownObjectError
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Citation, Text as InventoryText, \
     Translation, Edition
@@ -167,7 +167,19 @@ class CTSCapitainsLocalResolver(Resolver):
         if not isinstance(urn, URN):
             urn = URN(urn)
         if len(urn) != 5:
-            raise InvalidURN
+            if len(urn) == 4:
+                urn, reference = urn.upTo(URN.WORK), str(urn.reference)
+                urn = [
+                    t.id
+                    for t in self.__texts__
+                    if t.id.startswith(str(urn)) and isinstance(t, Edition) and not print(t.id)
+                ]
+                if len(urn) > 0:
+                    urn = URN(urn[0])
+                else:
+                    raise UnknownObjectError
+            else:
+                raise InvalidURN
 
         text = self.inventory[str(urn)]
 

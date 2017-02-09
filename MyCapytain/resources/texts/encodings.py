@@ -25,7 +25,10 @@ class TEIResource(InteractiveTextualNode):
     :cvar EXPORT_TO: List of exportable supported formats
     :cvar DEFAULT_EXPORT: Default export (Plain/PrototypeText)
     """
-    EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT]
+    EXPORT_TO = [
+        Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std,
+        Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT, Mimetypes.XML.TEI
+    ]
     DEFAULT_EXPORT = Mimetypes.PLAINTEXT
 
     def __init__(self, resource, **kwargs):
@@ -76,7 +79,7 @@ class TEIResource(InteractiveTextualNode):
             # Exports the whole resource as a LXML object
             return self.resource
 
-        elif output == Mimetypes.XML.Std:
+        elif output == Mimetypes.XML.Std or output == Mimetypes.XML.TEI:
             # Exports the whole resource formatted as XML but as string object
             return tostring(self.resource, encoding=str)
 

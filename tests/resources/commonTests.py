@@ -502,6 +502,7 @@ class CapitainsXmlPassageTests(TestCase):
     URN = None
     URN_2 = None
     TEI = None
+    FULL_EPIGRAMMATA = None
 
     def __init__(self, *args, **kwargs):
         """ Small helper to prevent run while inheriting from TestCase """
@@ -636,6 +637,43 @@ class CapitainsXmlPassageTests(TestCase):
         # Beginning of lowest level passage and beginning of parent level
         p = self.TEI.getTextualNode(["2", "pr", "sa"], simple=simple)
         self.assertEqual(str(p.prev.reference), "1.39.8")
+
+    @call_with_simple
+    def test_siblingsId(self, simple):
+        """ Test prev property """
+        # Normal passage checking
+        p, n = self.FULL_EPIGRAMMATA.getTextualNode(["2"], simple=simple).siblingsId
+        self.assertEqual(("1", "3"), (str(p), str(n)), "Middle node should have right siblings")
+        p, n = self.FULL_EPIGRAMMATA.getTextualNode(["1"], simple=simple).siblingsId
+        self.assertEqual((None, "2"), (p, str(n)), "First node should have right siblings")
+        p, n = self.FULL_EPIGRAMMATA.getTextualNode(["14"], simple=simple).siblingsId
+        self.assertEqual(("13", None), (str(p), n), "Last node should have right siblings")
+        # Ranges
+        if simple is False:
+            # Start
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-2"), simple=simple).siblingsId
+            self.assertEqual((None, "3-4"), (p, str(n)), "First node should have right siblings")
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-5"), simple=simple).siblingsId
+            self.assertEqual((None, "6-10"), (p, str(n)), "First node should have right siblings")
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-9"), simple=simple).siblingsId
+            self.assertEqual((None, "10-14"), (p, str(n)), "First node should have right siblings")
+            # End
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("12-14"), simple=simple).siblingsId
+            self.assertEqual(("9-11", None), (str(p), n), "Last node should have right siblings")
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("11-14"), simple=simple).siblingsId
+            self.assertEqual(("7-10", None), (str(p), n), "Last node should have right siblings")
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-14"), simple=simple).siblingsId
+            self.assertEqual(("1-4", None), (str(p), n), "Should take the rest")
+            # Middle
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-6"), simple=simple).siblingsId
+            self.assertEqual(("3-4", "7-8"), (str(p), str(n)), "Middle node should have right siblings")
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-8"), simple=simple).siblingsId
+            self.assertEqual(("1-4", "9-12"), (str(p), str(n)), "Middle node should have right siblings")
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-10"), simple=simple).siblingsId
+            self.assertEqual(("1-4", "11-14"), (str(p), str(n)), "Middle node should have right siblings")
+            # NONE !
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-14"), simple=simple).siblingsId
+            self.assertEqual((None, None), (p, n), "If whole range, nothing !")
 
 
 class CapitainsXMLRangePassageTests(TestCase):

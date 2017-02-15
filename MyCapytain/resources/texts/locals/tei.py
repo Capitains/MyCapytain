@@ -384,11 +384,12 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
             return self.__prevnext__
 
         document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
-        range_length = len(self.getReffs())
 
-        start = str(self.reference.start)
+        range_length = 1
+        if self.reference.end is not None:
+            range_length = len(self.getReffs())
 
-        start = document_references.index(start)
+        start = document_references.index(str(self.reference.start))
 
         if start == 0:
             # If the passage is already at the beginning
@@ -404,7 +405,7 @@ class __SimplePassage__(__SharedMethods__, encodings.TEIResource, text.Passage):
         elif start + range_length > len(document_references):
             _next = Reference(document_references[-1])
         else:
-            _next = Reference(document_references[start +1])
+            _next = Reference(document_references[start + 1])
 
         self.__prevnext__ = (_prev, _next)
         return self.__prevnext__
@@ -593,12 +594,13 @@ class Passage(__SharedMethods__, encodings.TEIResource, text.Passage):
             return self.__prevnext__
 
         document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
-        range_length = len(self.getReffs(level=0))
 
         if self.reference.end:
             start, end = str(self.reference.start), str(self.reference.end)
+            range_length = len(self.getReffs(level=0))
         else:
             start = end = str(self.reference.start)
+            range_length = 1
 
         start = document_references.index(start)
         end = document_references.index(end)

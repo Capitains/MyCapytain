@@ -54,6 +54,8 @@ class TestLocalXMLPassageImplementation(CapitainsXmlPassageTests, unittest.TestC
         self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
         self.TEI = MyCapytain.resources.texts.locals.tei.Text(resource=objectifiedParser(self.text))
+        with open("tests/testing_data/latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml", "rb") as f:
+            self.FULL_EPIGRAMMATA = MyCapytain.resources.texts.locals.tei.Text(resource=objectifiedParser(f))
 
         assert self.simple is False, "Simple should be True"
 
@@ -71,6 +73,8 @@ class TestLocalXMLSimplePassageImplementation(CapitainsXmlPassageTests, unittest
         self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
         self.TEI = MyCapytain.resources.texts.locals.tei.Text(resource=objectifiedParser(self.text))
+        with open("tests/testing_data/latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml", "rb") as f:
+            self.FULL_EPIGRAMMATA = MyCapytain.resources.texts.locals.tei.Text(resource=objectifiedParser(f))
 
         assert self.simple is True, "Simple should be True"
 

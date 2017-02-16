@@ -172,7 +172,7 @@ class CTSCapitainsLocalResolver(Resolver):
                 urn = [
                     t.id
                     for t in self.__texts__
-                    if t.id.startswith(str(urn)) and isinstance(t, Edition) and not print(t.id)
+                    if t.id.startswith(str(urn)) and isinstance(t, Edition)
                 ]
                 if len(urn) > 0:
                     urn = URN(urn[0])

@@ -43,7 +43,7 @@
          <refsDecl n="CTS">
             <cRefPattern n="line"
                          matchPattern="(\w+)"
-                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='edition']//tei:l[@n='$1'])">
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div[@type='translation']//tei:l[@n='$1'])">
                 <p>This pointer pattern extracts line</p>
             </cRefPattern>
         </refsDecl>
@@ -62,7 +62,7 @@
 
    <text xml:id="stoa0045.stoa0">
       <body>
-         <div type="edition" n="urn:cts:latinLit:phi0959.phi010.perseus-lat2" xml:lang="lat">
+         <div type="translation" n="urn:cts:latinLit:phi0959.phi010.perseus-eng2" xml:lang="eng">
             <pb xml:id="p.103"/>
 
 

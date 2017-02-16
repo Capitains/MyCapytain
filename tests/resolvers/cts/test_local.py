@@ -5,9 +5,12 @@ from __future__ import unicode_literals
 from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
 from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES, GRAPH
 from MyCapytain.common.reference import URN, Reference
+from MyCapytain.errors import InvalidURN, UnknownObjectError
 from MyCapytain.resources.prototypes.metadata import Collection
-from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup, PrototypeText as TextMetadata
+from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup, PrototypeText as TextMetadata, \
+    PrototypeTranslation, PrototypeTextInventory, TextInventoryCollection
 from MyCapytain.resources.prototypes.text import Passage
+from MyCapytain.resolvers.utils import CollectionDispatcher
 from unittest import TestCase
 
 
@@ -180,6 +183,18 @@ class TextXMLFolderResolver(TestCase):
             "Export to Etree should give an Etree or Etree like object"
         )
 
+    def test_getPassage_no_canonical(self):
+        """ Test that we can get a subreference text passage where no canonical exists"""
+        passage = self.resolver.getTextualNode("urn:cts:latinLit:phi0959.phi010.perseus-eng2", "2")
+        self.assertEqual(
+            passage.export(Mimetypes.PLAINTEXT), "Omne fuit Musae carmen inerme meae; ",
+            "Passage should resolve if directly asked"
+        )
+        with self.assertRaises(UnknownObjectError):
+            passage = self.resolver.getTextualNode("urn:cts:latinLit:phi0959.phi010", "2")
+        with self.assertRaises(InvalidURN):
+            passage = self.resolver.getTextualNode("urn:cts:latinLit:phi0959", "2")
+
     def test_getPassage_subreference(self):
         """ Test that we can get a subreference text passage"""
         passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
@@ -200,6 +215,12 @@ class TextXMLFolderResolver(TestCase):
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
             "Export PrototypeText should work correctly"
+        )
+        canonical = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002", "1.1")
+        self.assertEqual(
+            passage.export(output=Mimetypes.PLAINTEXT),
+            canonical.export(output=Mimetypes.PLAINTEXT),
+            "Canonical text should work"
         )
 
         self.assertEqual(
@@ -414,7 +435,6 @@ class TextXMLFolderResolver(TestCase):
                 "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
-        print(metadata.export(output=Mimetypes.JSON.DTS.Std))
         self.assertCountEqual(
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959",
@@ -462,6 +482,16 @@ class TextXMLFolderResolver(TestCase):
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
             ["urn:cts:latinLit:phi1294.phi002.perseus-lat2"],
             "There should be one member in DTS JSON"
+        )
+
+        tr = self.resolver.getMetadata(objectId="urn:cts:greekLit:tlg0003.tlg001.opp-fre1")
+        self.assertIsInstance(
+            tr, PrototypeTranslation, "Metadata should be translation"
+        )
+        self.assertIn(
+            "Histoire de la Guerre du Péloponnése",
+            tr.get_description("eng"),
+            "Description should be the right one"
         )
 
     def test_getSiblings(self):
@@ -537,4 +567,64 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             reffs[0], "1.1.1"
+        )
+
+
+class TextXMLFolderResolverDispatcher(TestCase):
+    """ Ensure working state of resolver """
+    def setUp(self):
+        GRAPH.remove((None, None, None))
+
+    def test_dispatching_latin_greek(self):
+        tic = TextInventoryCollection()
+        latin = PrototypeTextInventory("urn:perseus:latinLit", parent=tic)
+        latin.set_label("Classical Latin", "eng")
+        farsi = PrototypeTextInventory("urn:perseus:farsiLit", parent=tic)
+        farsi.set_label("Farsi", "eng")
+        gc = PrototypeTextInventory("urn:perseus:greekLit", parent=tic)
+        gc.set_label("Ancient Greek", "eng")
+        gc.set_label("Grec Ancien", "fre")
+
+        dispatcher = CollectionDispatcher(tic)
+
+        @dispatcher.inventory("urn:perseus:latinLit")
+        def dispatchLatinLit(collection, path=None, **kwargs):
+            if collection.id.startswith("urn:cts:latinLit:"):
+                return True
+            return False
+
+        @dispatcher.inventory("urn:perseus:farsiLit")
+        def dispatchfFarsiLit(collection, path=None, **kwargs):
+            if collection.id.startswith("urn:cts:farsiLit:"):
+                return True
+            return False
+
+        @dispatcher.inventory("urn:perseus:greekLit")
+        def dispatchGreekLit(collection, path=None, **kwargs):
+            if collection.id.startswith("urn:cts:greekLit:"):
+                return True
+            return False
+
+        resolver = CTSCapitainsLocalResolver(
+            ["./tests/testing_data/latinLit2"],
+            dispatcher=dispatcher
+        )
+        latin_stuff = resolver.getMetadata("urn:perseus:latinLit")
+        greek_stuff = resolver.getMetadata("urn:perseus:greekLit")
+        farsi_stuff = resolver.getMetadata("urn:perseus:farsiLit")
+        self.assertEqual(
+            len(latin_stuff.readableDescendants), 19,
+            "There should be 19 readable descendants in Latin"
+        )
+        self.assertEqual(
+            len(greek_stuff.readableDescendants), 6,
+            "There should be 6 readable descendants in Greek [6 only in __cts__.xml]"
+        )
+        self.assertEqual(
+            len(farsi_stuff.descendants), 0,
+            "There should be nothing in FarsiLit"
+        )
+        self.assertEqual(
+            str(greek_stuff.get_label("fre")), "Grec Ancien",
+            "Label should be correct"
         )

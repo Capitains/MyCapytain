@@ -107,8 +107,11 @@ class PrototypeCTSCollection(Collection):
         if namespaces is True:
             attrs.update(self.__namespaces_header__())
 
-        strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
+        TYPE_URI = self.TYPE_URI
+        if TYPE_URI == NAMESPACES.CTS.term("TextInventoryCollection"):
+            TYPE_URI = NAMESPACES.CTS.term("TextInventory")
 
+        strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)]
         for pred in self.CTS_PROPERTIES:
             for obj in self.graph.objects(self.metadata, pred):
                 strings.append(
@@ -122,7 +125,7 @@ class PrototypeCTSCollection(Collection):
         for obj in members:
             strings.append(obj.export(Mimetypes.XML.CTS, namespaces=False))
 
-        strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
+        strings.append(make_xml_node(self.graph, TYPE_URI, close=True))
 
         return lines.join(strings)
 
@@ -648,4 +651,3 @@ class TextInventoryCollection(PrototypeCTSCollection):
                 return Collection.__export__(self, output=output, domain=domain)
             else:
                 return self.members[0].export(output=output, domain=domain)
-

@@ -9,7 +9,7 @@ from math import ceil
 
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.errors import InvalidURN, UnknownObjectError
+from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Citation, Text as InventoryText, \
     Translation, Edition
@@ -38,7 +38,7 @@ class CTSCapitainsLocalResolver(Resolver):
     TEXT_CLASS = Text
     DEFAULT_PAGE = 1
     PER_PAGE = (1, 10, 100)  # Min, Default, Mainvex,
-
+    RAISE_ON_UNDISPATCHED = False
     @property
     def inventory(self):
         return self.__inventory__
@@ -152,6 +152,10 @@ class CTSCapitainsLocalResolver(Resolver):
                                     )
                             else:
                                 self.logger.error("%s is not present", __text__.path)
+                except UndispatchedTextError as E:
+                    self.logger.error("Error dispatching %s ", __cts__)
+                    if self.RAISE_ON_UNDISPATCHED is True:
+                        raise E
                 except Exception as E:
                     self.logger.error("Error parsing %s ", __cts__)
 

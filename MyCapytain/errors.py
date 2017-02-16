@@ -45,3 +45,8 @@ class UnknownObjectError(ValueError):
 class UnknownNamespace(ValueError):
     """ This error is thrown when a namespace is unknown
     """
+
+
+class UndispatchedTextError(Exception):
+    """ This error is thrown when a text has not been dispatched by a dispatcher
+    """

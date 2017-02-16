@@ -5,8 +5,9 @@ from __future__ import unicode_literals
 from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
 from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES, GRAPH
 from MyCapytain.common.reference import URN, Reference
-from MyCapytain.errors import InvalidURN, UnknownObjectError
+from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resources.prototypes.metadata import Collection
+from MyCapytain.resources.collections.cts import TextInventory
 from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup, PrototypeText as TextMetadata, \
     PrototypeTranslation, PrototypeTextInventory, TextInventoryCollection
 from MyCapytain.resources.prototypes.text import Passage
@@ -616,6 +617,9 @@ class TextXMLFolderResolverDispatcher(TestCase):
             len(latin_stuff.readableDescendants), 19,
             "There should be 19 readable descendants in Latin"
         )
+        self.assertIsInstance(
+            latin_stuff, PrototypeTextInventory, "should be textinventory"
+        )
         self.assertEqual(
             len(greek_stuff.readableDescendants), 6,
             "There should be 6 readable descendants in Greek [6 only in __cts__.xml]"
@@ -627,4 +631,106 @@ class TextXMLFolderResolverDispatcher(TestCase):
         self.assertEqual(
             str(greek_stuff.get_label("fre")), "Grec Ancien",
             "Label should be correct"
+        )
+
+        with self.assertRaises(KeyError):
+            _ = latin_stuff["urn:cts:greekLit:tlg0003"]
+
+    def test_dispatching_error(self):
+        tic = TextInventoryCollection()
+        latin = PrototypeTextInventory("urn:perseus:latinLit", parent=tic)
+        latin.set_label("Classical Latin", "eng")
+        dispatcher = CollectionDispatcher(tic)
+        # We remove default dispatcher
+        dispatcher.__methods__ = []
+
+        @dispatcher.inventory("urn:perseus:latinLit")
+        def dispatchLatinLit(collection, path=None, **kwargs):
+            print(collection.id)
+            if collection.id.startswith("urn:cts:latinLit:"):
+                return True
+            return False
+
+        CTSCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = True
+        with self.assertRaises(UndispatchedTextError):
+            resolver = CTSCapitainsLocalResolver(
+                ["./tests/testing_data/latinLit2"],
+                dispatcher=dispatcher
+            )
+
+        CTSCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = False
+        try:
+            resolver = CTSCapitainsLocalResolver(
+                ["./tests/testing_data/latinLit2"],
+                dispatcher=dispatcher
+            )
+        except UndispatchedTextError as E:
+            self.fail("UndispatchedTextError should not have been raised")
+
+    def test_dispatching_output(self):
+        tic = TextInventoryCollection()
+        latin = PrototypeTextInventory("urn:perseus:latinLit", parent=tic)
+        latin.set_label("Classical Latin", "eng")
+        farsi = PrototypeTextInventory("urn:perseus:farsiLit", parent=tic)
+        farsi.set_label("Farsi", "eng")
+        gc = PrototypeTextInventory("urn:perseus:greekLit", parent=tic)
+        gc.set_label("Ancient Greek", "eng")
+        gc.set_label("Grec Ancien", "fre")
+
+        dispatcher = CollectionDispatcher(tic)
+
+        @dispatcher.inventory("urn:perseus:latinLit")
+        def dispatchLatinLit(collection, path=None, **kwargs):
+            if collection.id.startswith("urn:cts:latinLit:"):
+                return True
+            return False
+
+        @dispatcher.inventory("urn:perseus:farsiLit")
+        def dispatchfFarsiLit(collection, path=None, **kwargs):
+            if collection.id.startswith("urn:cts:farsiLit:"):
+                return True
+            return False
+
+        @dispatcher.inventory("urn:perseus:greekLit")
+        def dispatchGreekLit(collection, path=None, **kwargs):
+            if collection.id.startswith("urn:cts:greekLit:"):
+                return True
+            return False
+
+        resolver = CTSCapitainsLocalResolver(
+            ["./tests/testing_data/latinLit2"],
+            dispatcher=dispatcher
+        )
+
+        all = resolver.getMetadata().export(Mimetypes.XML.CTS)
+        latin_stuff = resolver.getMetadata("urn:perseus:latinLit").export(Mimetypes.XML.CTS)
+        greek_stuff = resolver.getMetadata("urn:perseus:greekLit").export(Mimetypes.XML.CTS)
+        farsi_stuff = resolver.getMetadata("urn:perseus:farsiLit").export(Mimetypes.XML.CTS)
+        GRAPH.remove((None, None, None))
+        latin_stuff, greek_stuff, farsi_stuff = TextInventory.parse(latin_stuff), TextInventory.parse(greek_stuff),\
+            TextInventory.parse(farsi_stuff)
+        self.assertEqual(
+            len(latin_stuff.readableDescendants), 19,
+            "There should be 19 readable descendants in Latin"
+        )
+        self.assertIsInstance(
+            latin_stuff, PrototypeTextInventory, "should be textinventory"
+        )
+        self.assertEqual(
+            len(greek_stuff.readableDescendants), 6,
+            "There should be 6 readable descendants in Greek [6 only in __cts__.xml]"
+        )
+        self.assertEqual(
+            len(farsi_stuff.descendants), 0,
+            "There should be nothing in FarsiLit"
+        )
+        self.assertEqual(
+            greek_stuff.get_label("fre"), None,  # Text inventory have no label in CTS
+            "Label should be correct"
+        )
+        GRAPH.remove((None, None, None))
+        all = TextInventory.parse(all)
+        self.assertEqual(
+            len(all.readableDescendants), 25,
+            "There should be all 25 readable descendants in the master collection"
         )

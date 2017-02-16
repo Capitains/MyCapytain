@@ -84,6 +84,13 @@ Local CapiTainS Guidelines CTS Resolver
 .. autoclass:: MyCapytain.resolvers.cts.local.CTSCapitainsLocalResolver
     :members:
 
+Dispatcher
+**********
+
+.. autoclass:: MyCapytain.resolvers.utils.CollectionDispatcher
+    :members:
+    :noindex:
+
 Prototypes
 **********
 

@@ -191,6 +191,36 @@ Example
    :language: python
    :linenos:
 
+Dispatchers
+###########
+
+Description
+***********
+
+Dispatcher are tools to be used to organize semi-automatically resources, most likely in the context of a resolver \
+retrieving data from local directories.
+
+Dispatcher has following properties :
+
+- methods -> [tuple(Callable()->Bool, str)]
+- add(func[Callable()], inventory_name[str])
+- inventory(inventory_name[str]) -> @decorator
+- dispatch(collection[Collection, **kwargs)
+
+Implementation
+**************
+
+.. autoclass:: MyCapytain.resolvers.utils.CollectionDispatcher
+    :members:
+
+Example
+*******
+
+.. literalinclude:: Dispatcher.py
+   :language: python
+   :linenos:
+
+
 Resolvers
 #########
 

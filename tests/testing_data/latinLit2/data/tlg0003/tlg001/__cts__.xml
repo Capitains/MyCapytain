@@ -33,7 +33,7 @@
     
    </ti:translation>
     
-   <ti:translation projid="greekLit:opp-ger1" workUrn="urn:cts:greekLit:tlg0003.tlg001" urn="urn:cts:greekLit:tlg0003.tlg001.perseus-ger1">
+   <ti:translation projid="greekLit:opp-ger1" workUrn="urn:cts:greekLit:tlg0003.tlg001" urn="urn:cts:greekLit:tlg0003.tlg001.opp-ger1">
         
       <ti:label xml:lang="en">The Peloponnesian War (German. Ed. A. Warmund)</ti:label>
         
@@ -42,7 +42,7 @@
     
    </ti:translation>
     
-   <ti:translation projid="greekLit:opp-fre1" workUrn="urn:cts:greekLit:tlg0003.tlg001" urn="urn:cts:greekLit:tlg0003.tlg001.perseus-fre1">
+   <ti:translation projid="greekLit:opp-fre1" workUrn="urn:cts:greekLit:tlg0003.tlg001" urn="urn:cts:greekLit:tlg0003.tlg001.opp-fre1">
         
       <ti:label xml:lang="en">The Peloponnesian War (French. Marie Charles Zévort
             translator.)</ti:label>

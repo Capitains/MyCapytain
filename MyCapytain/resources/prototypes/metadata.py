@@ -8,6 +8,7 @@
 """
 
 from MyCapytain.common.metadata import Metadata
+from MyCapytain.errors import UnknownCollection
 from MyCapytain.common.utils import Subgraph, LiteralToDict
 from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, GRAPH
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
@@ -208,7 +209,7 @@ class Collection(Exportable):
         for obj in self.descendants + [self]:
             if obj.id == item:
                 return obj
-        raise KeyError("%s is not part of this object" % item)
+        raise UnknownCollection("%s is not part of this object" % item)
 
     def __contains__(self, item):
         """ Retrieve an item by its ID in the tree of a collection

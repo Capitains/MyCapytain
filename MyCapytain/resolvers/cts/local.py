@@ -39,6 +39,7 @@ class CTSCapitainsLocalResolver(Resolver):
     DEFAULT_PAGE = 1
     PER_PAGE = (1, 10, 100)  # Min, Default, Mainvex,
     RAISE_ON_UNDISPATCHED = False
+
     @property
     def inventory(self):
         return self.__inventory__
@@ -175,7 +176,7 @@ class CTSCapitainsLocalResolver(Resolver):
                 urn, reference = urn.upTo(URN.WORK), str(urn.reference)
                 urn = [
                     t.id
-                    for t in self.__texts__
+                    for t in self.texts
                     if t.id.startswith(str(urn)) and isinstance(t, Edition)
                 ]
                 if len(urn) > 0:
@@ -224,7 +225,7 @@ class CTSCapitainsLocalResolver(Resolver):
 
         matches = [
             text
-            for text in self.__texts__
+            for text in self.texts
             if
             (lang is None or (lang is not None and lang == text.lang)) and
             (urn is None or (urn is not None and text.urn.upTo(__PART) == urn)) and

@@ -16,7 +16,7 @@ from functools import reduce
 from io import IOBase, StringIO
 
 from lxml import etree
-from lxml.objectify import ObjectifiedElement, parse
+from lxml.objectify import ObjectifiedElement, parse, SubElement, Element
 from six import text_type
 from xml.sax.saxutils import escape
 from rdflib import BNode, Graph, Literal, URIRef
@@ -262,20 +262,20 @@ def copyNode(node, children=False, parent=False):
     :return: New Element
     """
     if parent is not False:
-        element = etree.SubElement(
+        element = SubElement(
             parent,
             node.tag,
             attrib=node.attrib,
             nsmap={None: "http://www.tei-c.org/ns/1.0"}
         )
     else:
-        element = etree.Element(
+        element = Element(
             node.tag,
             attrib=node.attrib,
             nsmap={None: "http://www.tei-c.org/ns/1.0"}
         )
     if children:
-        element.text = node.text
+        element._setText(node.text)
         for child in xmliter(node):
             element.append(copy(child))
     return element

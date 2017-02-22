@@ -198,10 +198,10 @@ def xmlparser(xml, objectify=True):
     elif not isinstance(xml, IOBase):
         raise TypeError("Unsupported type of resource {}".format(type(xml)))
 
-    if objectify:
+    if objectify is False:
         parsed = etree.parse(xml).getroot()
     else:
-        parsed = parse(xml, parser=__parser__)
+        parsed = parse(xml, parser=__parser__).getroot()
     if doclose:
         xml.close()
     return parsed

@@ -275,7 +275,8 @@ def copyNode(node, children=False, parent=False):
             nsmap={None: "http://www.tei-c.org/ns/1.0"}
         )
     if children:
-        element._setText(node.text)
+        if node.text:
+            element._setText(node.text)
         for child in xmliter(node):
             element.append(copy(child))
     return element

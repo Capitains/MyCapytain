@@ -42,8 +42,8 @@ class Collection(Exportable):
 
         self.graph.addN(
             [
-                (self.asNode(), NAMESPACES.DTS.capabilities, self.capabilities, self.graph),
-                (self.asNode(), NAMESPACES.DTS.metadata, self.__metadata__, self.graph)
+                (self.asNode(), NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph),
+                (self.asNode(), NAMESPACES.DTS.metadata, self.metadata.asNode(), self.graph)
             ]
         )
 
@@ -141,7 +141,7 @@ class Collection(Exportable):
         """
         self.graph.addN([
             (self.asNode(), RDFS.label, Literal(label, lang=lang), self.graph),
-            (self.metadata, SKOS.prefLabel, Literal(label, lang=lang), self.graph),
+            (self.metadata.asNode(), SKOS.prefLabel, Literal(label, lang=lang), self.graph),
         ])
 
     @property

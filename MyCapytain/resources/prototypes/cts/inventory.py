@@ -67,7 +67,7 @@ class PrototypeCTSCollection(Collection):
         :rtype: dict or Literal
         """
         x = {
-            value.language: value for _, _, value in self.graph.triples((self.metadata, NAMESPACES.CTS.term(prop), None))
+            value.language: value for _, _, value in self.graph.triples((self.metadata.asNode(), NAMESPACES.CTS.term(prop), None))
         }
         if lang is not None:
             if lang in x:
@@ -93,7 +93,7 @@ class PrototypeCTSCollection(Collection):
             self.set_label(value, lang)
 
         self.graph.add(
-            (self.metadata, prop, value)
+            (self.metadata.asNode(), prop, value)
         )
 
     def __xml_export_generic__(self, attrs, namespaces=False, lines="\n", members=None):
@@ -113,7 +113,7 @@ class PrototypeCTSCollection(Collection):
 
         strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)]
         for pred in self.CTS_PROPERTIES:
-            for obj in self.graph.objects(self.metadata, pred):
+            for obj in self.graph.objects(self.metadata.asNode(), pred):
                 strings.append(
                     make_xml_node(
                         self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
@@ -238,7 +238,7 @@ class PrototypeText(ResourceCollection, PrototypeCTSCollection):
 
             # additional = [make_xml_node(self.graph, NAMESPACES.CTS.extra)]
             for pred in self.CTS_PROPERTIES:
-                for obj in self.graph.objects(self.metadata, pred):
+                for obj in self.graph.objects(self.metadata.asNode(), pred):
                     strings.append(
                         make_xml_node(
                             self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True

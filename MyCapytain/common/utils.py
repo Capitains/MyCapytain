@@ -201,7 +201,7 @@ def xmlparser(xml, objectify=True):
     if objectify is False:
         parsed = etree.parse(xml).getroot()
     else:
-        parsed = parse(xml, parser=__parser__).getroot()
+        parsed = parse(xml).getroot()
     if doclose:
         xml.close()
     return parsed

@@ -38,7 +38,7 @@ class TextualElement(Exportable):
 
         self.__graph__.addN([
             (self.__node__, NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__),
-            (self.__node__, NAMESPACES.DTS.metadata, self.__metadata__, self.__graph__)
+            (self.__node__, NAMESPACES.DTS.metadata, self.metadata.asNode(), self.__graph__)
         ])
 
     def __repr__(self):

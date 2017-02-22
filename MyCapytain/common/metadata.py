@@ -12,7 +12,7 @@ from MyCapytain.common.constants import Mimetypes, Exportable, GRAPH
 from rdflib import BNode, Literal, Graph
 
 
-class Metadata(BNode, Exportable):
+class Metadata(Exportable):
     """ A metadatum aggregation object provided to centralize metadata
 
     :param keys: A metadata field names list
@@ -25,9 +25,16 @@ class Metadata(BNode, Exportable):
     EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.XML.RDFa, Mimetypes.JSON.LD]
     DEFAULT_EXPORT = Mimetypes.JSON.Std
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, node=None, *args, **kwargs):
         super(Metadata, self).__init__(*args, **kwargs)
         self.__graph__ = GRAPH
+        if node is not None:
+            self.__node__ = node
+        else:
+            self.__node__ = BNode()
+
+    def asNode(self):
+        return self.__node__
 
     @property
     def graph(self):
@@ -46,7 +53,7 @@ class Metadata(BNode, Exportable):
         """
         if not isinstance(value, Literal):
             value = Literal(value, lang=lang)
-        self.graph.add((self, key, value))
+        self.graph.add((self.asNode(), key, value))
 
     def get(self, key, lang=None):
         """ Returns a triple related to this node
@@ -57,13 +64,13 @@ class Metadata(BNode, Exportable):
         """
         if lang is not None:
             default = None
-            for o in self.graph.objects(self, key):
+            for o in self.graph.objects(self.asNode(), key):
                 default = o
                 if o.language == lang:
                     return o
             return default
         else:
-            for o in self.graph.objects(self, key):
+            for o in self.graph.objects(self.asNode(), key):
                 return o
 
     def get_all(self, key):
@@ -72,7 +79,7 @@ class Metadata(BNode, Exportable):
         :param key: Predicate of the triple
         :rtype: List of [Literal or BNode or URIRef]
         """
-        for o in self.graph.objects(self, key):
+        for o in self.graph.objects(self.asNode(), key):
             yield o
 
     def __getitem__(self, item):
@@ -87,7 +94,7 @@ class Metadata(BNode, Exportable):
         """
         if isinstance(item, tuple):
             return self.get(item[0], item[1])
-        return list(self.graph[self:item])
+        return list(self.graph[self.asNode():item])
 
     def __export__(self, output=Mimetypes.JSON.Std, **kwargs):
         """ Export a set of Metadata
@@ -97,8 +104,8 @@ class Metadata(BNode, Exportable):
         """
         graph = Graph()
         graph.namespace_manager = GRAPH.namespace_manager
-        for predicate, object in self.graph[self]:
-            graph.add((self, predicate, object))
+        for predicate, object in self.graph[self.asNode()]:
+            graph.add((self.asNode(), predicate, object))
 
         if output == Mimetypes.JSON.Std:
             out = {}
@@ -132,5 +139,5 @@ class Metadata(BNode, Exportable):
 
         """
         if (subject, predicate, None) in GRAPH:
-            return GRAPH.objects(subject, predicate).__next__()
+            return Metadata(node=GRAPH.objects(subject, predicate).__next__())
         return Metadata(*args, **kwargs)

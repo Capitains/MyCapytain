@@ -200,16 +200,31 @@ class Collection(Exportable):
             self.children[member.id] = member
             #self.graph.add((self.asNode(), NAMESPACES.DTS.child, member.asNode()))
 
-    def __getitem__(self, item):
+    def __getitem__(self, key):
         """ Retrieve an item by its ID in the tree of a collection
 
-        :param item:
+        :param key: Key of the object to delete
         :return: Collection identified by the item
         """
         for obj in self.descendants + [self]:
-            if obj.id == item:
+            if obj.id == key:
                 return obj
-        raise UnknownCollection("%s is not part of this object" % item)
+        raise UnknownCollection("%s is not part of this object" % key)
+
+    def __delitem__(self, key):
+        """ Delete a children of the collection
+
+        :param key: Key of the object to delete
+        """
+        item = self[key]
+        # Delete the graph Item
+        self.graph.remove((item.asNode(), None, None))
+        self.graph.remove((None, None, item.asNode()))
+        self.graph.remove((item.metadata.asNode(), None, None))
+        self.graph.remove((None, None, item.metadata.asNode()))
+        # Delete the Python item
+        if len(item.parents) > 0:
+            del item.parents[0].children[item.id]
 
     def __contains__(self, item):
         """ Retrieve an item by its ID in the tree of a collection

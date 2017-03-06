@@ -8,7 +8,7 @@
 
 """
 from __future__ import unicode_literals
-from MyCapytain.common.constants import Mimetypes, Exportable, GRAPH
+from MyCapytain.common.constants import Mimetypes, Exportable, get_graph
 from rdflib import BNode, Literal, Graph
 
 
@@ -27,7 +27,7 @@ class Metadata(Exportable):
     
     def __init__(self, node=None, *args, **kwargs):
         super(Metadata, self).__init__(*args, **kwargs)
-        self.__graph__ = GRAPH
+        self.__graph__ = get_graph()
         if node is not None:
             self.__node__ = node
         else:
@@ -103,7 +103,7 @@ class Metadata(Exportable):
         :return: Formatted Export
         """
         graph = Graph()
-        graph.namespace_manager = GRAPH.namespace_manager
+        graph.namespace_manager = get_graph().namespace_manager
         for predicate, object in self.graph[self.asNode()]:
             graph.add((self.asNode(), predicate, object))
 
@@ -138,6 +138,6 @@ class Metadata(Exportable):
         :rtype: Metadata
 
         """
-        if (subject, predicate, None) in GRAPH:
-            return Metadata(node=GRAPH.objects(subject, predicate).__next__())
+        if (subject, predicate, None) in get_graph():
+            return Metadata(node=get_graph().objects(subject, predicate).__next__())
         return Metadata(*args, **kwargs)

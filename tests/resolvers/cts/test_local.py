@@ -3,7 +3,8 @@
 from __future__ import unicode_literals
 
 from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
-from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES, GRAPH
+from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES, get_graph
+from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES, get_graph
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resources.prototypes.metadata import Collection
@@ -150,7 +151,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
 class TextXMLFolderResolver(TestCase):
     """ Ensure working state of resolver """
     def setUp(self):
-        GRAPH.remove((None, None, None))
+        get_graph().remove((None, None, None))
         self.resolver = CTSCapitainsLocalResolver(["./tests/testing_data/latinLit2"])
 
     def test_getPassage_full(self):
@@ -577,7 +578,7 @@ class TextXMLFolderResolver(TestCase):
 class TextXMLFolderResolverDispatcher(TestCase):
     """ Ensure working state of resolver """
     def setUp(self):
-        GRAPH.remove((None, None, None))
+        get_graph().remove((None, None, None))
 
     def test_dispatching_latin_greek(self):
         tic = TextInventoryCollection()
@@ -709,7 +710,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
         latin_stuff = resolver.getMetadata("urn:perseus:latinLit").export(Mimetypes.XML.CTS)
         greek_stuff = resolver.getMetadata("urn:perseus:greekLit").export(Mimetypes.XML.CTS)
         farsi_stuff = resolver.getMetadata("urn:perseus:farsiLit").export(Mimetypes.XML.CTS)
-        GRAPH.remove((None, None, None))
+        get_graph().remove((None, None, None))
         latin_stuff, greek_stuff, farsi_stuff = TextInventory.parse(latin_stuff), TextInventory.parse(greek_stuff),\
             TextInventory.parse(farsi_stuff)
         self.assertEqual(

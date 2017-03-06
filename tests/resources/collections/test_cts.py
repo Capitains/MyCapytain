@@ -120,7 +120,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     """ Test XML Implementation of resources Endpoint request making """
 
     def setUp(self):
-        constants.GRAPH.remove((None, None, None))
+        constants.__MYCAPYTAIN_TRIPLE_GRAPH__.remove((None, None, None))
 
         self.getCapabilities = open("tests/testing_data/cts/getCapabilities.xml", "r")
         self.ed = """<ti:edition urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
@@ -286,7 +286,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         del TI
 
         self.assertEqual(
-            len(list(constants.GRAPH.triples((None, None, None)))),
+            len(list(constants.__MYCAPYTAIN_TRIPLE_GRAPH__.triples((None, None, None)))),
             0,
             "There should be 0 metadata node for the child 1294 because everything is gone"
         )

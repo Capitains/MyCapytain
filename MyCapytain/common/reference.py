@@ -11,7 +11,7 @@ from six import text_type
 from copy import copy
 import re
 from lxml.etree import _Element
-from MyCapytain.common.constants import NS, Exportable, Mimetypes, GRAPH, NAMESPACES
+from MyCapytain.common.constants import NS, Exportable, Mimetypes, get_graph, NAMESPACES
 from MyCapytain.common.utils import make_xml_node
 
 REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
@@ -885,7 +885,7 @@ class Citation(Exportable):
                 label = self.name
 
             return make_xml_node(
-                GRAPH, NAMESPACES.CTS.citation, attributes={
+                get_graph(), NAMESPACES.CTS.citation, attributes={
                     "xpath": re.sub(Citation.escape, "'", self.xpath),
                     "scope": re.sub(Citation.escape, "'", self.scope),
                     "label": label

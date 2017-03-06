@@ -46,7 +46,7 @@ class CTSCapitainsLocalResolver(Resolver):
 
     @property
     def texts(self):
-        return self.__texts__
+        return self.inventory.readableDescendants
 
     def __init__(self, resource, name=None, logger=None, dispatcher=None):
         """ Initiate the XMLResolver
@@ -60,7 +60,6 @@ class CTSCapitainsLocalResolver(Resolver):
         else:
             self.dispatcher = dispatcher
         self.__inventory__ = self.dispatcher.collection
-        self.__texts__ = []
         self.name = name
 
         self.logger = logger
@@ -83,9 +82,9 @@ class CTSCapitainsLocalResolver(Resolver):
         return xmlparser(file)
 
     def parse(self, resource):
-        """ Parse a list of directories ans
+        """ Parse a list of directories and reades it into a collection
+
         :param resource: List of folders
-        :param cache: Auto cache the results
         :return: An inventory resource and a list of PrototypeText metadata-objects
         """
         for folder in resource:
@@ -307,7 +306,7 @@ class CTSCapitainsLocalResolver(Resolver):
                 x = Edition(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
                 x.citation = text.citation
             elif isinstance(text, Translation):
-                x = Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+                x = Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
                 x.citation = text.citation
 
         return inventory[objectId]

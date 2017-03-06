@@ -10,7 +10,7 @@
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.errors import UnknownCollection
 from MyCapytain.common.utils import Subgraph, LiteralToDict
-from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, GRAPH
+from MyCapytain.common.constants import NAMESPACES, RDFLIB_MAPPING, Mimetypes, Exportable, get_graph
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
 from rdflib.namespace import SKOS, DC
 
@@ -31,7 +31,7 @@ class Collection(Exportable):
 
     def __init__(self, identifier="", *args, **kwargs):
         super(Collection, self).__init__(identifier, *args, **kwargs)
-        self.__graph__ = GRAPH
+        self.__graph__ = get_graph()
 
         self.__node__ = URIRef(identifier)
         self.__metadata__ = Metadata.getOr(self.__node__, NAMESPACES.DTS.metadata)
@@ -305,7 +305,7 @@ class Collection(Exportable):
 
             RDFSLabel = self.graph.qname(RDFS.label)
             RDFType = self.graph.qname(RDF.type)
-            store = Subgraph(GRAPH.namespace_manager)
+            store = Subgraph(get_graph().namespace_manager)
             store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
             metadata = {}
             for _, predicate, obj in store.graph:

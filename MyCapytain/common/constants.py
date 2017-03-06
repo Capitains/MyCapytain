@@ -1,3 +1,5 @@
+
+
 from inspect import getmro
 from rdflib import Namespace, Graph
 from rdflib.namespace import SKOS
@@ -186,14 +188,25 @@ class Exportable(object):
         )
 
 
-GRAPH = Graph()
-GRAPH.bind("", NAMESPACES.CTS)
-GRAPH.bind("dts", NAMESPACES.DTS)
-GRAPH.bind("tei", NAMESPACES.TEI)
-GRAPH.bind("skos", SKOS)
+global __MYCAPYTAIN_TRIPLE_GRAPH__
+__MYCAPYTAIN_TRIPLE_GRAPH__ = Graph()
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("", NAMESPACES.CTS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", NAMESPACES.DTS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", NAMESPACES.TEI)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("skos", SKOS)
+
+
+def set_graph(graph):
+    global __MYCAPYTAIN_TRIPLE_GRAPH__
+    __MYCAPYTAIN_TRIPLE_GRAPH__ = graph
+
+
+def get_graph():
+    return __MYCAPYTAIN_TRIPLE_GRAPH__
 
 RDFLIB_MAPPING = {
     Mimetypes.XML.RDF: "xml",
     Mimetypes.JSON.LD: "json-ld",
     Mimetypes.JSON.DTS.Std: "json-ld"
 }
+

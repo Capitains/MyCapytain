@@ -12,7 +12,7 @@ from rdflib.namespace import DC
 from rdflib import BNode, URIRef
 from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.constants import Mimetypes, Exportable, GRAPH, NAMESPACES
+from MyCapytain.common.constants import Mimetypes, Exportable, get_graph, NAMESPACES
 from MyCapytain.resources.prototypes.metadata import Collection
 
 
@@ -30,7 +30,7 @@ class TextualElement(Exportable):
     default_exclude = []
 
     def __init__(self, identifier=None, metadata=None):
-        self.__graph__ = GRAPH
+        self.__graph__ = get_graph()
         self.__identifier__ = identifier
 
         self.__node__ = BNode()

@@ -153,7 +153,7 @@ class PrototypeText(ResourceCollection, PrototypeCTSCollection):
     CTS_PROPERTIES = [NAMESPACES.CTS.label, NAMESPACES.CTS.description]
     SUBTYPE = "unknown"
 
-    def __init__(self, urn="", parent=None):
+    def __init__(self, urn="", parent=None, lang=None):
         self.__subtype__ = self.SUBTYPE
         super(PrototypeText, self).__init__(identifier=str(urn))
         self.resource = None
@@ -161,10 +161,13 @@ class PrototypeText(ResourceCollection, PrototypeCTSCollection):
         self.__urn__ = URN(urn)
         self.docname = None
         self.validate = None
+        if lang is not None:
+            self.lang = lang
 
         if parent is not None:
             self.parent = parent
-            self.lang = self.parent.lang
+            if lang is None:
+                self.lang = self.parent.lang
 
     @property
     def subtype(self):
@@ -319,6 +322,8 @@ class PrototypeTranslation(PrototypeText):
     :type urn: str
     :param parent: Parent of current item
     :type parent: PrototypeWork
+    :param lang: Language of the translation
+    :type lang: Lang
     """
     TYPE_URI = NAMESPACES.CTS.term("translation")
     MODEL_URI = URIRef(NAMESPACES.DTS.resource)

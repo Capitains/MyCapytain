@@ -307,7 +307,8 @@ class CTSCapitainsLocalResolver(Resolver):
                 x = Edition(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
                 x.citation = text.citation
             elif isinstance(text, Translation):
-                x = Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+                print(text.id, text.lang)
+                x = Translation(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
                 x.citation = text.citation
 
         return inventory[objectId]

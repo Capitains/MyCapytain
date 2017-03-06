@@ -489,6 +489,9 @@ class TextXMLFolderResolver(TestCase):
         self.assertIsInstance(
             tr, PrototypeTranslation, "Metadata should be translation"
         )
+        self.assertEqual(
+            tr.lang, "fre", "Language is French"
+        )
         self.assertIn(
             "Histoire de la Guerre du Péloponnése",
             tr.get_description("eng"),

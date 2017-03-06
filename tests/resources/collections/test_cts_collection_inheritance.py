@@ -1,5 +1,6 @@
 from unittest import TestCase
-from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Edition
+from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Edition, Translation
+from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup
 
 with open("tests/testing_data/examples/getcapabilities.seneca.xml") as f:
     SENECA = f.read()
@@ -33,3 +34,9 @@ class TestCollectionCTSInheritance(TestCase):
              "de Otio Sapientis, Moral essays Vol 2"],
             "Title should be computed correctly : default should be set"
         )
+
+    def test_new_object(self):
+        """ When creating an object with same urn, we should retrieve the same metadata"""
+        TI = TextInventory.parse(resource=SENECA)
+        a = TI["urn:cts:latinLit:stoa0255.stoa012.perseus-lat2"].metadata
+        b = (PrototypeTextGroup("urn:cts:latinLit:stoa0255")).metadata

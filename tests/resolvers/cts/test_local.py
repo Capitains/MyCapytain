@@ -732,7 +732,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
             greek_stuff.get_label("fre"), None,  # Text inventory have no label in CTS
             "Label should be correct"
         )
-        GRAPH.remove((None, None, None))
+        get_graph().remove((None, None, None))
         all = TextInventory.parse(all)
         self.assertEqual(
             len(all.readableDescendants), 25,

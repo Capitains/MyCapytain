@@ -114,6 +114,12 @@ class Text(cts.PrototypeText):
             if lg is not None:
                 obj.set_cts_property("label", child.text, lg)
 
+        # Added for commentary
+        for child in xml.xpath("ti:about", namespaces=NS):
+            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+            if lg is not None:
+                obj.set_link("about", child.id, lg)
+
         obj.citation = Citation.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
 
         """
@@ -154,6 +160,19 @@ class Translation(cts.PrototypeTranslation, Text):
         Translation.parse_metadata(o, xml)
         return o
 
+class Commentary(cts.PrototypeCommentary, Text):
+    """ Create a commentary subtyped PrototypeText object
+    """
+    @staticmethod
+    def parse(resource, parent=None):
+        xml = xmlparser(resource)
+        lang = xml.get("{http://www.w3.org/XML/1998/namespace}lang")
+
+        o = Commentary(urn=xml.get("urn"), parent=parent)
+        if lang is not None:
+            o.lang = lang
+        Commentary.parse_metadata(o, xml)
+        return o
 
 class Work(cts.PrototypeWork):
     """ Represents a CTS Textgroup in XML
@@ -183,6 +202,8 @@ class Work(cts.PrototypeWork):
         # Parse children
         xpathDict(xml=xml, xpath='ti:edition', cls=Edition, parent=o)
         xpathDict(xml=xml, xpath='ti:translation', cls=Translation, parent=o)
+        # Added for commentary
+        xpathDict(xml=xml, xpath='ti:commentary', cls=Commentary, parent=o)
 
         return o
 

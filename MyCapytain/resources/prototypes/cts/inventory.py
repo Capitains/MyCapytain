@@ -31,6 +31,7 @@ class PrototypeCTSCollection(Collection):
     CTSMODEL = "CTSCollection"
     DC_TITLE_KEY = None
     CTS_PROPERTIES = []
+    CTS_LINKS = []
 
     EXPORT_TO = [Mimetypes.PYTHON.ETREE]
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
@@ -96,6 +97,28 @@ class PrototypeCTSCollection(Collection):
             (self.metadata.asNode(), prop, value)
         )
 
+    # new for commentary
+    def set_link(self, prop, value):
+        """ Set given link in CTS Namespace
+
+        .. example::
+            collection.set_link(NAMESPACES.CTS.about, "urn:cts:latinLit:phi1294.phi002")
+
+        :param prop: Property to set (Without namespace)
+        :param value: Value to set for given property
+        """
+        # https://rdflib.readthedocs.io/en/stable/
+        # URIRef == identifiers (urn, http, URI in general)
+        # Literal == String or Number (can have a language)
+        # BNode == Anonymous nodes (So no specific identifier)
+        #		eg. BNode : Edition(MartialEpigrams:URIRef) ---has_metadata--> Metadata(BNode)
+        if not isinstance(value, URIRef):
+            value = URIRef(value)
+
+        self.graph.add(
+            (self.metadata.asNode(), prop, value)
+        )
+
     def __xml_export_generic__(self, attrs, namespaces=False, lines="\n", members=None):
         """ Shared method for Mimetypes.XML.CTS Export
 
@@ -151,6 +174,7 @@ class PrototypeText(ResourceCollection, PrototypeCTSCollection):
     MODEL_URI = URIRef(NAMESPACES.DTS.resource)
     EXPORT_TO = [Mimetypes.XML.CTS]
     CTS_PROPERTIES = [NAMESPACES.CTS.label, NAMESPACES.CTS.description]
+    CTS_LINKS = [NAMESPACES.CTS.about]
     SUBTYPE = "unknown"
 
     def __init__(self, urn="", parent=None, lang=None):
@@ -228,7 +252,7 @@ class PrototypeText(ResourceCollection, PrototypeCTSCollection):
         :type output: basestring
         :param domain: Domain to prefix IDs when necessary
         :type domain: str
-        :returns: Desired output formated resource
+        :returns: Desired output formatted resource
         """
         if output == Mimetypes.XML.CTS:
             attrs = {"urn": self.id, "xml:lang": self.lang}
@@ -246,6 +270,17 @@ class PrototypeText(ResourceCollection, PrototypeCTSCollection):
                         make_xml_node(
                             self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
                         )
+                    )
+
+            for pred in self.CTS_LINKS:
+                # For each predicate in CTS_LINKS
+                for obj in self.graph.objects(self.metadata.asNode(), pred):
+                    # For each item in the graph connected to the current item metadata as object through the predicate "pred"
+                    strings.append(
+                        make_xml_node(
+                            self.graph, pred, attributes={"urn": str(obj)}, close=True
+                        )
+                        # <pref urn="obj.language"/>
                     )
 
             # Citation !
@@ -328,6 +363,20 @@ class PrototypeTranslation(PrototypeText):
     TYPE_URI = NAMESPACES.CTS.term("translation")
     MODEL_URI = URIRef(NAMESPACES.DTS.resource)
     SUBTYPE = "translation"
+
+class PrototypeCommentary(PrototypeText):
+    """ Represents a CTS Commentary
+
+    :param urn: Identifier of the PrototypeText
+    :type urn: str
+    :param parent: Parent of current item
+    :type parent: PrototypeWork
+    :param lang: Language of the commentary
+    :type lang: Lang
+    """
+    TYPE_URI = NAMESPACES.CTS.term("commentary")
+    MODEL_URI = URIRef(NAMESPACES.DTS.resource)
+    SUBTYPE = "commentary"
 
 
 class PrototypeWork(PrototypeCTSCollection):

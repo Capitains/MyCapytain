@@ -446,7 +446,7 @@ class Text(__SharedMethods__, encodings.TEIResource, text.CitableText):
         :return: None
         """
         if self.citation.isEmpty():
-            citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=NS),
+            citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=NS)
             if len(citation):
                 self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")
 

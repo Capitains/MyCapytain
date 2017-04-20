@@ -7,12 +7,12 @@ from io import open
 import xmlunittest
 from lxml import etree
 
-from MyCapytain.common.utils import xmlparser
 import MyCapytain.common.reference
 import MyCapytain.errors
 import MyCapytain.resources.texts.encodings
 import MyCapytain.resources.texts.locals.tei
-from tests.resources.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests, CapitainsXMLRangePassageTests
+from MyCapytain.common.utils import xmlparser
+from tests.resources.texts.locals.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests, CapitainsXMLRangePassageTests
 
 
 objectifiedParser = lambda x: xmlparser(x, objectify=False)
@@ -39,6 +39,16 @@ class TestLocalXMLTextImplementation(CapitainsXmlTextTest, unittest.TestCase, xm
             self.seneca = MyCapytain.resources.texts.locals.tei.Text(
                 resource=objectifiedParser(f)
             )
+
+        self.cls = lambda x: MyCapytain.resources.texts.locals.tei.Text(resource=objectifiedParser(x))
+
+    def parse(self, file):
+        with open(file) as f:
+            text = MyCapytain.resources.texts.locals.tei.Text(
+                resource=objectifiedParser(f)
+            )
+        return text
+
 
     def tearDown(self):
         self.text.close()

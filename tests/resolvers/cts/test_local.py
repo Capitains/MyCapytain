@@ -10,7 +10,7 @@ from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextEr
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.collections.cts import TextInventory
 from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup, PrototypeText as TextMetadata, \
-    PrototypeTranslation, PrototypeTextInventory, TextInventoryCollection
+    PrototypeTranslation, PrototypeTextInventory, TextInventoryCollection, PrototypeCommentary
 from MyCapytain.resources.prototypes.text import Passage
 from MyCapytain.resolvers.utils import CollectionDispatcher
 from unittest import TestCase
@@ -58,11 +58,15 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             ["./tests/testing_data/farsiLit"]
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__()[0]), 4,
+            len(Repository.__getTextMetadata__()[0]), 5,
             "General no filter works"
         )
         self.assertEqual(
             len(Repository.__getTextMetadata__(category="edition")[0]), 2,
+            "Type filter works"
+        )
+        self.assertEqual(
+            len(Repository.__getTextMetadata__(category="commentary")[0]), 1,
             "Type filter works"
         )
         self.assertEqual(
@@ -78,6 +82,10 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "Type filter + lang works"
         )
         self.assertEqual(
+            len(Repository.__getTextMetadata__(category="commentary", lang="lat")[0]), 1,
+            "Type filter + lang works"
+        )
+        self.assertEqual(
             len(Repository.__getTextMetadata__(page=1, limit=2, pagination=True)[0]), 2,
             "Pagination works without other filters"
         )
@@ -90,7 +98,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "URN Filtering works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(urn="urn:cts:latinLit")[0]), 1,
+            len(Repository.__getTextMetadata__(urn="urn:cts:latinLit")[0]), 2,
             "URN Filtering works"
         )
         self.assertEqual(
@@ -420,17 +428,17 @@ class TextXMLFolderResolver(TestCase):
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
-            len(metadata.descendants), 43,
-            "There should be as many descendants as there is edition, translation, works and textgroup + 1 for "
-            "default inventory"
+            len(metadata.descendants), 44,
+            "There should be as many descendants as there is edition, translation, commentary, works and textgroup + 1 "
+            "for default inventory"
         )
         self.assertEqual(
-            len(metadata.readableDescendants), 25,
-            "There should be as many readable descendants as there is edition, translation(25 ed+tr)"
+            len(metadata.readableDescendants), 26,
+            "There should be as many readable descendants as there is edition, translation, commentary (26 ed+tr+cm)"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, TextMetadata)]), 25,
-            "There should be 24 editions + 1 translations in readableDescendants"
+            len([x for x in metadata.readableDescendants if isinstance(x, TextMetadata)]), 26,
+            "There should be 24 editions + 1 translation + 1 commentary in readableDescendants"
         )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
@@ -456,16 +464,16 @@ class TextXMLFolderResolver(TestCase):
             "Members of PrototypeWork should be Texts"
         )
         self.assertEqual(
-            len(metadata.descendants), 1,
-            "There should be as many descendants as there is edition, translation"
+            len(metadata.descendants), 2,
+            "There should be as many descendants as there is edition, translation, commentary"
         )
         self.assertEqual(
-            len(metadata.readableDescendants), 1,
-            "There should be 1 edition in readableDescendants"
+            len(metadata.readableDescendants), 2,
+            "There should be 1 edition + 1 commentary in readableDescendants"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, TextMetadata)]), 1,
-            "There should be 1 edition in readableDescendants"
+            len([x for x in metadata.readableDescendants if isinstance(x, TextMetadata)]), 2,
+            "There should be 1 edition + 1 commentary in readableDescendants"
         )
         self.assertIsInstance(
             metadata.parent, PrototypeTextGroup,
@@ -480,10 +488,10 @@ class TextXMLFolderResolver(TestCase):
                 "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
-        self.assertEqual(
+        self.assertCountEqual(
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
-            ["urn:cts:latinLit:phi1294.phi002.perseus-lat2"],
-            "There should be one member in DTS JSON"
+            ["urn:cts:latinLit:phi1294.phi002.opp-eng3", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"],
+            "There should be two members in DTS JSON"
         )
 
         tr = self.resolver.getMetadata(objectId="urn:cts:greekLit:tlg0003.tlg001.opp-fre1")
@@ -496,6 +504,19 @@ class TextXMLFolderResolver(TestCase):
         self.assertIn(
             "Histoire de la Guerre du Péloponnése",
             tr.get_description("eng"),
+            "Description should be the right one"
+        )
+
+        cm = self.resolver.getMetadata(objectId="urn:cts:latinLit:phi1294.phi002.opp-eng3")
+        self.assertIsInstance(
+            cm, PrototypeCommentary, "Metadata should be commentary"
+        )
+        self.assertEqual(
+            cm.lang, "eng", "Language is English"
+        )
+        self.assertIn(
+            "Introduction to Martial's Epigrammata",
+            cm.get_description("eng"),
             "Description should be the right one"
         )
 
@@ -618,8 +639,8 @@ class TextXMLFolderResolverDispatcher(TestCase):
         greek_stuff = resolver.getMetadata("urn:perseus:greekLit")
         farsi_stuff = resolver.getMetadata("urn:perseus:farsiLit")
         self.assertEqual(
-            len(latin_stuff.readableDescendants), 19,
-            "There should be 19 readable descendants in Latin"
+            len(latin_stuff.readableDescendants), 20,
+            "There should be 20 readable descendants in Latin"
         )
         self.assertIsInstance(
             latin_stuff, PrototypeTextInventory, "should be textinventory"
@@ -714,8 +735,8 @@ class TextXMLFolderResolverDispatcher(TestCase):
         latin_stuff, greek_stuff, farsi_stuff = TextInventory.parse(latin_stuff), TextInventory.parse(greek_stuff),\
             TextInventory.parse(farsi_stuff)
         self.assertEqual(
-            len(latin_stuff.readableDescendants), 19,
-            "There should be 19 readable descendants in Latin"
+            len(latin_stuff.readableDescendants), 20,
+            "There should be 20 readable descendants in Latin"
         )
         self.assertIsInstance(
             latin_stuff, PrototypeTextInventory, "should be textinventory"
@@ -735,6 +756,6 @@ class TextXMLFolderResolverDispatcher(TestCase):
         get_graph().remove((None, None, None))
         all = TextInventory.parse(all)
         self.assertEqual(
-            len(all.readableDescendants), 25,
-            "There should be all 25 readable descendants in the master collection"
+            len(all.readableDescendants), 26,
+            "There should be all 26 readable descendants in the master collection"
         )

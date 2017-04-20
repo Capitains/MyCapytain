@@ -1,0 +1,117 @@
+<?xml-model href="http://www.stoa.org/epidoc/schema/8.19/tei-epidoc.rng"
+  schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="http://www.stoa.org/epidoc/schema/8.19/tei-epidoc.rng"
+  schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader type="text">
+        <fileDesc>
+            <titleStmt>
+                <title>Introduction to Epigrammata</title>
+                <author>Wilhelm Heraeus</author>
+                <sponsor>Perseus Project, Tufts University</sponsor>
+                <principal>Gregory Crane</principal>
+            </titleStmt>
+            <publicationStmt>
+                <publisher>Trustees of Tufts University</publisher>
+                <pubPlace>Medford, MA</pubPlace>
+                <authority>Perseus Project</authority>
+            </publicationStmt>
+            <sourceDesc default="false">
+                <bibl default="false">
+                    <title>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</title>
+                    <author>Martial</author>
+                    <editor role="editor">Wilhelm Heraeus<!--, 1862-1938 (main editor)--></editor>
+                    <editor role="editor">Jacobus Borovskij<!-- (added corrections in 1976, more than 30 years before 2011)--></editor>
+                    <pubPlace>Leipzig</pubPlace>
+                    <date>1925/1976</date>
+                </bibl>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+         <refsDecl n="CTS">
+            <cRefPattern n="paragraph"
+                         matchPattern="(\w+).(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
+                <p>This pointer pattern extracts book and poem</p>
+            </cRefPattern>
+            <cRefPattern n="commentary"
+                         matchPattern="(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                <p>This pointer pattern extracts book</p>
+            </cRefPattern>
+        </refsDecl>
+            <refsDecl>
+                <refState unit="commentary"/>
+                <refState unit="paragraph"/>
+            </refsDecl>
+        </encodingDesc>
+        <profileDesc>
+            <langUsage default="false">
+                <language ident="en">English</language>
+                <language ident="grc">Latin</language>
+            </langUsage>
+        </profileDesc>
+        <revisionDesc>
+	    <change when="2015-11-04" who="Zach Himes">Removed @rend from hi tag</change>
+            <change when="2008-01-01" who="Gregory Crane">Initial Markup</change>
+            <change when="2015-03-06" who="Thibault Clérice">converted to EpiDoc/CTS</change>
+        </revisionDesc>
+    </teiHeader>
+    <text n="urn:cts:latinLit:phi1294.phi002.opp-eng3"
+         
+         xml:id="stoa0045.stoa0">
+        <body>
+            <div type="edition" n="urn:cts:latinLit:phi1294.phi002.perseus-eng3" xml:lang="eng">
+                <div type="textpart" subtype="commentary" n="1">
+                    <div type="textpart" subtype="paragraph" n="1">
+                        <p>But I must explain to you how all this mistaken idea of denouncing 
+                            pleasure and praising pain was born and I will give you a complete 
+                            account of the system, and expound the actual teachings of the great 
+                            explorer of the truth, the master-builder of human happiness. No one 
+                            rejects, dislikes, or avoids pleasure itself, because it is pleasure, but 
+                            because those who do not know how to pursue pleasure rationally encounter 
+                            consequences that are extremely painful. Nor again is there anyone who loves or 
+                            pursues or desires to obtain pain of itself, because it is pain, but because 
+                            occasionally circumstances occur in which toil and pain can procure him some 
+                            great pleasure. To take a trivial example, which of us ever undertakes laborious 
+                            physical exercise, except to obtain some advantage from it? But who has any right 
+                            to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences,
+                            or one who avoids a pain that produces no resultant pleasure?
+                        </p>
+                    </div>
+                    <div type="textpart" subtype="paragraph" n="2">
+                        <p>But I must explain to you how all this mistaken idea of denouncing 
+                            pleasure and praising pain was born and I will give you a complete 
+                            account of the system, and expound the actual teachings of the great 
+                            explorer of the truth, the master-builder of human happiness. No one 
+                            rejects, dislikes, or avoids pleasure itself, because it is pleasure, but 
+                            because those who do not know how to pursue pleasure rationally encounter 
+                            consequences that are extremely painful. Nor again is there anyone who loves or 
+                            pursues or desires to obtain pain of itself, because it is pain, but because 
+                            occasionally circumstances occur in which toil and pain can procure him some 
+                            great pleasure. To take a trivial example, which of us ever undertakes laborious 
+                            physical exercise, except to obtain some advantage from it? But who has any right 
+                            to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences,
+                            or one who avoids a pain that produces no resultant pleasure?
+                        </p>
+                    </div>
+                    <div type="textpart" subtype="paragraph" n="3">
+                        <p>But I must explain to you how all this mistaken idea of denouncing 
+                            pleasure and praising pain was born and I will give you a complete 
+                            account of the system, and expound the actual teachings of the great 
+                            explorer of the truth, the master-builder of human happiness. No one 
+                            rejects, dislikes, or avoids pleasure itself, because it is pleasure, but 
+                            because those who do not know how to pursue pleasure rationally encounter 
+                            consequences that are extremely painful. Nor again is there anyone who loves or 
+                            pursues or desires to obtain pain of itself, because it is pain, but because 
+                            occasionally circumstances occur in which toil and pain can procure him some 
+                            great pleasure. To take a trivial example, which of us ever undertakes laborious 
+                            physical exercise, except to obtain some advantage from it? But who has any right 
+                            to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences,
+                            or one who avoids a pain that produces no resultant pleasure?
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

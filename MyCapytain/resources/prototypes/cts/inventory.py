@@ -108,7 +108,6 @@ class PrototypeCTSCollection(Collection):
         :return: whole set of values
         :rtype: list
         """
-
         return list([o for o in self.graph.objects(self.metadata.asNode(), prop)])
 
     def set_link(self, prop, value):

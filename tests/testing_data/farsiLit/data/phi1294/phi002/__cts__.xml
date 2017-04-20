@@ -6,4 +6,10 @@
             Somehow modified ?
         </ti:description>
     </ti:edition>
+    <ti:commentary workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.opp-lat3" xml:lang="lat">
+        <ti:label xml:lang="eng">Introduction to Epigrammata</ti:label>
+        <ti:description xml:lang="eng">
+            Somehow modified ?
+        </ti:description>
+    </ti:commentary>
 </ti:work>

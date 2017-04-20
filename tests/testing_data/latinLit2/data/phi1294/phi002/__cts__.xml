@@ -4,4 +4,10 @@
         <ti:label xml:lang="eng">Epigrams</ti:label>
         <ti:description xml:lang="eng">M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ti:description>
     </ti:edition>
+    <ti:commentary workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.opp-eng3" xml:lang="eng">
+        <ti:label xml:lang="eng">Introduction to Epigrammata</ti:label>
+        <ti:description xml:lang="eng">
+            Introduction to Martial's Epigrammata
+        </ti:description>
+    </ti:commentary>
 </ti:work>

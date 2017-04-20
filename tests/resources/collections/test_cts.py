@@ -141,6 +141,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
   <ti:label xml:lang='eng'>Introduction to Epigrammata</ti:label>
   <ti:description xml:lang='eng'>Introduction to Epigrammata by Someone, 1866, Oxford</ti:description>
   <ti:about urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2"/>
+  <ti:about urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"/>
 </ti:commentary>""".replace('\n', '')
 
         self.wk = """<ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
@@ -261,6 +262,11 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         tr = TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"]
         self.assertIsInstance(tr, Commentary)
         self.assertEqual(tr.subtype, "commentary")
+        self.assertEqual(tr.citation.name, 'commentary')
+        self.assertEqual(tr.citation.child.name, 'paragraph')
+        self.assertEqual(tr.citation.refsDecl, "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']")
+        self.assertEqual(tr.citation.child.refsDecl,
+                         "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']")
 
     def test_parse_string(self):
         TI = TextInventory.parse(
@@ -317,6 +323,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def test_Inventory_metadata(self):
         """ Tests PrototypeTextInventory parses without errors """
         TI = TextInventory.parse(resource=self.getCapabilities)
+        print(TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.NAMESPACES.CTS.term("about")))
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "eng")), "Martial")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "lat")), "Martialis")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "eng")), "Epigrammata")
@@ -329,9 +336,9 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                          "G. Heraeus")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "eng")),
                          "W. Heraeus")
-        self.assertEqual(
+        self.assertCountEqual(
             list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.NAMESPACES.CTS.term("about"))]),
-                         ["urn:cts:latinLit:phi1294.phi002.perseus-eng2"])
+                         ["urn:cts:latinLit:phi1294.phi002.perseus-eng2", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
         # Test that the citation scheme of the commentary is being returned
 
     def test_export(self):
@@ -361,6 +368,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
           <ns0:label xml:lang='eng'>Introduction to Epigrammata</ns0:label>
           <ns0:description xml:lang='eng'>Introduction to Epigrammata by Someone, 1866, Oxford</ns0:description>
           <ns0:about urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2"/>
+          <ns0:about urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"/>
         </ns0:commentary>""".replace('\n', '')
 
         wk = """<ns0:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ns0='http://chs.harvard.edu/xmlns/cts' xml:lang='lat'>

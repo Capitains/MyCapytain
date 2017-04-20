@@ -137,9 +137,16 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:online></ti:online>
 </ti:translation>""".replace("\n", "")
 
+        self.cm = """<ti:commentary xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng3' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
+  <ti:label xml:lang='eng'>Introduction to Epigrammata</ti:label>
+  <ti:description xml:lang='eng'>Introduction to Epigrammata by Someone, 1866, Oxford</ti:description>
+  <ti:about urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2"/>
+  <ti:about urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"/>
+</ti:commentary>""".replace('\n', '')
+
         self.wk = """<ti:work xml:lang='lat' urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
 <ti:title xml:lang='eng'>Epigrammata</ti:title>
-<ti:title xml:lang='fre'>Epigrammes</ti:title>""" + self.tr + self.ed + """</ti:work>""".replace("\n", "")
+<ti:title xml:lang='fre'>Epigrammes</ti:title>""" + self.tr + self.ed + self.tr + """</ti:work>""".replace("\n", "")
 
         self.tg = """<ti:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ti='http://chs.harvard.edu/xmlns/cts'>
 <ti:groupname xml:lang='eng'>Martial</ti:groupname>
@@ -155,7 +162,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def test_xml_TextInventoryLength(self):
         """ Tests PrototypeTextInventory parses without errors """
         TI = TextInventory.parse(resource=self.getCapabilities)
-        self.assertEqual(len(TI), 15)
+        self.assertEqual(len(TI), 16)
 
     def test_xml_TextInventoryParsing(self):
         """ Tests PrototypeTextInventory parses without errors """
@@ -250,6 +257,17 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertIsInstance(tr, Translation)
         self.assertEqual(tr.subtype, "translation")
 
+    def test_commentary(self):
+        TI = TextInventory.parse(resource=self.getCapabilities)
+        tr = TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"]
+        self.assertIsInstance(tr, Commentary)
+        self.assertEqual(tr.subtype, "commentary")
+        self.assertEqual(tr.citation.name, 'commentary')
+        self.assertEqual(tr.citation.child.name, 'paragraph')
+        self.assertEqual(tr.citation.refsDecl, "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']")
+        self.assertEqual(tr.citation.child.refsDecl,
+                         "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']")
+
     def test_parse_string(self):
         TI = TextInventory.parse(
             resource="""
@@ -305,6 +323,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def test_Inventory_metadata(self):
         """ Tests PrototypeTextInventory parses without errors """
         TI = TextInventory.parse(resource=self.getCapabilities)
+        print(TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.NAMESPACES.CTS.term("about")))
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "eng")), "Martial")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "lat")), "Martialis")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "eng")), "Epigrammata")
@@ -317,6 +336,10 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                          "G. Heraeus")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "eng")),
                          "W. Heraeus")
+        self.assertCountEqual(
+            list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.NAMESPACES.CTS.term("about"))]),
+                         ["urn:cts:latinLit:phi1294.phi002.perseus-eng2", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
+        # Test that the citation scheme of the commentary is being returned
 
     def test_export(self):
         # <ns0:validate schema='tei-epidoc.rng'/>
@@ -341,9 +364,16 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         <ns0:description xml:lang='eng'>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</ns0:description>
         </ns0:translation>""".replace("\n", "")
 
+        cm = """<ns0:commentary xml:lang='eng' urn='urn:cts:latinLit:phi1294.phi002.perseus-eng3' workUrn='urn:cts:latinLit:phi1294.phi002' xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>
+          <ns0:label xml:lang='eng'>Introduction to Epigrammata</ns0:label>
+          <ns0:description xml:lang='eng'>Introduction to Epigrammata by Someone, 1866, Oxford</ns0:description>
+          <ns0:about urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2"/>
+          <ns0:about urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"/>
+        </ns0:commentary>""".replace('\n', '')
+
         wk = """<ns0:work urn='urn:cts:latinLit:phi1294.phi002' groupUrn='urn:cts:latinLit:phi1294' xmlns:ns0='http://chs.harvard.edu/xmlns/cts' xml:lang='lat'>
         <ns0:title xml:lang='eng'>Epigrammata</ns0:title>
-        <ns0:title xml:lang='fre'>Epigrammes</ns0:title>""" + tr + ed + """</ns0:work>""".replace("\n", "")
+        <ns0:title xml:lang='fre'>Epigrammes</ns0:title>""" + tr + ed + cm + """</ns0:work>""".replace("\n", "")
 
         tg = """<ns0:textgroup urn='urn:cts:latinLit:phi1294' xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>
         <ns0:groupname xml:lang='eng'>Martial</ns0:groupname>
@@ -363,6 +393,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             *compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(Mimetypes.XML.CTS), tr))
         self.assertEqual(
             *compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(Mimetypes.XML.CTS), ed))
+        self.assertEqual(
+            *compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].export(Mimetypes.XML.CTS), cm))
 
         # Test export :
         self.assertEqual(*compareSTR(ti.export(Mimetypes.XML.CTS), t))
@@ -370,8 +402,10 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294.phi002"].export(Mimetypes.XML.CTS), wk))
         self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].export(Mimetypes.XML.CTS), tr))
         self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].export(Mimetypes.XML.CTS), ed))
+        self.assertEqual(*compareSTR(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].export(Mimetypes.XML.CTS), cm))
         self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].lang, "lat")
         self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng2"].lang, "eng")
+        self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].lang, "eng")
 
     def test_import_to_text(self):
         """ Test export to PrototypeText object """

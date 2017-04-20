@@ -12,7 +12,7 @@ import MyCapytain.common.utils
 import MyCapytain.errors
 import MyCapytain.resources.texts.encodings
 import MyCapytain.resources.texts.locals.tei
-from tests.resources.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests, CapitainsXMLRangePassageTests
+from tests.resources.texts.locals.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests, CapitainsXMLRangePassageTests
 
 
 class TestLocalXMLTextImplementation(CapitainsXmlTextTest, unittest.TestCase, xmlunittest.XmlTestMixin):
@@ -36,6 +36,13 @@ class TestLocalXMLTextImplementation(CapitainsXmlTextTest, unittest.TestCase, xm
             self.seneca = MyCapytain.resources.texts.locals.tei.Text(
                 resource=f
             )
+
+    def parse(self, file):
+        with open(file) as f:
+            text = MyCapytain.resources.texts.locals.tei.Text(
+                resource=f
+            )
+        return text
 
     def tearDown(self):
         self.text.close()

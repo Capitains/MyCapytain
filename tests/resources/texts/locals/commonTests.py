@@ -226,6 +226,14 @@ class CapitainsXmlTextTest(TestCase):
         """
         self.assertEqual(("pr.1" in list(map(lambda x: str(x), self.text_complex.reffs))), True)
 
+    def test_xml_no_refs_Decl(self):
+        """ Test the result of parsing when there is no citation """
+        text = self.parse("tests/testing_data/texts/refsDeclButNoCTS.xml")
+        self.assertEqual(
+            text.citation.isEmpty(), True, "There should be no citation"
+        )
+
+
     def test_urn(self):
         """ Test setters and getters for urn """
 

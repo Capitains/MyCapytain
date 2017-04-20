@@ -311,16 +311,16 @@ class TestHttpCTSResolver(TestCase):
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
-            len(metadata.descendants), 32,
-            "There should be as many descendants as there is edition, translation, works and textgroup"
+            len(metadata.descendants), 33,
+            "There should be as many descendants as there is edition, translation, commentaries, works and textgroup"
         )
         self.assertEqual(
-            len(metadata.readableDescendants), 15,
-            "There should be as many readable descendants as there is edition, translation"
+            len(metadata.readableDescendants), 16,
+            "There should be as many readable descendants as there is edition, translation, and commentaries"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, Text)]), 15,
-            "There should be 14 editions + 1 translations in readableDescendants"
+            len([x for x in metadata.readableDescendants if isinstance(x, Text)]), 16,
+            "There should be 14 editions + 1 translations + 1 commentary in readableDescendants"
         )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,

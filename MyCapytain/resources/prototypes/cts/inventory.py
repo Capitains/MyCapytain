@@ -98,6 +98,19 @@ class PrototypeCTSCollection(Collection):
         )
 
     # new for commentary
+    def get_link(self, prop):
+        """ Get given link in CTS Namespace
+
+        .. example::
+            collection.get_link("about")
+
+        :param prop: Property to get (Without namespace)
+        :return: whole set of values
+        :rtype: list
+        """
+
+        return list([o for o in self.graph.objects(self.metadata.asNode(), prop)])
+
     def set_link(self, prop, value):
         """ Set given link in CTS Namespace
 
@@ -278,7 +291,7 @@ class PrototypeText(ResourceCollection, PrototypeCTSCollection):
                     # For each item in the graph connected to the current item metadata as object through the predicate "pred"
                     strings.append(
                         make_xml_node(
-                            self.graph, pred, attributes={"urn": str(obj)}, close=True
+                            self.graph, pred, attributes={"urn": str(obj)}, complete=True
                         )
                         # <pref urn="obj.language"/>
                     )

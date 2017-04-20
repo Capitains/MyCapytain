@@ -13,7 +13,7 @@ from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import NS, Mimetypes
+from MyCapytain.common.constants import NS, Mimetypes, NAMESPACES
 
 
 class Citation(CitationPrototype):
@@ -116,9 +116,9 @@ class Text(cts.PrototypeText):
 
         # Added for commentary
         for child in xml.xpath("ti:about", namespaces=NS):
-            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-            if lg is not None:
-                obj.set_link("about", child.id, lg)
+            #lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+            #if lg is not None:
+            obj.set_link(NAMESPACES.CTS.term("about"), child.get('urn'))
 
         obj.citation = Citation.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
 

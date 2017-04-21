@@ -1,6 +1,6 @@
 from MyCapytain.resolvers.cts.api import HttpCtsResolver
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
-from MyCapytain.common.constants import Mimetypes, XPath_Namespaces
+from MyCapytain.common.constants import Mimetypes, XPATH_NAMESPACES
 
 # We set up a resolver which communicates with an API available in Leipzig
 resolver = HttpCtsResolver(HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts/"))
@@ -23,6 +23,6 @@ print(passage.export(
 print(
     passage.export(
         output=Mimetypes.PYTHON.ETREE
-    ).xpath(".//tei:bibl/text()", namespaces=XPath_Namespaces, magic_string=False)
+    ).xpath(".//tei:bibl/text()", namespaces=XPATH_NAMESPACES, magic_string=False)
 )
 ["Hdt. 8.33", "Paus. 10.35.1"]

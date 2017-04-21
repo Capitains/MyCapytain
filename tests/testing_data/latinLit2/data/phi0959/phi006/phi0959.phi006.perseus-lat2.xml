@@ -79,7 +79,7 @@ schematypens="http://purl.oclc.org/dsdl/schematron"?>
       </profileDesc>
 
       <revisionDesc>
-         <change who="#balmas01" when="2013-09-13T11:17:41">moving Greg's work-in-progress on CTS-izing greco-roman collection texts to a XmlCtsWorkMetadata directory</change>
+         <change who="#balmas01" when="2013-09-13T11:17:41">moving Greg's work-in-progress on CTS-izing greco-roman collection texts to a Work directory</change>
          <change who="#gcrane" when="2013-06-08T12:13:38">TEI XML converted to facilitate CTS compatibility</change>
          <change who="#lcerrato" when="2013-01-30T20:34:07">changed 7.114 impleverant to impleverunt</change>
          <change who="#lcerrato" when="2011-10-31T19:48:11">fixed typo ven to veri 5.247</change>

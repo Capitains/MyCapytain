@@ -140,5 +140,5 @@ class Metadata(Exportable):
 
         """
         if (subject, predicate, None) in get_graph():
-            return Metadata(node=get_graph() .objects(subject, predicate).__next__())
+            return Metadata(node=get_graph().objects(subject, predicate).__next__())
         return Metadata(*args, **kwargs)

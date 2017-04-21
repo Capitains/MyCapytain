@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.resources.collections import cts as CtsCollection
 from MyCapytain.resources.prototypes import text as prototypes
@@ -76,9 +76,9 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
             urn=urn
         )
         xml = xmlparser(xml)
-        self.__parse_request__(xml.xpath("//ti:request", namespaces=XPath_Namespaces)[0])
+        self.__parse_request__(xml.xpath("//ti:request", namespaces=XPATH_NAMESPACES)[0])
 
-        return [ref.split(":")[-1] for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=XPath_Namespaces)]
+        return [ref.split(":")[-1] for ref in xml.xpath("//ti:reply//ti:urn/text()", namespaces=XPATH_NAMESPACES)]
 
     def getTextualNode(self, subreference=None):
         """ Retrieve a passage and store it in the object
@@ -106,7 +106,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         response = xmlparser(self.retriever.getPassage(urn=urn))
 
-        self.__parse_request__(response.xpath("//ti:request", namespaces=XPath_Namespaces)[0])
+        self.__parse_request__(response.xpath("//ti:request", namespaces=XPATH_NAMESPACES)[0])
         return CtsPassage(urn=urn, resource=response, retriever=self.retriever)
 
     def getReffs(self, level=1, subreference=None):
@@ -141,7 +141,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         response = xmlparser(self.retriever.getPassagePlus(urn=urn))
 
         passage = CtsPassage(urn=urn, resource=response, retriever=self.retriever)
-        passage.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=XPath_Namespaces)[0])
+        passage.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=XPATH_NAMESPACES)[0])
         self.citation = passage.citation
         return passage
 
@@ -151,28 +151,28 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :param xml: LXML Object
         :type xml: Union[lxml.etree._Element]
         """
-        for node in xml.xpath(".//ti:groupname", namespaces=XPath_Namespaces):
+        for node in xml.xpath(".//ti:groupname", namespaces=XPATH_NAMESPACES):
             lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
-            self.metadata.add(RDF_Namespaces.CTS.groupname, lang=lang, value=node.text)
+            self.metadata.add(RDF_NAMESPACES.CTS.groupname, lang=lang, value=node.text)
             self.set_creator(node.text, lang)
 
-        for node in xml.xpath(".//ti:title", namespaces=XPath_Namespaces):
+        for node in xml.xpath(".//ti:title", namespaces=XPATH_NAMESPACES):
             lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
-            self.metadata.add(RDF_Namespaces.CTS.title, lang=lang, value=node.text)
+            self.metadata.add(RDF_NAMESPACES.CTS.title, lang=lang, value=node.text)
             self.set_title(node.text, lang)
 
-        for node in xml.xpath(".//ti:label", namespaces=XPath_Namespaces):
+        for node in xml.xpath(".//ti:label", namespaces=XPATH_NAMESPACES):
             lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
-            self.metadata.add(RDF_Namespaces.CTS.label, lang=lang, value=node.text)
+            self.metadata.add(RDF_NAMESPACES.CTS.label, lang=lang, value=node.text)
             self.set_subject(node.text, lang)
 
-        for node in xml.xpath(".//ti:description", namespaces=XPath_Namespaces):
+        for node in xml.xpath(".//ti:description", namespaces=XPATH_NAMESPACES):
             lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
-            self.metadata.add(RDF_Namespaces.CTS.description, lang=lang, value=node.text)
+            self.metadata.add(RDF_NAMESPACES.CTS.description, lang=lang, value=node.text)
             self.set_description(node.text, lang)
 
         # Need to code that p
-        if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=XPath_Namespaces):
+        if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=XPATH_NAMESPACES):
             self.citation = CtsCollection.XmlCtsCitation.ingest(
                 xml,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
@@ -189,7 +189,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         )
 
         self.__parse_request__(
-            response.xpath("//ti:reply/ti:label", namespaces=XPath_Namespaces)[0]
+            response.xpath("//ti:reply/ti:label", namespaces=XPATH_NAMESPACES)[0]
         )
 
         return self.metadata
@@ -273,7 +273,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :rtype: str
         """
         resource = xmlparser(resource)
-        urn = resource.xpath("//ti:reply/ti:urn/text()", namespaces=XPath_Namespaces, magic_string=True)
+        urn = resource.xpath("//ti:reply/ti:urn/text()", namespaces=XPATH_NAMESPACES, magic_string=True)
 
         if len(urn) > 0:
             urn = str(urn[0])
@@ -290,13 +290,13 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         """
         _prev, _next = False, False
         resource = xmlparser(resource)
-        prevnext = resource.xpath("//ti:prevnext", namespaces=XPath_Namespaces)
+        prevnext = resource.xpath("//ti:prevnext", namespaces=XPATH_NAMESPACES)
 
         if len(prevnext) > 0:
             _next, _prev = None, None
             prevnext = prevnext[0]
-            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=XPath_Namespaces, smart_strings=False)
-            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=XPath_Namespaces, smart_strings=False)
+            _next_xpath = prevnext.xpath("ti:next/ti:urn/text()", namespaces=XPATH_NAMESPACES, smart_strings=False)
+            _prev_xpath = prevnext.xpath("ti:prev/ti:urn/text()", namespaces=XPATH_NAMESPACES, smart_strings=False)
 
             if len(_next_xpath):
                 _next = _next_xpath[0].split(":")[-1]
@@ -449,11 +449,11 @@ class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
         :return: None
         """
         self.response = self.resource
-        self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=XPath_Namespaces)[0]
+        self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=XPATH_NAMESPACES)[0]
 
         self.__prev__, self.__nextId__ = __SharedMethod__.prevnext(self.response)
 
-        if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=XPath_Namespaces)):
+        if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=XPATH_NAMESPACES)):
             self.citation = CtsCollection.XmlCtsCitation.ingest(
                 self.response,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"

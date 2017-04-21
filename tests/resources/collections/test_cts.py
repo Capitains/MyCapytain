@@ -313,7 +313,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         tixml = ti.export(Mimetypes.XML.CTS)
         self.assertEqual(
             len(list(ti.graph.triples(
-                (ti["urn:cts:latinLit:phi1294"].asNode(), constants.RDF_Namespaces.DTS.term("metadata"), None)
+                (ti["urn:cts:latinLit:phi1294"].asNode(), constants.RDF_NAMESPACES.DTS.term("metadata"), None)
             ))),
             1,
             "There should be one node for the child 1294 which is metadata"
@@ -336,7 +336,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "eng")),
                          "W. Heraeus")
         self.assertCountEqual(
-            list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.RDF_Namespaces.CTS.term("about"))]),
+            list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.RDF_NAMESPACES.CTS.term("about"))]),
                          ["urn:cts:latinLit:phi1294.phi002.perseus-eng2", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
         # Test that the citation scheme of the commentary is being returned
 
@@ -415,23 +415,23 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_Namespaces.CTS.term("groupname"), "eng")),
+            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("groupname"), "eng")),
             "Martial",
             "Check inheritance of textgroup metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_Namespaces.CTS.term("title"), "eng")),
+            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "eng")),
             "Epigrammata",
             "Check inheritance of work metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_Namespaces.CTS.term("title"), "fre")),
+            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "fre")),
             "Epigrammes",
             "Check inheritance of work metadata"
         )
         for i in range(0, 100):
             self.assertEqual(
-                str(txt_text.metadata.get(constants.RDF_Namespaces.CTS.term("description"), "fre")),
+                str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("description"), "fre")),
                 "G. Heraeus",
                 "Check inheritance of work metadata"
             )

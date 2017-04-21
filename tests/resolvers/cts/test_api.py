@@ -1,7 +1,7 @@
 from MyCapytain.resolvers.cts.api import HttpCtsResolver
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import XPath_Namespaces, Mimetypes
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes
 from MyCapytain.resources.prototypes.text import Passage
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsTextMetadata
 from MyCapytain.resources.prototypes.metadata import Collection
@@ -72,7 +72,7 @@ class TestHttpCtsResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -108,7 +108,7 @@ class TestHttpCtsResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -169,7 +169,7 @@ class TestHttpCtsResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -221,7 +221,7 @@ class TestHttpCtsResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -293,7 +293,7 @@ class TestHttpCtsResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -323,7 +323,7 @@ class TestHttpCtsResolver(TestCase):
             "There should be 14 editions + 1 translations + 1 commentary in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPath_Namespaces)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -358,7 +358,7 @@ class TestHttpCtsResolver(TestCase):
             "There should be 1 edition + 1 translation in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPath_Namespaces)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(

@@ -10,7 +10,7 @@ from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.reference import Reference, Citation, URN
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 from MyCapytain.errors import MissingAttribute
 import mock
 
@@ -311,7 +311,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_LABEL
 
         metadata = text.getLabel()
-        self.assertEqual(str(metadata.get(RDF_Namespaces.CTS.label, "eng")), "Epigrammata")
+        self.assertEqual(str(metadata.get(RDF_NAMESPACES.CTS.label, "eng")), "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):
@@ -371,7 +371,7 @@ class TestAPIText(unittest.TestCase):
         first = passage.first
         self.endpoint.getFirstUrn.assert_called_with("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
-        self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPath_Namespaces)[0])
+        self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPATH_NAMESPACES)[0])
         self.assertIsInstance(first, CtsPassage)
 
     def test_get_first_id(self):
@@ -522,7 +522,7 @@ class TestCtsPassage(unittest.TestCase):
         self.endpoint.getPassage.assert_called_with(
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2"
         )
-        self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPath_Namespaces)[0])
+        self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPATH_NAMESPACES)[0])
         self.assertIsInstance(__next, CtsPassage)
 
     def test_next_resource(self):
@@ -540,7 +540,7 @@ class TestCtsPassage(unittest.TestCase):
         __next = passage.next
         # print(self.endpoint.getPrevNextUrn.mock_calls)
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.2")
-        self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPath_Namespaces)[0])
+        self.assertEqual(__next.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPATH_NAMESPACES)[0])
         self.assertIsInstance(__next, CtsPassage)
 
     def test_prev_getprevnext(self):
@@ -556,7 +556,7 @@ class TestCtsPassage(unittest.TestCase):
         __prev = passage.prev
         self.endpoint.getPrevNextUrn.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
-        self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPath_Namespaces)[0])
+        self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPATH_NAMESPACES)[0])
         self.assertIsInstance(__prev, CtsPassage)
 
     def test_prev_prev_next_property(self):
@@ -589,7 +589,7 @@ class TestCtsPassage(unittest.TestCase):
         # When next does not exist from the original resource
         __prev = passage.prev
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
-        self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPath_Namespaces)[0])
+        self.assertEqual(__prev.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPATH_NAMESPACES)[0])
         self.assertIsInstance(__prev, CtsPassage)
 
     def test_unicode_text(self):
@@ -631,7 +631,7 @@ class TestCtsPassage(unittest.TestCase):
         first = passage.first
         self.endpoint.getFirstUrn.assert_called_with("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1")
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.pr")
-        self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPath_Namespaces)[0])
+        self.assertEqual(first.xml, GET_PASSAGE.xpath("//tei:TEI", namespaces=XPATH_NAMESPACES)[0])
         self.assertIsInstance(first, CtsPassage)
 
     def test_get_first_id(self):
@@ -677,10 +677,9 @@ class TestCtsPassage(unittest.TestCase):
         )
         self.assertIsInstance(
             passage.parent, CtsPassage,
-            "Parent CapitainsCtsPassage should be a passage"
+            "Parent CTSPassage should be a passage"
         )
         self.endpoint.getPassage.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1")
-
 
     def test_prev_id(self):
         """ Test next property, given that next information already exists or not)

@@ -8,7 +8,7 @@ Shared elements for TEI XmlCtsCitation
 """
 from lxml.etree import tostring
 
-from MyCapytain.common.constants import Mimetypes, XPath_Namespaces
+from MyCapytain.common.constants import Mimetypes, XPATH_NAMESPACES
 from MyCapytain.common.utils import xmlparser, nested_ordered_dictionary, nested_set, normalize
 from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 
@@ -101,7 +101,7 @@ class TEIResource(InteractiveTextualNode):
                         for element
                         in self.resource.xpath(
                             ".//descendant-or-self::text(){}".format(exclude),
-                            namespaces=XPath_Namespaces,
+                            namespaces=XPATH_NAMESPACES,
                             smart_strings=False
                         )
                     ]

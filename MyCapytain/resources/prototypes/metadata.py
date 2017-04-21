@@ -10,7 +10,7 @@
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.errors import UnknownCollection
 from MyCapytain.common.utils import Subgraph, LiteralToDict
-from MyCapytain.common.constants import RDF_Namespaces, RDFLIB_MAPPING, Mimetypes, get_graph
+from MyCapytain.common.constants import RDF_NAMESPACES, RDFLIB_MAPPING, Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
 from rdflib.namespace import SKOS, DC
@@ -26,8 +26,8 @@ class Collection(Exportable):
     :ivar metadata: Metadata
     :type metadata: Metadata
     """
-    TYPE_URI = URIRef(RDF_Namespaces.DTS.collection)
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.collection)
+    TYPE_URI = URIRef(RDF_NAMESPACES.DTS.collection)
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.JSON.LD, Mimetypes.JSON.DTS.Std, Mimetypes.XML.RDF]
 
     def __init__(self, identifier="", *args, **kwargs):
@@ -35,16 +35,16 @@ class Collection(Exportable):
         self.__graph__ = get_graph()
 
         self.__node__ = URIRef(identifier)
-        self.__metadata__ = Metadata.getOr(self.__node__, RDF_Namespaces.DTS.metadata)
-        self.__capabilities__ = Metadata.getOr(self.__node__, RDF_Namespaces.DTS.capabilities)
+        self.__metadata__ = Metadata.getOr(self.__node__, RDF_NAMESPACES.DTS.metadata)
+        self.__capabilities__ = Metadata.getOr(self.__node__, RDF_NAMESPACES.DTS.capabilities)
 
         self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
-        self.graph.set((self.asNode(), RDF_Namespaces.DTS.model, self.MODEL_URI))
+        self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.model, self.MODEL_URI))
 
         self.graph.addN(
             [
-                (self.asNode(), RDF_Namespaces.DTS.capabilities, self.capabilities.asNode(), self.graph),
-                (self.asNode(), RDF_Namespaces.DTS.metadata, self.metadata.asNode(), self.graph)
+                (self.asNode(), RDF_NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph),
+                (self.asNode(), RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.graph)
             ]
         )
 
@@ -56,14 +56,14 @@ class Collection(Exportable):
 
     @property
     def version(self):
-        for x in self.graph.objects(self.asNode(), RDF_Namespaces.DTS.version):
+        for x in self.graph.objects(self.asNode(), RDF_NAMESPACES.DTS.version):
             return x
 
     @version.setter
     def version(self, value):
         if not isinstance(value, Literal):
             value = Literal(value)
-        self.graph.set((self.asNode(), RDF_Namespaces.DTS.version, value))
+        self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.version, value))
 
     @property
     def type(self):
@@ -77,13 +77,13 @@ class Collection(Exportable):
 
     @property
     def model(self):
-        return list(self.graph.objects(self.asNode(), RDF_Namespaces.DTS.model))[0]
+        return list(self.graph.objects(self.asNode(), RDF_NAMESPACES.DTS.model))[0]
 
     @model.setter
     def model(self, value):
         if not isinstance(value, URIRef):
             value = URIRef(value)
-        self.graph.set((self.asNode(), RDF_Namespaces.DTS.model, value))
+        self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.model, value))
 
     @property
     def size(self):
@@ -184,7 +184,7 @@ class Collection(Exportable):
         """
         self.__parent__ = parent
         self.graph.set(
-            (self.asNode(), RDF_Namespaces.DTS.parent, parent.asNode())
+            (self.asNode(), RDF_NAMESPACES.DTS.parent, parent.asNode())
         )
         parent.__add_member__(self)
 
@@ -199,7 +199,7 @@ class Collection(Exportable):
             return None
         else:
             self.children[member.id] = member
-            #self.graph.add((self.asNode(), RDF_Namespaces.DTS.child, member.asNode()))
+            #self.graph.add((self.asNode(), RDF_NAMESPACES.DTS.child, member.asNode()))
 
     def __getitem__(self, key):
         """ Retrieve an item by its ID in the tree of a collection
@@ -324,28 +324,28 @@ class Collection(Exportable):
                     "@id": self.id,
                     RDFType: str(self.type),
                     RDFSLabel: LiteralToDict(self.get_label()) or self.id,
-                    self.graph.qname(RDF_Namespaces.DTS.size): len(self.members),
-                    self.graph.qname(RDF_Namespaces.DTS.metadata): metadata
+                    self.graph.qname(RDF_NAMESPACES.DTS.size): len(self.members),
+                    self.graph.qname(RDF_NAMESPACES.DTS.metadata): metadata
                 }
             }
             version = self.version
             if version is not None:
                 o["@graph"]["version"] = str(version)
             if len(self.members):
-                o["@graph"][self.graph.qname(RDF_Namespaces.DTS.members)] = [
+                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.members)] = [
                     {
                         "@id": member.id,
                         RDFSLabel: LiteralToDict(member.get_label()) or member.id,
-                        self.graph.qname(RDF_Namespaces.DTS.url): domain + member.id
+                        self.graph.qname(RDF_NAMESPACES.DTS.url): domain + member.id
                     }
                     for member in self.members
                 ]
             if self.parent:
-                o["@graph"][self.graph.qname(RDF_Namespaces.DTS.parents)] = [
+                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.parents)] = [
                     {
                         "@id": member.id,
                         RDFSLabel: LiteralToDict(member.get_label()) or member.id,
-                        self.graph.qname(RDF_Namespaces.DTS.url): domain + member.id
+                        self.graph.qname(RDF_NAMESPACES.DTS.url): domain + member.id
                     }
                     for member in self.parents
                 ]

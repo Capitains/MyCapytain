@@ -12,7 +12,7 @@ from six import text_type
 from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
 from MyCapytain.common.reference import URN
 from MyCapytain.common.utils import make_xml_node, xmlparser
-from MyCapytain.common.constants import RDF_Namespaces, Mimetypes
+from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
 from copy import deepcopy
@@ -40,8 +40,8 @@ class PrototypeCtsCollection(Collection):
         super(PrototypeCtsCollection, self).__init__(identifier)
 
         if hasattr(type(self), "CTS_MODEL"):
-            self.graph.set((self.asNode(), RDF.type, RDF_Namespaces.CTS.term(self.CTS_MODEL)))
-            self.graph.set((self.asNode(), RDF_Namespaces.CTS.isA, RDF_Namespaces.CTS.term(self.CTS_MODEL)))
+            self.graph.set((self.asNode(), RDF.type, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
+            self.graph.set((self.asNode(), RDF_NAMESPACES.CTS.isA, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
 
         self.__urn__ = ""
 
@@ -68,7 +68,7 @@ class PrototypeCtsCollection(Collection):
         :rtype: dict or Literal
         """
         x = {
-            value.language: value for _, _, value in self.graph.triples((self.metadata.asNode(), RDF_Namespaces.CTS.term(prop), None))
+            value.language: value for _, _, value in self.graph.triples((self.metadata.asNode(), RDF_NAMESPACES.CTS.term(prop), None))
         }
         if lang is not None:
             if lang in x:
@@ -88,7 +88,7 @@ class PrototypeCtsCollection(Collection):
         """
         if not isinstance(value, Literal):
             value = Literal(value, lang=lang)
-        prop = RDF_Namespaces.CTS.term(prop)
+        prop = RDF_NAMESPACES.CTS.term(prop)
 
         if prop == self.DC_TITLE_KEY:
             self.set_label(value, lang)
@@ -143,8 +143,8 @@ class PrototypeCtsCollection(Collection):
             attrs.update(self.__namespaces_header__())
 
         TYPE_URI = self.TYPE_URI
-        if TYPE_URI == RDF_Namespaces.CTS.term("CtsTextInventoryCollection"):
-            TYPE_URI = RDF_Namespaces.CTS.term("TextInventory")
+        if TYPE_URI == RDF_NAMESPACES.CTS.term("CtsTextInventoryCollection"):
+            TYPE_URI = RDF_NAMESPACES.CTS.term("TextInventory")
 
         strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)]
         for pred in self.CTS_PROPERTIES:
@@ -181,12 +181,12 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
     :type urn: URN
     """
 
-    DC_TITLE_KEY = RDF_Namespaces.CTS.term("label")
-    TYPE_URI = RDF_Namespaces.CTS.term("text")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.resource)
+    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("label")
+    TYPE_URI = RDF_NAMESPACES.CTS.term("text")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.resource)
     EXPORT_TO = [Mimetypes.XML.CTS]
-    CTS_PROPERTIES = [RDF_Namespaces.CTS.label, RDF_Namespaces.CTS.description]
-    CTS_LINKS = [RDF_Namespaces.CTS.about]
+    CTS_PROPERTIES = [RDF_NAMESPACES.CTS.label, RDF_NAMESPACES.CTS.description]
+    CTS_LINKS = [RDF_NAMESPACES.CTS.about]
     SUBTYPE = "unknown"
 
     def __init__(self, urn="", parent=None, lang=None):
@@ -275,7 +275,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
 
             strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
 
-            # additional = [make_xml_node(self.graph, RDF_Namespaces.CTS.extra)]
+            # additional = [make_xml_node(self.graph, RDF_NAMESPACES.CTS.extra)]
             for pred in self.CTS_PROPERTIES:
                 for obj in self.graph.objects(self.metadata.asNode(), pred):
                     strings.append(
@@ -300,10 +300,10 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
                 strings.append(
                     # Online
                     make_xml_node(
-                        self.graph, RDF_Namespaces.CTS.term("online"), complete=True,
+                        self.graph, RDF_NAMESPACES.CTS.term("online"), complete=True,
                         # XmlCtsCitation Mapping
                         innerXML=make_xml_node(
-                            self.graph, RDF_Namespaces.CTS.term("citationMapping"), complete=True,
+                            self.graph, RDF_NAMESPACES.CTS.term("citationMapping"), complete=True,
                             innerXML=self.citation.export(Mimetypes.XML.CTS)
                         )
                     )
@@ -337,7 +337,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
         :return: Description string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=RDF_Namespaces.CTS.description, lang=lang)
+        return self.metadata.get(key=RDF_NAMESPACES.CTS.description, lang=lang)
 
     def get_subject(self, lang=None):
         """ Get the DC subject of the object
@@ -357,8 +357,8 @@ class CtsEditionMetadata(CtsTextMetadata):
     :param parent: Parent of current item
     :type parent: CtsWorkMetadata
     """
-    TYPE_URI = RDF_Namespaces.CTS.term("edition")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.resource)
+    TYPE_URI = RDF_NAMESPACES.CTS.term("edition")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.resource)
     SUBTYPE = "edition"
 
 
@@ -372,9 +372,10 @@ class CtsTranslationMetadata(CtsTextMetadata):
     :param lang: Language of the translation
     :type lang: Lang
     """
-    TYPE_URI = RDF_Namespaces.CTS.term("translation")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.resource)
+    TYPE_URI = RDF_NAMESPACES.CTS.term("translation")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.resource)
     SUBTYPE = "translation"
+
 
 class CtsCommentaryMetadata(CtsTextMetadata):
     """ Represents a CTS Commentary
@@ -386,8 +387,8 @@ class CtsCommentaryMetadata(CtsTextMetadata):
     :param lang: Language of the commentary
     :type lang: Lang
     """
-    TYPE_URI = RDF_Namespaces.CTS.term("commentary")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.resource)
+    TYPE_URI = RDF_NAMESPACES.CTS.term("commentary")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.resource)
     SUBTYPE = "commentary"
 
 
@@ -406,11 +407,11 @@ class CtsWorkMetadata(PrototypeCtsCollection):
     :type urn: URN
     """
 
-    DC_TITLE_KEY = RDF_Namespaces.CTS.term("title")
-    TYPE_URI = RDF_Namespaces.CTS.term("work")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.collection)
+    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("title")
+    TYPE_URI = RDF_NAMESPACES.CTS.term("work")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS]
-    CTS_PROPERTIES = [RDF_Namespaces.CTS.term("title")]
+    CTS_PROPERTIES = [RDF_NAMESPACES.CTS.term("title")]
 
     def __init__(self, urn=None, parent=None):
         super(CtsWorkMetadata, self).__init__(identifier=str(urn))
@@ -527,11 +528,11 @@ class CtsTextgroupMetadata(PrototypeCtsCollection):
     :ivar urn: URN Identifier
     :type urn: URN
     """
-    DC_TITLE_KEY = RDF_Namespaces.CTS.term("groupname")
-    TYPE_URI = RDF_Namespaces.CTS.term("textgroup")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.collection)
+    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("groupname")
+    TYPE_URI = RDF_NAMESPACES.CTS.term("textgroup")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS]
-    CTS_PROPERTIES = [RDF_Namespaces.CTS.groupname]
+    CTS_PROPERTIES = [RDF_NAMESPACES.CTS.groupname]
 
     def __init__(self, urn="", parent=None):
         super(CtsTextgroupMetadata, self).__init__(identifier=str(urn))
@@ -609,9 +610,9 @@ class CtsTextInventoryMetadata(PrototypeCtsCollection):
     :param name: Identifier of the CtsTextInventoryMetadata
     :type name: str
     """
-    DC_TITLE_KEY = RDF_Namespaces.CTS.term("name")
-    TYPE_URI = RDF_Namespaces.CTS.term("TextInventory")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.collection)
+    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("name")
+    TYPE_URI = RDF_NAMESPACES.CTS.term("TextInventory")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS]
 
     def __init__(self, name="defaultInventory", parent=None):
@@ -668,9 +669,9 @@ class CtsTextInventoryCollection(PrototypeCtsCollection):
     :param name: Identifier of the CtsTextInventoryMetadata
     :type name: str
     """
-    DC_TITLE_KEY = RDF_Namespaces.CTS.term("name")
-    TYPE_URI = RDF_Namespaces.CTS.term("CtsTextInventoryCollection")
-    MODEL_URI = URIRef(RDF_Namespaces.DTS.collection)
+    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("name")
+    TYPE_URI = RDF_NAMESPACES.CTS.term("CtsTextInventoryCollection")
+    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.JSON.DTS.Std]
 
     def __init__(self, identifier="default"):

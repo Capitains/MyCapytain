@@ -12,7 +12,7 @@ from rdflib.namespace import DC
 from rdflib import BNode, URIRef
 from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.constants import Mimetypes, get_graph, RDF_Namespaces
+from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES
 from MyCapytain.common.base import Exportable
 from MyCapytain.resources.prototypes.metadata import Collection
 
@@ -38,8 +38,8 @@ class TextualElement(Exportable):
         self.__metadata__ = metadata or Metadata()
 
         self.__graph__.addN([
-            (self.__node__, RDF_Namespaces.DTS.implements, URIRef(identifier), self.__graph__),
-            (self.__node__, RDF_Namespaces.DTS.metadata, self.metadata.asNode(), self.__graph__)
+            (self.__node__, RDF_NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__),
+            (self.__node__, RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.__graph__)
         ])
 
     def __repr__(self):
@@ -420,7 +420,7 @@ class CtsNode(InteractiveTextualNode):
         self.__urn__ = value
 
     def get_cts_metadata(self, key, lang=None):
-        return self.metadata.get(RDF_Namespaces.CTS.term(key), lang)
+        return self.metadata.get(RDF_NAMESPACES.CTS.term(key), lang)
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, CitableText will compute valid reffs
@@ -450,24 +450,24 @@ class CtsNode(InteractiveTextualNode):
         """
         edition, work, textgroup = tuple(([text_metadata] + text_metadata.parents)[:3])
 
-        for node in textgroup.metadata.get_all(RDF_Namespaces.CTS.groupname):
+        for node in textgroup.metadata.get_all(RDF_NAMESPACES.CTS.groupname):
             lang = node.language
-            self.metadata.add(RDF_Namespaces.CTS.groupname, lang=lang, value=str(node))
+            self.metadata.add(RDF_NAMESPACES.CTS.groupname, lang=lang, value=str(node))
             self.set_creator(str(node), lang)
 
-        for node in work.metadata.get_all(RDF_Namespaces.CTS.title):
+        for node in work.metadata.get_all(RDF_NAMESPACES.CTS.title):
             lang = node.language
-            self.metadata.add(RDF_Namespaces.CTS.title, lang=lang, value=str(node))
+            self.metadata.add(RDF_NAMESPACES.CTS.title, lang=lang, value=str(node))
             self.set_title(str(node), lang)
 
-        for node in edition.metadata.get_all(RDF_Namespaces.CTS.label):
+        for node in edition.metadata.get_all(RDF_NAMESPACES.CTS.label):
             lang = node.language
-            self.metadata.add(RDF_Namespaces.CTS.label, lang=lang, value=str(node))
+            self.metadata.add(RDF_NAMESPACES.CTS.label, lang=lang, value=str(node))
             self.set_subject(str(node), lang)
 
-        for node in edition.metadata.get_all(RDF_Namespaces.CTS.description):
+        for node in edition.metadata.get_all(RDF_NAMESPACES.CTS.description):
             lang = node.language
-            self.metadata.add(RDF_Namespaces.CTS.description, lang=lang, value=str(node))
+            self.metadata.add(RDF_NAMESPACES.CTS.description, lang=lang, value=str(node))
             self.set_description(str(node), lang)
 
         if self.citation.isEmpty() and not edition.citation.isEmpty():

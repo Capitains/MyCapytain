@@ -55,9 +55,9 @@ class TestProtoText(unittest.TestCase):
         self.assertIsInstance(a.metadata, MyCapytain.common.metadata.Metadata)
 
         m = MyCapytain.common.metadata.Metadata()
-        m.add(RDF_Namespaces.CTS.title, "I am a metadata", "fre")
+        m.add(RDF_NAMESPACES.CTS.title, "I am a metadata", "fre")
         a = CitableText(metadata=m)
-        self.assertEqual(str(a.metadata.get(RDF_Namespaces.CTS.title, "fre")), "I am a metadata")
+        self.assertEqual(str(a.metadata.get(RDF_NAMESPACES.CTS.title, "fre")), "I am a metadata")
 
     def test_proto_reff(self):
         """ Test that getValidReff function are not implemented """

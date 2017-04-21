@@ -5,8 +5,8 @@ Made a lot of renaming for clarity :
 | Old name | New name |
 |--------------|---------------|
 | MyCapytain.common.constants.Exportable | MyCapytain.common.base.Exportable | 
-| MyCapytain.common.constants.NS | MyCapytain.common.constants.XPath_Namespaces |
-| MyCapytain.common.constants.NAMESPACES | MyCapytain.common.constants.RDF_Namespaces |
+| MyCapytain.common.constants.NS | MyCapytain.common.constants.XPATH_NAMESPACES |
+| MyCapytain.common.constants.NAMESPACES | MyCapytain.common.constants.RDF_NAMESPACES |
 | MyCapytain.resources.texts.api | MyCapytain.resources.texts.remote |
 | MyCapytain.resources.texts.api.Passage | MyCapytain.resources.texts.remote.cts.CtsPassage |
 | MyCapytain.resources.texts.api.Text | MyCapytain.resources.texts.remote.cts.CtsText |

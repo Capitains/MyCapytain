@@ -13,7 +13,7 @@ import warnings
 
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
-from MyCapytain.common.constants import XPath_Namespaces, RDF_Namespaces
+from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
 from MyCapytain.common.reference import URN, Citation, Reference
 
 from MyCapytain.resources.prototypes import text
@@ -120,7 +120,7 @@ class __SharedMethods__:
 
         resource = self.resource.xpath(
             self.citation[len(reference)-1].fill(reference),
-            namespaces=XPath_Namespaces
+            namespaces=XPATH_NAMESPACES
         )
 
         if len(resource) != 1:
@@ -224,7 +224,7 @@ class __SharedMethods__:
                         (
                             xml.xpath(
                                 citations[len(filling)-1].fill(filling),
-                                namespaces=XPath_Namespaces
+                                namespaces=XPATH_NAMESPACES
                             ),
                             refs
                         )
@@ -446,7 +446,7 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
         :return: None
         """
         if self.citation.isEmpty():
-            citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=XPath_Namespaces)
+            citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=XPATH_NAMESPACES)
             if len(citation):
                 self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")
 
@@ -454,7 +454,7 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
         """ Parse the object and generate the children
         """
         try:
-            xml = self.xml.xpath(self.citation.scope, namespaces=XPath_Namespaces)
+            xml = self.xml.xpath(self.citation.scope, namespaces=XPATH_NAMESPACES)
             if len(xml) == 0:
                 msg = "Main citation scope does not result in any result ({0})".format(self.citation.scope)
                 raise RefsDeclError(msg)

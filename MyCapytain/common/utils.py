@@ -21,7 +21,7 @@ from six import text_type
 from xml.sax.saxutils import escape
 from rdflib import BNode, Graph, Literal, URIRef
 
-from MyCapytain.common.constants import XPath_Namespaces
+from MyCapytain.common.constants import XPATH_NAMESPACES
 
 __strip = re.compile("([ ]{2,})+")
 __parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
@@ -237,18 +237,18 @@ def performXpath(parent, xpath):
     if xpath.startswith(".//"):
         result = parent.xpath(
             xpath.replace(".//", "./"),
-            namespaces=XPath_Namespaces
+            namespaces=XPATH_NAMESPACES
         )
         if len(result) == 0:
             result = parent.xpath(
                 "*[{}]".format(xpath),
-                namespaces=XPath_Namespaces
+                namespaces=XPATH_NAMESPACES
             )
             loop = True
     else:
         result = parent.xpath(
             xpath,
-            namespaces=XPath_Namespaces
+            namespaces=XPATH_NAMESPACES
         )
     return result[0], loop
 

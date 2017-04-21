@@ -1,6 +1,6 @@
 #  We import the correct classes from the local module
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
-from MyCapytain.common.constants import Mimetypes, XPath_Namespaces
+from MyCapytain.common.constants import Mimetypes, XPATH_NAMESPACES
 from lxml.etree import tostring
 
 #  We open a file
@@ -55,7 +55,7 @@ with open("./tests/testing_data/examples/text.cicero.xml") as f:
     # So we export to an LXML Object
     document = p28_29.export(Mimetypes.PYTHON.ETREE)
     # We remove some XML
-    for element in document.xpath("//tei:note", namespaces=XPath_Namespaces):
+    for element in document.xpath("//tei:note", namespaces=XPATH_NAMESPACES):
         element.getparent().remove(element)
     # And we print using LXML constants
     print("Clean XML of 28-29")

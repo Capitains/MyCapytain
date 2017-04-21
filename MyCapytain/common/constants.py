@@ -3,14 +3,14 @@ from rdflib.namespace import SKOS
 
 
 #: List of XPath Namespaces used in guidelines
-XPath_Namespaces = {
+XPATH_NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ti": "http://chs.harvard.edu/xmlns/cts",
     "xml": "http://www.w3.org/XML/1998/namespace"
 }
 
 
-class RDF_Namespaces:
+class RDF_NAMESPACES:
     """ Namespaces Constants used to provide Namespace capacities across the library
 
     :cvar CTS: CTS Namespace
@@ -89,9 +89,9 @@ class Mimetypes:
 
 global __MYCAPYTAIN_TRIPLE_GRAPH__
 __MYCAPYTAIN_TRIPLE_GRAPH__ = Graph()
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("", RDF_Namespaces.CTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", RDF_Namespaces.DTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", RDF_Namespaces.TEI)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("", RDF_NAMESPACES.CTS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", RDF_NAMESPACES.DTS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", RDF_NAMESPACES.TEI)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("skos", SKOS)
 
 

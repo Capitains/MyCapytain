@@ -11,7 +11,7 @@ from six import text_type
 from copy import copy
 import re
 from lxml.etree import _Element
-from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, get_graph, RDF_Namespaces
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, get_graph, RDF_NAMESPACES
 from MyCapytain.common.base import Exportable
 from MyCapytain.common.utils import make_xml_node
 
@@ -886,7 +886,7 @@ class Citation(Exportable):
                 label = self.name
 
             return make_xml_node(
-                get_graph(), RDF_Namespaces.CTS.citation, attributes={
+                get_graph(), RDF_NAMESPACES.CTS.citation, attributes={
                     "xpath": re.sub(Citation.escape, "'", self.xpath),
                     "scope": re.sub(Citation.escape, "'", self.scope),
                     "label": label
@@ -927,7 +927,7 @@ class Citation(Exportable):
         elif not isinstance(resource, _Element):
             return None
 
-        resource = resource.xpath(xpath, namespaces=XPath_Namespaces)
+        resource = resource.xpath(xpath, namespaces=XPATH_NAMESPACES)
         resources = []
 
         for x in range(0, len(resource)):

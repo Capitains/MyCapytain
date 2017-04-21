@@ -898,7 +898,7 @@
 <!-- 42 -->
 <g id="node43" class="node"><title>42</title>
 <polygon fill="none" stroke="black" points="4040.5,-68 4040.5,-167 4158.5,-167 4158.5,-68 4040.5,-68"/>
-<text text-anchor="middle" x="4099.5" y="-151.8" font-family="Times,serif" font-size="14.00">RDF_Namespaces</text>
+<text text-anchor="middle" x="4099.5" y="-151.8" font-family="Times,serif" font-size="14.00">RDF_NAMESPACES</text>
 <polyline fill="none" stroke="black" points="4040.5,-144 4158.5,-144 "/>
 <text text-anchor="start" x="4048.5" y="-128.8" font-family="Times,serif" font-size="14.00">CTS : Namespace</text>
 <text text-anchor="start" x="4048.5" y="-113.8" font-family="Times,serif" font-size="14.00">DTS : Namespace</text>

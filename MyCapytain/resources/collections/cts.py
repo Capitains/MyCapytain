@@ -13,7 +13,7 @@ from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 
 
 class XmlCtsCitation(CitationPrototype):
@@ -32,7 +32,7 @@ class XmlCtsCitation(CitationPrototype):
         :return: XmlCtsCitation
         """
         # Reuse of of find citation
-        results = resource.xpath(xpath, namespaces=XPath_Namespaces)
+        results = resource.xpath(xpath, namespaces=XPATH_NAMESPACES)
         if len(results) > 0:
             citation = XmlCtsCitation(
                 name=results[0].get("label"),
@@ -72,7 +72,7 @@ def xpathDict(xml, xpath, cls, parent, **kwargs):
     :rtype: collections.defaultdict.<basestring, inventory.Resource>
     :returns: Dictionary of children
     """
-    for child in xml.xpath(xpath, namespaces=XPath_Namespaces):
+    for child in xml.xpath(xpath, namespaces=XPATH_NAMESPACES):
         cls.parse(
             resource=child,
             parent=parent,
@@ -104,12 +104,12 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
         :type xml: lxml.etree._Element
         """
 
-        for child in xml.xpath("ti:description", namespaces=XPath_Namespaces):
+        for child in xml.xpath("ti:description", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 obj.set_cts_property("description", child.text, lg)
 
-        for child in xml.xpath("ti:label", namespaces=XPath_Namespaces):
+        for child in xml.xpath("ti:label", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 obj.set_cts_property("label", child.text, lg)
@@ -117,10 +117,10 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
         obj.citation = XmlCtsCitation.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
 
         # Added for commentary
-        for child in xml.xpath("ti:about", namespaces=XPath_Namespaces):
+        for child in xml.xpath("ti:about", namespaces=XPATH_NAMESPACES):
             #lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             #if lg is not None:
-            obj.set_link(RDF_Namespaces.CTS.term("about"), child.get('urn'))
+            obj.set_link(RDF_NAMESPACES.CTS.term("about"), child.get('urn'))
 
         """
         online = xml.xpath("ti:online", namespaces=NS)
@@ -194,7 +194,7 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
         if lang is not None:
             o.lang = lang
 
-        for child in xml.xpath("ti:title", namespaces=XPath_Namespaces):
+        for child in xml.xpath("ti:title", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 o.set_cts_property("title", child.text, lg)
@@ -222,7 +222,7 @@ class XmlCtsTextgroupMetadata(cts.CtsTextgroupMetadata):
         xml = xmlparser(resource)
         o = XmlCtsTextgroupMetadata(urn=xml.get("urn"), parent=parent)
 
-        for child in xml.xpath("ti:groupname", namespaces=XPath_Namespaces):
+        for child in xml.xpath("ti:groupname", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
                 o.set_cts_property("groupname", child.text, lg)
@@ -244,7 +244,7 @@ class XmlCtsTextInventoryMetadata(cts.CtsTextInventoryMetadata):
         :param type: basestring, etree._Element
         """
         xml = xmlparser(resource)
-        o = XmlCtsTextInventoryMetadata(name=xml.xpath("//ti:TextInventory", namespaces=XPath_Namespaces)[0].get("tiid") or "")
+        o = XmlCtsTextInventoryMetadata(name=xml.xpath("//ti:TextInventory", namespaces=XPATH_NAMESPACES)[0].get("tiid") or "")
         # Parse textgroups
         xpathDict(xml=xml, xpath='//ti:textgroup', cls=XmlCtsTextgroupMetadata, parent=o)
         return o

@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from MyCapytain.resolvers.cts.local import CtsCapitainsLocalResolver
-from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces, get_graph
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES, get_graph
 from MyCapytain.common.reference import URN, Reference
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resources.prototypes.metadata import Collection
@@ -186,7 +186,7 @@ class TextXMLFolderResolver(TestCase):
             passage.export(
                 output=Mimetypes.PYTHON.ETREE
             ).xpath(
-                ".//tei:div[@n='1']/tei:div[@n='1']/tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False
+                ".//tei:div[@n='1']/tei:div[@n='1']/tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False
             ),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
@@ -233,7 +233,7 @@ class TextXMLFolderResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -247,19 +247,19 @@ class TextXMLFolderResolver(TestCase):
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("title"), "eng"]), "Epigrammata",
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("title"), "eng"]), "Epigrammata",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("groupname"), "eng"]), "Martial",
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("groupname"), "eng"]), "Martial",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("label"), "eng"]), "Epigrams",
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("label"), "eng"]), "Epigrams",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("description"), "eng"]),
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("description"), "eng"]),
             "M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
@@ -288,7 +288,7 @@ class TextXMLFolderResolver(TestCase):
             passage.export(
                 output=Mimetypes.PYTHON.ETREE
             ).xpath(
-                ".//tei:div[@n='1']/tei:div[@n='1']/tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False
+                ".//tei:div[@n='1']/tei:div[@n='1']/tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False
             ),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
@@ -338,7 +338,7 @@ class TextXMLFolderResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -353,19 +353,19 @@ class TextXMLFolderResolver(TestCase):
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("title"), "eng"]), "Epigrammata",
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("title"), "eng"]), "Epigrammata",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("groupname"), "eng"]), "Martial",
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("groupname"), "eng"]), "Martial",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("label"), "eng"]), "Epigrams",
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("label"), "eng"]), "Epigrams",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_Namespaces.CTS.term("description"), "eng"]),
+            str(passage.metadata[RDF_NAMESPACES.CTS.term("description"), "eng"]),
             "M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
@@ -410,7 +410,7 @@ class TextXMLFolderResolver(TestCase):
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPath_Namespaces, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -441,7 +441,7 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
-                "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPath_Namespaces)), 1,
+                "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -484,7 +484,7 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
-                "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPath_Namespaces)), 1,
+                "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(

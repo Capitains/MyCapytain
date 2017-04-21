@@ -1,73 +1,16 @@
-
-
-from inspect import getmro
 from rdflib import Namespace, Graph
 from rdflib.namespace import SKOS
 
 
 #: List of XPath Namespaces used in guidelines
-NS = {
+XPath_Namespaces = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ti": "http://chs.harvard.edu/xmlns/cts",
     "xml": "http://www.w3.org/XML/1998/namespace"
 }
 
-#: List of RDF Prefixes with their equivalents
-RDF_PREFIX = {
-  "foaf": "http://xmlns.com/foaf/0.1/",
-  "dc": "http://purl.org/dc/elements/1.1/",
-  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-  "owl": "http://www.w3.org/2002/07/owl#",
-  "geonames": "http://www.geonames.org/ontology#",
-  "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
-  "skos": "http://www.w3.org/2004/02/skos/core#",
-  "dbp": "http://dbpedia.org/property/",
-  "swrc": "http://swrc.ontoware.org/ontology#",
-  "sioc": "http://rdfs.org/sioc/ns#",
-  "xsd": "http://www.w3.org/2001/XMLSchema#",
-  "dbo": "http://dbpedia.org/ontology/",
-  "dc11": "http://purl.org/dc/elements/1.1/",
-  "doap": "http://usefulinc.com/ns/doap#",
-  "dts": "http://w3id.org/dts-ontology/",
-  "dbpprop": "http://dbpedia.org/property/",
-  "content": "http://purl.org/rss/1.0/modules/content/",
-  "wot": "http://xmlns.com/wot/0.1/",
-  "rss": "http://purl.org/rss/1.0/",
-  "gen": "http://purl.org/gen/0.1#",
-  "dbpedia": "http://dbpedia.org/resource/",
 
-  "tei": "http://www.tei-c.org/ns/1.0/",
-  "ti": "http://chs.harvard.edu/xmlns/cts/"
-}
-
-#: List of RDF URI with their equivalent Prefix
-RDF_MAPPING = {
-    'http://chs.harvard.edu/xmlns/cts/': 'ti',
-    'http://dbpedia.org/ontology/': 'dbo',
-    'http://dbpedia.org/property/': 'dbp',
-    'http://dbpedia.org/resource/': 'dbpedia',
-    'http://purl.org/dc/elements/1.1/': 'dc11',
-    'http://purl.org/gen/0.1#': 'gen',
-    'http://purl.org/rss/1.0/': 'rss',
-    'http://purl.org/rss/1.0/modules/content/': 'content',
-    'http://rdfs.org/sioc/ns#': 'sioc',
-    'http://swrc.ontoware.org/ontology#': 'swrc',
-    'http://usefulinc.com/ns/doap#': 'doap',
-    'http://www.geonames.org/ontology#': 'geonames',
-    'http://www.tei-c.org/ns/1.0/': 'tei',
-    'http://www.w3.org/1999/02/22-rdf-syntax-ns#': 'rdf',
-    'http://www.w3.org/2000/01/rdf-schema#': 'rdfs',
-    'http://www.w3.org/2001/XMLSchema#': 'xsd',
-    'http://www.w3.org/2002/07/owl#': 'owl',
-    'http://www.w3.org/2003/01/geo/wgs84_pos#': 'geo',
-    'http://www.w3.org/2004/02/skos/core#': 'skos',
-    'http://xmlns.com/foaf/0.1/': 'foaf',
-    'http://xmlns.com/wot/0.1/': 'wot'
-}
-
-
-class NAMESPACES:
+class RDF_Namespaces:
     """ Namespaces Constants used to provide Namespace capacities across the library
 
     :cvar CTS: CTS Namespace
@@ -144,55 +87,11 @@ class Mimetypes:
     PLAINTEXT = "text/plain"
 
 
-class Exportable(object):
-    """ Objects that supports Export
-
-    :cvar EXPORT_TO: List of Mimetypes the resource can export to
-    """
-    EXPORT_TO = []
-    DEFAULT_EXPORT = None
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @property
-    def export_capacities(self):
-        """  List Mimetypes that current object can export to
-        """
-        return [export for cls in getmro(type(self)) if hasattr(cls, "EXPORT_TO") for export in cls.EXPORT_TO]
-
-    def __export__(self, output=None, **kwargs):
-        """ Export the collection item in the Mimetype required.
-
-        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
-        :type output: str
-        :return: Object using a different representation
-        """
-        return None
-
-    def export(self, output=None, **kwargs):
-        """ Export the collection item in the Mimetype required.
-
-        :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
-        :type output: str
-        :return: Object using a different representation
-        """
-        if output is None:
-            output = self.DEFAULT_EXPORT
-        if output is not None and output in self.export_capacities:
-            for cls in getmro(type(self)):
-                if hasattr(cls, "EXPORT_TO") and output in cls.EXPORT_TO:
-                    return cls.__export__(self, output, **kwargs)
-        raise NotImplementedError(
-            "Mimetype {} has not been implemented for this resource".format(output or "(No Mimetype)")
-        )
-
-
 global __MYCAPYTAIN_TRIPLE_GRAPH__
 __MYCAPYTAIN_TRIPLE_GRAPH__ = Graph()
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("", NAMESPACES.CTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", NAMESPACES.DTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", NAMESPACES.TEI)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("", RDF_Namespaces.CTS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", RDF_Namespaces.DTS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", RDF_Namespaces.TEI)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("skos", SKOS)
 
 

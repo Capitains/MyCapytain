@@ -16,8 +16,8 @@
    :target: https://www.codacy.com/app/leponteineptique/MyCapytain
 
 
-MyCapytain is a python library which provides a large set of methods to interact with Text Services API  such as the \
-Canonical Text Services, the Distributed Text Services. It also provides a programming interface to exploit local \
+MyCapytain is a python library which provides a large set of methods to interact with CapitainsCTSText Services API  such as the \
+Canonical CapitainsCTSText Services, the Distributed CapitainsCTSText Services. It also provides a programming interface to exploit local \
 textual resources developed according to the Capitains Guidelines.
 
 Simple Example of what it does
@@ -26,7 +26,7 @@ Simple Example of what it does
 The following code and example is badly displayed at the moment on Github. We recommend you to go to \
 http://mycapytain.readthedocs.org
 
-On Leipzig DH Chair's Canonical Text Services API, we can find the Epigrammata of Martial. This texts are identified \
+On Leipzig DH Chair's Canonical CapitainsCTSText Services API, we can find the Epigrammata of Martial. This texts are identified \
 by the identifier "urn:cts:latinLit:phi1294.phi002.perseus-lat2". We want to have some information about this text \
 so we are gonna ask the API to give its metadata to us :
 
@@ -43,14 +43,14 @@ so we are gonna ask the API to give its metadata to us :
     # We require some metadata information
     textMetadata = resolver.getMetadata("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
     # Texts in CTS Metadata have one interesting property : its citation scheme.
-    # Citation are embedded objects that carries information about how a text can be quoted, what depth it has
+    # XmlCtsCitation are embedded objects that carries information about how a text can be quoted, what depth it has
     print(type(textMetadata), [citation.name for citation in textMetadata.citation])
 
 This query will return the following information :
 
 .. code-block:: none
 
-   <class 'MyCapytain.resources.collections.cts.Text'> ['book', 'poem', 'line']
+   <class 'MyCapytain.resources.collections.cts.CapitainsCTSText'> ['book', 'poem', 'line']
 
 .. code-block:: python
    :linenos:

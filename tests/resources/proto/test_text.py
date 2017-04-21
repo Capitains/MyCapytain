@@ -10,7 +10,7 @@ import MyCapytain.common.metadata
 
 
 class TestProtoResource(unittest.TestCase):
-    """ Test for resource, mother class of PrototypeText and Passage """
+    """ Test for resource, mother class of CtsTextMetadata and CapitainsCTSPassage """
     def test_init(self):
         a = CTSNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.id, "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
@@ -55,9 +55,9 @@ class TestProtoText(unittest.TestCase):
         self.assertIsInstance(a.metadata, MyCapytain.common.metadata.Metadata)
 
         m = MyCapytain.common.metadata.Metadata()
-        m.add(NAMESPACES.CTS.title, "I am a metadata", "fre")
+        m.add(RDF_Namespaces.CTS.title, "I am a metadata", "fre")
         a = CitableText(metadata=m)
-        self.assertEqual(str(a.metadata.get(NAMESPACES.CTS.title, "fre")), "I am a metadata")
+        self.assertEqual(str(a.metadata.get(RDF_Namespaces.CTS.title, "fre")), "I am a metadata")
 
     def test_proto_reff(self):
         """ Test that getValidReff function are not implemented """

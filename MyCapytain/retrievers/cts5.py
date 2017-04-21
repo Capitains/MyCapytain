@@ -12,7 +12,7 @@ from MyCapytain.common.reference import Reference
 import requests
 
 
-class CTS(MyCapytain.retrievers.prototypes.CTS):
+class CtsHttpRetriever(MyCapytain.retrievers.prototypes.CTS):
     """ Basic integration of the MyCapytain.retrievers.proto.CTS abstraction
     """
 
@@ -29,7 +29,7 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
         :ivar endpoint: Url of the endpoint
         :ivar inventory: Default Inventory
         """
-        super(CTS, self).__init__(endpoint)
+        super(CtsHttpRetriever, self).__init__(endpoint)
         self.inventory = inventory
 
     def call(self, parameters):
@@ -181,8 +181,8 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: PrototypeText Identifier
-        :param subreference: Passage Reference
+        :param textId: CtsTextMetadata Identifier
+        :param subreference: CapitainsCTSPassage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
         :return: GetPassage or GetPassagePlus CTS API request response
@@ -198,8 +198,8 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
-        :param reference: Passage Reference
+        :param textId: CtsTextMetadata Identifier
+        :param reference: CapitainsCTSPassage Reference
         :return: GetPrevNextUrn request response from the endpoint
         """
         textId = "{}:{}".format(textId, subreference)
@@ -208,11 +208,11 @@ class CTS(MyCapytain.retrievers.prototypes.CTS):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCTSPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]

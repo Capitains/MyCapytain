@@ -12,7 +12,8 @@ from rdflib.namespace import DC
 from rdflib import BNode, URIRef
 from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.constants import Mimetypes, Exportable, get_graph, NAMESPACES
+from MyCapytain.common.constants import Mimetypes, get_graph, RDF_Namespaces
+from MyCapytain.common.base import Exportable
 from MyCapytain.resources.prototypes.metadata import Collection
 
 
@@ -37,8 +38,8 @@ class TextualElement(Exportable):
         self.__metadata__ = metadata or Metadata()
 
         self.__graph__.addN([
-            (self.__node__, NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__),
-            (self.__node__, NAMESPACES.DTS.metadata, self.metadata.asNode(), self.__graph__)
+            (self.__node__, RDF_Namespaces.DTS.implements, URIRef(identifier), self.__graph__),
+            (self.__node__, RDF_Namespaces.DTS.metadata, self.metadata.asNode(), self.__graph__)
         ])
 
     def __repr__(self):
@@ -164,7 +165,7 @@ class TextualNode(TextualElement, NodeId):
     :type identifier: str
     :param metadata: Collection Information about the Item
     :type metadata: Collection
-    :param citation: Citation system of the text
+    :param citation: XmlCtsCitation system of the text
     :type citation: Citation
     :param children: Current node Children's Identifier
     :type children: [str]
@@ -184,9 +185,9 @@ class TextualNode(TextualElement, NodeId):
 
     @property
     def citation(self):
-        """ Citation Object of the PrototypeText
+        """ XmlCtsCitation Object of the CtsTextMetadata
 
-        :return: Citation Object of the PrototypeText
+        :return: XmlCtsCitation Object of the CtsTextMetadata
         :rtype: Citation
         """
         return self.__citation__
@@ -194,7 +195,7 @@ class TextualNode(TextualElement, NodeId):
     @citation.setter
     def citation(self, value):
         if not isinstance(value, Citation):
-            raise TypeError("Citation property can only be a Citation object")
+            raise TypeError("XmlCtsCitation property can only be a XmlCtsCitation object")
         self.__citation__ = value
 
 
@@ -205,7 +206,7 @@ class TextualGraph(TextualNode):
     :type identifier: str
     :param metadata: Collection Information about the Item
     :type metadata: Collection
-    :param citation: Citation system of the text
+    :param citation: XmlCtsCitation system of the text
     :type citation: Citation
     :param children: Current node Children's Identifier
     :type children: [str]
@@ -255,7 +256,7 @@ class InteractiveTextualNode(TextualGraph):
     :type identifier: str
     :param metadata: Collection Information about the Item
     :type metadata: Collection
-    :param citation: Citation system of the text
+    :param citation: XmlCtsCitation system of the text
     :type citation: Citation
     :param children: Current node Children's Identifier
     :type children: [str]
@@ -275,7 +276,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def prev(self):
-        """ Get Previous Passage
+        """ Get Previous CapitainsCTSPassage
 
         :rtype: Passage
         """
@@ -284,7 +285,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def next(self):
-        """ Get Next Passage
+        """ Get Next CapitainsCTSPassage
 
         :rtype: Passage
         """
@@ -295,14 +296,14 @@ class InteractiveTextualNode(TextualGraph):
     def children(self):
         """ Children Passages
 
-        :rtype: iterator(Passage)
+        :rtype: iterator(CapitainsCTSPassage)
         """
         for ID in self.childIds:
             yield self.getTextualNode(ID)
 
     @property
     def parent(self):
-        """ Parent Passage
+        """ Parent CapitainsCTSPassage
 
         :rtype: Passage
         """
@@ -310,7 +311,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def first(self):
-        """ First Passage
+        """ First CapitainsCTSPassage
 
         :rtype: Passage
         """
@@ -319,7 +320,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def last(self):
-        """ Last Passage
+        """ Last CapitainsCTSPassage
 
         :rtype: Passage
         """
@@ -339,7 +340,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def firstId(self):
-        """ First child of current Passage
+        """ First child of current CapitainsCTSPassage
 
         :rtype: str
         :returns: First passage node Information
@@ -353,7 +354,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def lastId(self):
-        """ Last child of current Passage
+        """ Last child of current CapitainsCTSPassage
 
         :rtype: str
         :returns: Last passage Node representation
@@ -373,7 +374,7 @@ class CTSNode(InteractiveTextualNode):
     :type urn: URN
     :param metadata: Collection Information about the Item
     :type metadata: Collection
-    :param citation: Citation system of the text
+    :param citation: XmlCtsCitation system of the text
     :type citation: Citation
     :param children: Current node Children's Identifier
     :type children: [str]
@@ -419,7 +420,7 @@ class CTSNode(InteractiveTextualNode):
         self.__urn__ = value
 
     def get_cts_metadata(self, key, lang=None):
-        return self.metadata.get(NAMESPACES.CTS.term(key), lang)
+        return self.metadata.get(RDF_Namespaces.CTS.term(key), lang)
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, CitableText will compute valid reffs
@@ -445,28 +446,28 @@ class CTSNode(InteractiveTextualNode):
         """ Set the object metadata using its collections recursively
 
         :param text_metadata: Object representing the current text as a collection
-        :type text_metadata: PrototypeEdition or PrototypeTranslation
+        :type text_metadata: CtsEditionMetadata or CtsTranslationMetadata
         """
         edition, work, textgroup = tuple(([text_metadata] + text_metadata.parents)[:3])
 
-        for node in textgroup.metadata.get_all(NAMESPACES.CTS.groupname):
+        for node in textgroup.metadata.get_all(RDF_Namespaces.CTS.groupname):
             lang = node.language
-            self.metadata.add(NAMESPACES.CTS.groupname, lang=lang, value=str(node))
+            self.metadata.add(RDF_Namespaces.CTS.groupname, lang=lang, value=str(node))
             self.set_creator(str(node), lang)
 
-        for node in work.metadata.get_all(NAMESPACES.CTS.title):
+        for node in work.metadata.get_all(RDF_Namespaces.CTS.title):
             lang = node.language
-            self.metadata.add(NAMESPACES.CTS.title, lang=lang, value=str(node))
+            self.metadata.add(RDF_Namespaces.CTS.title, lang=lang, value=str(node))
             self.set_title(str(node), lang)
 
-        for node in edition.metadata.get_all(NAMESPACES.CTS.label):
+        for node in edition.metadata.get_all(RDF_Namespaces.CTS.label):
             lang = node.language
-            self.metadata.add(NAMESPACES.CTS.label, lang=lang, value=str(node))
+            self.metadata.add(RDF_Namespaces.CTS.label, lang=lang, value=str(node))
             self.set_subject(str(node), lang)
 
-        for node in edition.metadata.get_all(NAMESPACES.CTS.description):
+        for node in edition.metadata.get_all(RDF_Namespaces.CTS.description):
             lang = node.language
-            self.metadata.add(NAMESPACES.CTS.description, lang=lang, value=str(node))
+            self.metadata.add(RDF_Namespaces.CTS.description, lang=lang, value=str(node))
             self.set_description(str(node), lang)
 
         if self.citation.isEmpty() and not edition.citation.isEmpty():
@@ -474,13 +475,13 @@ class CTSNode(InteractiveTextualNode):
 
 
 class Passage(CTSNode):
-    """ Passage objects possess metadata informations
+    """ CapitainsCTSPassage objects possess metadata informations
 
     :param urn: A URN identifier
     :type urn: URN
     :param metadata: Collection Information about the Item
     :type metadata: Collection
-    :param citation: Citation system of the text
+    :param citation: XmlCtsCitation system of the text
     :type citation: Citation
     :param children: Current node Children's Identifier
     :type children: [str]

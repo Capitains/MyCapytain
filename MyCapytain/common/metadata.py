@@ -8,7 +8,8 @@
 
 """
 from __future__ import unicode_literals
-from MyCapytain.common.constants import Mimetypes, Exportable, get_graph
+from MyCapytain.common.constants import Mimetypes, get_graph
+from MyCapytain.common.base import Exportable
 from rdflib import BNode, Literal, Graph
 
 
@@ -139,5 +140,5 @@ class Metadata(Exportable):
 
         """
         if (subject, predicate, None) in get_graph():
-            return Metadata(node=get_graph().objects(subject, predicate).__next__())
+            return Metadata(node=get_graph() .objects(subject, predicate).__next__())
         return Metadata(*args, **kwargs)

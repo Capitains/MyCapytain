@@ -21,7 +21,7 @@ from six import text_type
 from xml.sax.saxutils import escape
 from rdflib import BNode, Graph, Literal, URIRef
 
-from MyCapytain.common.constants import NS
+from MyCapytain.common.constants import XPath_Namespaces
 
 __strip = re.compile("([ ]{2,})+")
 __parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
@@ -34,7 +34,7 @@ def make_xml_node(graph, name, close=False, attributes=None, text="", complete=F
     :param name: Name of the tag
     :param close: Produce closing tag (close=False -> "<tag>", close=True -> "</tag>")
     :param attributes: Dictionary of attributes
-    :param text: Text to put inside the node
+    :param text: CapitainsCTSText to put inside the node
     :param complete: Complete node (node with opening and closing tag)
     :param innerXML: XML to append to the node
     :return: String representation of the node
@@ -237,18 +237,18 @@ def performXpath(parent, xpath):
     if xpath.startswith(".//"):
         result = parent.xpath(
             xpath.replace(".//", "./"),
-            namespaces=NS
+            namespaces=XPath_Namespaces
         )
         if len(result) == 0:
             result = parent.xpath(
                 "*[{}]".format(xpath),
-                namespaces=NS
+                namespaces=XPath_Namespaces
             )
             loop = True
     else:
         result = parent.xpath(
             xpath,
-            namespaces=NS
+            namespaces=XPath_Namespaces
         )
     return result[0], loop
 

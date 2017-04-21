@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.resolvers.cts.api
+.. module:: MyCapytain.resolvers.cts.remote
    :synopsis: Resolver built for CTS APIs
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
@@ -9,9 +9,9 @@
 """
 
 from MyCapytain.resolvers.prototypes import Resolver
-from MyCapytain.resources.texts.api.cts import Text
-from MyCapytain.resources.collections.cts import TextInventory
-from MyCapytain.retrievers.cts5 import CTS
+from MyCapytain.resources.texts.remote.cts import CTSText
+from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
+from MyCapytain.retrievers.cts5 import CtsHttpRetriever
 
 
 class HttpCTSResolver(Resolver):
@@ -21,10 +21,10 @@ class HttpCTSResolver(Resolver):
     :type endpoint: CTS
 
     :ivar endpoint: CTS API Retriever
-    :type endpoint: CTS
+    :type endpoint: CtsHttpRetriever
     """
     def __init__(self, endpoint):
-        if not isinstance(endpoint, CTS):
+        if not isinstance(endpoint, CtsHttpRetriever):
             raise TypeError("Endpoint should be a CTS Endpoint object")
         self.__endpoint__ = endpoint
 
@@ -33,25 +33,25 @@ class HttpCTSResolver(Resolver):
         """ CTS Endpoint of the resolver
 
         :return: CTS Endpoint
-        :rtype: CTS
+        :rtype: CtsHttpRetriever
         """
         return self.__endpoint__
 
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCTSPassage Reference
         :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
         :type prevnext: boolean
         :param metadata: Retrieve metadata about the passage and the text
         :type metadata: boolean
-        :return: Passage
-        :rtype: Passage
+        :return: CapitainsCTSPassage
+        :rtype: CapitainsCTSPassage
         """
-        text = Text(
+        text = CTSText(
             urn=textId,
             retriever=self.endpoint
         )
@@ -63,14 +63,14 @@ class HttpCTSResolver(Resolver):
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCTSPassage Reference
         :type subreference: str
         :return: Tuple of references
         :rtype: (str, str)
         """
-        text = Text(
+        text = CTSText(
             urn=textId,
             retriever=self.endpoint
         )
@@ -79,16 +79,16 @@ class HttpCTSResolver(Resolver):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCTSPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]
         """
-        text = Text(
+        text = CTSText(
             urn=textId,
             retriever=self.endpoint
         )
@@ -106,7 +106,7 @@ class HttpCTSResolver(Resolver):
         if objectId is not None:
             filters["urn"] = objectId
 
-        ti = TextInventory.parse(self.endpoint.getCapabilities(**filters))
+        ti = XmlCtsTextInventoryMetadata.parse(self.endpoint.getCapabilities(**filters))
         if objectId:
             return [x for x in [ti] + ti.descendants if x.id == objectId][0]
         return ti

@@ -45,8 +45,8 @@ class CollectionDispatcher:
 
         .. code-block:: python
 
-            tic = TextInventoryCollection()
-            latin = PrototypeTextInventory("urn:perseus:latinLit", parent=tic)
+            tic = CtsTextInventoryCollection()
+            latin = CtsTextInventoryMetadata("urn:perseus:latinLit", parent=tic)
             latin.set_label("Classical Latin", "eng")
             dispatcher = CollectionDispatcher(tic)
 
@@ -74,4 +74,4 @@ class CollectionDispatcher:
             if method(collection, **kwargs) is True:
                 collection.parent = self.collection.children[inventory]
                 return
-        raise UndispatchedTextError("Text not dispatched %s" % collection.id)
+        raise UndispatchedTextError("CapitainsCTSText not dispatched %s" % collection.id)

@@ -7,7 +7,7 @@ Exportable Parent Classes
 Description
 ***********
 
-:class:`MyCapytain.common.constants.Exportable`
+:class:`MyCapytain.common.base.Exportable`
 
 The Exportable class is visible all across the library. It provides a common, standardized way to retrieve in an API \
 fashion to what can an object be exported and to exports it. Any exportable object should have an EXPORT_TO constant \
@@ -51,7 +51,7 @@ For Textual API, it is recommended to implement the following requests
 Example of implementation : CTS 5
 *********************************
 
-:class:`MyCapytain.retrievers.cts5.CTS`
+:class:`MyCapytain.retrievers.cts5.HttpCtsRetriever`
 
 .. literalinclude:: Retriever.py
    :language: python
@@ -83,7 +83,7 @@ that complexified over different features. The basic is
 
     Prototype of Texts from :module:`MyCapytain.resources.prototypes.text`. \
     :class:`NodeId` and :class:`Exportable` are respectively from :module:`MyCapytain.common.reference` and \
-    :module:`MyCapytain.common.constants`.
+    :module:`MyCapytain.common.base`.
 
 Objectives
 ----------
@@ -111,10 +111,10 @@ implementation should make sure that the whole set of navigation tool are covere
 +---------------------------------------------+----------------------------------------------------------------------+-----------------------------------+-------------------------------------------------------------+
 
 
-The encodings module
-********************
+The base module
+***************
 
-The encoding module contains special implementations : they technically do not support interactive methods but \
+The base module contains special implementations : they technically do not support interactive methods but \
 provides generic parsing and export methods for specific type of contents such as TEI XML object or other formats \
 such as json, csv, treebank objects in the future.
 
@@ -132,7 +132,7 @@ Implementation example : HTTP API Passage work
 Other Example
 *************
 
-See :ref:`MyCapytain.local`
+See :ref:`MyCapytain.resources.texts.local`
 
 Collection
 ##########
@@ -144,7 +144,7 @@ Collections are the metadata containers object in MyCapytain. Unlike other objec
 content such as Texts and Passages but will in return help you browse through the catalog of one APIs collection and \
 identify manually or automatically texts that are of relevant interests to you.
 
-The main informations that you should be interested in are :
+The main information that you should be interested in are :
 
 - Collections are children from Exportable. As of 2.0.0, any collection can be exported to JSON DTS.
 - Collections are built on a hierarchy. They have children and descendants
@@ -161,7 +161,7 @@ Main Properties
 - Collection().descendants : Direct and Indirect children of the objects
 - Collection().readableDescendants : Descendants that have .readable as True
 - Collection().export() : Export Method
-- Collection().metadata : Metadata object that contain flat descriptive localized informations about the object.
+- Collection().metadata : Metadata object that contain flat descriptive localized information about the object.
 
 
 Implementation : CTS Collections

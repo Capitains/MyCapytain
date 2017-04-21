@@ -68,7 +68,7 @@ def xpathDict(xml, xpath, cls, parent, **kwargs):
     :param cls: Class identifying children
     :type cls: inventory.Resource
     :param parent: Parent of object
-    :type parent: CTSCollection
+    :type parent: CtsCollection
     :rtype: collections.defaultdict.<basestring, inventory.Resource>
     :returns: Dictionary of children
     """

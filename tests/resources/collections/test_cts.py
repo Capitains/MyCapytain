@@ -9,7 +9,7 @@ import lxml.etree as etree
 import xmlunittest
 
 from MyCapytain.resources.collections.cts import *
-from MyCapytain.resources.prototypes.text import CTSNode
+from MyCapytain.resources.prototypes.text import CtsNode
 from MyCapytain.common import constants
 
 
@@ -378,7 +378,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
-        txt_text = CTSNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        txt_text = CtsNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(

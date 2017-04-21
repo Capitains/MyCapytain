@@ -30,14 +30,14 @@ class Resolver(object):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
         :type prevnext: boolean
         :param metadata: Retrieve metadata about the passage and the text
         :type metadata: boolean
-        :return: CapitainsCTSPassage
-        :rtype: CapitainsCTSPassage
+        :return: CapitainsCtsPassage
+        :rtype: CapitainsCtsPassage
         """
         raise NotImplementedError()
 
@@ -46,7 +46,7 @@ class Resolver(object):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: Tuple of references
         :rtype: (str, str)
@@ -60,7 +60,7 @@ class Resolver(object):
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]

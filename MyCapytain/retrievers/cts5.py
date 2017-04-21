@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 .. module:: MyCapytain.retrievers.cts5
-   :synopsis: CTS5 endpoint implementation
+   :synopsis: Cts5 endpoint implementation
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
@@ -182,7 +182,7 @@ class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
         """ Retrieve a text node from the API
 
         :param textId: CtsTextMetadata Identifier
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
         :return: GetPassage or GetPassagePlus CTS API request response
@@ -199,7 +199,7 @@ class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
         """ Retrieve the siblings of a textual node
 
         :param textId: CtsTextMetadata Identifier
-        :param reference: CapitainsCTSPassage Reference
+        :param reference: CapitainsCtsPassage Reference
         :return: GetPrevNextUrn request response from the endpoint
         """
         textId = "{}:{}".format(textId, subreference)
@@ -212,7 +212,7 @@ class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]

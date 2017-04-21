@@ -9,13 +9,13 @@
 """
 
 from MyCapytain.resolvers.prototypes import Resolver
-from MyCapytain.resources.texts.remote.cts import CTSText
+from MyCapytain.resources.texts.remote.cts import CtsText
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 
 
-class HttpCTSResolver(Resolver):
-    """ HttpCTSResolver provide a resolver for CTS API http endpoint.
+class HttpCtsResolver(Resolver):
+    """ HttpCtsResolver provide a resolver for CTS API http endpoint.
 
     :param endpoint: CTS API Retriever
     :type endpoint: CTS
@@ -42,16 +42,16 @@ class HttpCTSResolver(Resolver):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
         :type prevnext: boolean
         :param metadata: Retrieve metadata about the passage and the text
         :type metadata: boolean
-        :return: CapitainsCTSPassage
-        :rtype: CapitainsCTSPassage
+        :return: CapitainsCtsPassage
+        :rtype: CapitainsCtsPassage
         """
-        text = CTSText(
+        text = CtsText(
             urn=textId,
             retriever=self.endpoint
         )
@@ -65,12 +65,12 @@ class HttpCTSResolver(Resolver):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: Tuple of references
         :rtype: (str, str)
         """
-        text = CTSText(
+        text = CtsText(
             urn=textId,
             retriever=self.endpoint
         )
@@ -83,12 +83,12 @@ class HttpCTSResolver(Resolver):
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]
         """
-        text = CTSText(
+        text = CtsText(
             urn=textId,
             retriever=self.endpoint
         )

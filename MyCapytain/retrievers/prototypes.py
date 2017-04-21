@@ -45,10 +45,10 @@ class CitableTextServiceRetriever(API):
         """ Retrieve a text node from the API
 
         :param textId: CtsTextMetadata Identifier
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
-        :return: CtsTextMetadata of a CapitainsCTSPassage from an API or the likes as bytes
+        :return: CtsTextMetadata of a CapitainsCtsPassage from an API or the likes as bytes
         """
         raise NotImplementedError
 
@@ -56,7 +56,7 @@ class CitableTextServiceRetriever(API):
         """ Retrieve the siblings of a textual node
 
         :param textId: CtsTextMetadata Identifier
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :return: Siblings references from an API or the likes as bytes
         """
         raise NotImplementedError
@@ -68,7 +68,7 @@ class CitableTextServiceRetriever(API):
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]

@@ -140,5 +140,5 @@ class TestTEIPassage(unittest.TestCase):
         self.assertEqual(
             P.export_capacities,
             [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT, Mimetypes.XML.TEI],
-            "CapitainsCTSPassage should be able to export to given resources"
+            "CapitainsCtsPassage should be able to export to given resources"
         )

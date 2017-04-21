@@ -1,12 +1,12 @@
 #  We import the correct classes from the local module
-from MyCapytain.resources.texts.local.capitains.cts import CapitainsCTSText
+from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 from MyCapytain.common.constants import Mimetypes, XPath_Namespaces
 from lxml.etree import tostring
 
 #  We open a file
 with open("./tests/testing_data/examples/text.martial.xml") as f:
     # We initiate a Text object giving the IO instance to resource argument
-    text = CapitainsCTSText(resource=f)
+    text = CapitainsCtsText(resource=f)
 
 # Text objects have a citation property
 #  len(Citation(...)) gives the depth of the citation scheme
@@ -39,7 +39,7 @@ You'll print something like the following :
 #  We open another such as Cicero's texts !
 with open("./tests/testing_data/examples/text.cicero.xml") as f:
     # We initiate a Text object giving the IO instance to resource argument
-    text = CapitainsCTSText(resource=f)
+    text = CapitainsCtsText(resource=f)
     # We are specifically interest in the portion 28-30
     # Note that we won't use 28-30 as cross passage reference won't work properly
     p28_29 = text.getTextualNode("28-29")

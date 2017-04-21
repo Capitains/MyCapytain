@@ -11,7 +11,7 @@ from six import text_type as str
 import MyCapytain.errors
 from MyCapytain.common.constants import Mimetypes
 from MyCapytain.common.reference import Reference, URN, Citation
-from MyCapytain.resources.texts.local.capitains.cts import CapitainsCTSText
+from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
 
 def call_with_simple(f):
@@ -49,7 +49,7 @@ class CapitainsXmlTextTest(TestCase):
 
     def testURN(self):
         """ Check that urn is set"""
-        tei = CapitainsCTSText(resource=self.TEI.xml, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        tei = CapitainsCtsText(resource=self.TEI.xml, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(str(tei.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
     def test_fulltext(self):
@@ -96,7 +96,7 @@ class CapitainsXmlTextTest(TestCase):
             child=None
         )
         with open("tests/testing_data/texts/sample.xml", "rb") as sample:
-            a = CapitainsCTSText(resource=sample, citation=b)
+            a = CapitainsCtsText(resource=sample, citation=b)
 
         """ Test original setting """
         self.assertIs(a.citation, b)
@@ -199,7 +199,7 @@ class CapitainsXmlTextTest(TestCase):
 
     def test_warning(self):
         with open("tests/testing_data/texts/duplicate_references.xml") as xml:
-            text = CapitainsCTSText(resource=xml)
+            text = CapitainsCtsText(resource=xml)
         with warnings.catch_warnings(record=True) as w:
             # Cause all warnings to always be triggered.
             warnings.simplefilter("always")
@@ -214,7 +214,7 @@ class CapitainsXmlTextTest(TestCase):
     def test_wrong_main_scope(self):
         with open("tests/testing_data/texts/sample2.xml", "rb") as f:
             with self.assertRaises(MyCapytain.errors.RefsDeclError):
-                (CapitainsCTSText(resource=f)).test()
+                (CapitainsCtsText(resource=f)).test()
 
     def test_reffs(self):
         """ Check that every level is returned trough reffs property """
@@ -269,10 +269,10 @@ class CapitainsXmlTextTest(TestCase):
         )
 
     def test_get_Passage_context_no_double_slash(self):
-        """ Check that get CapitainsCTSPassage contexts return right information """
+        """ Check that get CapitainsCtsPassage contexts return right information """
         simple = self.TEI.getTextualNode(Reference("1.pr.2"))
         str_simple = simple.tostring(encoding=str)
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
@@ -280,12 +280,12 @@ class CapitainsXmlTextTest(TestCase):
             text.getTextualNode(Reference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (One reference CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (One reference CapitainsCtsPassage)"
         )
 
         simple = self.TEI.getTextualNode(Reference("1.pr.2-1.pr.7"))
         str_simple = simple.tostring(encoding=str)
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
@@ -295,25 +295,25 @@ class CapitainsXmlTextTest(TestCase):
             ).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same "
-            "parent range CapitainsCTSPassage)"
+            "parent range CapitainsCtsPassage)"
         )
         self.assertEqual(
             text.getTextualNode(Reference("1.pr.3"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "senserit, cum salva infimarum quoque personarum re-",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same "
-            "parent range CapitainsCTSPassage)"
+            "parent range CapitainsCtsPassage)"
         )
         self.assertEqual(
             list(map(lambda x: str(x), text.getValidReff(level=3))),
             ["1.pr.2", "1.pr.3", "1.pr.4", "1.pr.5", "1.pr.6", "1.pr.7"],
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same "
-            "parent range CapitainsCTSPassage)"
+            "parent range CapitainsCtsPassage)"
         )
 
         simple = self.TEI.getTextualNode(Reference("1.pr.2-1.1.6"))
         str_simple = simple.tostring(encoding=str)
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
@@ -321,13 +321,13 @@ class CapitainsXmlTextTest(TestCase):
             text.getTextualNode(Reference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             text.getTextualNode(Reference("1.1.6"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             list(map(lambda x: str(x), text.getValidReff(level=3))),
@@ -338,12 +338,12 @@ class CapitainsXmlTextTest(TestCase):
                 "1.pr.20", "1.pr.21", "1.pr.22",
                 "1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.1.5", "1.1.6",
             ],
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCtsPassage)"
         )
 
         simple = self.TEI.getTextualNode(Reference("1.pr.2-1.2"))
         str_simple = simple.tostring(encoding=str)
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
@@ -351,13 +351,13 @@ class CapitainsXmlTextTest(TestCase):
             text.getTextualNode(Reference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             text.getTextualNode(Reference("1.1.6"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             list(map(lambda x: str(x), text.getValidReff(level=3))),
@@ -369,7 +369,7 @@ class CapitainsXmlTextTest(TestCase):
                 "1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.1.5", "1.1.6",
                 '1.2.1', '1.2.2', '1.2.3', '1.2.4', '1.2.5', '1.2.6', '1.2.7', '1.2.8'
             ],
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
 
     @call_with_simple
@@ -380,7 +380,7 @@ class CapitainsXmlTextTest(TestCase):
         self.assertEqual(
             simple.export(output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
 
     def test_type_accepted_reference_validreff(self):
@@ -416,7 +416,7 @@ class CapitainsXmlTextTest(TestCase):
     def test_get_passage_hypercontext_complex_xpath(self):
         simple = self.text_complex.getTextualNode(Reference("pr.1-1.2"))
         str_simple = simple.tostring(encoding=str)
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.text_complex.citation
         )
@@ -425,27 +425,27 @@ class CapitainsXmlTextTest(TestCase):
             text.getTextualNode(Reference("pr.1"), simple=True).export(
                 output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]).strip(),
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             text.getTextualNode(Reference("1.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "lusimus quos in Suebae gratiam virgunculae,",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             list(map(lambda x: str(x), text.getValidReff(level=2))),
             [
                 "pr.1", "1.1", "1.2"
             ],
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
 
     @call_with_simple
     def test_Text_text_function(self, simple):
         simple = self.seneca.getTextualNode(Reference("1"), simple=simple)
         str_simple = simple.tostring(encoding=str)
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.seneca.citation
         )
@@ -460,7 +460,7 @@ class CapitainsXmlTextTest(TestCase):
         str_simple = simple.export(
             output=Mimetypes.XML.Std
         )
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.seneca.citation
         )
@@ -470,24 +470,24 @@ class CapitainsXmlTextTest(TestCase):
                 exclude=["tei:note"]
             ).strip(),
             "Di coniugales tuque genialis tori,",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             text.getTextualNode(Reference("10"), simple=True).export(
                 output=Mimetypes.PLAINTEXT
             ).strip(),
             "aversa superis regna manesque impios",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             list(map(lambda x: str(x), text.getValidReff(level=1))),
             ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
 
         simple = self.seneca.getTextualNode(Reference("1"))
         str_simple = simple.tostring(encoding=str)
-        text = CapitainsCTSText(
+        text = CapitainsCtsText(
             resource=str_simple,
             citation=self.seneca.citation
         )
@@ -497,12 +497,12 @@ class CapitainsXmlTextTest(TestCase):
                 exclude=["tei:note"]
             ).strip(),
             "Di coniugales tuque genialis tori,",
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
             list(map(lambda x: str(x), text.getValidReff(level=1))),
             ["1"],
-            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCTSPassage)"
+            "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
 
 
@@ -534,7 +534,7 @@ class CapitainsXmlPassageTests(TestCase):
         a = self.TEI.getTextualNode(["2", "40", "8"], simple=simple)
         self.assertEqual(
             str(a.reference), "2.40.8",
-            "CapitainsCTSPassage should have a URN parameter"
+            "CapitainsCtsPassage should have a URN parameter"
         )
 
     @call_with_simple

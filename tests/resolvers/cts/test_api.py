@@ -1,4 +1,4 @@
-from MyCapytain.resolvers.cts.api import HttpCTSResolver
+from MyCapytain.resolvers.cts.api import HttpCtsResolver
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import XPath_Namespaces, Mimetypes
@@ -32,9 +32,9 @@ with open("tests/testing_data/cts/getPassageOtherTest.xml") as f:
     GET_PASSAGE_CITATION_FAILURE = f.read()
 
 
-class TestHttpCTSResolver(TestCase):
+class TestHttpCtsResolver(TestCase):
     def setUp(self):
-        self.resolver = HttpCTSResolver(HttpCtsRetriever("http://localhost"))
+        self.resolver = HttpCtsResolver(HttpCtsRetriever("http://localhost"))
         self.resolver.endpoint.getPassagePlus = MagicMock(return_value=GET_PASSAGE_PLUS)
         self.resolver.endpoint.getPassage = MagicMock(return_value=GET_PASSAGE)
         self.resolver.endpoint.getPrevNextUrn = MagicMock(return_value=NEXT_PREV)
@@ -188,11 +188,11 @@ class TestHttpCTSResolver(TestCase):
         )
         self.assertEqual(
             passage.prevId, "1.pr",
-            "Previous CapitainsCTSPassage ID should be parsed"
+            "Previous CapitainsCtsPassage ID should be parsed"
         )
         self.assertEqual(
             passage.nextId, "1.2",
-            "Next CapitainsCTSPassage ID should be parsed"
+            "Next CapitainsCtsPassage ID should be parsed"
         )
         children = list(passage.getReffs())
 
@@ -260,11 +260,11 @@ class TestHttpCTSResolver(TestCase):
         )
         self.assertEqual(
             passage.prevId, "1.pr",
-            "Previous CapitainsCTSPassage ID should be parsed"
+            "Previous CapitainsCtsPassage ID should be parsed"
         )
         self.assertEqual(
             passage.nextId, "1.2",
-            "Next CapitainsCTSPassage ID should be parsed"
+            "Next CapitainsCtsPassage ID should be parsed"
         )
         children = list(passage.getReffs())
 
@@ -472,8 +472,8 @@ class TestHttpCTSResolver(TestCase):
         """
         retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/remote/cts/")
         retriever.getPassage = MagicMock(return_value=GET_PASSAGE_CITATION_FAILURE)
-        resolver = HttpCTSResolver(retriever)
-        # We require a passage : passage is now a CapitainsCTSPassage object
+        resolver = HttpCtsResolver(retriever)
+        # We require a passage : passage is now a CapitainsCtsPassage object
         passage = resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
         # We need an export as plaintext
         self.assertEqual(

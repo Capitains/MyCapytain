@@ -36,7 +36,7 @@ def __childOrNone__(liste):
 class Reference(object):
     """ A reference object giving information
 
-    :param reference: CapitainsCTSPassage Reference part of a Urn
+    :param reference: CapitainsCtsPassage Reference part of a Urn
     :type reference: basestring
 
     :Example:
@@ -810,7 +810,7 @@ class Citation(Exportable):
     def fill(self, passage=None, xpath=None):
         """ Fill the xpath with given informations
 
-        :param passage: CapitainsCTSPassage reference
+        :param passage: CapitainsCtsPassage reference
         :type passage: Reference or list or None. Can be list of None and not None
         :param xpath: If set to True, will return the replaced self.xpath value and not the whole self.refsDecl
         :type xpath: Boolean

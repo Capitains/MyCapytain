@@ -16,7 +16,7 @@ from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 class TEIResource(InteractiveTextualNode):
     """ TEI Encoded Resource
 
-    :param resource: XML Resource that needs to be parsed into a CapitainsCTSPassage/CtsTextMetadata
+    :param resource: XML Resource that needs to be parsed into a CapitainsCtsPassage/CtsTextMetadata
     :type resource: Union[str,_Element]
     :cvar EXPORT_TO: List of exportable supported formats
     :cvar DEFAULT_EXPORT: Default export (Plain/CtsTextMetadata)
@@ -52,7 +52,7 @@ class TEIResource(InteractiveTextualNode):
         :returns: CtsTextMetadata of the xml node
 
         :Example:
-            >>>    P = CapitainsCTSPassage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+            >>>    P = CapitainsCtsPassage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
             >>>    P.export(output=Mimetypes.PLAINTEXT) == "Ibis hello b ab excusso missus in astra sago. "
             >>>    P.export(output=Mimetypes.PLAINTEXT, exclude=[]) == "Ibis hello b ab excusso missus in astra sago. "
 
@@ -110,7 +110,7 @@ class TEIResource(InteractiveTextualNode):
 
     @property
     def xml(self):
-        """ XML Representation of the CapitainsCTSPassage
+        """ XML Representation of the CapitainsCtsPassage
 
         :rtype: lxml.etree._Element
         :returns: XML element representing the passage

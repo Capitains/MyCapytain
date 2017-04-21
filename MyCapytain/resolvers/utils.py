@@ -74,4 +74,4 @@ class CollectionDispatcher:
             if method(collection, **kwargs) is True:
                 collection.parent = self.collection.children[inventory]
                 return
-        raise UndispatchedTextError("CapitainsCTSText not dispatched %s" % collection.id)
+        raise UndispatchedTextError("CapitainsCtsText not dispatched %s" % collection.id)

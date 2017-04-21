@@ -276,7 +276,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def prev(self):
-        """ Get Previous CapitainsCTSPassage
+        """ Get Previous CapitainsCtsPassage
 
         :rtype: Passage
         """
@@ -285,7 +285,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def next(self):
-        """ Get Next CapitainsCTSPassage
+        """ Get Next CapitainsCtsPassage
 
         :rtype: Passage
         """
@@ -296,14 +296,14 @@ class InteractiveTextualNode(TextualGraph):
     def children(self):
         """ Children Passages
 
-        :rtype: iterator(CapitainsCTSPassage)
+        :rtype: iterator(CapitainsCtsPassage)
         """
         for ID in self.childIds:
             yield self.getTextualNode(ID)
 
     @property
     def parent(self):
-        """ Parent CapitainsCTSPassage
+        """ Parent CapitainsCtsPassage
 
         :rtype: Passage
         """
@@ -311,7 +311,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def first(self):
-        """ First CapitainsCTSPassage
+        """ First CapitainsCtsPassage
 
         :rtype: Passage
         """
@@ -320,7 +320,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def last(self):
-        """ Last CapitainsCTSPassage
+        """ Last CapitainsCtsPassage
 
         :rtype: Passage
         """
@@ -340,7 +340,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def firstId(self):
-        """ First child of current CapitainsCTSPassage
+        """ First child of current CapitainsCtsPassage
 
         :rtype: str
         :returns: First passage node Information
@@ -354,7 +354,7 @@ class InteractiveTextualNode(TextualGraph):
 
     @property
     def lastId(self):
-        """ Last child of current CapitainsCTSPassage
+        """ Last child of current CapitainsCtsPassage
 
         :rtype: str
         :returns: Last passage Node representation
@@ -367,7 +367,7 @@ class InteractiveTextualNode(TextualGraph):
             raise NotImplementedError
 
 
-class CTSNode(InteractiveTextualNode):
+class CtsNode(InteractiveTextualNode):
     """ Initiate a Resource object
     
     :param urn: A URN identifier
@@ -390,7 +390,7 @@ class CTSNode(InteractiveTextualNode):
     """
 
     def __init__(self, urn=None, **kwargs):
-        super(CTSNode, self).__init__(identifier=str(urn), **kwargs)
+        super(CtsNode, self).__init__(identifier=str(urn), **kwargs)
         self.__urn__ = None
 
         if urn is not None:
@@ -474,8 +474,8 @@ class CTSNode(InteractiveTextualNode):
             self.citation = edition.citation
 
 
-class Passage(CTSNode):
-    """ CapitainsCTSPassage objects possess metadata informations
+class Passage(CtsNode):
+    """ CapitainsCtsPassage objects possess metadata informations
 
     :param urn: A URN identifier
     :type urn: URN
@@ -504,7 +504,7 @@ class Passage(CTSNode):
         return self.urn.reference
 
 
-class CitableText(CTSNode):
+class CitableText(CtsNode):
     """ A CTS CitableText
     """
     def __init__(self, citation=None, metadata=None, **kwargs):

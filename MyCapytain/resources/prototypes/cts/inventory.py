@@ -21,14 +21,14 @@ from rdflib import RDF, Literal, URIRef
 from rdflib.namespace import DC
 
 
-class PrototypeCTSCollection(Collection):
+class PrototypeCtsCollection(Collection):
     """ Resource represents any resource from the inventory
 
     :param identifier: Identifier representing the CtsTextInventoryMetadata
     :type identifier: str,URN
-    :cvar CTSMODEL: String Representation of the type of collection
+    :cvar CTS_MODEL: String Representation of the type of collection
     """
-    CTSMODEL = "CTSCollection"
+    CTS_MODEL = "CtsCollection"
     DC_TITLE_KEY = None
     CTS_PROPERTIES = []
 
@@ -36,11 +36,11 @@ class PrototypeCTSCollection(Collection):
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
 
     def __init__(self, identifier=""):
-        super(PrototypeCTSCollection, self).__init__(identifier)
+        super(PrototypeCtsCollection, self).__init__(identifier)
 
-        if hasattr(type(self), "CTSMODEL"):
-            self.graph.set((self.asNode(), RDF.type, RDF_Namespaces.CTS.term(self.CTSMODEL)))
-            self.graph.set((self.asNode(), RDF_Namespaces.CTS.isA, RDF_Namespaces.CTS.term(self.CTSMODEL)))
+        if hasattr(type(self), "CTS_MODEL"):
+            self.graph.set((self.asNode(), RDF.type, RDF_Namespaces.CTS.term(self.CTS_MODEL)))
+            self.graph.set((self.asNode(), RDF_Namespaces.CTS.isA, RDF_Namespaces.CTS.term(self.CTS_MODEL)))
 
         self.__urn__ = ""
 
@@ -134,13 +134,13 @@ class PrototypeCTSCollection(Collection):
             return xmlparser(self.export(output=Mimetypes.XML.CTS))
 
 
-class CtsTextMetadata(ResourceCollection, PrototypeCTSCollection):
+class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
     """ Represents a CTS CtsTextMetadata
 
     :param urn: Identifier of the CtsTextMetadata
     :type urn: str
     :param parent: Item parents of the current collection
-    :type parent: [PrototypeCTSCollection]
+    :type parent: [PrototypeCtsCollection]
 
     :ivar urn: URN Identifier
     :type urn: URN
@@ -185,7 +185,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCTSCollection):
     def members(self):
         """ Children of the collection's item
 
-        .. warning:: CapitainsCTSText has no children
+        .. warning:: CapitainsCtsText has no children
 
         :rtype: list
         """
@@ -195,7 +195,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCTSCollection):
     def descendants(self):
         """ Descendants of the collection's item
 
-        .. warning:: CapitainsCTSText has no Descendants
+        .. warning:: CapitainsCtsText has no Descendants
 
         :rtype: list
         """
@@ -222,7 +222,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCTSCollection):
             ]
 
     def __export__(self, output=None, domain="", namespaces=True, lines="\n"):
-        """ Create a {output} version of the CapitainsCTSText
+        """ Create a {output} version of the CapitainsCtsText
 
         :param output: Format to be chosen
         :type output: basestring
@@ -330,7 +330,7 @@ class CtsTranslationMetadata(CtsTextMetadata):
     SUBTYPE = "translation"
 
 
-class CtsWorkMetadata(PrototypeCTSCollection):
+class CtsWorkMetadata(PrototypeCtsCollection):
     """ Represents a CTS CtsWorkMetadata
 
     CTS CtsWorkMetadata can be added to each other which would most likely happen if you take your data from multiple API or \
@@ -452,7 +452,7 @@ class CtsWorkMetadata(PrototypeCTSCollection):
             return self.__xml_export_generic__(attrs, namespaces=namespaces)
 
 
-class CtsTextgroupMetadata(PrototypeCTSCollection):
+class CtsTextgroupMetadata(PrototypeCtsCollection):
     """ Represents a CTS Textgroup
 
     CTS CtsTextgroupMetadata can be added to each other which would most likely happen if you take your data from multiple API or \
@@ -540,7 +540,7 @@ class CtsTextgroupMetadata(PrototypeCTSCollection):
             return self.__xml_export_generic__(attrs, namespaces=namespaces)
 
 
-class CtsTextInventoryMetadata(PrototypeCTSCollection):
+class CtsTextInventoryMetadata(PrototypeCtsCollection):
     """ Initiate a CtsTextInventoryMetadata resource
 
     :param resource: Resource representing the CtsTextInventoryMetadata
@@ -599,7 +599,7 @@ class CtsTextInventoryMetadata(PrototypeCTSCollection):
             return self.__xml_export_generic__(attrs, namespaces=namespaces)
 
 
-class CtsTextInventoryCollection(PrototypeCTSCollection):
+class CtsTextInventoryCollection(PrototypeCtsCollection):
     """ Initiate a CtsTextInventoryMetadata resource
 
     :param resource: Resource representing the CtsTextInventoryMetadata

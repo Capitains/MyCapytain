@@ -34,7 +34,7 @@ def make_xml_node(graph, name, close=False, attributes=None, text="", complete=F
     :param name: Name of the tag
     :param close: Produce closing tag (close=False -> "<tag>", close=True -> "</tag>")
     :param attributes: Dictionary of attributes
-    :param text: CapitainsCTSText to put inside the node
+    :param text: CapitainsCtsText to put inside the node
     :param complete: Complete node (node with opening and closing tag)
     :param innerXML: XML to append to the node
     :return: String representation of the node

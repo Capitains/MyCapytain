@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
+from MyCapytain.resolvers.cts.local import CtsCapitainsLocalResolver
 from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces, get_graph
 from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces, get_graph
 from MyCapytain.common.reference import URN, Reference
@@ -20,7 +20,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
     """ Test behind the scene functions of the Resolver """
     def test_resource_parser(self):
         """ Test that the initiation finds correctly the resources """
-        Repository = CTSCapitainsLocalResolver(["./tests/testing_data/farsiLit"])
+        Repository = CtsCapitainsLocalResolver(["./tests/testing_data/farsiLit"])
         self.assertEqual(
             Repository.inventory["urn:cts:farsiLit:hafez"].urn, URN("urn:cts:farsiLit:hafez"),
             "Hafez is found"
@@ -40,7 +40,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
 
     def test_text_resource(self):
         """ Test to get the text resource to perform other queries """
-        Repository = CTSCapitainsLocalResolver(["./tests/testing_data/farsiLit"])
+        Repository = CtsCapitainsLocalResolver(["./tests/testing_data/farsiLit"])
         text, metadata = Repository.__getText__("urn:cts:farsiLit:hafez.divan.perseus-eng1")
         self.assertEqual(
             len(text.citation), 4,
@@ -54,7 +54,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
 
     def test_get_capabilities(self):
         """ Check Get Capabilities """
-        Repository = CTSCapitainsLocalResolver(
+        Repository = CtsCapitainsLocalResolver(
             ["./tests/testing_data/farsiLit"]
         )
         self.assertEqual(
@@ -100,7 +100,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
 
     def test_get_shared_textgroup_cross_repo(self):
         """ Check Get Capabilities """
-        Repository = CTSCapitainsLocalResolver(
+        Repository = CtsCapitainsLocalResolver(
             [
                 "./tests/testing_data/farsiLit",
                 "./tests/testing_data/latinLit2"
@@ -117,7 +117,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
 
     def test_get_capabilities_nocites(self):
         """ Check Get Capabilities latinLit data"""
-        Repository = CTSCapitainsLocalResolver(
+        Repository = CtsCapitainsLocalResolver(
             ["./tests/testing_data/latinLit"]
         )
         self.assertEqual(
@@ -127,23 +127,23 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
 
     def test_pagination(self):
         self.assertEqual(
-            CTSCapitainsLocalResolver.pagination(2, 30, 150), (30, 60, 2, 30),
+            CtsCapitainsLocalResolver.pagination(2, 30, 150), (30, 60, 2, 30),
             " Pagination should return Array limits "
         )
         self.assertEqual(
-            CTSCapitainsLocalResolver.pagination(4, 40, 150), (120, 150, 4, 30),
+            CtsCapitainsLocalResolver.pagination(4, 40, 150), (120, 150, 4, 30),
             " Pagination should return Array limits "
         )
         self.assertEqual(
-            CTSCapitainsLocalResolver.pagination(5, 40, 150), (120, 150, 4, 30),
+            CtsCapitainsLocalResolver.pagination(5, 40, 150), (120, 150, 4, 30),
             " Pagination should return Array limits "
         )
         self.assertEqual(
-            CTSCapitainsLocalResolver.pagination(5, 100, 150), (100, 150, 2, 50),
+            CtsCapitainsLocalResolver.pagination(5, 100, 150), (100, 150, 2, 50),
             " Pagination should give corrected page and correct count"
         )
         self.assertEqual(
-            CTSCapitainsLocalResolver.pagination(5, 110, 150), (40, 50, 5, 10),
+            CtsCapitainsLocalResolver.pagination(5, 110, 150), (40, 50, 5, 10),
             " Pagination should use default limit (10) when getting too much "
         )
 
@@ -152,7 +152,7 @@ class TextXMLFolderResolver(TestCase):
     """ Ensure working state of resolver """
     def setUp(self):
         get_graph().remove((None, None, None))
-        self.resolver = CTSCapitainsLocalResolver(["./tests/testing_data/latinLit2"])
+        self.resolver = CtsCapitainsLocalResolver(["./tests/testing_data/latinLit2"])
 
     def test_getPassage_full(self):
         """ Test that we can get a full text """
@@ -190,7 +190,7 @@ class TextXMLFolderResolver(TestCase):
         passage = self.resolver.getTextualNode("urn:cts:latinLit:phi0959.phi010.perseus-eng2", "2")
         self.assertEqual(
             passage.export(Mimetypes.PLAINTEXT), "Omne fuit Musae carmen inerme meae; ",
-            "CapitainsCTSPassage should resolve if directly asked"
+            "CapitainsCtsPassage should resolve if directly asked"
         )
         with self.assertRaises(UnknownObjectError):
             passage = self.resolver.getTextualNode("urn:cts:latinLit:phi0959.phi010", "2")
@@ -299,11 +299,11 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             passage.prevId, "1.pr",
-            "Previous CapitainsCTSPassage ID should be parsed"
+            "Previous CapitainsCtsPassage ID should be parsed"
         )
         self.assertEqual(
             passage.nextId, "1.2",
-            "Next CapitainsCTSPassage ID should be parsed"
+            "Next CapitainsCtsPassage ID should be parsed"
         )
 
         children = list(passage.getReffs())
@@ -372,11 +372,11 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             passage.prevId, "1.pr",
-            "Previous CapitainsCTSPassage ID should be parsed"
+            "Previous CapitainsCtsPassage ID should be parsed"
         )
         self.assertEqual(
             passage.nextId, "1.2",
-            "Next CapitainsCTSPassage ID should be parsed"
+            "Next CapitainsCtsPassage ID should be parsed"
         )
         children = list(passage.getReffs())
         # Ensure navigability
@@ -610,7 +610,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
                 return True
             return False
 
-        resolver = CTSCapitainsLocalResolver(
+        resolver = CtsCapitainsLocalResolver(
             ["./tests/testing_data/latinLit2"],
             dispatcher=dispatcher
         )
@@ -655,16 +655,16 @@ class TextXMLFolderResolverDispatcher(TestCase):
                 return True
             return False
 
-        CTSCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = True
+        CtsCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = True
         with self.assertRaises(UndispatchedTextError):
-            resolver = CTSCapitainsLocalResolver(
+            resolver = CtsCapitainsLocalResolver(
                 ["./tests/testing_data/latinLit2"],
                 dispatcher=dispatcher
             )
 
-        CTSCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = False
+        CtsCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = False
         try:
-            resolver = CTSCapitainsLocalResolver(
+            resolver = CtsCapitainsLocalResolver(
                 ["./tests/testing_data/latinLit2"],
                 dispatcher=dispatcher
             )
@@ -701,7 +701,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
                 return True
             return False
 
-        resolver = CTSCapitainsLocalResolver(
+        resolver = CtsCapitainsLocalResolver(
             ["./tests/testing_data/latinLit2"],
             dispatcher=dispatcher
         )
@@ -729,7 +729,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
             "There should be nothing in FarsiLit"
         )
         self.assertEqual(
-            greek_stuff.get_label("fre"), None,  # CapitainsCTSText inventory have no label in CTS
+            greek_stuff.get_label("fre"), None,  # CapitainsCtsText inventory have no label in CTS
             "Label should be correct"
         )
         get_graph().remove((None, None, None))

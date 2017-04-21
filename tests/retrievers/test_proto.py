@@ -10,7 +10,7 @@ class TestEndpointsProto(unittest.TestCase):
     def setUp(self):
         self.cts = CtsRetriever("http://ahab.com")
 
-    def test_raise_CTS_proto(self):
+    def test_raise_Cts_proto(self):
         """ Tests that methods raises NotImplementedError """
         with self.assertRaises(NotImplementedError):
             self.cts.getCapabilities("inventory")
@@ -45,37 +45,37 @@ class TestEndpointsProto(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             Proto.getSiblings(textId="urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1")
 
-    def test_raise_CTS_getCapabilities_arguments(self):
+    def test_raise_Cts_getCapabilities_arguments(self):
         """ Tests that methods getCapabilities have consistent arguments"""
         with self.assertRaises(NotImplementedError):
             self.cts.getCapabilities(inventory="inventory")
 
-    def test_raise_CTS_getValidReff_arguments(self):
+    def test_raise_Cts_getValidReff_arguments(self):
         """ Tests that methods getValidReff have consistent arguments"""
         with self.assertRaises(NotImplementedError):
             self.cts.getValidReff(urn="urn", inventory="inventory", level=1)
 
-    def test_raise_CTS_getPassage_arguments(self):
+    def test_raise_Cts_getPassage_arguments(self):
         """ Tests that methods getPassage have consistent arguments"""
         with self.assertRaises(NotImplementedError):
             self.cts.getPassage(urn="urn", inventory="inventory", context=1)
 
-    def test_raise_CTS_getPassagePlus_arguments(self):
+    def test_raise_Cts_getPassagePlus_arguments(self):
         """ Tests that methods getPassagePlus have consistent arguments"""
         with self.assertRaises(NotImplementedError):
             self.cts.getPassagePlus(urn="urn", inventory="inventory", context=1)
 
-    def test_raise_CTS_getFirstUrn_arguments(self):
+    def test_raise_Cts_getFirstUrn_arguments(self):
         """ Tests that methods getFirstUrn have consistent arguments"""
         with self.assertRaises(NotImplementedError):
             self.cts.getFirstUrn(urn="urn", inventory="inventory")
 
-    def test_raise_CTS_getPrevNextUrn_arguments(self):
+    def test_raise_Cts_getPrevNextUrn_arguments(self):
         """ Tests that methods getPrevNextUrn have consistent arguments"""
         with self.assertRaises(NotImplementedError):
             self.cts.getPrevNextUrn(urn="urn", inventory="inventory")
 
-    def test_raise_CTS_getLabel_arguments(self):
+    def test_raise_Cts_getLabel_arguments(self):
         """ Tests that methods getLabel have consistent arguments"""
         with self.assertRaises(NotImplementedError):
             self.cts.getLabel(urn="urn", inventory="inventory")

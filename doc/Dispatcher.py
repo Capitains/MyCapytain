@@ -1,4 +1,4 @@
-from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
+from MyCapytain.resolvers.cts.local import CtsCapitainsLocalResolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
 from MyCapytain.common.constants import Mimetypes
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
@@ -39,7 +39,7 @@ def dispatchGreekLit(collection, path=None, **kwargs):
     return False
 
 # We set up a resolver which parses local file
-NautilusDummy = CTSCapitainsLocalResolver(
+NautilusDummy = CtsCapitainsLocalResolver(
     resource=[
         "./tests/testing_data/latinLit2"
     ],

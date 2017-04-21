@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 .. module:: MyCapytain.resources.texts.remote.cts
-   :synopsis: CtsTextMetadata and CapitainsCTSPassage implementation for dealing with CTS API Responses
+   :synopsis: CtsTextMetadata and CapitainsCtsPassage implementation for dealing with CTS API Responses
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
@@ -14,14 +14,14 @@ from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces
 from MyCapytain.common.reference import URN, Reference
-from MyCapytain.resources.collections import cts as CTSCollection
+from MyCapytain.resources.collections import cts as CtsCollection
 from MyCapytain.resources.prototypes import text as prototypes
 from MyCapytain.resources.texts.base.tei import TEIResource
 from MyCapytain.errors import MissingAttribute
 
 
 class __SharedMethod__(prototypes.InteractiveTextualNode):
-    """ Set of methods shared by CtsTextMetadata and CapitainsCTSPassage
+    """ Set of methods shared by CtsTextMetadata and CapitainsCtsPassage
 
     :param retriever: Retriever used to retrieve other data
     :type retriever: MyCapytain.retrievers.prototypes.CitableTextServiceRetriever
@@ -58,7 +58,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
-        :param reference: CapitainsCTSPassage reference
+        :param reference: CapitainsCtsPassage reference
         :type reference: Reference
         :rtype: list(str)
         :returns: List of levels
@@ -86,7 +86,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :param subreference: Reference of the passage (Note : if given a list, this should be a list of string that \
         compose the reference)
         :type subreference: Union[Reference, URN, str, list]
-        :rtype: CTSPassage
+        :rtype: CtsPassage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
         """
@@ -107,7 +107,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         response = xmlparser(self.retriever.getPassage(urn=urn))
 
         self.__parse_request__(response.xpath("//ti:request", namespaces=XPath_Namespaces)[0])
-        return CTSPassage(urn=urn, resource=response, retriever=self.retriever)
+        return CtsPassage(urn=urn, resource=response, retriever=self.retriever)
 
     def getReffs(self, level=1, subreference=None):
         """ Reference available at a given level
@@ -129,7 +129,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         :param reference: Reference of the passage
         :type reference: Reference or List of text_type
-        :rtype: CTSPassage
+        :rtype: CtsPassage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
         """
@@ -140,7 +140,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         response = xmlparser(self.retriever.getPassagePlus(urn=urn))
 
-        passage = CTSPassage(urn=urn, resource=response, retriever=self.retriever)
+        passage = CtsPassage(urn=urn, resource=response, retriever=self.retriever)
         passage.__parse_request__(response.xpath("//ti:reply/ti:label", namespaces=XPath_Namespaces)[0])
         self.citation = passage.citation
         return passage
@@ -152,28 +152,28 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :type xml: Union[lxml.etree._Element]
         """
         for node in xml.xpath(".//ti:groupname", namespaces=XPath_Namespaces):
-            lang = node.get("xml:lang") or CTSText.DEFAULT_LANG
+            lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
             self.metadata.add(RDF_Namespaces.CTS.groupname, lang=lang, value=node.text)
             self.set_creator(node.text, lang)
 
         for node in xml.xpath(".//ti:title", namespaces=XPath_Namespaces):
-            lang = node.get("xml:lang") or CTSText.DEFAULT_LANG
+            lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
             self.metadata.add(RDF_Namespaces.CTS.title, lang=lang, value=node.text)
             self.set_title(node.text, lang)
 
         for node in xml.xpath(".//ti:label", namespaces=XPath_Namespaces):
-            lang = node.get("xml:lang") or CTSText.DEFAULT_LANG
+            lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
             self.metadata.add(RDF_Namespaces.CTS.label, lang=lang, value=node.text)
             self.set_subject(node.text, lang)
 
         for node in xml.xpath(".//ti:description", namespaces=XPath_Namespaces):
-            lang = node.get("xml:lang") or CTSText.DEFAULT_LANG
+            lang = node.get("xml:lang") or CtsText.DEFAULT_LANG
             self.metadata.add(RDF_Namespaces.CTS.description, lang=lang, value=node.text)
             self.set_description(node.text, lang)
 
         # Need to code that p
         if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=XPath_Namespaces):
-            self.citation = CTSCollection.XmlCtsCitation.ingest(
+            self.citation = CtsCollection.XmlCtsCitation.ingest(
                 xml,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
             )
@@ -199,7 +199,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
 
         :param reference: Reference from which to find siblings
         :type reference: Union[Reference, str]
-        :return: (Previous CapitainsCTSPassage Reference,Next CapitainsCTSPassage Reference)
+        :return: (Previous CapitainsCtsPassage Reference,Next CapitainsCtsPassage Reference)
         """
         _prev, _next = __SharedMethod__.prevnext(
             self.retriever.getPrevNextUrn(
@@ -307,7 +307,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         return _prev, _next
 
 
-class CTSText(__SharedMethod__, prototypes.CitableText):
+class CtsText(__SharedMethod__, prototypes.CitableText):
     """ API CtsTextMetadata object
 
     :param urn: A URN identifier
@@ -324,7 +324,7 @@ class CTSText(__SharedMethod__, prototypes.CitableText):
     DEFAULT_LANG = "eng"
 
     def __init__(self, urn, retriever, citation=None, **kwargs):
-        super(CTSText, self).__init__(retriever=retriever, urn=urn, citation=citation, **kwargs)
+        super(CtsText, self).__init__(retriever=retriever, urn=urn, citation=citation, **kwargs)
 
     @property
     def reffs(self):
@@ -372,8 +372,8 @@ class CTSText(__SharedMethod__, prototypes.CitableText):
         return self.getTextualNode().export(output, exclude)
 
 
-class CTSPassage(__SharedMethod__, prototypes.Passage, TEIResource):
-    """ CapitainsCTSPassage representing
+class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
+    """ CapitainsCtsPassage representing
 
     :param urn:
     :param resource:
@@ -384,7 +384,7 @@ class CTSPassage(__SharedMethod__, prototypes.Passage, TEIResource):
 
     def __init__(self, urn, resource, *args, **kwargs):
         SuperKwargs = {key: value for key, value in kwargs.items() if key not in ["parent"]}
-        super(CTSPassage, self).__init__(resource=resource, *args, **SuperKwargs)
+        super(CtsPassage, self).__init__(resource=resource, *args, **SuperKwargs)
         self.urn = urn
 
         # Could be set during parsing
@@ -403,7 +403,7 @@ class CTSPassage(__SharedMethod__, prototypes.Passage, TEIResource):
     def prevId(self):
         """ Previous passage Identifier
 
-        :rtype: CTSPassage
+        :rtype: CtsPassage
         :returns: Previous passage at same level
         """
         if self.__prev__ is False:
@@ -454,7 +454,7 @@ class CTSPassage(__SharedMethod__, prototypes.Passage, TEIResource):
         self.__prev__, self.__nextId__ = __SharedMethod__.prevnext(self.response)
 
         if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=XPath_Namespaces)):
-            self.citation = CTSCollection.XmlCtsCitation.ingest(
+            self.citation = CtsCollection.XmlCtsCitation.ingest(
                 self.response,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
             )

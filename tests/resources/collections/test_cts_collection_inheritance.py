@@ -6,7 +6,7 @@ with open("tests/testing_data/examples/getcapabilities.seneca.xml") as f:
     SENECA = f.read()
 
 
-class TestCollectionCTSInheritance(TestCase):
+class TestCollectionCtsInheritance(TestCase):
     def test_types(self):
         TI = XmlCtsTextInventoryMetadata.parse(resource=SENECA)
         self.assertCountEqual(

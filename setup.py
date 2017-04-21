@@ -35,7 +35,7 @@ setup(
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Topic :: Software Development :: Libraries",
-    "Topic :: CapitainsCTSText Processing :: Markup :: XML",
-    "Topic :: CapitainsCTSText Processing :: General"
+    "Topic :: CapitainsCtsText Processing :: Markup :: XML",
+    "Topic :: CapitainsCtsText Processing :: General"
   ]
 )

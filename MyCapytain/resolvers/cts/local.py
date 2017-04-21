@@ -15,10 +15,10 @@ from MyCapytain.resolvers.utils import CollectionDispatcher
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsCitation, XmlCtsTextMetadata as InventoryText, \
     XmlCtsTranslationMetadata, XmlCtsEditionMetadata
 from MyCapytain.resources.prototypes.cts.inventory import CtsTextInventoryCollection
-from MyCapytain.resources.texts.local.capitains.cts import CapitainsCTSText
+from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
 
-class CTSCapitainsLocalResolver(Resolver):
+class CtsCapitainsLocalResolver(Resolver):
     """ XML Folder Based resolver. CtsTextMetadata and metadata resolver based on local directories
 
     :param resource: Resource should be a list of folders retaining data as Capitains Guidelines Repositories
@@ -35,7 +35,7 @@ class CTSCapitainsLocalResolver(Resolver):
 
 
     """
-    TEXT_CLASS = CapitainsCTSText
+    TEXT_CLASS = CapitainsCtsText
     DEFAULT_PAGE = 1
     PER_PAGE = (1, 10, 100)  # Min, Default, Mainvex,
     RAISE_ON_UNDISPATCHED = False
@@ -122,7 +122,7 @@ class CTSCapitainsLocalResolver(Resolver):
                             if os.path.isfile(__text__.path):
                                 try:
                                     with io.open(__text__.path) as f:
-                                        t = CapitainsCTSText(resource=self.xmlparse(f))
+                                        t = CapitainsCtsText(resource=self.xmlparse(f))
                                         cites = list()
                                         for cite in [c for c in t.citation][::-1]:
                                             if len(cites) >= 1:
@@ -166,7 +166,7 @@ class CTSCapitainsLocalResolver(Resolver):
         :param urn: URN of a text to retrieve
         :type urn: str, URN
         :return: Textual resource and metadata
-        :rtype: (CapitainsCTSText, InventoryText)
+        :rtype: (CapitainsCtsText, InventoryText)
         """
         if not isinstance(urn, URN):
             urn = URN(urn)
@@ -250,11 +250,11 @@ class CTSCapitainsLocalResolver(Resolver):
         :return: (Start Index, End Index, Page Number, Item Count)
         """
         realpage = page
-        page = page or CTSCapitainsLocalResolver.DEFAULT_PAGE
-        limit = limit or CTSCapitainsLocalResolver.PER_PAGE[1]
+        page = page or CtsCapitainsLocalResolver.DEFAULT_PAGE
+        limit = limit or CtsCapitainsLocalResolver.PER_PAGE[1]
 
-        if limit < CTSCapitainsLocalResolver.PER_PAGE[0] or limit > CTSCapitainsLocalResolver.PER_PAGE[2]:
-            limit = CTSCapitainsLocalResolver.PER_PAGE[1]
+        if limit < CtsCapitainsLocalResolver.PER_PAGE[0] or limit > CtsCapitainsLocalResolver.PER_PAGE[2]:
+            limit = CtsCapitainsLocalResolver.PER_PAGE[1]
 
         page = (page - 1) * limit
 
@@ -316,14 +316,14 @@ class CTSCapitainsLocalResolver(Resolver):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
         :type prevnext: boolean
         :param metadata: Retrieve metadata about the passage and the text
         :type metadata: boolean
-        :return: CapitainsCTSPassage
-        :rtype: CapitainsCTSPassage
+        :return: CapitainsCtsPassage
+        :rtype: CapitainsCtsPassage
         """
         text, text_metadata = self.__getText__(textId)
         if subreference is not None:
@@ -338,7 +338,7 @@ class CTSCapitainsLocalResolver(Resolver):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: Tuple of references
         :rtype: (str, str)
@@ -354,7 +354,7 @@ class CTSCapitainsLocalResolver(Resolver):
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: CapitainsCTSPassage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]

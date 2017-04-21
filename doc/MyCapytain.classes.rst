@@ -74,8 +74,8 @@ that complexified over different features. The basic is
 - *TextualNode* inherits from NodeId and unlike TextualElement, TextualNode is part of a graph of CitableObject. It bears informations about its siblings, parents, children.
 - *TextualGraph* is a bit interactive : you can query for children nodes and get descendant references of the object.
 - *InteractiveTextualNode* is completely interative . You can browse the graph by accessing the :code:`.next` property for example : it should then return an InteractiveTextualNode as well
-- *CTSNode* has two unique methods more as well as a :code:`urn` property.
-- From *CTSNode* we find *CitableText* and *Passage*, which represents complete and portion of a Text. The main difference is that CitableText has no parents, no siblings.
+- *CtsNode* has two unique methods more as well as a :code:`urn` property.
+- From *CtsNode* we find *CitableText* and *Passage*, which represents complete and portion of a Text. The main difference is that CitableText has no parents, no siblings.
 
 
 .. figure:: _static/pyreverse/classes_MyCapytain_texts.svg

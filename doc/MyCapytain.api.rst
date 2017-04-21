@@ -82,13 +82,13 @@ Resolvers
 Remote CTS API
 **************
 
-.. autoclass:: MyCapytain.resolvers.cts.api.HttpCTSResolver
+.. autoclass:: MyCapytain.resolvers.cts.api.HttpCtsResolver
     :members:
 
 Local CapiTainS Guidelines CTS Resolver
 ***************************************
 
-.. autoclass:: MyCapytain.resolvers.cts.local.CTSCapitainsLocalResolver
+.. autoclass:: MyCapytain.resolvers.cts.local.CtsCapitainsLocalResolver
     :members:
 
 Dispatcher
@@ -124,13 +124,13 @@ TEI based texts
 Locally read text
 +++++++++++++++++
 
-.. autoclass:: MyCapytain.resources.texts.local.capitains.cts.CapitainsCTSText
+.. autoclass:: MyCapytain.resources.texts.local.capitains.cts.CapitainsCtsText
     :members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
 
-.. autoclass:: MyCapytain.resources.texts.local.capitains.cts.CapitainsCTSPassage
+.. autoclass:: MyCapytain.resources.texts.local.capitains.cts.CapitainsCtsPassage
     :members:
     :undoc-members:
     :show-inheritance:
@@ -146,13 +146,13 @@ CTS API Texts
 
 Formerly MyCapytain.resources.texts.api (< 2.0.0)
 
-.. autoclass:: MyCapytain.resources.texts.remote.cts.CTSText
+.. autoclass:: MyCapytain.resources.texts.remote.cts.CtsText
     :members:
     :undoc-members:
     :show-inheritance:
     :inherited-members:
 
-.. autoclass:: MyCapytain.resources.texts.remote.cts.CTSPassage
+.. autoclass:: MyCapytain.resources.texts.remote.cts.CtsPassage
     :members:
     :undoc-members:
     :show-inheritance:

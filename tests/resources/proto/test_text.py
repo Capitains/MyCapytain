@@ -10,9 +10,9 @@ import MyCapytain.common.metadata
 
 
 class TestProtoResource(unittest.TestCase):
-    """ Test for resource, mother class of CtsTextMetadata and CapitainsCTSPassage """
+    """ Test for resource, mother class of CtsTextMetadata and CapitainsCtsPassage """
     def test_init(self):
-        a = CTSNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        a = CtsNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.id, "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.urn, URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2"))
         self.assertIsInstance(a.citation, Citation)
@@ -23,7 +23,7 @@ class TestProtoResource(unittest.TestCase):
 
     def test_urn(self):
         """ Test setters and getters for urn """
-        a = CTSNode()
+        a = CtsNode()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
         self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)

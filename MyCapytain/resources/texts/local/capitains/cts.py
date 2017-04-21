@@ -24,7 +24,7 @@ from lxml import etree
 
 
 def __makePassageKwargs__(urn, reference):
-    """ Little helper used by CapitainsCTSPassage here to comply with parents args
+    """ Little helper used by CapitainsCtsPassage here to comply with parents args
 
     :param urn: URN String
     :param reference: Reference String
@@ -50,7 +50,7 @@ class __SharedMethods__:
         :type subreference: Union[list, Reference]
         :param simple: If set to true, retrieves nodes up to the given one, cleaning non required siblings.
         :type simple: boolean
-        :rtype: CapitainsCTSPassage, ContextPassage
+        :rtype: CapitainsCtsPassage, ContextPassage
         :returns: Asked passage
         """
 
@@ -91,7 +91,7 @@ class __SharedMethods__:
             urn, subreference = URN("{}:{}".format(self.urn, subreference)), subreference
         else:
             urn, subreference = None, subreference
-        return CapitainsCTSPassage(
+        return CapitainsCtsPassage(
             urn=urn,
             resource=root,
             text=self,
@@ -107,7 +107,7 @@ class __SharedMethods__:
         :param reference: Identifier of the subreference / passages
         :type reference: list, reference
         :returns: Asked passage
-        :rtype: CapitainsCTSPassage
+        :rtype: CapitainsCtsPassage
         """
         if reference is None:
             return __SimplePassage__(
@@ -136,13 +136,13 @@ class __SharedMethods__:
 
     @property
     def textObject(self):
-        """ Textual Object with full capacities (Unlike Simple CapitainsCTSPassage)
+        """ Textual Object with full capacities (Unlike Simple CapitainsCtsPassage)
 
-        :rtype: CtsTextMetadata, CapitainsCTSPassage
-        :return: Textual Object with full capacities (Unlike Simple CapitainsCTSPassage)
+        :rtype: CtsTextMetadata, CapitainsCtsPassage
+        :return: Textual Object with full capacities (Unlike Simple CapitainsCtsPassage)
         """
         text = None
-        if isinstance(self, CapitainsCTSText):
+        if isinstance(self, CapitainsCtsText):
             text = self
         return text
 
@@ -170,14 +170,14 @@ class __SharedMethods__:
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: int
-        :param reference: CapitainsCTSPassage Reference
+        :param reference: CapitainsCtsPassage Reference
         :type reference: Reference
         :param _debug: Check on passages duplicates
         :type _debug: bool
         :returns: List of levels
         :rtype: list(basestring, str)
 
-        .. note:: GetValidReff works for now as a loop using CapitainsCTSPassage, subinstances of CtsTextMetadata, to retrieve the valid \
+        .. note:: GetValidReff works for now as a loop using CapitainsCtsPassage, subinstances of CtsTextMetadata, to retrieve the valid \
         informations. Maybe something is more powerfull ?
         """
         depth = 0
@@ -263,7 +263,7 @@ class __SharedMethods__:
         return self.resource.xpath(*args, **kwargs)
 
     def tostring(self, *args, **kwargs):
-        """ Transform the CapitainsCTSPassage in XML string
+        """ Transform the CapitainsCtsPassage in XML string
 
         :param args: Ordered arguments for etree.tostring() (except the first one)
         :param kwargs: Named arguments
@@ -273,18 +273,18 @@ class __SharedMethods__:
 
 
 class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
-    """ CapitainsCTSPassage for simple and quick parsing of texts
+    """ CapitainsCtsPassage for simple and quick parsing of texts
 
     :param resource: Element representing the passage
     :type resource: etree._Element
-    :param reference: CapitainsCTSPassage reference
+    :param reference: CapitainsCtsPassage reference
     :type reference: Reference
     :param urn: URN of the source text or of the passage
     :type urn: URN
     :param citation: XmlCtsCitation scheme of the text
     :type citation: Citation
     :param text: CtsTextMetadata containing the passage
-    :type text: CapitainsCTSText
+    :type text: CapitainsCtsText
     """
     def __init__(self, resource, reference, citation, text, urn=None):
         super(__SimplePassage__, self).__init__(
@@ -302,7 +302,7 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
 
     @property
     def reference(self):
-        """ URN CapitainsCTSPassage Reference
+        """ URN CapitainsCtsPassage Reference
 
         :return: Reference
         :rtype: Reference
@@ -379,7 +379,7 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         """
 
         if not self.__text__:
-            raise MissingAttribute("CapitainsCTSPassage was iniated without CtsTextMetadata object")
+            raise MissingAttribute("CapitainsCtsPassage was iniated without CtsTextMetadata object")
         if self.__prevnext__ is not None:
             return self.__prevnext__
 
@@ -414,12 +414,12 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
     def textObject(self):
         """ CtsTextMetadata Object. Required for NextPrev
 
-        :rtype: CapitainsCTSText
+        :rtype: CapitainsCtsText
         """
         return self.__text__
 
 
-class CapitainsCTSText(__SharedMethods__, TEIResource, text.CitableText):
+class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
@@ -434,7 +434,7 @@ class CapitainsCTSText(__SharedMethods__, TEIResource, text.CitableText):
     """
 
     def __init__(self, urn=None, citation=None, resource=None):
-        super(CapitainsCTSText, self).__init__(urn=urn, citation=citation, resource=resource)
+        super(CapitainsCtsText, self).__init__(urn=urn, citation=citation, resource=resource)
 
         if self.resource is not None:
             self.__findCRefPattern(self.resource)
@@ -462,8 +462,8 @@ class CapitainsCTSText(__SharedMethods__, TEIResource, text.CitableText):
             raise E
 
 
-class CapitainsCTSPassage(__SharedMethods__, TEIResource, text.Passage):
-    """ CapitainsCTSPassage class for local texts which rebuilds the tree up to the passage.
+class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
+    """ CapitainsCtsPassage class for local texts which rebuilds the tree up to the passage.
 
         For design purposes, some people would prefer the output of GetPassage to be consistent. ContextPassage rebuilds
         the tree of the text up to the passage, keeping attributes of original nodes
@@ -493,7 +493,7 @@ class CapitainsCTSPassage(__SharedMethods__, TEIResource, text.Passage):
                 </text>
             </TEI>
 
-        :param reference: CapitainsCTSPassage reference
+        :param reference: CapitainsCtsPassage reference
         :type reference: Reference
         :param urn: URN of the source text or of the passage
         :type urn: URN
@@ -511,7 +511,7 @@ class CapitainsCTSPassage(__SharedMethods__, TEIResource, text.Passage):
     """
     def __init__(self, reference, urn=None, citation=None, resource=None, text=None):
 
-        super(CapitainsCTSPassage, self).__init__(
+        super(CapitainsCtsPassage, self).__init__(
             citation=citation,
             resource=resource,
             **__makePassageKwargs__(urn, reference)
@@ -589,7 +589,7 @@ class CapitainsCTSPassage(__SharedMethods__, TEIResource, text.Passage):
         self.__raiseDepth__()
 
         if not self.__text__:
-            raise MissingAttribute("CapitainsCTSPassage was initiated without CtsTextMetadata object")
+            raise MissingAttribute("CapitainsCtsPassage was initiated without CtsTextMetadata object")
         if self.__prevnext__:
             return self.__prevnext__
 
@@ -638,14 +638,14 @@ class CapitainsCTSPassage(__SharedMethods__, TEIResource, text.Passage):
 
     @property
     def next(self):
-        """ Next CapitainsCTSPassage (Interactive CapitainsCTSPassage)
+        """ Next CapitainsCtsPassage (Interactive CapitainsCtsPassage)
         """
         if self.nextId is not None:
             return __SharedMethods__.getTextualNode(self.__text__, self.nextId)
 
     @property
     def prev(self):
-        """ Previous CapitainsCTSPassage (Interactive CapitainsCTSPassage)
+        """ Previous CapitainsCtsPassage (Interactive CapitainsCtsPassage)
         """
         if self.prevId is not None:
             return __SharedMethods__.getTextualNode(self.__text__, self.prevId)
@@ -661,6 +661,6 @@ class CapitainsCTSPassage(__SharedMethods__, TEIResource, text.Passage):
     def textObject(self):
         """ CtsTextMetadata Object. Required for NextPrev
 
-        :rtype: CapitainsCTSText
+        :rtype: CapitainsCtsText
         """
         return self.__text__

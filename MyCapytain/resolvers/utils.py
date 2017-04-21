@@ -12,7 +12,8 @@ class CollectionDispatcher:
         self.collection = collection
         if default_inventory_name is None:
             default_inventory_name = list(self.collection.children.values())[0].id
-        self.__methods__ = [(default_inventory_name, lambda x, **kwargs: True)]
+        self.__methods__ = []
+        self.add(self.default, default_inventory_name)
 
     @property
     def methods(self):
@@ -25,6 +26,16 @@ class CollectionDispatcher:
         :rtype: List
         """
         return self.__methods__
+
+    def default(self, collection, **kwargs):
+        """ Default dispatcher
+
+        :param collection: Collection to dispatch
+        :param kwargs: Additional argument
+        :return: True
+        """
+
+        return True
 
     def add(self, func, inventory_name):
         """ Register given function as a filter.

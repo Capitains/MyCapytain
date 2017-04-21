@@ -12,7 +12,7 @@ from MyCapytain.common.reference import Reference
 import requests
 
 
-class CtsHttpRetriever(MyCapytain.retrievers.prototypes.CTS):
+class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
     """ Basic integration of the MyCapytain.retrievers.proto.CTS abstraction
     """
 
@@ -29,7 +29,7 @@ class CtsHttpRetriever(MyCapytain.retrievers.prototypes.CTS):
         :ivar endpoint: Url of the endpoint
         :ivar inventory: Default Inventory
         """
-        super(CtsHttpRetriever, self).__init__(endpoint)
+        super(HttpCtsRetriever, self).__init__(endpoint)
         self.inventory = inventory
 
     def call(self, parameters):

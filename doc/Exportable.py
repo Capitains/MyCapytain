@@ -1,4 +1,5 @@
-from MyCapytain.common.constants import Exportable, Mimetypes
+from MyCapytain.common.constants import Mimetypes
+from MyCapytain.common.base import Exportable
 
 
 class Sentence(Exportable):

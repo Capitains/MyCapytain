@@ -76,7 +76,7 @@ class CitableTextServiceRetriever(API):
         raise NotImplementedError
 
 
-class CTS(CitableTextServiceRetriever):
+class CtsRetriever(CitableTextServiceRetriever):
     """ CTS API Endpoint Prototype
     """
     def getCapabilities(self, inventory):

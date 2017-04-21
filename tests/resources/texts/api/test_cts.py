@@ -6,7 +6,7 @@ from six import text_type as str
 from io import open
 
 from MyCapytain.resources.texts.remote.cts import CTSPassage, CTSText
-from MyCapytain.retrievers.cts5 import CtsHttpRetriever
+from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.reference import Reference, Citation, URN
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
@@ -50,7 +50,7 @@ class TestAPIText(unittest.TestCase):
             child=b,
             refsDecl="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1' and @type='section']"
         )
-        self.endpoint = CtsHttpRetriever("http://services.perseids.org/remote/cts")
+        self.endpoint = HttpCtsRetriever("http://services.perseids.org/remote/cts")
 
     def test_init(self):
         """ Test the __init__ parameters of CtsTextMetadata
@@ -496,7 +496,7 @@ class TestCTSPassage(unittest.TestCase):
             child=b
         )
         self.url = "http://services.perseids.org/remote/cts"
-        self.endpoint = CtsHttpRetriever(self.url)
+        self.endpoint = HttpCtsRetriever(self.url)
         self.endpoint.getPassage = mock.MagicMock(return_value=GET_PASSAGE)
         self.endpoint.getPrevNextUrn = mock.MagicMock(return_value=NEXT_PREV)
         self.endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF)
@@ -763,7 +763,7 @@ class TestCTSPassage(unittest.TestCase):
 
     def test_first_urn_when_empty(self):
 
-        endpoint = CtsHttpRetriever(self.url)
+        endpoint = HttpCtsRetriever(self.url)
         endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST_EMPTY)
         text = CTSText("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
         passage = CTSPassage(
@@ -781,7 +781,7 @@ class TestCTSPassage(unittest.TestCase):
         )
 
     def test_first_urn_whenfullurn(self):
-        endpoint = CtsHttpRetriever(self.url)
+        endpoint = HttpCtsRetriever(self.url)
         endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
         text = CTSText("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
         passage = CTSPassage(
@@ -799,7 +799,7 @@ class TestCTSPassage(unittest.TestCase):
         )
 
     def test_first_urn_whenreference(self):
-        endpoint = CtsHttpRetriever(self.url)
+        endpoint = HttpCtsRetriever(self.url)
         endpoint.getFirstUrn = mock.MagicMock(return_value=Get_FIRST)
         text = CTSText("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
         passage = CTSPassage(
@@ -818,7 +818,7 @@ class TestCTSPassage(unittest.TestCase):
 
     def test_get_reffs_contextual(self):
         """ Ensure getReffs works with context """
-        endpoint = CtsHttpRetriever(self.url)
+        endpoint = HttpCtsRetriever(self.url)
         endpoint.getValidReff = mock.MagicMock(return_value=GET_VALID_REFF)
         text = CTSText("urn:cts:latinLit:phi1294.phi002.perseus-lat2", retriever=endpoint)
         passage = CTSPassage(

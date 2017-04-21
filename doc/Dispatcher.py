@@ -1,17 +1,17 @@
 from MyCapytain.resolvers.cts.local import CTSCapitainsLocalResolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
-from MyCapytain.common.constants import Mimetypes, NS
-from MyCapytain.resources.collections.cts import TextInventory
-from MyCapytain.resources.prototypes.cts.inventory import TextInventoryCollection
+from MyCapytain.common.constants import Mimetypes
+from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
+from MyCapytain.resources.prototypes.cts.inventory import CtsTextInventoryCollection
 
 # We set up a main collection
-tic = TextInventoryCollection()
+tic = CtsTextInventoryCollection()
 # We register sub collection we want to dispatch to
-latin = TextInventory("urn:perseus:latinLit", parent=tic)
+latin = XmlCtsTextInventoryMetadata("urn:perseus:latinLit", parent=tic)
 latin.set_label("Classical Latin", "eng")
-farsi = TextInventory("urn:perseus:farsiLit", parent=tic)
+farsi = XmlCtsTextInventoryMetadata("urn:perseus:farsiLit", parent=tic)
 farsi.set_label("Farsi", "eng")
-gc = TextInventory("urn:perseus:greekLit", parent=tic)
+gc = XmlCtsTextInventoryMetadata("urn:perseus:greekLit", parent=tic)
 gc.set_label("Ancient Greek", "eng")
 gc.set_label("Grec Ancien", "fre")
 

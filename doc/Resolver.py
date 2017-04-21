@@ -1,9 +1,9 @@
 from MyCapytain.resolvers.cts.api import HttpCTSResolver
-from MyCapytain.retrievers.cts5 import CTS
-from MyCapytain.common.constants import Mimetypes, NS
+from MyCapytain.retrievers.cts5 import HttpCtsRetriever
+from MyCapytain.common.constants import Mimetypes, XPath_Namespaces
 
 # We set up a resolver which communicates with an API available in Leipzig
-resolver = HttpCTSResolver(CTS("http://cts.dh.uni-leipzig.de/api/cts/"))
+resolver = HttpCTSResolver(HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts/"))
 # We require a passage : passage is now a Passage object
 # This is an entry from the Smith Myth Dictionary
 # The inner methods will resolve to the URI http://cts.dh.uni-leipzig.de/api/cts/?request=GetPassage&urn=urn:cts:pdlrefwk:viaf88890045.003.perseus-eng1:A.abaeus_1
@@ -23,6 +23,6 @@ print(passage.export(
 print(
     passage.export(
         output=Mimetypes.PYTHON.ETREE
-    ).xpath(".//tei:bibl/text()", namespaces=NS, magic_string=False)
+    ).xpath(".//tei:bibl/text()", namespaces=XPath_Namespaces, magic_string=False)
 )
 ["Hdt. 8.33", "Paus. 10.35.1"]

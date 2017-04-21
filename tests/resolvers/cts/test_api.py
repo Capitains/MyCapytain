@@ -1,5 +1,5 @@
 from MyCapytain.resolvers.cts.api import HttpCTSResolver
-from MyCapytain.retrievers.cts5 import CtsHttpRetriever
+from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import XPath_Namespaces, Mimetypes
 from MyCapytain.resources.prototypes.text import Passage
@@ -34,7 +34,7 @@ with open("tests/testing_data/cts/getPassageOtherTest.xml") as f:
 
 class TestHttpCTSResolver(TestCase):
     def setUp(self):
-        self.resolver = HttpCTSResolver(CtsHttpRetriever("http://localhost"))
+        self.resolver = HttpCTSResolver(HttpCtsRetriever("http://localhost"))
         self.resolver.endpoint.getPassagePlus = MagicMock(return_value=GET_PASSAGE_PLUS)
         self.resolver.endpoint.getPassage = MagicMock(return_value=GET_PASSAGE)
         self.resolver.endpoint.getPrevNextUrn = MagicMock(return_value=NEXT_PREV)
@@ -470,7 +470,7 @@ class TestHttpCTSResolver(TestCase):
     def test_citation_failure(self):
         """ Example for Resolver failed : some response have an issue with not available Citations ?
         """
-        retriever = CtsHttpRetriever("http://cts.dh.uni-leipzig.de/remote/cts/")
+        retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/remote/cts/")
         retriever.getPassage = MagicMock(return_value=GET_PASSAGE_CITATION_FAILURE)
         resolver = HttpCTSResolver(retriever)
         # We require a passage : passage is now a CapitainsCTSPassage object

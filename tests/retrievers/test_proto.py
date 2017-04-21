@@ -8,7 +8,7 @@ class TestEndpointsProto(unittest.TestCase):
     """ Testing prototypes retrievers """
 
     def setUp(self):
-        self.cts = CTS("http://ahab.com")
+        self.cts = CtsRetriever("http://ahab.com")
 
     def test_raise_CTS_proto(self):
         """ Tests that methods raises NotImplementedError """

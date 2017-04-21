@@ -11,7 +11,7 @@
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resources.texts.remote.cts import CTSText
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
-from MyCapytain.retrievers.cts5 import CtsHttpRetriever
+from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 
 
 class HttpCTSResolver(Resolver):
@@ -21,10 +21,10 @@ class HttpCTSResolver(Resolver):
     :type endpoint: CTS
 
     :ivar endpoint: CTS API Retriever
-    :type endpoint: CtsHttpRetriever
+    :type endpoint: HttpCtsRetriever
     """
     def __init__(self, endpoint):
-        if not isinstance(endpoint, CtsHttpRetriever):
+        if not isinstance(endpoint, HttpCtsRetriever):
             raise TypeError("Endpoint should be a CTS Endpoint object")
         self.__endpoint__ = endpoint
 
@@ -33,7 +33,7 @@ class HttpCTSResolver(Resolver):
         """ CTS Endpoint of the resolver
 
         :return: CTS Endpoint
-        :rtype: CtsHttpRetriever
+        :rtype: HttpCtsRetriever
         """
         return self.__endpoint__
 

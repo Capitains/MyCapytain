@@ -1,8 +1,8 @@
-from MyCapytain.retrievers.cts5 import CTS
-from MyCapytain.resources.texts.api.cts import Text
+from MyCapytain.retrievers.cts5 import HttpCtsRetriever
+from MyCapytain.resources.texts.remote.cts import CTSText
 
 # We set up a retriever which communicates with an API available in Leipzig
-retriever = CTS("http://cts.dh.uni-leipzig.de/api/cts/")
+retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts/")
 
 # Given that we have other examples that shows how to work with text,
 # we will focus here on playing with the graph functionality of texts implementations.
@@ -13,7 +13,7 @@ retriever = CTS("http://cts.dh.uni-leipzig.de/api/cts/")
 
 # We will work with the line 7 of poem 39 of book 4 of Martial's Epigrammata
 # The text is urn:cts:latinLit:phi1294.phi002.perseus-lat2
-text = Text(retriever=retriever, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+text = CTSText(retriever=retriever, urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
 # We retrieve up the passage
 target = text.getTextualNode(subreference="4.39.7")

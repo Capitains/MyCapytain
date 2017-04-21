@@ -1,0 +1,99 @@
+<?xml-model href="http://www.stoa.org/epidoc/schema/8.19/tei-epidoc.rng"
+  schematypens="http://relaxng.org/ns/structure/1.0"?><?xml-model href="http://www.stoa.org/epidoc/schema/8.19/tei-epidoc.rng"
+  schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader type="text">
+        <fileDesc>
+            <titleStmt>
+                <title>Introduction to Epigrammata</title>
+                <author>Wilhelm Heraeus</author>
+                <sponsor>Perseus Project, Tufts University</sponsor>
+                <principal>Gregory Crane</principal>
+            </titleStmt>
+            <publicationStmt>
+                <publisher>Trustees of Tufts University</publisher>
+                <pubPlace>Medford, MA</pubPlace>
+                <authority>Perseus Project</authority>
+            </publicationStmt>
+            <sourceDesc default="false">
+                <bibl default="false">
+                    <title>M. Valerii Martialis Epigrammaton libri / recognovit W. Heraeus</title>
+                    <author>Martial</author>
+                    <editor role="editor">Wilhelm Heraeus<!--, 1862-1938 (main editor)--></editor>
+                    <editor role="editor">Jacobus Borovskij<!-- (added corrections in 1976, more than 30 years before 2011)--></editor>
+                    <pubPlace>Leipzig</pubPlace>
+                    <date>1925/1976</date>
+                </bibl>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+         <refsDecl n="CTS">
+            <cRefPattern n="paragraph"
+                         matchPattern="(\w+).(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
+                <p>This pointer pattern extracts book and poem</p>
+            </cRefPattern>
+            <cRefPattern n="commentary"
+                         matchPattern="(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                <p>This pointer pattern extracts book</p>
+            </cRefPattern>
+        </refsDecl>
+            <refsDecl>
+                <refState unit="commentary"/>
+                <refState unit="paragraph"/>
+            </refsDecl>
+        </encodingDesc>
+        <profileDesc>
+            <langUsage default="false">
+                <language ident="en">English</language>
+                <language ident="grc">Latin</language>
+            </langUsage>
+        </profileDesc>
+        <revisionDesc>
+	    <change when="2015-11-04" who="Zach Himes">Removed @rend from hi tag</change>
+            <change when="2008-01-01" who="Gregory Crane">Initial Markup</change>
+            <change when="2015-03-06" who="Thibault Clérice">converted to EpiDoc/CTS</change>
+        </revisionDesc>
+    </teiHeader>
+    <text n="urn:cts:latinLit:phi1294.phi002.opp-lat3"
+         
+         xml:id="stoa0045.stoa0">
+        <body>
+            <div type="edition" n="urn:cts:latinLit:phi1294.phi002.perseus-lat3" xml:lang="lat">
+                <div type="textpart" subtype="commentary" n="1">
+                    <div type="textpart" subtype="paragraph" n="1">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+                            officia deserunt mollit anim id est laborum.
+                        </p>
+                    </div>
+                    <div type="textpart" subtype="paragraph" n="2">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+                            officia deserunt mollit anim id est laborum.
+                        </p>
+                    </div>
+                    <div type="textpart" subtype="paragraph" n="3">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+                            officia deserunt mollit anim id est laborum.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </text>
+</TEI>

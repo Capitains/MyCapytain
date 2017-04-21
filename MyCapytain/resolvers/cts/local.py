@@ -13,7 +13,7 @@ from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextEr
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsCitation, XmlCtsTextMetadata as InventoryText, \
-    XmlCtsTranslationMetadata, XmlCtsEditionMetadata
+    XmlCtsTranslationMetadata, XmlCtsEditionMetadata, XmlCtsCommentaryMetadata
 from MyCapytain.resources.prototypes.cts.inventory import CtsTextInventoryCollection
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
@@ -230,8 +230,8 @@ class CtsCapitainsLocalResolver(Resolver):
             (urn is None or (urn is not None and text.urn.upTo(__PART) == urn)) and
             (text.citation is not None) and
             (
-                category not in ["edition", "translation"] or
-                (category in ["edition", "translation"] and category.lower() == text.subtype.lower())
+                category not in ["edition", "translation", "commentary"] or
+                (category in ["edition", "translation", "commentary"] and category.lower() == text.subtype.lower())
             )
         ]
         if pagination:
@@ -307,6 +307,9 @@ class CtsCapitainsLocalResolver(Resolver):
                 x.citation = text.citation
             elif isinstance(text, XmlCtsTranslationMetadata):
                 x = XmlCtsTranslationMetadata(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
+                x.citation = text.citation
+            elif isinstance(text, XmlCtsCommentaryMetadata):
+                x = XmlCtsCommentaryMetadata(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
                 x.citation = text.citation
 
         return inventory[objectId]

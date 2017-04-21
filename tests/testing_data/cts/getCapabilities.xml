@@ -280,6 +280,23 @@
                             </ti:citationMapping>
                         </ti:online>
                     </ti:translation>
+                    <ti:commentary workUrn="urn:cts:latinLit:phi1294.phi002" urn="urn:cts:latinLit:phi1294.phi002.perseus-eng3" xml:lang="eng">
+                        <ti:label xml:lang="eng">Introduction to Epigrammata</ti:label>
+                        <ti:description xml:lang="eng">
+            Introduction to Epigrammata by Someone, 1866, Oxford
+                        </ti:description>
+                        <ti:about urn="urn:cts:latinLit:phi1294.phi002.perseus-eng2"/>
+                        <ti:about urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"/>
+                        <ti:online docname="/db/apps/canonical-latinLit/data/phi1294/phi002/phi1294.phi002.perseus-eng3.xml">
+                            <ti:validate schema="tei-epidoc.rng"/>
+                            <ti:namespaceMapping abbreviation="tei" nsURI="http://www.tei-c.org/ns/1.0"/>
+                            <ti:citationMapping>
+                                <ti:citation label="commentary" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div">
+                                    <ti:citation label="paragraph" xpath="/tei:div[@n='?']" scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']"/>
+                                </ti:citation>
+                            </ti:citationMapping>
+                        </ti:online>
+                    </ti:commentary>
                 </ti:work>
             </ti:textgroup>
         </ti:TextInventory>

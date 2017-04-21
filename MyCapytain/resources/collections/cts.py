@@ -13,7 +13,7 @@ from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import XPath_Namespaces, Mimetypes
+from MyCapytain.common.constants import XPath_Namespaces, Mimetypes, RDF_Namespaces
 
 
 class XmlCtsCitation(CitationPrototype):
@@ -116,6 +116,12 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
 
         obj.citation = XmlCtsCitation.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
 
+        # Added for commentary
+        for child in xml.xpath("ti:about", namespaces=XPath_Namespaces):
+            #lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+            #if lg is not None:
+            obj.set_link(RDF_Namespaces.CTS.term("about"), child.get('urn'))
+
         """
         online = xml.xpath("ti:online", namespaces=NS)
         if len(online) > 0:
@@ -154,6 +160,19 @@ class XmlCtsTranslationMetadata(cts.CtsTranslationMetadata, XmlCtsTextMetadata):
         XmlCtsTranslationMetadata.parse_metadata(o, xml)
         return o
 
+class XmlCtsCommentaryMetadata(cts.CtsCommentaryMetadata, XmlCtsTextMetadata):
+    """ Create a commentary subtyped PrototypeText object
+    """
+    @staticmethod
+    def parse(resource, parent=None):
+        xml = xmlparser(resource)
+        lang = xml.get("{http://www.w3.org/XML/1998/namespace}lang")
+
+        o = XmlCtsCommentaryMetadata(urn=xml.get("urn"), parent=parent)
+        if lang is not None:
+            o.lang = lang
+        XmlCtsCommentaryMetadata.parse_metadata(o, xml)
+        return o
 
 class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
     """ Represents a CTS Textgroup in XML
@@ -183,6 +202,8 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
         # Parse children
         xpathDict(xml=xml, xpath='ti:edition', cls=XmlCtsEditionMetadata, parent=o)
         xpathDict(xml=xml, xpath='ti:translation', cls=XmlCtsTranslationMetadata, parent=o)
+       # Added for commentary
+        xpathDict(xml=xml, xpath='ti:commentary', cls=XmlCtsCommentaryMetadata, parent=o)
 
         return o
 

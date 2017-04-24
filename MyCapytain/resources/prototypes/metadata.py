@@ -140,9 +140,9 @@ class Collection(Exportable):
         :param label: Label Value
         :param lang:  Language code
         """
+        self.metadata.add(SKOS.prefLabel, Literal(label, lang=lang))
         self.graph.addN([
             (self.asNode(), RDFS.label, Literal(label, lang=lang), self.graph),
-            (self.metadata.asNode(), SKOS.prefLabel, Literal(label, lang=lang), self.graph),
         ])
 
     @property
@@ -221,8 +221,8 @@ class Collection(Exportable):
         # Delete the graph Item
         self.graph.remove((item.asNode(), None, None))
         self.graph.remove((None, None, item.asNode()))
-        self.graph.remove((item.metadata.asNode(), None, None))
-        self.graph.remove((None, None, item.metadata.asNode()))
+        self.metadata.remove()
+        self.metadata.unlink()
         # Delete the Python item
         if len(item.parents) > 0:
             del item.parents[0].children[item.id]

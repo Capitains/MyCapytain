@@ -68,7 +68,7 @@ class PrototypeCtsCollection(Collection):
         :rtype: dict or Literal
         """
         x = {
-            value.language: value for _, _, value in self.graph.triples((self.metadata.asNode(), RDF_NAMESPACES.CTS.term(prop), None))
+            obj.language: obj for obj in self.metadata.get(RDF_NAMESPACES.CTS.term(prop))
         }
         if lang is not None:
             if lang in x:
@@ -93,9 +93,7 @@ class PrototypeCtsCollection(Collection):
         if prop == self.DC_TITLE_KEY:
             self.set_label(value, lang)
 
-        self.graph.add(
-            (self.metadata.asNode(), prop, value)
-        )
+        self.metadata.add(prop, value)
 
     # new for commentary
     def get_link(self, prop):
@@ -108,7 +106,7 @@ class PrototypeCtsCollection(Collection):
         :return: whole set of values
         :rtype: list
         """
-        return list([o for o in self.graph.objects(self.metadata.asNode(), prop)])
+        return list(self.metadata.get(prop))
 
     def set_link(self, prop, value):
         """ Set given link in CTS Namespace
@@ -127,9 +125,7 @@ class PrototypeCtsCollection(Collection):
         if not isinstance(value, URIRef):
             value = URIRef(value)
 
-        self.graph.add(
-            (self.metadata.asNode(), prop, value)
-        )
+        self.metadata.add(prop, value)
 
     def __xml_export_generic__(self, attrs, namespaces=False, lines="\n", members=None):
         """ Shared method for Mimetypes.XML.CTS Export
@@ -148,7 +144,7 @@ class PrototypeCtsCollection(Collection):
 
         strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)]
         for pred in self.CTS_PROPERTIES:
-            for obj in self.graph.objects(self.metadata.asNode(), pred):
+            for obj in self.metadata.get(pred):
                 strings.append(
                     make_xml_node(
                         self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
@@ -277,7 +273,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
 
             # additional = [make_xml_node(self.graph, RDF_NAMESPACES.CTS.extra)]
             for pred in self.CTS_PROPERTIES:
-                for obj in self.graph.objects(self.metadata.asNode(), pred):
+                for obj in self.metadata.get(pred):
                     strings.append(
                         make_xml_node(
                             self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
@@ -286,7 +282,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
 
             for pred in self.CTS_LINKS:
                 # For each predicate in CTS_LINKS
-                for obj in self.graph.objects(self.metadata.asNode(), pred):
+                for obj in self.metadata.get(pred):
                     # For each item in the graph connected to the current item metadata as object through the predicate "pred"
                     strings.append(
                         make_xml_node(

@@ -75,3 +75,37 @@ class TestMetadata(TestCase):
                 rdflib.term.Literal('SubTitle', lang="eng")
             ]
         )
+
+    def test_remove_unlink(self):
+        m = Metadata()
+        b = rdflib.BNode()
+        m.add(RDF_NAMESPACES.CTS.title, "Title")
+        m.add(RDF_NAMESPACES.CTS.title, "Title", lang="eng")
+        m.add(RDF_NAMESPACES.CTS.title, "SubTitle", lang="eng")
+        m.add(RDF_NAMESPACES.CTS.description, "SubTitle", lang="eng")
+        m.add(RDF_NAMESPACES.CTS.description, "SubTitle", lang="fre")
+        m.graph.add((b, RDF_NAMESPACES.TEI.nobodycares, m.asNode()))
+
+        self.assertCountEqual(
+            m[RDF_NAMESPACES.CTS.title],
+            [
+                rdflib.term.Literal('Title'),
+                rdflib.term.Literal('Title', lang="eng"),
+                rdflib.term.Literal('SubTitle', lang="eng")
+            ]
+        )
+        m.remove(RDF_NAMESPACES.CTS.title)
+        self.assertEqual(m[RDF_NAMESPACES.CTS.title], [])
+        self.assertCountEqual(m[RDF_NAMESPACES.CTS.description], [
+                rdflib.term.Literal('SubTitle', lang="fre"),
+                rdflib.term.Literal('SubTitle', lang="eng")
+        ])
+        self.assertEqual(
+            list(m.graph.subject_predicates(m.asNode())),
+            [(b, RDF_NAMESPACES.TEI.nobodycares)]
+        )
+        m.unlink()
+        self.assertEqual(
+            list(m.graph.subject_predicates(m.asNode())),
+            []
+        )

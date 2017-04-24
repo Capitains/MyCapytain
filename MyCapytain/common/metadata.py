@@ -109,6 +109,19 @@ class Metadata(Exportable):
             return self.get_single(item[0], item[1])
         return list(self.get(item))
 
+    def remove(self, predicate=None, obj=None):
+        """ Remove triple matching the predicate or the object
+
+        :param predicate: Predicate to match, None to match all
+        :param obj: Object to match, None to match all
+        """
+        self.graph.remove((self.asNode(), predicate, obj))
+
+    def unlink(self, subj=None, predicate=None):
+        """ Remove triple where Metadata is the object
+        """
+        self.graph.remove((subj, predicate, self.asNode()))
+
     def __export__(self, output=Mimetypes.JSON.Std, **kwargs):
         """ Export a set of Metadata
 

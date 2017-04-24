@@ -1,9 +1,9 @@
-from MyCapytain.resolvers.cts.api import HttpCTSResolver
-from MyCapytain.retrievers.cts5 import CTS
+from MyCapytain.resolvers.cts.api import HttpCtsResolver
+from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.constants import NS, Mimetypes
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes
 from MyCapytain.resources.prototypes.text import Passage
-from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Text
+from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsTextMetadata
 from MyCapytain.resources.prototypes.metadata import Collection
 
 from unittest import TestCase
@@ -32,9 +32,9 @@ with open("tests/testing_data/cts/getPassageOtherTest.xml") as f:
     GET_PASSAGE_CITATION_FAILURE = f.read()
 
 
-class TestHttpCTSResolver(TestCase):
+class TestHttpCtsResolver(TestCase):
     def setUp(self):
-        self.resolver = HttpCTSResolver(CTS("http://localhost"))
+        self.resolver = HttpCtsResolver(HttpCtsRetriever("http://localhost"))
         self.resolver.endpoint.getPassagePlus = MagicMock(return_value=GET_PASSAGE_PLUS)
         self.resolver.endpoint.getPassage = MagicMock(return_value=GET_PASSAGE)
         self.resolver.endpoint.getPrevNextUrn = MagicMock(return_value=NEXT_PREV)
@@ -68,11 +68,11 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export PrototypeText should work correctly"
+            "Export CtsTextMetadata should work correctly"
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=NS, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -104,11 +104,11 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export PrototypeText should work correctly"
+            "Export CtsTextMetadata should work correctly"
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=NS, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -165,11 +165,11 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export PrototypeText should work correctly"
+            "Export CtsTextMetadata should work correctly"
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=NS, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -188,11 +188,11 @@ class TestHttpCTSResolver(TestCase):
         )
         self.assertEqual(
             passage.prevId, "1.pr",
-            "Previous Passage ID should be parsed"
+            "Previous CapitainsCtsPassage ID should be parsed"
         )
         self.assertEqual(
             passage.nextId, "1.2",
-            "Next Passage ID should be parsed"
+            "Next CapitainsCtsPassage ID should be parsed"
         )
         children = list(passage.getReffs())
 
@@ -217,11 +217,11 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export PrototypeText should work correctly"
+            "Export CtsTextMetadata should work correctly"
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=NS, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -260,11 +260,11 @@ class TestHttpCTSResolver(TestCase):
         )
         self.assertEqual(
             passage.prevId, "1.pr",
-            "Previous Passage ID should be parsed"
+            "Previous CapitainsCtsPassage ID should be parsed"
         )
         self.assertEqual(
             passage.nextId, "1.2",
-            "Next Passage ID should be parsed"
+            "Next CapitainsCtsPassage ID should be parsed"
         )
         children = list(passage.getReffs())
 
@@ -289,11 +289,11 @@ class TestHttpCTSResolver(TestCase):
 
         self.assertIn(
             "Hic est quem legis ille, quem requiris,", passage.export(output=Mimetypes.PLAINTEXT),
-            "Export PrototypeText should work correctly"
+            "Export CtsTextMetadata should work correctly"
         )
 
         self.assertEqual(
-            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=NS, magic_string=False),
+            passage.export(output=Mimetypes.PYTHON.ETREE).xpath(".//tei:l[@n='1']/text()", namespaces=XPATH_NAMESPACES, magic_string=False),
             ["Hic est quem legis ille, quem requiris, "],
             "Export to Etree should give an Etree or Etree like object"
         )
@@ -307,7 +307,7 @@ class TestHttpCTSResolver(TestCase):
             "Resolver should return a collection object"
         )
         self.assertIsInstance(
-            metadata.members[0], TextGroup,
+            metadata.members[0], XmlCtsTextgroupMetadata,
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
@@ -319,11 +319,11 @@ class TestHttpCTSResolver(TestCase):
             "There should be as many readable descendants as there is edition, translation, and commentaries"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, Text)]), 16,
+            len([x for x in metadata.readableDescendants if isinstance(x, XmlCtsTextMetadata)]), 16,
             "There should be 14 editions + 1 translations + 1 commentary in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -339,11 +339,11 @@ class TestHttpCTSResolver(TestCase):
         self.resolver.endpoint.getCapabilities.assert_called_with(urn="urn:cts:latinLit:phi1294.phi002")
         self.assertIsInstance(
             metadata, Collection,
-            "Resolver should return a collection object (specifically here a PrototypeWork)"
+            "Resolver should return a collection object (specifically here a CtsWorkMetadata)"
         )
         self.assertIsInstance(
-            metadata.members[0], Text,
-            "Members of PrototypeWork should be TextGroups"
+            metadata.members[0], XmlCtsTextMetadata,
+            "Members of CtsWorkMetadata should be TextGroups"
         )
         self.assertEqual(
             len(metadata.descendants), 2,
@@ -354,11 +354,11 @@ class TestHttpCTSResolver(TestCase):
             "There should be 1 edition + 1 translation in readableDescendants"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, Text)]), 2,
+            len([x for x in metadata.readableDescendants if isinstance(x, XmlCtsTextMetadata)]), 2,
             "There should be 1 edition + 1 translation in readableDescendants"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=NS)), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath("//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
@@ -376,7 +376,7 @@ class TestHttpCTSResolver(TestCase):
                     ["http://w3id.org/dts-ontology/navigation"]\
                     ["http://w3id.org/dts-ontology/parents"]
                 ],
-            ["http://chs.harvard.edu/xmlns/cts/PrototypeTextGroup", "http://chs.harvard.edu/xmlns/cts/PrototypeTextInventory"],
+            ["http://chs.harvard.edu/xmlns/cts/CtsTextgroupMetadata", "http://chs.harvard.edu/xmlns/cts/CtsTextInventoryMetadata"],
             "There should be one member in DTS JSON"
         )
         """
@@ -470,10 +470,10 @@ class TestHttpCTSResolver(TestCase):
     def test_citation_failure(self):
         """ Example for Resolver failed : some response have an issue with not available Citations ?
         """
-        retriever = CTS("http://cts.dh.uni-leipzig.de/api/cts/")
+        retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/remote/cts/")
         retriever.getPassage = MagicMock(return_value=GET_PASSAGE_CITATION_FAILURE)
-        resolver = HttpCTSResolver(retriever)
-        # We require a passage : passage is now a Passage object
+        resolver = HttpCtsResolver(retriever)
+        # We require a passage : passage is now a CapitainsCtsPassage object
         passage = resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", "1.1")
         # We need an export as plaintext
         self.assertEqual(

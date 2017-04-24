@@ -9,7 +9,7 @@ import lxml.etree as etree
 import xmlunittest
 
 from MyCapytain.resources.collections.cts import *
-from MyCapytain.resources.prototypes.text import CTSNode
+from MyCapytain.resources.prototypes.text import CtsNode
 from MyCapytain.common import constants
 
 
@@ -160,22 +160,22 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.getCapabilities.close()
 
     def test_xml_TextInventoryLength(self):
-        """ Tests PrototypeTextInventory parses without errors """
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        """ Tests CtsTextInventoryMetadata parses without errors """
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         self.assertEqual(len(TI), 16)
 
     def test_xml_TextInventoryParsing(self):
-        """ Tests PrototypeTextInventory parses without errors """
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        """ Tests CtsTextInventoryMetadata parses without errors """
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         self.assertGreater(len(TI.textgroups), 0)
 
     def test_xml_TextInventory_GetItem(self):
         """ Test access through getItem obj[urn] """
-        TI = TextInventory.parse(resource=self.getCapabilities)
-        self.assertIsInstance(TI["urn:cts:latinLit:phi1294"], TextGroup)
-        self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002"], Work)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
+        self.assertIsInstance(TI["urn:cts:latinLit:phi1294"], XmlCtsTextgroupMetadata)
+        self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002"], XmlCtsWorkMetadata)
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].urn), "urn:cts:latinLit:phi1294.phi002")
-        self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], Text)
+        self.assertIsInstance(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], XmlCtsTextMetadata)
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn),
                          "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(TI["urn:cts:latinLit:phi1294.phi002"].lang, "lat")
@@ -183,11 +183,11 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     def test_xml_Work_GetItem(self):
         """ Test access through getItem obj[urn] """
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         tg = TI["urn:cts:latinLit:phi1294"]
-        self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002"], Work)
+        self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002"], XmlCtsWorkMetadata)
         self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002"].urn), "urn:cts:latinLit:phi1294.phi002")
-        self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], Text)
+        self.assertIsInstance(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"], XmlCtsTextMetadata)
         self.assertEqual(str(tg["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].urn),
                          "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 
@@ -206,7 +206,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 </ti:translation>
             </ti:work>
         """
-        W = Work.parse(resource=xml)
+        W = XmlCtsWorkMetadata.parse(resource=xml)
         self.assertEqual(len(W.get_translation_in("eng")), 2)
         self.assertEqual(len(W.get_translation_in()), 3)
         self.assertEqual(
@@ -231,7 +231,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 </ti:translation>
             </ti:work>
         """
-        W = Work.parse(resource=xml)
+        W = XmlCtsWorkMetadata.parse(resource=xml)
         E = W["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
         T = W["urn:cts:latinLit:phi1294.phi002.perseus-fre1"]
 
@@ -240,7 +240,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(T.editions(), [E])
 
     def test_get_parent(self):
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         tg = TI["urn:cts:latinLit:phi1294"]
         wk = TI["urn:cts:latinLit:phi1294.phi002"]
         tx = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
@@ -252,15 +252,15 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(tx.parents[2], TI)
 
     def test_translation(self):
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         tr = TI["urn:cts:latinLit:phi1294.phi002.perseus-eng2"]
-        self.assertIsInstance(tr, Translation)
+        self.assertIsInstance(tr, XmlCtsTranslationMetadata)
         self.assertEqual(tr.subtype, "translation")
 
     def test_commentary(self):
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         tr = TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"]
-        self.assertIsInstance(tr, Commentary)
+        self.assertIsInstance(tr, XmlCtsCommentaryMetadata)
         self.assertEqual(tr.subtype, "commentary")
         self.assertEqual(tr.citation.name, 'commentary')
         self.assertEqual(tr.citation.child.name, 'paragraph')
@@ -269,7 +269,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                          "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']")
 
     def test_parse_string(self):
-        TI = TextInventory.parse(
+        TI = XmlCtsTextInventoryMetadata.parse(
             resource="""
 <ti:TextInventory xmlns:ti="http://chs.harvard.edu/xmlns/cts" tiid="thibault3">
     <ti:textgroup urn="urn:cts:greekLit:tlg0003">
@@ -288,13 +288,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 
     def test_parse_error(self):
         with self.assertRaises(TypeError):
-            TI = TextInventory.parse(
+            TI = XmlCtsTextInventoryMetadata.parse(
                 resource=5
             )
 
     def test_Inventory_pickle(self):
-        """ Tests PrototypeTextInventory parses without errors """
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        """ Tests CtsTextInventoryMetadata parses without errors """
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         from pickle import dumps, loads
 
         dp = dumps(TI)
@@ -313,7 +313,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         tixml = ti.export(Mimetypes.XML.CTS)
         self.assertEqual(
             len(list(ti.graph.triples(
-                (ti["urn:cts:latinLit:phi1294"].asNode(), constants.NAMESPACES.DTS.term("metadata"), None)
+                (ti["urn:cts:latinLit:phi1294"].asNode(), constants.RDF_NAMESPACES.DTS.term("metadata"), None)
             ))),
             1,
             "There should be one node for the child 1294 which is metadata"
@@ -321,9 +321,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(*compareSTR(tixml, xml))
 
     def test_Inventory_metadata(self):
-        """ Tests PrototypeTextInventory parses without errors """
-        TI = TextInventory.parse(resource=self.getCapabilities)
-        print(TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.NAMESPACES.CTS.term("about")))
+        """ Tests CtsTextInventoryMetadata parses without errors """
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "eng")), "Martial")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "lat")), "Martialis")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "eng")), "Epigrammata")
@@ -337,7 +336,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "eng")),
                          "W. Heraeus")
         self.assertCountEqual(
-            list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.NAMESPACES.CTS.term("about"))]),
+            list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.RDF_NAMESPACES.CTS.term("about"))]),
                          ["urn:cts:latinLit:phi1294.phi002.perseus-eng2", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
         # Test that the citation scheme of the commentary is being returned
 
@@ -382,7 +381,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         t = """<ns0:TextInventory tiid='annotsrc' xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>""" + tg + """</ns0:TextInventory>""".replace(
             "\n", "").strip("\n")
         # compareSTR
-        ti = TextInventory.parse(resource=t)
+        ti = XmlCtsTextInventoryMetadata.parse(resource=t)
         self.assertEqual(*compareSTR(ti.export(Mimetypes.XML.CTS), t))
 
         # Test individual :
@@ -408,31 +407,31 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(ti["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].lang, "eng")
 
     def test_import_to_text(self):
-        """ Test export to PrototypeText object """
-        TI = TextInventory.parse(resource=self.getCapabilities)
+        """ Test export to CtsTextMetadata object """
+        TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
-        txt_text = CTSNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        txt_text = CtsNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(
-            str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("groupname"), "eng")),
+            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("groupname"), "eng")),
             "Martial",
             "Check inheritance of textgroup metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("title"), "eng")),
+            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "eng")),
             "Epigrammata",
             "Check inheritance of work metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("title"), "fre")),
+            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "fre")),
             "Epigrammes",
             "Check inheritance of work metadata"
         )
         for i in range(0, 100):
             self.assertEqual(
-                str(txt_text.metadata.get(constants.NAMESPACES.CTS.term("description"), "fre")),
+                str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("description"), "fre")),
                 "G. Heraeus",
                 "Check inheritance of work metadata"
             )
@@ -461,8 +460,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 <ti:title xml:lang='ger'>De spectaculis</ti:title>
 </ti:work>
 </ti:textgroup>""".replace("\n", "")
-        TG1 = TextGroup.parse(resource=self.tg)
-        TG2 = TextGroup.parse(resource=tg)
+        TG1 = XmlCtsTextgroupMetadata.parse(resource=self.tg)
+        TG2 = XmlCtsTextgroupMetadata.parse(resource=tg)
         self.assertEqual(
             len(TG1), 2,
             "There is two edition/translations in TG1"
@@ -480,7 +479,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(
             list(TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].parents),
             list(TG1["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].parents),
-            "Edition OPP should be added to textgroup and original kept"
+            "XmlCtsEditionMetadata OPP should be added to textgroup and original kept"
         )
         self.assertListEqual(
             sorted(TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].editions(), key=lambda x: str(x.urn)),
@@ -522,13 +521,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         from MyCapytain.errors import InvalidURN
         self.assertRaises(
             InvalidURN,
-            lambda x: Work(urn="urn:cts:latinLit:phi1294.phi002").update(Work(urn="urn:cts:latinLit:phi1297.phi002")),
+            lambda x: XmlCtsWorkMetadata(urn="urn:cts:latinLit:phi1294.phi002").update(XmlCtsWorkMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
             "Addition of different work with different URN should fail"
         )
         self.assertRaises(
             InvalidURN,
-            lambda x: TextGroup(urn="urn:cts:latinLit:phi1294").update(
-                TextGroup(urn="urn:cts:latinLit:phi1297")),
+            lambda x: XmlCtsTextgroupMetadata(urn="urn:cts:latinLit:phi1294").update(
+                XmlCtsTextgroupMetadata(urn="urn:cts:latinLit:phi1297")),
             "Addition of different work with different URN should fail"
         )
 
@@ -536,19 +535,19 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         """ Checks that we cannot add work or textgroup with different URN"""
         self.assertRaises(
             TypeError,
-            lambda x: Work(urn="urn:cts:latinLit:phi1294.phi002").update(
-                TextGroup.parse(urn="urn:cts:latinLit:phi1297")),
-            "Addition of different type should fail for PrototypeWork"
+            lambda x: XmlCtsWorkMetadata(urn="urn:cts:latinLit:phi1294.phi002").update(
+                XmlCtsTextgroupMetadata.parse(urn="urn:cts:latinLit:phi1297")),
+            "Addition of different type should fail for CtsWorkMetadata"
         )
         self.assertRaises(
             TypeError,
-            lambda x: TextGroup.parse(urn="urn:cts:latinLit:phi1294").update(
-                Work(urn="urn:cts:latinLit:phi1297.phi002")),
-            "Addition of different type should fail for PrototypeTextGroup"
+            lambda x: XmlCtsTextgroupMetadata.parse(urn="urn:cts:latinLit:phi1294").update(
+                XmlCtsWorkMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
+            "Addition of different type should fail for CtsTextgroupMetadata"
         )
 
 
 class TestCitation(unittest.TestCase):
     def test_empty(self):
-        a = Citation(name="none")
+        a = XmlCtsCitation(name="none")
         self.assertEqual(a.export(), "")

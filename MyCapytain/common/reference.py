@@ -11,7 +11,8 @@ from six import text_type
 from copy import copy
 import re
 from lxml.etree import _Element
-from MyCapytain.common.constants import NS, Exportable, Mimetypes, get_graph, NAMESPACES
+from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, get_graph, RDF_NAMESPACES
+from MyCapytain.common.base import Exportable
 from MyCapytain.common.utils import make_xml_node
 
 REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
@@ -21,7 +22,7 @@ REFERENCE_REPLACER = re.compile(r"(@[a-zA-Z0-9:]+)(=)([\\$'\"?0-9]{3,6})")
 
 
 def __childOrNone__(liste):
-    """ Used to parse resources in Citation
+    """ Used to parse resources in XmlCtsCitation
 
     :param liste: List of item
     :return: If there is > 1 element in the list, return the last one
@@ -35,7 +36,7 @@ def __childOrNone__(liste):
 class Reference(object):
     """ A reference object giving information
 
-    :param reference: Passage Reference part of a Urn
+    :param reference: CapitainsCtsPassage Reference part of a Urn
     :type reference: basestring
 
     :Example:
@@ -358,10 +359,10 @@ class URN(object):
 
     @property
     def work(self):
-        """ PrototypeWork element of the URN
+        """ CtsWorkMetadata element of the URN
 
         :rtype: str
-        :return: PrototypeWork part of the URN
+        :return: CtsWorkMetadata part of the URN
         """
         return self.__parsed["work"]
 
@@ -642,7 +643,7 @@ class Citation(Exportable):
     :param refsDecl: refsDecl version
     :type refsDecl: basestring
     :param child: A citation
-    :type child: Citation
+    :type child: XmlCtsCitation
     :ivar name: Name of the citation (e.g. "book")
     :type name: basestring
     :ivar xpath: Xpath of the citation (As described by CTS norm)
@@ -662,7 +663,7 @@ class Citation(Exportable):
     escape = re.compile('(")')
 
     def __init__(self, name=None, xpath=None, scope=None, refsDecl=None, child=None):
-        """ Initialize a Citation object
+        """ Initialize a XmlCtsCitation object
         """
         self.__name = None
         self.__xpath = None
@@ -693,7 +694,7 @@ class Citation(Exportable):
 
     @property
     def xpath(self):
-        """ PrototypeTextInventory xpath property of a citation (ie. identifier of the last element of the citation)
+        """ CtsTextInventoryMetadata xpath property of a citation (ie. identifier of the last element of the citation)
         
         :type: basestring
         :Example: //tei:l[@n="?"]
@@ -708,7 +709,7 @@ class Citation(Exportable):
 
     @property
     def scope(self):
-        """ PrototypeTextInventory scope property of a citation (ie. identifier of all element but the last of the citation)
+        """ CtsTextInventoryMetadata scope property of a citation (ie. identifier of all element but the last of the citation)
         
         :type: basestring
         :Example: /tei:TEI/tei:text/tei:body/tei:div
@@ -740,8 +741,8 @@ class Citation(Exportable):
     def child(self):
         """ Child of a citation
 
-        :type: Citation or None
-        :Example: Citation.name==poem would have a child Citation.name==line
+        :type: XmlCtsCitation or None
+        :Example: XmlCtsCitation.name==poem would have a child XmlCtsCitation.name==line
         """
         return self.__child
         
@@ -779,9 +780,9 @@ class Citation(Exportable):
         Loop over the citation childs
 
         :Example:
-            >>>    c = Citation(name="line")
-            >>>    b = Citation(name="poem", child=c)
-            >>>    a = Citation(name="book", child=b)
+            >>>    c = XmlCtsCitation(name="line")
+            >>>    b = XmlCtsCitation(name="poem", child=c)
+            >>>    a = XmlCtsCitation(name="book", child=b)
             >>>    [e for e in a] == [a, b, c]
             
         """
@@ -795,7 +796,7 @@ class Citation(Exportable):
 
     def __getitem__(self, item):
         if not isinstance(item, int) or item > len(self)-1:
-            raise KeyError("Citation index is too big")
+            raise KeyError("XmlCtsCitation index is too big")
         return [x for x in self][item]
 
     def __len__(self):
@@ -809,7 +810,7 @@ class Citation(Exportable):
     def fill(self, passage=None, xpath=None):
         """ Fill the xpath with given informations
 
-        :param passage: Passage reference
+        :param passage: CapitainsCtsPassage reference
         :type passage: Reference or list or None. Can be list of None and not None
         :param xpath: If set to True, will return the replaced self.xpath value and not the whole self.refsDecl
         :type xpath: Boolean
@@ -818,7 +819,7 @@ class Citation(Exportable):
 
         .. code-block:: python
 
-            citation = Citation(name="line", scope="/TEI/text/body/div/div[@n=\"?\"]",xpath="//l[@n=\"?\"]")
+            citation = XmlCtsCitation(name="line", scope="/TEI/text/body/div/div[@n=\"?\"]",xpath="//l[@n=\"?\"]")
             print(citation.fill(["1", None]))
             # /TEI/text/body/div/div[@n='1']//l[@n]
             print(citation.fill(None))
@@ -885,7 +886,7 @@ class Citation(Exportable):
                 label = self.name
 
             return make_xml_node(
-                get_graph(), NAMESPACES.CTS.citation, attributes={
+                get_graph(), RDF_NAMESPACES.CTS.citation, attributes={
                     "xpath": re.sub(Citation.escape, "'", self.xpath),
                     "scope": re.sub(Citation.escape, "'", self.scope),
                     "label": label
@@ -926,7 +927,7 @@ class Citation(Exportable):
         elif not isinstance(resource, _Element):
             return None
 
-        resource = resource.xpath(xpath, namespaces=NS)
+        resource = resource.xpath(xpath, namespaces=XPATH_NAMESPACES)
         resources = []
 
         for x in range(0, len(resource)):

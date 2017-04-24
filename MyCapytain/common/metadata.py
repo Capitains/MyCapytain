@@ -8,7 +8,8 @@
 
 """
 from __future__ import unicode_literals
-from MyCapytain.common.constants import Mimetypes, Exportable, get_graph
+from MyCapytain.common.constants import Mimetypes, get_graph
+from MyCapytain.common.base import Exportable
 from rdflib import BNode, Literal, Graph
 
 

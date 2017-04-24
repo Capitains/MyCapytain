@@ -5,4 +5,4 @@ import unittest
 import six
 from collections import defaultdict
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.constants import NAMESPACES, Mimetypes
+from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes

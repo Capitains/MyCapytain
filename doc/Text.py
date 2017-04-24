@@ -1,12 +1,12 @@
 #  We import the correct classes from the local module
-from MyCapytain.resources.texts.locals.tei import Text
-from MyCapytain.common.constants import Mimetypes, NS
+from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
+from MyCapytain.common.constants import Mimetypes, XPATH_NAMESPACES
 from lxml.etree import tostring
 
 #  We open a file
 with open("./tests/testing_data/examples/text.martial.xml") as f:
     # We initiate a Text object giving the IO instance to resource argument
-    text = Text(resource=f)
+    text = CapitainsCtsText(resource=f)
 
 # Text objects have a citation property
 #  len(Citation(...)) gives the depth of the citation scheme
@@ -39,7 +39,7 @@ You'll print something like the following :
 #  We open another such as Cicero's texts !
 with open("./tests/testing_data/examples/text.cicero.xml") as f:
     # We initiate a Text object giving the IO instance to resource argument
-    text = Text(resource=f)
+    text = CapitainsCtsText(resource=f)
     # We are specifically interest in the portion 28-30
     # Note that we won't use 28-30 as cross passage reference won't work properly
     p28_29 = text.getTextualNode("28-29")
@@ -55,7 +55,7 @@ with open("./tests/testing_data/examples/text.cicero.xml") as f:
     # So we export to an LXML Object
     document = p28_29.export(Mimetypes.PYTHON.ETREE)
     # We remove some XML
-    for element in document.xpath("//tei:note", namespaces=NS):
+    for element in document.xpath("//tei:note", namespaces=XPATH_NAMESPACES):
         element.getparent().remove(element)
     # And we print using LXML constants
     print("Clean XML of 28-29")

@@ -1,7 +1,7 @@
 digraph "classes_MyCapytain_texts" {
 charset="utf-8"
 rankdir=BT
-"0" [label="CTSNode", shape="record"];
+"0" [label="CtsNode", shape="record"];
 "1" [label="CitableText", shape="record"];
 "2" [label="Collection", shape="record"];
 "3" [label="InteractiveTextualNode", shape="record"];

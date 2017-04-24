@@ -10,9 +10,9 @@ import MyCapytain.common.metadata
 
 
 class TestProtoResource(unittest.TestCase):
-    """ Test for resource, mother class of PrototypeText and Passage """
+    """ Test for resource, mother class of CtsTextMetadata and CapitainsCtsPassage """
     def test_init(self):
-        a = CTSNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        a = CtsNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.id, "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.urn, URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2"))
         self.assertIsInstance(a.citation, Citation)
@@ -23,7 +23,7 @@ class TestProtoResource(unittest.TestCase):
 
     def test_urn(self):
         """ Test setters and getters for urn """
-        a = CTSNode()
+        a = CtsNode()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
         self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)
@@ -55,9 +55,9 @@ class TestProtoText(unittest.TestCase):
         self.assertIsInstance(a.metadata, MyCapytain.common.metadata.Metadata)
 
         m = MyCapytain.common.metadata.Metadata()
-        m.add(NAMESPACES.CTS.title, "I am a metadata", "fre")
+        m.add(RDF_NAMESPACES.CTS.title, "I am a metadata", "fre")
         a = CitableText(metadata=m)
-        self.assertEqual(str(a.metadata.get(NAMESPACES.CTS.title, "fre")), "I am a metadata")
+        self.assertEqual(str(a.metadata.get(RDF_NAMESPACES.CTS.title, "fre")), "I am a metadata")
 
     def test_proto_reff(self):
         """ Test that getValidReff function are not implemented """

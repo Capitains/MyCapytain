@@ -2,28 +2,24 @@
 """
 .. module:: MyCapytain.resources.xml
 
-Shared elements for TEI Citation
+Shared elements for TEI XmlCtsCitation
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 """
-from __future__ import unicode_literals
-from six import text_type
-
-from MyCapytain.common.utils import normalize, xmlparser, \
-    nested_set, nested_ordered_dictionary
-from MyCapytain.common.constants import NS, Mimetypes
-from MyCapytain.resources.prototypes.text import InteractiveTextualNode
-
 from lxml.etree import tostring
+
+from MyCapytain.common.constants import Mimetypes, XPATH_NAMESPACES
+from MyCapytain.common.utils import xmlparser, nested_ordered_dictionary, nested_set, normalize
+from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 
 
 class TEIResource(InteractiveTextualNode):
     """ TEI Encoded Resource
 
-    :param resource: XML Resource that needs to be parsed into a Passage/PrototypeText
+    :param resource: XML Resource that needs to be parsed into a CapitainsCtsPassage/CtsTextMetadata
     :type resource: Union[str,_Element]
     :cvar EXPORT_TO: List of exportable supported formats
-    :cvar DEFAULT_EXPORT: Default export (Plain/PrototypeText)
+    :cvar DEFAULT_EXPORT: Default export (Plain/CtsTextMetadata)
     """
     EXPORT_TO = [
         Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std,
@@ -36,15 +32,15 @@ class TEIResource(InteractiveTextualNode):
         self.resource = xmlparser(resource)
 
     def __str__(self):
-        """ PrototypeText based representation of the passage
-    
+        """ CtsTextMetadata based representation of the passage
+
         :rtype: basestring
         :returns: XML of the passage in string form
         """
         return self.export(output=Mimetypes.XML.Std)
 
     def __export__(self, output=Mimetypes.PLAINTEXT, exclude=None, _preformatted=False):
-        """ PrototypeText content of the passage
+        """ CtsTextMetadata content of the passage
 
         :param output: Mimetype (From MyCapytian.common.utils.Mimetypes) to output
         :type output: str
@@ -53,10 +49,10 @@ class TEIResource(InteractiveTextualNode):
         :param _preformatted: This parameter is used when export loops on itself
         :type _preformatted: boolean
         :rtype: basestring
-        :returns: PrototypeText of the xml node
+        :returns: CtsTextMetadata of the xml node
 
         :Example:
-            >>>    P = Passage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
+            >>>    P = CapitainsCtsPassage(resource='<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
             >>>    P.export(output=Mimetypes.PLAINTEXT) == "Ibis hello b ab excusso missus in astra sago. "
             >>>    P.export(output=Mimetypes.PLAINTEXT, exclude=[]) == "Ibis hello b ab excusso missus in astra sago. "
 
@@ -105,7 +101,7 @@ class TEIResource(InteractiveTextualNode):
                         for element
                         in self.resource.xpath(
                             ".//descendant-or-self::text(){}".format(exclude),
-                            namespaces=NS,
+                            namespaces=XPATH_NAMESPACES,
                             smart_strings=False
                         )
                     ]
@@ -114,7 +110,7 @@ class TEIResource(InteractiveTextualNode):
 
     @property
     def xml(self):
-        """ XML Representation of the Passage
+        """ XML Representation of the CapitainsCtsPassage
 
         :rtype: lxml.etree._Element
         :returns: XML element representing the passage

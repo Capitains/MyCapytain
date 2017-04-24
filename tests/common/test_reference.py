@@ -360,7 +360,7 @@ class TestCitation(unittest.TestCase):
         self.assertEqual(a[2], c, "Third citation is C")
         self.assertEqual(a[0], a, "First citation is A")
         self.assertEqual(a[1], b, "Second citation is B")
-        with self.assertRaises(KeyError, msg="Citation is out of bound"):
+        with self.assertRaises(KeyError, msg="XmlCtsCitation is out of bound"):
             a[8]
 
     def test_fill(self):

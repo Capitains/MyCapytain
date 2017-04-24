@@ -34,16 +34,16 @@ so we are gonna ask the API to give its metadata to us :
    :linenos:
    :caption: example.py from the Github Repository
 
-    from MyCapytain.resolvers.cts.api import HttpCTSResolver
+    from MyCapytain.resolvers.cts.api import HttpCtsResolver
     from MyCapytain.retrievers.cts5 import CTS
     from MyCapytain.common.constants import Mimetypes
 
     # We set up a resolver which communicates with an API available in Leipzig
-    resolver = HttpCTSResolver(CTS("http://cts.dh.uni-leipzig.de/api/cts/"))
+    resolver = HttpCtsResolver(CTS("http://cts.dh.uni-leipzig.de/api/cts/"))
     # We require some metadata information
     textMetadata = resolver.getMetadata("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
     # Texts in CTS Metadata have one interesting property : its citation scheme.
-    # Citation are embedded objects that carries information about how a text can be quoted, what depth it has
+    # XmlCtsCitation are embedded objects that carries information about how a text can be quoted, what depth it has
     print(type(textMetadata), [citation.name for citation in textMetadata.citation])
 
 This query will return the following information :

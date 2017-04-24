@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 import unittest
 
-from six import text_type as str
-
 from MyCapytain.common.reference import Reference, Citation
-from MyCapytain.resources.texts.encodings import *
+from MyCapytain.resources.texts.base.tei import TEIResource
+from MyCapytain.common.constants import Mimetypes
+from MyCapytain.common.utils import xmlparser
 
 
 class TestTEICitation(unittest.TestCase):
@@ -140,5 +140,5 @@ class TestTEIPassage(unittest.TestCase):
         self.assertEqual(
             P.export_capacities,
             [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT, Mimetypes.XML.TEI],
-            "Passage should be able to export to given resources"
+            "CapitainsCtsPassage should be able to export to given resources"
         )

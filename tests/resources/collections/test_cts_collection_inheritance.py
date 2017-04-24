@@ -1,27 +1,27 @@
 from unittest import TestCase
-from MyCapytain.resources.collections.cts import TextInventory, TextGroup, Work, Edition, Translation
-from MyCapytain.resources.prototypes.cts.inventory import PrototypeTextGroup
+from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsEditionMetadata, XmlCtsTranslationMetadata
+from MyCapytain.resources.prototypes.cts.inventory import CtsTextgroupMetadata
 
 with open("tests/testing_data/examples/getcapabilities.seneca.xml") as f:
     SENECA = f.read()
 
 
-class TestCollectionCTSInheritance(TestCase):
+class TestCollectionCtsInheritance(TestCase):
     def test_types(self):
-        TI = TextInventory.parse(resource=SENECA)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=SENECA)
         self.assertCountEqual(
             [type(descendant) for descendant in TI.descendants],
-            [TextGroup] + [Work]*10 + [Edition]*10,
+            [XmlCtsTextgroupMetadata] + [XmlCtsWorkMetadata] * 10 + [XmlCtsEditionMetadata] * 10,
             "Descendant should be correctly parsed into correct types"
         )
         self.assertCountEqual(
             [type(descendant) for descendant in TI.readableDescendants],
-            [Work]*0 + [Edition]*10,
+            [XmlCtsWorkMetadata] * 0 + [XmlCtsEditionMetadata] * 10,
             "Descendant should be correctly parsed into correct types and filtered when readable"
         )
 
     def test_title(self):
-        TI = TextInventory.parse(resource=SENECA)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=SENECA)
         self.assertCountEqual(
             [str(descendant.get_label()) for descendant in TI.descendants],
             ["Seneca, Lucius Annaeus", "de Ira", "de Vita Beata", "de consolatione ad Helviam", "de Constantia",
@@ -37,6 +37,6 @@ class TestCollectionCTSInheritance(TestCase):
 
     def test_new_object(self):
         """ When creating an object with same urn, we should retrieve the same metadata"""
-        TI = TextInventory.parse(resource=SENECA)
+        TI = XmlCtsTextInventoryMetadata.parse(resource=SENECA)
         a = TI["urn:cts:latinLit:stoa0255.stoa012.perseus-lat2"].metadata
-        b = (PrototypeTextGroup("urn:cts:latinLit:stoa0255")).metadata
+        b = (CtsTextgroupMetadata("urn:cts:latinLit:stoa0255")).metadata

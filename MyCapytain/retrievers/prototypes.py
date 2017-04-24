@@ -28,14 +28,14 @@ class API(object):
 
 
 class CitableTextServiceRetriever(API):
-    """ Citable PrototypeText Service retrievers should have at least have some of the following properties
+    """ Citable CtsTextMetadata Service retrievers should have at least have some of the following properties
 
     """
 
     def getMetadata(self, objectId=None, **filters):
         """ Request metadata about a text or a collection
 
-        :param objectId: PrototypeText Identifier
+        :param objectId: CtsTextMetadata Identifier
         :param filters: Kwargs parameters. URN and Inv are available
         :return: Metadata of text from an API or the likes as bytes
         """
@@ -44,19 +44,19 @@ class CitableTextServiceRetriever(API):
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: PrototypeText Identifier
-        :param subreference: Passage Reference
+        :param textId: CtsTextMetadata Identifier
+        :param subreference: CapitainsCtsPassage Reference
         :param prevnext: Retrieve graph representing previous and next passage
         :param metadata: Retrieve metadata about the passage and the text
-        :return: PrototypeText of a Passage from an API or the likes as bytes
+        :return: CtsTextMetadata of a CapitainsCtsPassage from an API or the likes as bytes
         """
         raise NotImplementedError
 
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
-        :param subreference: Passage Reference
+        :param textId: CtsTextMetadata Identifier
+        :param subreference: CapitainsCtsPassage Reference
         :return: Siblings references from an API or the likes as bytes
         """
         raise NotImplementedError
@@ -64,11 +64,11 @@ class CitableTextServiceRetriever(API):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]
@@ -76,7 +76,7 @@ class CitableTextServiceRetriever(API):
         raise NotImplementedError
 
 
-class CTS(CitableTextServiceRetriever):
+class CtsRetriever(CitableTextServiceRetriever):
     """ CTS API Endpoint Prototype
     """
     def getCapabilities(self, inventory):

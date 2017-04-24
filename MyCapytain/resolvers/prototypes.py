@@ -28,25 +28,25 @@ class Resolver(object):
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
         :type prevnext: boolean
         :param metadata: Retrieve metadata about the passage and the text
         :type metadata: boolean
-        :return: Passage
-        :rtype: Passage
+        :return: CapitainsCtsPassage
+        :rtype: CapitainsCtsPassage
         """
         raise NotImplementedError()
 
     def getSiblings(self, textId, subreference):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: Tuple of references
         :rtype: (str, str)
@@ -56,11 +56,11 @@ class Resolver(object):
     def getReffs(self, textId, level=1, subreference=None):
         """ Retrieve the siblings of a textual node
 
-        :param textId: PrototypeText Identifier
+        :param textId: CtsTextMetadata Identifier
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: Passage Reference
+        :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
         :return: List of references
         :rtype: [str]

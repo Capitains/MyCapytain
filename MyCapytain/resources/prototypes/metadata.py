@@ -388,7 +388,7 @@ class ResourceCollection(Collection):
         :return: Creator string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.creator, lang=lang)
+        return self.metadata.get_single(key=DC.creator, lang=lang)
 
     def get_title(self, lang=None):
         """ Get the title of the object
@@ -397,7 +397,7 @@ class ResourceCollection(Collection):
         :return: Title string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.title, lang=lang)
+        return self.metadata.get_single(key=DC.title, lang=lang)
 
     def get_description(self, lang=None):
         """ Get the description of the object
@@ -406,7 +406,7 @@ class ResourceCollection(Collection):
         :return: Description string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.description, lang=lang)
+        return self.metadata.get_single(key=DC.description, lang=lang)
 
     def get_subject(self, lang=None):
         """ Get the subject of the object
@@ -415,4 +415,4 @@ class ResourceCollection(Collection):
         :return: Subject string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.subject, lang=lang)
+        return self.metadata.get_single(key=DC.subject, lang=lang)

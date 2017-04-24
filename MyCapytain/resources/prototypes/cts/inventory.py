@@ -337,7 +337,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
         :return: Description string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=RDF_NAMESPACES.CTS.description, lang=lang)
+        return self.metadata.get_single(key=RDF_NAMESPACES.CTS.description, lang=lang)
 
     def get_subject(self, lang=None):
         """ Get the DC subject of the object

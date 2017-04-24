@@ -415,23 +415,23 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("groupname"), "eng")),
+            str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("groupname"), "eng")),
             "Martial",
             "Check inheritance of textgroup metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "eng")),
+            str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("title"), "eng")),
             "Epigrammata",
             "Check inheritance of work metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "fre")),
+            str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("title"), "fre")),
             "Epigrammes",
             "Check inheritance of work metadata"
         )
         for i in range(0, 100):
             self.assertEqual(
-                str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("description"), "fre")),
+                str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("description"), "fre")),
                 "G. Heraeus",
                 "Check inheritance of work metadata"
             )

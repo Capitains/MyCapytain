@@ -311,7 +311,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_LABEL
 
         metadata = text.getLabel()
-        self.assertEqual(str(metadata.get(RDF_NAMESPACES.CTS.label, "eng")), "Epigrammata")
+        self.assertEqual(str(metadata.get_single(RDF_NAMESPACES.CTS.label, "eng")), "Epigrammata")
 
     @mock.patch("MyCapytain.retrievers.cts5.requests.get", create=True)
     def test_reffs(self, requests):

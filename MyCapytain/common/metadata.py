@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 from MyCapytain.common.constants import Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
-from rdflib import BNode, Literal, Graph
+from rdflib import BNode, Literal, Graph, URIRef, term
 
 
 class Metadata(Exportable):
@@ -52,12 +52,33 @@ class Metadata(Exportable):
         :param value: Object of the triple
         :param lang: Language of the triple if applicable
         """
-        if not isinstance(value, Literal):
+        if not isinstance(value, Literal) and lang is not None:
             value = Literal(value, lang=lang)
+        elif not isinstance(value, (BNode, URIRef)):
+            value, _type = term._castPythonToLiteral(value)
+            if _type is None:
+                value = Literal(value)
+            else:
+                value = Literal(value, datatype=_type)
         self.graph.add((self.asNode(), key, value))
 
     def get(self, key, lang=None):
-        """ Returns a triple related to this node
+        """ Returns triple related to this node. Can filter on lang
+
+        :param key: Predicate of the triple
+        :param lang: Language of the triple if applicable
+        :rtype: Literal or BNode or URIRef
+        """
+        if lang is not None:
+            for o in self.graph.objects(self.asNode(), key):
+                if o.language == lang:
+                    yield o
+        else:
+            for o in self.graph.objects(self.asNode(), key):
+                yield o
+
+    def get_single(self, key, lang=None):
+        """ Returns a single triple related to this node.
 
         :param key: Predicate of the triple
         :param lang: Language of the triple if applicable
@@ -74,15 +95,6 @@ class Metadata(Exportable):
             for o in self.graph.objects(self.asNode(), key):
                 return o
 
-    def get_all(self, key):
-        """ Returns a triple related to this node
-
-        :param key: Predicate of the triple
-        :rtype: List of [Literal or BNode or URIRef]
-        """
-        for o in self.graph.objects(self.asNode(), key):
-            yield o
-
     def __getitem__(self, item):
         """ Quick access method. If
 
@@ -94,8 +106,8 @@ class Metadata(Exportable):
             Metadata[Title] == [Metadata.get(Title, lang=lang1), Metadata.get(Title, lang=lang2)]
         """
         if isinstance(item, tuple):
-            return self.get(item[0], item[1])
-        return list(self.graph[self.asNode():item])
+            return self.get_single(item[0], item[1])
+        return list(self.get(item))
 
     def __export__(self, output=Mimetypes.JSON.Std, **kwargs):
         """ Export a set of Metadata

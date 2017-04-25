@@ -70,6 +70,12 @@ class Mimetypes:
         CTS = "text/xml:CTS"
         TEI = "text/xml:tei"
 
+        class CapiTainS:
+            """ CapiTainS Guideline XML Structured metadata
+
+            """
+            CTS = "text/xml:CTS_CapiTainS"
+
     class PYTHON:
         """ Python Native Objects
 

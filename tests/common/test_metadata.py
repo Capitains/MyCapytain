@@ -109,3 +109,29 @@ class TestMetadata(TestCase):
             list(m.graph.subject_predicates(m.asNode())),
             []
         )
+
+    def test_export_exclude(self):
+        m = Metadata()
+        b = rdflib.BNode()
+        m.add(RDF_NAMESPACES.CTS.title, "Title")
+        m.add(RDF_NAMESPACES.CTS.title, "Title", lang="eng")
+        m.add(RDF_NAMESPACES.CTS.title, "SubTitle", lang="eng")
+        m.add(RDF_NAMESPACES.CTS.description, "SubTitle", lang="eng")
+        m.add(RDF_NAMESPACES.CTS.description, "SubTitle", lang="fre")
+        m.add(RDF_NAMESPACES.DTS.description, "SubTitle", lang="eng")
+        m.add(RDF_NAMESPACES.DTS.description, "SubTitle", lang="fre")
+        m.graph.add((b, RDF_NAMESPACES.TEI.nobodycares, m.asNode()))
+
+        self.assertEqual(
+            m.export(Mimetypes.JSON.Std, exclude=[RDF_NAMESPACES.CTS.title]),
+            {
+                'http://w3id.org/dts-ontology/description': {'fre': 'Subtitle', 'eng': 'Subtitle'},
+             'http://chs.harvard.edu/xmlns/cts/description': {'fre': 'Subtitle', 'eng': 'Subtitle'}
+            }
+        )
+        self.assertEqual(
+            m.export(Mimetypes.JSON.Std, exclude=[RDF_NAMESPACES.CTS]),
+            {
+                'http://w3id.org/dts-ontology/description': {'fre': 'Subtitle', 'eng': 'Subtitle'}
+            }
+        )

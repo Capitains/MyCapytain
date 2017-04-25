@@ -119,29 +119,54 @@ class Metadata(Exportable):
 
     def unlink(self, subj=None, predicate=None):
         """ Remove triple where Metadata is the object
+
+        :param subj: Subject to match, None to match all
+        :param predicate: Predicate to match, None to match all
         """
         self.graph.remove((subj, predicate, self.asNode()))
 
-    def __export__(self, output=Mimetypes.JSON.Std, only=None, **kwargs):
+    def predicate_object(self, predicate=None, obj=None):
+        """ Retrieve predicate and object around this object
+
+        :param predicate: Predicate to match, None to match all
+        :param obj: Object to match, None to match all
+
+        :return: List of resources
+        """
+    def __export__(self, output=Mimetypes.JSON.Std, only=None, exclude=None, **kwargs):
         """ Export a set of Metadata
 
         :param output: Mimetype to export to
         :param only: Includes only term from given namespaces
+        :param only: Includes only term from given namespaces
         :return: Formatted Export
+
+        .. warning:: exclude and warning cannot be used together
         """
         graph = Graph()
         graph.namespace_manager = get_graph().namespace_manager
 
         if only is not None:
             _only = only
+            only = [str(s) for s in only]
             for predicate in set(self.graph.predicates(subject=self.asNode())):
                 if str(predicate) not in only:
                     prefix, namespace, name = self.graph.compute_qname(predicate)
                     if str(namespace) in only:
                         _only.append(predicate)
-            for predicate, object in self.graph[self.asNode()]:
+            for predicate, obj in self.graph[self.asNode()]:
                 if predicate in _only:
-                    graph.add((self.asNode(), predicate, object))
+                    graph.add((self.asNode(), predicate, obj))
+        elif exclude is not None:
+            _only = []
+            exclude = [str(s) for s in exclude]
+            for predicate in set(self.graph.predicates(subject=self.asNode())):
+                prefix, namespace, name = self.graph.compute_qname(predicate)
+                if str(predicate) not in exclude and not str(namespace) in exclude:
+                    _only.append(predicate)
+            for predicate, obj in self.graph[self.asNode()]:
+                if predicate in _only:
+                    graph.add((self.asNode(), predicate, obj))
         else:
             for predicate, object in self.graph[self.asNode()]:
                 graph.add((self.asNode(), predicate, object))
@@ -166,6 +191,9 @@ class Metadata(Exportable):
             out = graph.serialize(format="xml")
             del graph
             return out
+
+        elif output == Mimetypes.XML.CapiTainS.CTS:
+            pass
 
     @staticmethod
     def getOr(subject, predicate, *args, **kwargs):

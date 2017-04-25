@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 
 from rdflib import URIRef
 
-from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype
 from MyCapytain.common.utils import xmlparser

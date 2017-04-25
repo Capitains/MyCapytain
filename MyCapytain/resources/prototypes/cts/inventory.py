@@ -180,7 +180,7 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
     DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("label")
     TYPE_URI = RDF_NAMESPACES.CTS.term("text")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.resource)
-    EXPORT_TO = [Mimetypes.XML.CTS]
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
     CTS_PROPERTIES = [RDF_NAMESPACES.CTS.label, RDF_NAMESPACES.CTS.description]
     CTS_LINKS = [RDF_NAMESPACES.CTS.about]
     SUBTYPE = "unknown"
@@ -304,6 +304,9 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
                         )
                     )
                 )
+
+            if output == Mimetypes.XML.CapiTainS.CTS:
+                strings.append(self.metadata.export(Mimetypes.XML.CapiTainS.CTS, exclude=self.CTS_PROPERTIES+self.CTS_LINKS))
             strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
 
             return lines.join(strings)

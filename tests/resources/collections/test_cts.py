@@ -210,9 +210,14 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(len(W.get_translation_in("eng")), 2)
         self.assertEqual(len(W.get_translation_in()), 3)
         self.assertEqual(
-            W.metadata.export(output=Mimetypes.JSON.Std),
-            {'http://www.w3.org/2004/02/skos/core#prefLabel': {'eng': 'Epigrammata'},
-             'http://chs.harvard.edu/xmlns/cts/title': {'eng': 'Epigrammata'}},
+            W.metadata.export(
+                output=Mimetypes.JSON.Std,
+                only=["http://www.w3.org/2004/02/skos/core#", 'http://chs.harvard.edu/xmlns/cts/']
+            ),
+            {
+                'http://www.w3.org/2004/02/skos/core#prefLabel': {'eng': 'Epigrammata'},
+                'http://chs.harvard.edu/xmlns/cts/title': {'eng': 'Epigrammata'}
+            },
             "Default export should work well"
         )
 
@@ -312,11 +317,9 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         ti = loads(dp)
         tixml = ti.export(Mimetypes.XML.CTS)
         self.assertEqual(
-            len(list(ti.graph.triples(
-                (ti["urn:cts:latinLit:phi1294"].asNode(), constants.RDF_NAMESPACES.DTS.term("metadata"), None)
-            ))),
-            1,
-            "There should be one node for the child 1294 which is metadata"
+            len(list(ti["urn:cts:latinLit:phi1294"].metadata.get(RDF_NAMESPACES.CTS.groupname))),
+            2,
+            "There should be 2 groupname node for the child 1294"
         )
         self.assertEqual(*compareSTR(tixml, xml))
 

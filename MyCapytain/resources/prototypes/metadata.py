@@ -35,16 +35,15 @@ class Collection(Exportable):
         self.__graph__ = get_graph()
 
         self.__node__ = URIRef(identifier)
-        self.__metadata__ = Metadata.getOr(self.__node__, RDF_NAMESPACES.DTS.metadata)
-        self.__capabilities__ = Metadata.getOr(self.__node__, RDF_NAMESPACES.DTS.capabilities)
+        self.__metadata__ = Metadata(node=self.asNode())
+        self.__capabilities__ = Metadata.getOr(self.asNode(), RDF_NAMESPACES.DTS.capabilities)
 
         self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
         self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.model, self.MODEL_URI))
 
         self.graph.addN(
             [
-                (self.asNode(), RDF_NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph),
-                (self.asNode(), RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.graph)
+                (self.asNode(), RDF_NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph)
             ]
         )
 

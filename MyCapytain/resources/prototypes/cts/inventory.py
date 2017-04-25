@@ -41,7 +41,7 @@ class PrototypeCtsCollection(Collection):
 
         if hasattr(type(self), "CTS_MODEL"):
             self.graph.set((self.asNode(), RDF.type, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
-            self.graph.set((self.asNode(), RDF_NAMESPACES.CTS.isA, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
+            self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.isA, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
 
         self.__urn__ = ""
 

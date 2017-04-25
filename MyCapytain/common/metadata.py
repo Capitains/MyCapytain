@@ -122,16 +122,29 @@ class Metadata(Exportable):
         """
         self.graph.remove((subj, predicate, self.asNode()))
 
-    def __export__(self, output=Mimetypes.JSON.Std, **kwargs):
+    def __export__(self, output=Mimetypes.JSON.Std, only=None, **kwargs):
         """ Export a set of Metadata
 
         :param output: Mimetype to export to
+        :param only: Includes only term from given namespaces
         :return: Formatted Export
         """
         graph = Graph()
         graph.namespace_manager = get_graph().namespace_manager
-        for predicate, object in self.graph[self.asNode()]:
-            graph.add((self.asNode(), predicate, object))
+
+        if only is not None:
+            _only = only
+            for predicate in set(self.graph.predicates(subject=self.asNode())):
+                if str(predicate) not in only:
+                    prefix, namespace, name = self.graph.compute_qname(predicate)
+                    if str(namespace) in only:
+                        _only.append(predicate)
+            for predicate, object in self.graph[self.asNode()]:
+                if predicate in _only:
+                    graph.add((self.asNode(), predicate, object))
+        else:
+            for predicate, object in self.graph[self.asNode()]:
+                graph.add((self.asNode(), predicate, object))
 
         if output == Mimetypes.JSON.Std:
             out = {}

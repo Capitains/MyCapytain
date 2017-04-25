@@ -35,11 +35,11 @@ class TextualElement(Exportable):
         self.__identifier__ = identifier
 
         self.__node__ = BNode()
-        self.__metadata__ = metadata or Metadata()
+        self.__metadata__ = metadata or Metadata(node=self.asNode())
 
         self.__graph__.addN([
-            (self.__node__, RDF_NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__),
-            (self.__node__, RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.__graph__)
+            (self.__node__, RDF_NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__)#,
+            #(self.__node__, RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.__graph__)
         ])
 
     def __repr__(self):
@@ -48,10 +48,6 @@ class TextualElement(Exportable):
     @property
     def graph(self):
         return self.__graph__
-
-    @property
-    def asNode(self):
-        return self.__node__
 
     @property
     def text(self):
@@ -79,6 +75,9 @@ class TextualElement(Exportable):
         :rtype: Metadata
         """
         return self.__metadata__
+
+    def asNode(self):
+        return self.__node__
 
     def get_creator(self, lang=None):
         """ Get the DC Creator literal value

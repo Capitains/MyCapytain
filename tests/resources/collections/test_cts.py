@@ -5,6 +5,8 @@ import unittest
 from io import open, StringIO
 from operator import attrgetter
 
+from rdflib import Literal, URIRef
+
 import lxml.etree as etree
 import xmlunittest
 
@@ -548,6 +550,39 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 XmlCtsWorkMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
             "Addition of different type should fail for CtsTextgroupMetadata"
         )
+
+    def test_structured_metadata_parse(self):
+        with open("./tests/testing_data/capitains/work_with_structured.xml") as f:
+            work = XmlCtsWorkMetadata.parse(f)
+        self.assertEqual(
+            list(
+                work["urn:cts:greekLit:stoa0033a.tlg028.1st1K-grc1"].metadata.
+                    get(URIRef("http://purl.org/dc/terms/dateCopyrighted"))
+            ),
+            [Literal("1837")]
+        )
+        self.assertEqual(
+            list(
+                work["urn:cts:greekLit:stoa0033a.tlg028.1st1K-grc1"].metadata.
+                    get(URIRef("http://purl.org/dc/elements/1.1/contributor"))
+            ),
+            [Literal("Immanuel Bekker", lang="eng")]
+        )
+        self.assertEqual(
+            list(
+                work.metadata.get(URIRef("http://purl.org/saws/ontology#isAttributedToAuthor"))
+            ),
+            [Literal("Aristote", lang="eng")]
+        )
+        with open("./tests/testing_data/capitains/textgroup_with_structured.xml") as f:
+            tg = XmlCtsWorkMetadata.parse(f)
+        self.assertEqual(
+            list(
+                tg.metadata.get(URIRef("http://schema.org/birthDate"))
+            ),
+            [Literal("-384")]
+        )
+
 
 
 class TestCitation(unittest.TestCase):

@@ -9,6 +9,8 @@
 """
 from __future__ import unicode_literals
 
+from rdflib import URIRef
+
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype
@@ -80,6 +82,27 @@ def xpathDict(xml, xpath, cls, parent, **kwargs):
         )
 
 
+def __parse_structured_metadata__(obj, xml):
+    """ Parse an XML object for structured metadata
+
+    :param obj: Object whose metadata are parsed
+    :param xml: XML that needs to be parsed
+    """
+    for metadata in xml.xpath("cpt:structured-metadata/*", namespaces=XPATH_NAMESPACES):
+        tag = metadata.tag
+        if "{" in tag:
+            ns, tag = tuple(tag.split("}"))
+            tag = URIRef(ns[1:]+tag)
+            if '{http://www.w3.org/XML/1998/namespace}lang' in metadata.attrib:
+                obj.metadata.add(
+                    tag,
+                    str(metadata),
+                    lang=metadata.attrib['{http://www.w3.org/XML/1998/namespace}lang']
+                )
+            else:
+                obj.metadata.add(tag, str(metadata))
+
+
 class XmlCtsTextMetadata(cts.CtsTextMetadata):
     """ Represents a CTS CtsTextMetadata
 
@@ -122,6 +145,8 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
             #if lg is not None:
             obj.set_link(RDF_NAMESPACES.CTS.term("about"), child.get('urn'))
 
+        __parse_structured_metadata__(obj, xml)
+
         """
         online = xml.xpath("ti:online", namespaces=NS)
         if len(online) > 0:
@@ -160,6 +185,7 @@ class XmlCtsTranslationMetadata(cts.CtsTranslationMetadata, XmlCtsTextMetadata):
         XmlCtsTranslationMetadata.parse_metadata(o, xml)
         return o
 
+
 class XmlCtsCommentaryMetadata(cts.CtsCommentaryMetadata, XmlCtsTextMetadata):
     """ Create a commentary subtyped PrototypeText object
     """
@@ -173,6 +199,7 @@ class XmlCtsCommentaryMetadata(cts.CtsCommentaryMetadata, XmlCtsTextMetadata):
             o.lang = lang
         XmlCtsCommentaryMetadata.parse_metadata(o, xml)
         return o
+
 
 class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
     """ Represents a CTS Textgroup in XML
@@ -202,8 +229,10 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
         # Parse children
         xpathDict(xml=xml, xpath='ti:edition', cls=XmlCtsEditionMetadata, parent=o)
         xpathDict(xml=xml, xpath='ti:translation', cls=XmlCtsTranslationMetadata, parent=o)
-       # Added for commentary
+        # Added for commentary
         xpathDict(xml=xml, xpath='ti:commentary', cls=XmlCtsCommentaryMetadata, parent=o)
+
+        __parse_structured_metadata__(o, xml)
 
         return o
 
@@ -229,6 +258,8 @@ class XmlCtsTextgroupMetadata(cts.CtsTextgroupMetadata):
 
         # Parse Works
         xpathDict(xml=xml, xpath='ti:work', cls=XmlCtsWorkMetadata, parent=o)
+
+        __parse_structured_metadata__(o, xml)
         return o
 
 

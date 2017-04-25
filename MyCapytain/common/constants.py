@@ -6,7 +6,8 @@ from rdflib.namespace import SKOS
 XPATH_NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ti": "http://chs.harvard.edu/xmlns/cts",
-    "xml": "http://www.w3.org/XML/1998/namespace"
+    "xml": "http://www.w3.org/XML/1998/namespace",
+    "cpt": "http://capitains.org/ns/1.0#"
 }
 
 
@@ -23,6 +24,7 @@ class RDF_NAMESPACES:
     CTS = Namespace("http://chs.harvard.edu/xmlns/cts/")
     DTS = Namespace("http://w3id.org/dts-ontology/")
     TEI = Namespace("http://www.tei-c.org/ns/1.0/")
+    CAPITAINS = Namespace("http://capitains.org/ns/1.0#")
 
 
 class Mimetypes:

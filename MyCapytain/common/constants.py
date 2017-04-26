@@ -6,7 +6,10 @@ from rdflib.namespace import SKOS
 XPATH_NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ti": "http://chs.harvard.edu/xmlns/cts",
-    "xml": "http://www.w3.org/XML/1998/namespace"
+    "cpt": "http://purl.org/capitains/ns/1.0#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "xml": "http://www.w3.org/XML/1998/namespace",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 }
 
 
@@ -19,10 +22,13 @@ class RDF_NAMESPACES:
     :type TEI: Namespace
     :cvar DC: DC Elements
     :type DC: Namespace
+    :cvar CAPITAINS: CapiTainS Ontology
+    :type CAPITAINS: Namespace
     """
     CTS = Namespace("http://chs.harvard.edu/xmlns/cts/")
     DTS = Namespace("http://w3id.org/dts-ontology/")
     TEI = Namespace("http://www.tei-c.org/ns/1.0/")
+    CAPITAINS = Namespace("http://purl.org/capitains/ns/1.0#")
 
 
 class Mimetypes:
@@ -68,6 +74,12 @@ class Mimetypes:
         CTS = "text/xml:CTS"
         TEI = "text/xml:tei"
 
+        class CapiTainS:
+            """ CapiTainS Guideline XML Structured metadata
+
+            """
+            CTS = "text/xml:CTS_CapiTainS"
+
     class PYTHON:
         """ Python Native Objects
 
@@ -93,6 +105,7 @@ __MYCAPYTAIN_TRIPLE_GRAPH__.bind("", RDF_NAMESPACES.CTS)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", RDF_NAMESPACES.DTS)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", RDF_NAMESPACES.TEI)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("skos", SKOS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("cpt", RDF_NAMESPACES.CAPITAINS)
 
 
 def set_graph(graph):

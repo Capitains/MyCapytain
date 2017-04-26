@@ -35,16 +35,15 @@ class Collection(Exportable):
         self.__graph__ = get_graph()
 
         self.__node__ = URIRef(identifier)
-        self.__metadata__ = Metadata.getOr(self.__node__, RDF_NAMESPACES.DTS.metadata)
-        self.__capabilities__ = Metadata.getOr(self.__node__, RDF_NAMESPACES.DTS.capabilities)
+        self.__metadata__ = Metadata(node=self.asNode())
+        self.__capabilities__ = Metadata.getOr(self.asNode(), RDF_NAMESPACES.DTS.capabilities)
 
         self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
         self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.model, self.MODEL_URI))
 
         self.graph.addN(
             [
-                (self.asNode(), RDF_NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph),
-                (self.asNode(), RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.graph)
+                (self.asNode(), RDF_NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph)
             ]
         )
 
@@ -140,9 +139,9 @@ class Collection(Exportable):
         :param label: Label Value
         :param lang:  Language code
         """
+        self.metadata.add(SKOS.prefLabel, Literal(label, lang=lang))
         self.graph.addN([
             (self.asNode(), RDFS.label, Literal(label, lang=lang), self.graph),
-            (self.metadata.asNode(), SKOS.prefLabel, Literal(label, lang=lang), self.graph),
         ])
 
     @property
@@ -221,8 +220,8 @@ class Collection(Exportable):
         # Delete the graph Item
         self.graph.remove((item.asNode(), None, None))
         self.graph.remove((None, None, item.asNode()))
-        self.graph.remove((item.metadata.asNode(), None, None))
-        self.graph.remove((None, None, item.metadata.asNode()))
+        self.metadata.remove()
+        self.metadata.unlink()
         # Delete the Python item
         if len(item.parents) > 0:
             del item.parents[0].children[item.id]
@@ -269,7 +268,7 @@ class Collection(Exportable):
         """
         return [member for member in self.descendants if member.readable]
 
-    def __namespaces_header__(self):
+    def __namespaces_header__(self, cpt=None):
         """ Generates Namespaces Header given the graph
 
         :return: Dictionary with XMLNS prefix and uri as key and values
@@ -279,9 +278,16 @@ class Collection(Exportable):
         for predicate in set(self.graph.predicates()):
             prefix, namespace, name = nm.compute_qname(predicate)
             if prefix != "":
-                bindings["xmlns:" + prefix] = str(URIRef(namespace))[:-1]
+                bindings["xmlns:" + prefix] = str(URIRef(namespace))#[:-1]
             else:
-                bindings["xmlns"] = str(URIRef(namespace))[:-1]
+                bindings["xmlns"] = str(URIRef(namespace))#[:-1]
+        if cpt is True:
+            bindings["xmlns:cpt"] = str(RDF_NAMESPACES.CAPITAINS)
+
+        # Small hard coded fix for namespace that were not thought for RDF
+        for k, v in bindings.items():
+            if v in ["http://chs.harvard.edu/xmlns/cts/"]:
+                bindings[k] = v[:-1]
 
         return bindings
 
@@ -388,7 +394,7 @@ class ResourceCollection(Collection):
         :return: Creator string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.creator, lang=lang)
+        return self.metadata.get_single(key=DC.creator, lang=lang)
 
     def get_title(self, lang=None):
         """ Get the title of the object
@@ -397,7 +403,7 @@ class ResourceCollection(Collection):
         :return: Title string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.title, lang=lang)
+        return self.metadata.get_single(key=DC.title, lang=lang)
 
     def get_description(self, lang=None):
         """ Get the description of the object
@@ -406,7 +412,7 @@ class ResourceCollection(Collection):
         :return: Description string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.description, lang=lang)
+        return self.metadata.get_single(key=DC.description, lang=lang)
 
     def get_subject(self, lang=None):
         """ Get the subject of the object
@@ -415,4 +421,4 @@ class ResourceCollection(Collection):
         :return: Subject string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.subject, lang=lang)
+        return self.metadata.get_single(key=DC.subject, lang=lang)

@@ -35,11 +35,11 @@ class TextualElement(Exportable):
         self.__identifier__ = identifier
 
         self.__node__ = BNode()
-        self.__metadata__ = metadata or Metadata()
+        self.__metadata__ = metadata or Metadata(node=self.asNode())
 
         self.__graph__.addN([
-            (self.__node__, RDF_NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__),
-            (self.__node__, RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.__graph__)
+            (self.__node__, RDF_NAMESPACES.DTS.implements, URIRef(identifier), self.__graph__)#,
+            #(self.__node__, RDF_NAMESPACES.DTS.metadata, self.metadata.asNode(), self.__graph__)
         ])
 
     def __repr__(self):
@@ -48,10 +48,6 @@ class TextualElement(Exportable):
     @property
     def graph(self):
         return self.__graph__
-
-    @property
-    def asNode(self):
-        return self.__node__
 
     @property
     def text(self):
@@ -80,6 +76,9 @@ class TextualElement(Exportable):
         """
         return self.__metadata__
 
+    def asNode(self):
+        return self.__node__
+
     def get_creator(self, lang=None):
         """ Get the DC Creator literal value
 
@@ -87,7 +86,7 @@ class TextualElement(Exportable):
         :return: Creator string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.creator, lang=lang)
+        return self.metadata.get_single(key=DC.creator, lang=lang)
 
     def set_creator(self, value, lang):
         """ Set the DC Creator literal value
@@ -103,7 +102,7 @@ class TextualElement(Exportable):
         :return: Title string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.title, lang=lang)
+        return self.metadata.get_single(key=DC.title, lang=lang)
 
     def set_title(self, value, lang=None):
         """ Set the DC Title literal value
@@ -119,7 +118,7 @@ class TextualElement(Exportable):
         :return: Description string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.description, lang=lang)
+        return self.metadata.get_single(key=DC.description, lang=lang)
 
     def set_description(self, value, lang=None):
         """ Set the DC Description literal value
@@ -135,7 +134,7 @@ class TextualElement(Exportable):
         :return: Subject string representation
         :rtype: Literal
         """
-        return self.metadata.get(key=DC.subject, lang=lang)
+        return self.metadata.get_single(key=DC.subject, lang=lang)
 
     def set_subject(self, value, lang=None):
         """ Set the DC Subject literal value
@@ -420,7 +419,7 @@ class CtsNode(InteractiveTextualNode):
         self.__urn__ = value
 
     def get_cts_metadata(self, key, lang=None):
-        return self.metadata.get(RDF_NAMESPACES.CTS.term(key), lang)
+        return self.metadata.get_single(RDF_NAMESPACES.CTS.term(key), lang)
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, CitableText will compute valid reffs
@@ -450,22 +449,22 @@ class CtsNode(InteractiveTextualNode):
         """
         edition, work, textgroup = tuple(([text_metadata] + text_metadata.parents)[:3])
 
-        for node in textgroup.metadata.get_all(RDF_NAMESPACES.CTS.groupname):
+        for node in textgroup.metadata.get(RDF_NAMESPACES.CTS.groupname):
             lang = node.language
             self.metadata.add(RDF_NAMESPACES.CTS.groupname, lang=lang, value=str(node))
             self.set_creator(str(node), lang)
 
-        for node in work.metadata.get_all(RDF_NAMESPACES.CTS.title):
+        for node in work.metadata.get(RDF_NAMESPACES.CTS.title):
             lang = node.language
             self.metadata.add(RDF_NAMESPACES.CTS.title, lang=lang, value=str(node))
             self.set_title(str(node), lang)
 
-        for node in edition.metadata.get_all(RDF_NAMESPACES.CTS.label):
+        for node in edition.metadata.get(RDF_NAMESPACES.CTS.label):
             lang = node.language
             self.metadata.add(RDF_NAMESPACES.CTS.label, lang=lang, value=str(node))
             self.set_subject(str(node), lang)
 
-        for node in edition.metadata.get_all(RDF_NAMESPACES.CTS.description):
+        for node in edition.metadata.get(RDF_NAMESPACES.CTS.description):
             lang = node.language
             self.metadata.add(RDF_NAMESPACES.CTS.description, lang=lang, value=str(node))
             self.set_description(str(node), lang)

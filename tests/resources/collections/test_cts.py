@@ -5,6 +5,8 @@ import unittest
 from io import open, StringIO
 from operator import attrgetter
 
+from rdflib import Literal, URIRef
+
 import lxml.etree as etree
 import xmlunittest
 
@@ -210,9 +212,14 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(len(W.get_translation_in("eng")), 2)
         self.assertEqual(len(W.get_translation_in()), 3)
         self.assertEqual(
-            W.metadata.export(output=Mimetypes.JSON.Std),
-            {'http://www.w3.org/2004/02/skos/core#prefLabel': {'eng': 'Epigrammata'},
-             'http://chs.harvard.edu/xmlns/cts/title': {'eng': 'Epigrammata'}},
+            W.metadata.export(
+                output=Mimetypes.JSON.Std,
+                only=["http://www.w3.org/2004/02/skos/core#", 'http://chs.harvard.edu/xmlns/cts/']
+            ),
+            {
+                'http://www.w3.org/2004/02/skos/core#prefLabel': {'eng': 'Epigrammata'},
+                'http://chs.harvard.edu/xmlns/cts/title': {'eng': 'Epigrammata'}
+            },
             "Default export should work well"
         )
 
@@ -312,11 +319,9 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         ti = loads(dp)
         tixml = ti.export(Mimetypes.XML.CTS)
         self.assertEqual(
-            len(list(ti.graph.triples(
-                (ti["urn:cts:latinLit:phi1294"].asNode(), constants.RDF_NAMESPACES.DTS.term("metadata"), None)
-            ))),
-            1,
-            "There should be one node for the child 1294 which is metadata"
+            len(list(ti["urn:cts:latinLit:phi1294"].metadata.get(RDF_NAMESPACES.CTS.groupname))),
+            2,
+            "There should be 2 groupname node for the child 1294"
         )
         self.assertEqual(*compareSTR(tixml, xml))
 
@@ -415,23 +420,23 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("groupname"), "eng")),
+            str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("groupname"), "eng")),
             "Martial",
             "Check inheritance of textgroup metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "eng")),
+            str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("title"), "eng")),
             "Epigrammata",
             "Check inheritance of work metadata"
         )
         self.assertEqual(
-            str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("title"), "fre")),
+            str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("title"), "fre")),
             "Epigrammes",
             "Check inheritance of work metadata"
         )
         for i in range(0, 100):
             self.assertEqual(
-                str(txt_text.metadata.get(constants.RDF_NAMESPACES.CTS.term("description"), "fre")),
+                str(txt_text.metadata.get_single(constants.RDF_NAMESPACES.CTS.term("description"), "fre")),
                 "G. Heraeus",
                 "Check inheritance of work metadata"
             )
@@ -545,6 +550,78 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 XmlCtsWorkMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
             "Addition of different type should fail for CtsTextgroupMetadata"
         )
+
+    def test_structured_metadata_parse(self):
+        with open("./tests/testing_data/capitains/work_with_structured.xml") as f:
+            work = XmlCtsWorkMetadata.parse(f)
+        self.assertEqual(
+            list(
+                work["urn:cts:greekLit:stoa0033a.tlg028.1st1K-grc1"].metadata.
+                    get(URIRef("http://purl.org/dc/terms/dateCopyrighted"))
+            ),
+            [Literal("1837", datatype=XSD.gYear)]
+        )
+        self.assertEqual(
+            list(
+                work["urn:cts:greekLit:stoa0033a.tlg028.1st1K-grc1"].metadata.
+                    get(URIRef("http://purl.org/dc/elements/1.1/contributor"))
+            ),
+            [Literal("Immanuel Bekker", lang="eng")]
+        )
+        self.assertEqual(
+            list(
+                work.metadata.get(URIRef("http://purl.org/saws/ontology#isAttributedToAuthor"))
+            ),
+            [Literal("Aristote", lang="eng")]
+        )
+        with open("./tests/testing_data/capitains/textgroup_with_structured.xml") as f:
+            tg = XmlCtsTextgroupMetadata.parse(f)
+        self.assertCountEqual(
+            list(
+                tg.metadata.get(URIRef("http://schema.org/birthDate"))
+            ),
+            [Literal("-384", datatype=XSD.integer), Literal("457BCE")]
+        )
+        self.assertEqual(
+            list(
+                tg.members[0].metadata.get(URIRef("http://purl.org/saws/ontology#cost"))
+            ),
+            [Literal("1.5", datatype=XSD.float)]
+        )
+        self.assertCountEqual(
+            list(
+                tg.metadata.get(URIRef("http://schema.org/birthPlace"))
+            ),
+            [Literal("Stagire", lang="fre"), URIRef('https://pleiades.stoa.org/places/501625')]
+        )
+
+    def test_export_structured_metadata(self):
+        with open("./tests/testing_data/capitains/textgroup_with_structured.xml") as f:
+            tg = XmlCtsTextgroupMetadata.parse(f)
+        out = xmlparser(tg.export(Mimetypes.XML.CapiTainS.CTS))
+
+        ns = {k: v for k, v in XPATH_NAMESPACES.items()}
+        ns["scm"] = "http://schema.org/"
+        ns["saws"] = "http://purl.org/saws/ontology#"
+        ns["dct"] = "http://purl.org/dc/terms/"
+        self.assertCountEqual(
+            out.xpath("./cpt:structured-metadata//scm:birthDate", namespaces=ns),
+            ['457BCE', -384]
+        )
+        self.assertCountEqual(
+            out.xpath("./cpt:structured-metadata//scm:birthPlace", namespaces=ns),
+            ['Stagire', "https://pleiades.stoa.org/places/501625"]
+        )
+        self.assertCountEqual(
+            out.xpath("./ti:work/cpt:structured-metadata/saws:cost", namespaces=ns),
+            [1.5]
+        )
+        self.assertCountEqual(
+            out.xpath(".//ti:translation/cpt:structured-metadata/dct:dateCopyrighted", namespaces=ns),
+            [1837]
+        )
+        #
+        # print(out)
 
 
 class TestCitation(unittest.TestCase):

@@ -9,11 +9,13 @@
 """
 from __future__ import unicode_literals
 
-from rdflib import URIRef
+from rdflib import URIRef, Literal
+from rdflib.namespace import XSD
+from lxml.objectify import IntElement, FloatElement
 
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference import Citation as CitationPrototype
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils import xmlparser, expand_namespace
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 
 
@@ -92,14 +94,30 @@ def __parse_structured_metadata__(obj, xml):
         if "{" in tag:
             ns, tag = tuple(tag.split("}"))
             tag = URIRef(ns[1:]+tag)
-            if '{http://www.w3.org/XML/1998/namespace}lang' in metadata.attrib:
+            s_m = str(metadata)
+            if s_m.startswith("urn:") or s_m.startswith("http:") or s_m.startswith("https:") or s_m.startswith("hdl:"):
                 obj.metadata.add(
                     tag,
-                    str(metadata),
+                    URIRef(metadata)
+                )
+            elif '{http://www.w3.org/XML/1998/namespace}lang' in metadata.attrib:
+                obj.metadata.add(
+                    tag,
+                    s_m,
                     lang=metadata.attrib['{http://www.w3.org/XML/1998/namespace}lang']
                 )
             else:
-                obj.metadata.add(tag, str(metadata))
+                if "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}datatype" in metadata.attrib:
+                    datatype = metadata.attrib["{http://www.w3.org/1999/02/22-rdf-syntax-ns#}datatype"]
+                    if not datatype.startswith("http") and ":" in datatype:
+                        datatype = expand_namespace(metadata.nsmap, datatype)
+                    obj.metadata.add(tag, Literal(s_m, datatype=URIRef(datatype)))
+                elif isinstance(metadata, IntElement):
+                    obj.metadata.add(tag, Literal(int(metadata), datatype=XSD.integer))
+                elif isinstance(metadata, FloatElement):
+                    obj.metadata.add(tag, Literal(float(metadata), datatype=XSD.float))
+                else:
+                    obj.metadata.add(tag, s_m)
 
 
 class XmlCtsTextMetadata(cts.CtsTextMetadata):
@@ -140,8 +158,6 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
 
         # Added for commentary
         for child in xml.xpath("ti:about", namespaces=XPATH_NAMESPACES):
-            #lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-            #if lg is not None:
             obj.set_link(RDF_NAMESPACES.CTS.term("about"), child.get('urn'))
 
         __parse_structured_metadata__(obj, xml)

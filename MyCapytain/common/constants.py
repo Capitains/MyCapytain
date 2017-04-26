@@ -6,8 +6,10 @@ from rdflib.namespace import SKOS
 XPATH_NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ti": "http://chs.harvard.edu/xmlns/cts",
+    "cpt": "http://capitains.org/ns/1.0#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
     "xml": "http://www.w3.org/XML/1998/namespace",
-    "cpt": "http://capitains.org/ns/1.0#"
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 }
 
 
@@ -20,6 +22,8 @@ class RDF_NAMESPACES:
     :type TEI: Namespace
     :cvar DC: DC Elements
     :type DC: Namespace
+    :cvar CAPITAINS: CapiTainS Ontology
+    :type CAPITAINS: Namespace
     """
     CTS = Namespace("http://chs.harvard.edu/xmlns/cts/")
     DTS = Namespace("http://w3id.org/dts-ontology/")

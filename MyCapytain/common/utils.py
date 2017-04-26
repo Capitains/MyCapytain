@@ -87,6 +87,7 @@ def LiteralToDict(value):
         return None
     return str(value)
 
+
 class Subgraph(object):
     """ Utility class to generate subgraph around one or more items
 
@@ -147,7 +148,6 @@ class Subgraph(object):
 
     def add(self, *args, **kwargs):
         self.graph.add(*args, **kwargs)
-
 
 
 def xmliter(node):
@@ -451,3 +451,14 @@ def nested_set(dictionary,  keys, value):
     nested_get(dictionary, keys[:-1])[keys[-1]] = value
 
 
+def expand_namespace(nsmap, string):
+    """ If the string starts with a known prefix in nsmap, replace it by full URI
+
+    :param nsmap: Dictionary of prefix -> uri of namespace
+    :param string: String in which to replace the namespace
+    :return: Expanded string with no namespace
+    """
+    for ns in nsmap:
+        if string.startswith(ns+":"):
+            return string.replace(ns+":", nsmap[ns])
+    return string

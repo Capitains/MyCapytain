@@ -559,7 +559,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                 work["urn:cts:greekLit:stoa0033a.tlg028.1st1K-grc1"].metadata.
                     get(URIRef("http://purl.org/dc/terms/dateCopyrighted"))
             ),
-            [Literal("1837")]
+            [Literal("1837", datatype=XSD.gYear)]
         )
         self.assertEqual(
             list(
@@ -575,14 +575,25 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             [Literal("Aristote", lang="eng")]
         )
         with open("./tests/testing_data/capitains/textgroup_with_structured.xml") as f:
-            tg = XmlCtsWorkMetadata.parse(f)
+            tg = XmlCtsTextgroupMetadata.parse(f)
         self.assertEqual(
             list(
                 tg.metadata.get(URIRef("http://schema.org/birthDate"))
             ),
-            [Literal("-384")]
+            [Literal("-384", datatype=XSD.integer)]
         )
-
+        self.assertEqual(
+            list(
+                tg.members[0].metadata.get(URIRef("http://purl.org/saws/ontology#cost"))
+            ),
+            [Literal("1.5", datatype=XSD.float)]
+        )
+        self.assertCountEqual(
+            list(
+                tg.metadata.get(URIRef("http://schema.org/birthPlace"))
+            ),
+            [Literal("Stagire", lang="fre"), URIRef('https://pleiades.stoa.org/places/501625')]
+        )
 
 
 class TestCitation(unittest.TestCase):

@@ -21,9 +21,12 @@
         </ti:translation>
         <cpt:structured-metadata>
             <saws:isAttributedToAuthor xml:lang="eng">Aristote</saws:isAttributedToAuthor>
+            <saws:cost>1.5</saws:cost>
         </cpt:structured-metadata>
     </ti:work>
     <cpt:structured-metadata>
         <scm:birthDate>-0384</scm:birthDate>
+        <scm:birthPlace xml:lang="fre">Stagire</scm:birthPlace>
+        <scm:birthPlace>https://pleiades.stoa.org/places/501625</scm:birthPlace>
     </cpt:structured-metadata>
 </ti:textgroup>

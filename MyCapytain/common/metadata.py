@@ -8,6 +8,7 @@
 
 """
 from __future__ import unicode_literals
+from MyCapytain.common.utils import make_xml_node
 from MyCapytain.common.constants import Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from rdflib import BNode, Literal, Graph, URIRef, term
@@ -23,7 +24,7 @@ class Metadata(Exportable):
     :cvar DEFAULT_EXPORT: Default export (CTS XML Inventory)
     :cvar STORE: RDF Store
     """
-    EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.XML.RDFa, Mimetypes.JSON.LD]
+    EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.XML.RDFa, Mimetypes.JSON.LD, Mimetypes.XML.CapiTainS.CTS]
     DEFAULT_EXPORT = Mimetypes.JSON.Std
     
     def __init__(self, node=None, *args, **kwargs):
@@ -193,7 +194,17 @@ class Metadata(Exportable):
             return out
 
         elif output == Mimetypes.XML.CapiTainS.CTS:
-            pass
+            print(graph.serialize(format="xml"))
+            strings = []
+            for pred, obj in graph.predicate_objects(self.asNode()):
+                kwargs = {}
+                if hasattr(obj, "language") and obj.language is not None:
+                    kwargs["xml:lang"] = obj.language
+                if hasattr(obj, "datatype") and obj.datatype is not None:
+                    kwargs["rdf:type"] = obj.datatype
+                strings.append(make_xml_node(graph, pred, text=obj, attributes=kwargs, complete=True))
+            del graph
+            return "\n".join(strings)
 
     @staticmethod
     def getOr(subject, predicate, *args, **kwargs):

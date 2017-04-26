@@ -1,3 +1,9 @@
+### 2017-04-06 2.0.0rc1 @ponteineptique
+
+- Simplified Metadata object and its relation to other items. Metadata is now more of an helper to mediate with triple regarding an object (text, passage or collection)
+- Added support for CapiTainS Structured Metadata
+- (via @sonofmun) Added support for Commentary
+
 ### 2017-04-21 @ponteineptique
 
 Made a lot of renaming for clarity :

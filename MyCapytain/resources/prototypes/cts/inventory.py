@@ -127,7 +127,7 @@ class PrototypeCtsCollection(Collection):
 
         self.metadata.add(prop, value)
 
-    def __xml_export_generic__(self, attrs, namespaces=False, lines="\n", members=None):
+    def __xml_export_generic__(self, attrs, namespaces=False, lines="\n", members=None, output=None):
         """ Shared method for Mimetypes.XML.CTS Export
 
         :param attrs: Dictionary of attributes for the node
@@ -136,7 +136,7 @@ class PrototypeCtsCollection(Collection):
         :return: String representation of XML Nodes
         """
         if namespaces is True:
-            attrs.update(self.__namespaces_header__())
+            attrs.update(self.__namespaces_header__(cpt=(output == Mimetypes.XML.CapiTainS.CTS)))
 
         TYPE_URI = self.TYPE_URI
         if TYPE_URI == RDF_NAMESPACES.CTS.term("CtsTextInventoryCollection"):
@@ -151,10 +151,19 @@ class PrototypeCtsCollection(Collection):
                     )
                 )
 
+        if output == Mimetypes.XML.CapiTainS.CTS:
+            strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata")))
+            strings.append(
+                self.metadata.export(
+                    Mimetypes.XML.CapiTainS.CTS,
+                    exclude=[RDF_NAMESPACES.CTS, RDF_NAMESPACES.DTS, RDF])
+            )
+            strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata"), close=True))
+
         if members is None:
             members = self.members
         for obj in members:
-            strings.append(obj.export(Mimetypes.XML.CTS, namespaces=False))
+            strings.append(obj.export(output, namespaces=False))
 
         strings.append(make_xml_node(self.graph, TYPE_URI, close=True))
 
@@ -262,12 +271,12 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
         :type domain: str
         :returns: Desired output formatted resource
         """
-        if output == Mimetypes.XML.CTS:
+        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
             attrs = {"urn": self.id, "xml:lang": self.lang}
             if self.parent is not None and self.parent.id:
                 attrs["workUrn"] = self.parent.id
             if namespaces is True:
-                attrs.update(self.__namespaces_header__())
+                attrs.update(self.__namespaces_header__(cpt=(output==Mimetypes.XML.CapiTainS.CTS)))
 
             strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
 
@@ -306,7 +315,16 @@ class CtsTextMetadata(ResourceCollection, PrototypeCtsCollection):
                 )
 
             if output == Mimetypes.XML.CapiTainS.CTS:
-                strings.append(self.metadata.export(Mimetypes.XML.CapiTainS.CTS, exclude=self.CTS_PROPERTIES+self.CTS_LINKS))
+                strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata")))
+                strings.append(
+                    self.metadata.export(
+                        Mimetypes.XML.CapiTainS.CTS,
+                        exclude=[RDF_NAMESPACES.CTS, RDF_NAMESPACES.DTS, RDF])
+                )
+                strings.append(
+                    make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata"), close=True)
+                )
+
             strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
 
             return lines.join(strings)
@@ -409,7 +427,7 @@ class CtsWorkMetadata(PrototypeCtsCollection):
     DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("title")
     TYPE_URI = RDF_NAMESPACES.CTS.term("work")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS]
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
     CTS_PROPERTIES = [RDF_NAMESPACES.CTS.term("title")]
 
     def __init__(self, urn=None, parent=None):
@@ -506,11 +524,11 @@ class CtsWorkMetadata(PrototypeCtsCollection):
         :type domain: str
         :returns: Desired output formated resource
         """
-        if output == Mimetypes.XML.CTS:
+        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
             attrs = {"urn": self.id, "xml:lang": self.lang}
             if self.parent is not None and self.parent.id:
                 attrs["groupUrn"] = self.parent.id
-            return self.__xml_export_generic__(attrs, namespaces=namespaces)
+            return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)
 
 
 class CtsTextgroupMetadata(PrototypeCtsCollection):
@@ -530,7 +548,7 @@ class CtsTextgroupMetadata(PrototypeCtsCollection):
     DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("groupname")
     TYPE_URI = RDF_NAMESPACES.CTS.term("textgroup")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS]
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
     CTS_PROPERTIES = [RDF_NAMESPACES.CTS.groupname]
 
     def __init__(self, urn="", parent=None):
@@ -596,9 +614,9 @@ class CtsTextgroupMetadata(PrototypeCtsCollection):
         :type domain: str
         :returns: Desired output formated resource
         """
-        if output == Mimetypes.XML.CTS:
+        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
             attrs = {"urn": self.id}
-            return self.__xml_export_generic__(attrs, namespaces=namespaces)
+            return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)
 
 
 class CtsTextInventoryMetadata(PrototypeCtsCollection):
@@ -612,7 +630,7 @@ class CtsTextInventoryMetadata(PrototypeCtsCollection):
     DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("name")
     TYPE_URI = RDF_NAMESPACES.CTS.term("TextInventory")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS]
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
 
     def __init__(self, name="defaultInventory", parent=None):
         super(CtsTextInventoryMetadata, self).__init__(identifier=name)
@@ -652,12 +670,12 @@ class CtsTextInventoryMetadata(PrototypeCtsCollection):
         :param namespaces: List namespaces in main node
         :returns: Desired output formated resource
         """
-        if output == Mimetypes.XML.CTS:
+        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
             attrs = {}
             if self.id:
                 attrs["tiid"] = self.id
 
-            return self.__xml_export_generic__(attrs, namespaces=namespaces)
+            return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)
 
 
 class CtsTextInventoryCollection(PrototypeCtsCollection):
@@ -671,7 +689,7 @@ class CtsTextInventoryCollection(PrototypeCtsCollection):
     DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("name")
     TYPE_URI = RDF_NAMESPACES.CTS.term("CtsTextInventoryCollection")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.JSON.DTS.Std]
+    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.JSON.DTS.Std, Mimetypes.XML.CapiTainS.CTS]
 
     def __init__(self, identifier="default"):
         super(CtsTextInventoryCollection, self).__init__(identifier=identifier)
@@ -710,7 +728,8 @@ class CtsTextInventoryCollection(PrototypeCtsCollection):
                 namespaces=namespaces,
                 members=[
                     m for inv in self.members for m in inv.members
-                ]
+                ],
+                output=Mimetypes.XML.CTS
             )
         elif output == Mimetypes.JSON.DTS.Std:
             if len(self.members) > 1:

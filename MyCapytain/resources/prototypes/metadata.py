@@ -268,7 +268,7 @@ class Collection(Exportable):
         """
         return [member for member in self.descendants if member.readable]
 
-    def __namespaces_header__(self):
+    def __namespaces_header__(self, cpt=None):
         """ Generates Namespaces Header given the graph
 
         :return: Dictionary with XMLNS prefix and uri as key and values
@@ -278,9 +278,16 @@ class Collection(Exportable):
         for predicate in set(self.graph.predicates()):
             prefix, namespace, name = nm.compute_qname(predicate)
             if prefix != "":
-                bindings["xmlns:" + prefix] = str(URIRef(namespace))[:-1]
+                bindings["xmlns:" + prefix] = str(URIRef(namespace))#[:-1]
             else:
-                bindings["xmlns"] = str(URIRef(namespace))[:-1]
+                bindings["xmlns"] = str(URIRef(namespace))#[:-1]
+        if cpt is True:
+            bindings["xmlns:cpt"] = str(RDF_NAMESPACES.CAPITAINS)
+
+        # Small hard coded fix for namespace that were not thought for RDF
+        for k, v in bindings.items():
+            if v in ["http://chs.harvard.edu/xmlns/cts/"]:
+                bindings[k] = v[:-1]
 
         return bindings
 

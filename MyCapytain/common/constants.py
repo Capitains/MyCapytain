@@ -6,7 +6,7 @@ from rdflib.namespace import SKOS
 XPATH_NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
     "ti": "http://chs.harvard.edu/xmlns/cts",
-    "cpt": "http://capitains.org/ns/1.0#",
+    "cpt": "http://purl.org/capitains/ns/1.0#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "xml": "http://www.w3.org/XML/1998/namespace",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -28,7 +28,7 @@ class RDF_NAMESPACES:
     CTS = Namespace("http://chs.harvard.edu/xmlns/cts/")
     DTS = Namespace("http://w3id.org/dts-ontology/")
     TEI = Namespace("http://www.tei-c.org/ns/1.0/")
-    CAPITAINS = Namespace("http://capitains.org/ns/1.0#")
+    CAPITAINS = Namespace("http://purl.org/capitains/ns/1.0#")
 
 
 class Mimetypes:
@@ -105,6 +105,7 @@ __MYCAPYTAIN_TRIPLE_GRAPH__.bind("", RDF_NAMESPACES.CTS)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", RDF_NAMESPACES.DTS)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", RDF_NAMESPACES.TEI)
 __MYCAPYTAIN_TRIPLE_GRAPH__.bind("skos", SKOS)
+__MYCAPYTAIN_TRIPLE_GRAPH__.bind("cpt", RDF_NAMESPACES.CAPITAINS)
 
 
 def set_graph(graph):

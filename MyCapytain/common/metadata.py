@@ -139,7 +139,7 @@ class Metadata(Exportable):
 
         :param output: Mimetype to export to
         :param only: Includes only term from given namespaces
-        :param only: Includes only term from given namespaces
+        :param exclude: Includes only term from given namespaces
         :return: Formatted Export
 
         .. warning:: exclude and warning cannot be used together
@@ -194,7 +194,6 @@ class Metadata(Exportable):
             return out
 
         elif output == Mimetypes.XML.CapiTainS.CTS:
-            print(graph.serialize(format="xml"))
             strings = []
             for pred, obj in graph.predicate_objects(self.asNode()):
                 kwargs = {}

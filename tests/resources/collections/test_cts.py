@@ -576,11 +576,11 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         with open("./tests/testing_data/capitains/textgroup_with_structured.xml") as f:
             tg = XmlCtsTextgroupMetadata.parse(f)
-        self.assertEqual(
+        self.assertCountEqual(
             list(
                 tg.metadata.get(URIRef("http://schema.org/birthDate"))
             ),
-            [Literal("-384", datatype=XSD.integer)]
+            [Literal("-384", datatype=XSD.integer), Literal("457BCE")]
         )
         self.assertEqual(
             list(
@@ -594,6 +594,34 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             ),
             [Literal("Stagire", lang="fre"), URIRef('https://pleiades.stoa.org/places/501625')]
         )
+
+    def test_export_structured_metadata(self):
+        with open("./tests/testing_data/capitains/textgroup_with_structured.xml") as f:
+            tg = XmlCtsTextgroupMetadata.parse(f)
+        out = xmlparser(tg.export(Mimetypes.XML.CapiTainS.CTS))
+
+        ns = {k: v for k, v in XPATH_NAMESPACES.items()}
+        ns["scm"] = "http://schema.org/"
+        ns["saws"] = "http://purl.org/saws/ontology#"
+        ns["dct"] = "http://purl.org/dc/terms/"
+        self.assertCountEqual(
+            out.xpath("./cpt:structured-metadata//scm:birthDate", namespaces=ns),
+            ['457BCE', -384]
+        )
+        self.assertCountEqual(
+            out.xpath("./cpt:structured-metadata//scm:birthPlace", namespaces=ns),
+            ['Stagire', "https://pleiades.stoa.org/places/501625"]
+        )
+        self.assertCountEqual(
+            out.xpath("./ti:work/cpt:structured-metadata/saws:cost", namespaces=ns),
+            [1.5]
+        )
+        self.assertCountEqual(
+            out.xpath(".//ti:translation/cpt:structured-metadata/dct:dateCopyrighted", namespaces=ns),
+            [1837]
+        )
+        #
+        # print(out)
 
 
 class TestCitation(unittest.TestCase):

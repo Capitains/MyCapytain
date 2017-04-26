@@ -670,7 +670,6 @@ class TextXMLFolderResolverDispatcher(TestCase):
 
         @dispatcher.inventory("urn:perseus:latinLit")
         def dispatchLatinLit(collection, path=None, **kwargs):
-            print(collection.id)
             if collection.id.startswith("urn:cts:latinLit:"):
                 return True
             return False

@@ -1,4 +1,4 @@
-### 2017-04-06 2.0.1rc1 @sonofmun
+### 2017-05-15 2.0.1 @sonofmun
 
 Corrected bug with the `CtsCapitainsLocalResolver.__getText__` that it would stop if a text was mentioned in the metadata but the file did not exist
 

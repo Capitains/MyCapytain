@@ -187,8 +187,12 @@ class CtsCapitainsLocalResolver(Resolver):
 
         text = self.inventory[str(urn)]
 
-        with io.open(text.path) as __xml__:
-            resource = self.TEXT_CLASS(urn=urn, resource=self.xmlparse(__xml__))
+        if os.path.isfile(text.path):
+            with io.open(text.path) as __xml__:
+                resource = self.TEXT_CLASS(urn=urn, resource=self.xmlparse(__xml__))
+        else:
+            resource = None
+            self.logger.warning('The file {} is mentioned in the metadata but does not exist'.format(text.path))
 
         return resource, text
 

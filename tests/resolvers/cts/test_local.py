@@ -51,6 +51,20 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "It should be possible to retrieve text"
         )
 
+    def test_missing_text_resource(self):
+        """ Test to make sure the correct warning is raised if a text is missing """
+        with self.assertLogs(CtsCapitainsLocalResolver(["./tests/testing_data/missing_text"]).logger) as cm:
+            Repository = CtsCapitainsLocalResolver(["./tests/testing_data/missing_text"])
+            text, metadata = Repository.__getText__("urn:cts:farsiLit:hafez.divan.missing_text")
+            self.assertIsNone(text)
+        self.assertIn('WARNING:root:The file '
+                      './tests/testing_data/missing_text/data/hafez/divan/hafez.divan.missing_text.xml '
+                      'is mentioned in the metadata but does not exist', cm.output)
+        self.assertIn(
+            'ERROR:root:./tests/testing_data/missing_text/data/hafez/divan/hafez.divan.missing_text.xml is not present',
+            cm.output
+        )
+
     def test_get_capabilities(self):
         """ Check Get Capabilities """
         Repository = CtsCapitainsLocalResolver(

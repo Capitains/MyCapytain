@@ -1,3 +1,7 @@
+### 2017-04-06 2.0.1rc1 @sonofmun
+
+Corrected bug with the `CtsCapitainsLocalResolver.__getText__` that it would stop if a text was mentioned in the metadata but the file did not exist
+
 ### 2017-04-06 2.0.0rc1 @ponteineptique
 
 - Simplified Metadata object and its relation to other items. Metadata is now more of an helper to mediate with triple regarding an object (text, passage or collection)

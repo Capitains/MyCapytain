@@ -24,3 +24,11 @@ branches:
     - master
     - rdflib-shift
     - dts-dev
+
+deploy:
+  provider: pypi
+  user: ponteineptique
+  password: $PYPASS
+  on:
+    tags: true
+    python: "3.5"

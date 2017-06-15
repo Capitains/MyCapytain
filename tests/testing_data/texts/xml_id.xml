@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:id="transcr_Asprem_C" type="transcr" xml:lang="fr" version="5">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title type="main">Aspremont</title>
+                <title type="sub">Transcription du fragment de Clermont</title>
+                <respStmt>
+                    <resp>transcription, encodage XML et vérification de l'annotation linguistique</resp>
+                    <persName xml:id="JBC">Jean-Baptiste Camps</persName>
+                </respStmt>
+                <respStmt>
+                    <resp>Annotation linguistique</resp>
+                    <persName xml:id="AC">Alice Cochet</persName>
+                </respStmt>
+            </titleStmt>
+            <publicationStmt>
+                <authority>
+                    <persName><forename>Jean-Baptiste</forename><surname>Camps</surname></persName>
+                    <address>
+                        <orgName>École nationale des chartes</orgName>
+                        <addrLine>65 rue de Richelieu</addrLine>
+                        <addrLine>F-75012 Paris</addrLine>
+                    </address>
+                    <email>jbcamps@hotmail.com</email>
+                </authority>
+                <availability status="restricted">
+                    <licence>Fichier de travail, à ne pas diffuser.</licence>
+                </availability>
+                <date>2016</date>
+            </publicationStmt>
+            <sourceDesc>
+                <msDesc xml:id="C">
+                    <msIdentifier>
+                        <country>France</country>
+                        <settlement>Clermont-Ferrand</settlement>
+                        <institution>Archives départementales du Puy-de-Dôme</institution>
+                        <idno>1F2</idno>
+                        <msName type="sigle">C</msName>
+                    </msIdentifier>
+                    <head>
+                        <title>Chanson d'Aspremont</title>
+                        <title>Fabliau: Le Héron (Cele qui fu foutue et desfoutue II)</title>
+                        <title>Couplets sur le mariage</title>
+                    </head>
+                    <physDesc>
+                        <handDesc>
+                            <handNote xml:id="main1"> Main principale de la copie de l'Aspremont de
+                                C </handNote>
+                        </handDesc>
+                    </physDesc>
+                    <history>
+                        <origin>
+                            <origPlace cert="high" resp="#JBC">Angleterre</origPlace>
+                            <origDate cert="medium" resp="#JBC" notBefore="1201" notAfter="1233">premier tiers du XIIIe siècle</origDate>
+                        </origin>
+                    </history>
+                    <!--<additional>
+                        <surrogates> Fac-similé en ligne sur Gallica: <ref target="http://gallica.bnf.fr/ark:/12148/btv1b6000371s/f21.image.r=5094.langFR.zoom">http://gallica.bnf.fr/ark:/12148/btv1b6000371s/f21.image.r=5094.langFR.zoom</ref>.
+                        </surrogates>
+                    </additional>-->
+                </msDesc>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <refsDecl n="CTS">
+                <cRefPattern n="mot"
+                    matchPattern="(\w+).(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:lg/tei:l[@n='$1']//tei:w[@xml:id='$2'])">
+                    <p>Deuxième niveau de citation : Lemma</p>
+                </cRefPattern>
+                <cRefPattern n="vers"
+                    matchPattern="(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:lg/tei:l[@n='$1'])">
+                    <p>Premier niveau de citation : vers</p>
+                </cRefPattern>
+            </refsDecl>
+        </encodingDesc>
+        <profileDesc>
+            <creation>
+                <origPlace cert="medium" resp="#AFLL">Sicile?</origPlace>
+                <origDate cert="high" resp="#AFLL" notBefore="1170" notAfter="1190">Fin du XIIe
+                    siècle, avant
+                1190</origDate><!-- à faire: ajouter la référence bibliographique soutenant cette affirmation -->
+            </creation>
+            <langUsage>
+                <language cert="high" resp="#JBC" ident="xno" usage="100">anglo-normand du XIIIe
+                    siècle (langue du scribe ou couche principale)</language>
+            </langUsage>
+        </profileDesc>
+        <revisionDesc status="draft">
+            <change when="2017-02" who="#JBC" status="draft">Vérification et intégration de l'annotation linguistique</change>
+            <change when="2016-09" who="#AC" status="draft">Correction des résultats de l'annotation linguistique par Pandora</change>
+            <change when="2016-03-06" who="#JBC" status="draft">Création du document et mise en
+                place de la transcription</change>
+        </revisionDesc>
+    </teiHeader>
+    <text xml:lang="xno">
+        <!-- Relecture d'ensemble et de détail nécessaire -->
+        <body n="urn:cts:froLit:jns78308.jns4006.geste-pos-fro1" xml:lang="fro">
+            <pb n="8r" facs="facsimile/ADClermont_1F2-01r.JPG"/>
+            <cb n="a"/>
+            <lg type="laisse" n="520">
+                <gap reason="lacuna"/>
+                <!--<lb/><l><w><hi rend="initiale detach">E</hi>t</w> <w rend="elision">l</w><pc type="supplied">'</pc><w>apostoles</w> <w>les</w> <w>prist</w> <w>a</w> <w>esgarder</w><pc type="supplied">.</pc></l>
+<lb/><l><w><hi rend="initiale detach">A</hi>u</w> <w>duc</w> <w>Girart</w> <w>les</w> <w>comence</w> <w>a</w> <w>mostrer</w><pc type="supplied">.</pc></l>-->
+                <lb n="1"/>
+                <l n="1" xml:id="C_l_1">
+                    <q>
+                    <w lemma="ce2" ana="#CATTEX2009_MS_pos_DETdem #CATTEX2009_MS_NOMB._p #CATTEX2009_MS_GENRE_f #CATTEX2009_MS_CAS_r" xml:id="C_w_000001"><hi rend="initiale detach">c</hi>e<choice><reg>s</reg><orig>ſ</orig></choice></w>
+                    <w lemma="crïature" ana="#CATTEX2009_MS_pos_NOMcom #CATTEX2009_MS_NOMB._p #CATTEX2009_MS_GENRE_f #CATTEX2009_MS_CAS_r" xml:id="C_w_000002">c<choice><expan><ex>r</ex>e</expan><abbr>ͤ</abbr></choice><choice><reg>a</reg><orig>ɑ</orig></choice>tu<choice><reg>r</reg><orig>ɼ</orig></choice>e<choice><reg>s</reg><orig></orig></choice></w>
+                    <w lemma="que2" ana="#CATTEX2009_MS_pos_PROrel #CATTEX2009_MS_NOMB._p #CATTEX2009_MS_GENRE_f #CATTEX2009_MS_CAS_r" xml:id="C_w_000003">que</w>
+                    <w lemma="je" ana="#CATTEX2009_MS_pos_PROper #CATTEX2009_MS_PERS._1 #CATTEX2009_MS_NOMB._s #CATTEX2009_MS_GENRE_m #CATTEX2009_MS_CAS_n" xml:id="C_w_000004"><choice><reg>j</reg><orig>ı</orig></choice>o</w>
+                    <w lemma="vëoir" ana="#CATTEX2009_MS_pos_VERcjg #CATTEX2009_MS_MODE_ind #CATTEX2009_MS_TEMPS_pst #CATTEX2009_MS_PERS._1 #CATTEX2009_MS_NOMB._s" xml:id="C_w_000005"><choice><reg>v</reg><orig>u</orig></choice>e<choice><reg>i</reg><orig>ı</orig></choice></w>
+                    <w lemma="là" ana="#CATTEX2009_MS_pos_ADVgen #CATTEX2009_MS_DEGRE_-" xml:id="C_w_000006">l<choice><reg>a</reg><orig>ɑ</orig></choice></w>
+                    <w lemma="ester" ana="#CATTEX2009_MS_pos_VERinf" xml:id="C_w_000007">e<choice><reg>s</reg><orig>ſ</orig></choice>ter</w></q></l>
+                <lb n="2"/>
+                <l n="2" xml:id="C_l_2"><q><w lemma="faire" ana="#CATTEX2009_MS_pos_VERcjg #CATTEX2009_MS_MODE_ind #CATTEX2009_MS_TEMPS_psp #CATTEX2009_MS_PERS._3 #CATTEX2009_MS_NOMB._s" xml:id="C_w_000008"><hi rend="initiale detach">f</hi><choice><reg>i</reg><orig>ı</orig></choice><choice><reg>s</reg><orig>ſ</orig></choice>t</w>
+                    <w lemma="dieu" ana="#CATTEX2009_MS_pos_NOMpro #CATTEX2009_MS_NOMB._s #CATTEX2009_MS_GENRE_m #CATTEX2009_MS_CAS_n" xml:id="C_w_000009"><choice><reg>d</reg><orig>δ</orig></choice>eu</w>
+                    <w lemma="por2" ana="#CATTEX2009_MS_pos_PRE" xml:id="C_w_000010">pur</w>
+                    <w lemma="ome" ana="#CATTEX2009_MS_pos_NOMcom #CATTEX2009_MS_NOMB._s #CATTEX2009_MS_GENRE_m #CATTEX2009_MS_CAS_r" xml:id="C_w_000011">ho<choice><expan><ex>m</ex></expan><abbr>̃</abbr></choice>me</w>
+                    <w lemma="servir" ana="#CATTEX2009_MS_pos_VERinf" xml:id="C_w_000012"><choice><reg>s</reg><orig>ſ</orig></choice><choice><expan><ex>er</ex></expan><abbr>͛</abbr></choice><choice><reg>v</reg><orig>u</orig></choice><choice><reg>i</reg><orig>ı</orig></choice>r</w>
+                    <w lemma="et" ana="#CATTEX2009_MS_pos_CONcoo" xml:id="C_w_000013">e</w>
+                    <w lemma="onorer" ana="#CATTEX2009_MS_pos_VERinf" xml:id="C_w_000014">hono<choice><reg>r</reg><orig>ꝛ</orig></choice>e<choice><reg>r</reg><orig>ɼ</orig></choice></w></q><pc type="supplied">.</pc></l>
+                <lb n="3"/>
+            </lg>
+        </body>
+    </text>
+</TEI>

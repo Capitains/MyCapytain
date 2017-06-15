@@ -1,3 +1,8 @@
+### 2017-06-15 2.0.2 @ponteineptique
+
+- Issue 133 : Fixed a limitation of CapiTainS that did not allow to use any other attribute than @n in MyCapytain local capitains text parser and getReffs"
+- Addeted a travis setting to upload directly to pypi on github release.
+
 ### 2017-05-15 2.0.1 @sonofmun
 
 Corrected bug with the `CtsCapitainsLocalResolver.__getText__` that it would stop if a text was mentioned in the metadata but the file did not exist

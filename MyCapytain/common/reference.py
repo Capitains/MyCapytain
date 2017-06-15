@@ -20,7 +20,6 @@ REFSDECL_REPLACER = re.compile(r"\$[0-9]+")
 SUBREFERENCE = re.compile(r"(\w*)\[?([0-9]*)\]?", re.UNICODE)
 REFERENCE_REPLACER = re.compile(r"(@[a-zA-Z0-9:]+)(=)([\\$'\"?0-9]{3,6})")
 
-
 def __childOrNone__(liste):
     """ Used to parse resources in XmlCtsCitation
 
@@ -750,6 +749,16 @@ class Citation(Exportable):
     def child(self, val):
         if isinstance(val, self.__class__):
             self.__child = val
+
+    @property
+    def attribute(self):
+        """ Attribute that serves as a reference getter
+        """
+        refs = re.findall(
+            "\@([a-zA-Z:]+)=\\\?[\'\"]\$"+str(self.refsDecl.count("$"))+"\\\?[\'\"]",
+            self.refsDecl
+        )
+        return refs[-1]
 
     def __upXpathScope(self):
         """ Update xpath and scope property when refsDecl is updated

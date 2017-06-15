@@ -234,6 +234,27 @@ class CapitainsXmlTextTest(TestCase):
             text.citation.isEmpty(), True, "There should be no citation"
         )
 
+    def test_xml_with_xml_id(self):
+        """ Test that xml:id is Citation xpath works fine in passage retriaval """
+        text = self.parse("tests/testing_data/texts/xml_id.xml")
+        self.assertEqual(
+            text.citation.child.fill(["1", "2"]),
+            "/tei:TEI/tei:text/tei:body/tei:lg/tei:l[@n='1']//tei:w[@xml:id='2']",
+            "Filling of citation and citation detection should work"
+        )
+        self.assertIn(
+            '<l n="1" xml:id="C_l_1"><q><w lemma="ce2"',
+            text.getTextualNode(subreference="1.C_w_000001").export(Mimetypes.XML.TEI),
+            "Word chould be there !"
+        )
+        self.assertEqual(
+            text.getReffs(level=2), [
+                '1.C_w_000001', '1.C_w_000002', '1.C_w_000003', '1.C_w_000004', '1.C_w_000005',
+                '1.C_w_000006', '1.C_w_000007', '2.C_w_000008', '2.C_w_000009', '2.C_w_000010',
+                '2.C_w_000011', '2.C_w_000012', '2.C_w_000013', '2.C_w_000014'
+            ],
+            "XML:IDs and N should be retrieved."
+        )
 
     def test_urn(self):
         """ Test setters and getters for urn """

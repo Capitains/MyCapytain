@@ -219,14 +219,15 @@ class __SharedMethods__:
 
         while len(nodes) >= 1:
             passages = [
-                refs + [node.get("n")]
-                for xpath_result, refs in [
+                refs + [node.get(current_citation.attribute.replace("xml:", "{http://www.w3.org/XML/1998/namespace}"))]
+                for xpath_result, refs, current_citation in [
                         (
                             xml.xpath(
                                 citations[len(filling)-1].fill(filling),
                                 namespaces=XPATH_NAMESPACES
                             ),
-                            refs
+                            refs,
+                            citations[len(filling)-1]
                         )
                         for filling, refs in
                         [(refs + [None], refs) for refs in passages]

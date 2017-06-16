@@ -166,6 +166,40 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         self.assertEqual(len(TI), 16)
 
+    def test_empty_namespace_doesnot_crash(self):
+        """ Test when we have a string to expand in structured metadata but we have an empty Namespace"""
+        TG = """<textgroup
+        xmlns="http://chs.harvard.edu/xmlns/cts"
+        xmlns:dct="http://purl.org/dc/terms/"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:dts="http://w3id.org/dts-ontology/"
+        xmlns:cpt="http://purl.org/capitains/ns/1.0#"
+        xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:saws="http://purl.org/saws/ontology#"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        urn="urn:cts:pompei:cil004-00000">
+    <groupname xml:lang="lat">Corpus Inscriptionum Latinarum IV 0-100</groupname>
+    <cpt:structured-metadata>
+        <dc:identifier>http://arachne.uni-koeln.de/item/buch/2688</dc:identifier>
+        <dc:identifier>CIL IV</dc:identifier>
+        <dc:identifier>CIL 4</dc:identifier>
+        <dc:title xml:lang="lat">Corpus Inscriptionum Latinarum IV</dc:title>
+
+        <dc:contributor>Manfred Clauss</dc:contributor>
+        <dc:contributor>Anne Kolb</dc:contributor>
+        <dc:contributor>Wolfgang A. Slaby </dc:contributor>
+
+        <dc:author>Mau, August. Zangemeister</dc:author>
+        <dc:author>Karl Friedrich Wilhelm</dc:author>
+
+        <dc:publisher xml:lang="eng">Oxford University Press</dc:publisher>
+        <dct:dateCopyrighted rdf:datatype="xsd:gYear">1837</dct:dateCopyrighted>
+    </cpt:structured-metadata>
+</textgroup>"""
+        TG = XmlCtsTextgroupMetadata.parse(TG)
+        self.assertEqual(TG.id, "urn:cts:pompei:cil004-00000")
+
     def test_xml_TextInventoryParsing(self):
         """ Tests CtsTextInventoryMetadata parses without errors """
         TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)

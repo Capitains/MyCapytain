@@ -1,3 +1,8 @@
+### 2017-06-16 2.0.3 @ponteineptique
+
+- Issue 135 : Added support for empty namespace in string expansion for structured metadata"
+- Upgraded travis script to work correctly on tag release
+
 ### 2017-06-15 2.0.2 @ponteineptique
 
 - Issue 133 : Fixed a limitation of CapiTainS that did not allow to use any other attribute than @n in MyCapytain local capitains text parser and getReffs"

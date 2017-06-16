@@ -19,12 +19,6 @@ matrix:
 after_success:
     - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then coveralls; fi
 
-branches:
-  only:
-    - master
-    - rdflib-shift
-    - dts-dev
-
 deploy:
   provider: pypi
   user: ponteineptique

@@ -459,6 +459,6 @@ def expand_namespace(nsmap, string):
     :return: Expanded string with no namespace
     """
     for ns in nsmap:
-        if string.startswith(ns+":"):
+        if isinstance(string, str) and isinstance(ns, str) and string.startswith(ns+":"):
             return string.replace(ns+":", nsmap[ns])
     return string

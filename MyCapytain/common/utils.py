@@ -236,7 +236,7 @@ def performXpath(parent, xpath):
     loop = False
     if xpath.startswith(".//"):
         result = parent.xpath(
-            xpath.replace(".//", "./"),
+            xpath.replace(".//", "./", 1),
             namespaces=XPATH_NAMESPACES
         )
         if len(result) == 0:

@@ -245,7 +245,7 @@ class CapitainsXmlTextTest(TestCase):
         self.assertIn(
             '<l n="1" xml:id="C_l_1"><q><w lemma="ce2"',
             text.getTextualNode(subreference="1.C_w_000001").export(Mimetypes.XML.TEI),
-            "Word chould be there !"
+            "Word should be there !"
         )
         self.assertEqual(
             text.getReffs(level=2), [

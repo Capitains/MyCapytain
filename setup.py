@@ -20,6 +20,7 @@ setup(
   ],
   tests_require=[
     "mock>=2.0.0",
+    "responses>=0.8.1",
     "xmlunittest>=0.3.2"
   ],
   extras_require={

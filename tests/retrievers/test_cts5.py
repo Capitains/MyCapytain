@@ -1,5 +1,9 @@
 import unittest
+
+import requests
+import responses
 from mock import patch
+
 from MyCapytain.retrievers.cts5 import *
 
 
@@ -214,3 +218,13 @@ class TestEndpointsCts5(unittest.TestCase):
                     "urn": "urn:1.1"
                 }
             )
+
+    @responses.activate
+    def test_error_handling(self):
+        responses.add(
+            responses.GET,
+            "http://domainname.com/rest/cts?urn=urn%3A1.1&request=GetPassage",
+            body="Internal Server Error", status=500,
+        )
+        with self.assertRaises(requests.HTTPError):
+            self.cts.getTextualNode(textId="urn", subreference="1.1")

@@ -47,6 +47,7 @@ class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
             parameters["inv"] = self.inventory
 
         request = requests.get(self.endpoint, params=parameters)
+        request.raise_for_status()
         return request.text
 
     def getCapabilities(self, inventory=None, urn=None):

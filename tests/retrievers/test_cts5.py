@@ -2,7 +2,7 @@ import unittest
 
 import requests
 import responses
-from mock import patch
+from mock import patch, MagicMock
 
 from MyCapytain.retrievers.cts5 import *
 
@@ -228,3 +228,15 @@ class TestEndpointsCts5(unittest.TestCase):
         )
         with self.assertRaises(requests.HTTPError):
             self.cts.getTextualNode(textId="urn", subreference="1.1")
+
+    @responses.activate
+    def test_encoding(self):
+        """ Ensure retriever falls back to UTF-8 when no encoding is present on responses """
+        response = MagicMock(encoding=None)
+        with patch('requests.get', return_value=response) as patched_get:
+            self.cts.getTextualNode(textId="urn", subreference="1.1")
+            self.assertEqual(response.encoding, "utf-8")
+        response = MagicMock(encoding="latin1")
+        with patch('requests.get', return_value=response) as patched_get:
+            self.cts.getTextualNode(textId="urn", subreference="1.1")
+            self.assertEqual(response.encoding, "latin1")

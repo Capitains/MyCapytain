@@ -48,6 +48,8 @@ class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
 
         request = requests.get(self.endpoint, params=parameters)
         request.raise_for_status()
+        if request.encoding is None:
+            request.encoding = "utf-8"
         return request.text
 
     def getCapabilities(self, inventory=None, urn=None):

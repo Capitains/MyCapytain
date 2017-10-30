@@ -1,3 +1,10 @@
+### 2017-10-30 2.0.5 @ponteineptique
+
+Contributions by @brosner
+
+- Added error handling for failed requests to CTS API
+- Explicitly set fallback encoding for CTS API responses
+
 ### 2017-08-21 2.0.4 @ponteineptique
 
 - Issue 137 : Fixed a bug where a passage extraction would not work even if the passage was found in the reff extraction. Origin of the issue was replacing too much .// in the xpath and thus breaking it

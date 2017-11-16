@@ -3,7 +3,7 @@ from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.constants import Mimetypes
 
 # We set up a resolver which communicates with an API available in Leipzig
-resolver = HttpCtsResolver(HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts/"))
+resolver = HttpCtsResolver(HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts"))
 # We require some metadata information
 textMetadata = resolver.getMetadata("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
 # Texts in CTS Metadata have one interesting property : its citation scheme.

@@ -12,7 +12,7 @@ is represented by urn:cts:latinLit:stoa0255
 To retrieve data, we are gonna make a GetMetadata query
 to the CTS Retriever.
 """
-retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts/")
+retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts")
 # We store the response (Pure XML String)
 response = retriever.getMetadata(objectId="urn:cts:latinLit:stoa0255")
 

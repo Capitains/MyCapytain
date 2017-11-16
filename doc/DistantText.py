@@ -2,7 +2,7 @@ from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.resources.texts.remote.cts import CtsText
 
 # We set up a retriever which communicates with an API available in Leipzig
-retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts/")
+retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts")
 
 # Given that we have other examples that shows how to work with text,
 # we will focus here on playing with the graph functionality of texts implementations.

@@ -142,3 +142,17 @@ class TestTEIPassage(unittest.TestCase):
             [Mimetypes.PYTHON.ETREE, Mimetypes.XML.Std, Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT, Mimetypes.XML.TEI],
             "CapitainsCtsPassage should be able to export to given resources"
         )
+
+    def test_changing_space(self):
+        """ Test when user change default value of export joining char """
+        X = xmlparser("""<root>in- genium<note place="unspecified">ingenium <hi rend="italic">ll.v</hi>(<hi rend="italic">G</hi>). -nio
+<hi rend="italic">B.</hi> in ganea <hi rend="italic">J</hi></note><add>n</add>a<add>t</add>us</root>""")
+        P = TEIResource(
+            identifier="dummy",
+            resource=X
+        )
+        P.plaintext_string_join = ""
+        self.assertEqual(
+            P.export(Mimetypes.PLAINTEXT, exclude=["note"]),
+            "in- geniumnatus"
+        )

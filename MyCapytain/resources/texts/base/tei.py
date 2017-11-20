@@ -26,10 +26,28 @@ class TEIResource(InteractiveTextualNode):
         Mimetypes.PYTHON.NestedDict, Mimetypes.PLAINTEXT, Mimetypes.XML.TEI
     ]
     DEFAULT_EXPORT = Mimetypes.PLAINTEXT
+    PLAINTEXT_STRING_JOIN = " "
 
     def __init__(self, resource, **kwargs):
         super(TEIResource, self).__init__(**kwargs)
         self.resource = xmlparser(resource)
+        self.__plaintext_string_join__ = ""+self.PLAINTEXT_STRING_JOIN
+
+    @property
+    def plaintext_string_join(self):
+        """ String used to join xml node's texts in export
+        """
+        return self.__plaintext_string_join__
+
+    @plaintext_string_join.setter
+    def plaintext_string_join(self, value):
+        """ Set the value for string join
+
+        :param value: Default string value to use for join at export for plaintext
+        :type value: str
+        :return:
+        """
+        self.__plaintext_string_join__ = value
 
     def __str__(self):
         """ CtsTextMetadata based representation of the passage
@@ -95,7 +113,7 @@ class TEIResource(InteractiveTextualNode):
         elif output == Mimetypes.PLAINTEXT:
             # Exports to string
             return normalize(
-                " ".join(
+                self.plaintext_string_join.join(
                     [
                         element
                         for element

@@ -1,3 +1,8 @@
+### 2017-11-16 2.0.6 @ponteineptique
+
+- Added a way to specify the joining string for Plaintext export in TEIResource (Fixed #146)
+- Fixed some examples in the doc which had a trailing slash for the test remote API
+
 ### 2017-10-30 2.0.5 @ponteineptique
 
 Contributions by @brosner

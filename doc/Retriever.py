@@ -1,7 +1,7 @@
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 
 # We set up a retriever which communicates with an API available in Leipzig
-retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts/")
+retriever = HttpCtsRetriever("http://cts.dh.uni-leipzig.de/api/cts")
 # We require a passage : passage is now a Passage object
 passage = retriever.getPassage("urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
 # Passage is now equal to the string content of http://cts.dh.uni-leipzig.de/api/cts/?request=GetPassage&urn=urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1

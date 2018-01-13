@@ -14,7 +14,9 @@
    :target: https://pypi.python.org/pypi/MyCapytain
 .. image:: https://api.codacy.com/project/badge/grade/8e63e69a94274422865e4f275dbf08ea
    :target: https://www.codacy.com/app/leponteineptique/MyCapytain
-
+.. image:: https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg
+    :alt: License: MPL 2.0
+    :target: https://opensource.org/licenses/MPL-2.0
 
 MyCapytain is a python library which provides a large set of methods to interact with Text Services API  such as the \
 Canonical Text Services, the Distributed Text Services. It also provides a programming interface to exploit local \

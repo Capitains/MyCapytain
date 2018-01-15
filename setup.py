@@ -9,7 +9,7 @@ setup(
   url='http://github.com/Capitains/MyCapytain',
   author='Thibault Clerice',
   author_email='leponteineptique@gmail.com',
-  license='MIT',
+  license='Mozilla Public License Version 2.0',
   packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
   install_requires=[
     "requests>=2.8.1",

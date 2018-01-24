@@ -12,8 +12,11 @@ from MyCapytain.common.utils import xmlparser
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
-from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsCitation, XmlCtsTextMetadata as InventoryText, \
+from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, \
+    XmlCtsWorkMetadata, XmlCtsCitation, XmlCtsTextMetadata as InventoryText, \
     XmlCtsTranslationMetadata, XmlCtsEditionMetadata, XmlCtsCommentaryMetadata
+from MyCapytain.resources.prototypes.cts.inventory import CtsEditionMetadata, CtsTextgroupMetadata, CtsWorkMetadata, \
+    CtsCommentaryMetadata, CtsTextInventoryCollection, CtsTranslationMetadata, CtsTextInventoryMetadata
 from MyCapytain.resources.prototypes.cts.inventory import CtsTextInventoryCollection
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
@@ -35,7 +38,17 @@ class CtsCapitainsLocalResolver(Resolver):
 
 
     """
-    TEXT_CLASS = CapitainsCtsText
+    CLASSES = {
+        "text": CapitainsCtsText,
+        "edition": XmlCtsEditionMetadata,
+        "translation": XmlCtsTranslationMetadata,
+        "commentary": XmlCtsCommentaryMetadata,
+        "work": XmlCtsWorkMetadata,
+        "textgroup": XmlCtsTextgroupMetadata,
+        "inventory": XmlCtsTextInventoryMetadata,
+        "inventory_collection": CtsTextInventoryCollection
+    }
+
     DEFAULT_PAGE = 1
     PER_PAGE = (1, 10, 100)  # Min, Default, Mainvex,
     RAISE_ON_UNDISPATCHED = False
@@ -51,9 +64,12 @@ class CtsCapitainsLocalResolver(Resolver):
     def __init__(self, resource, name=None, logger=None, dispatcher=None):
         """ Initiate the XMLResolver
         """
+        self.classes = {}
+        self.classes.update(type(self).CLASSES)
+
         if dispatcher is None:
-            inventory_collection = CtsTextInventoryCollection(identifier="defaultTic")
-            ti = XmlCtsTextInventoryMetadata("default")
+            inventory_collection = self.classes["inventory_collection"](identifier="defaultTic")
+            ti = self.classes["inventory"]("default")
             ti.parent = inventory_collection
             ti.set_label("Default collection", "eng")
             self.dispatcher = CollectionDispatcher(inventory_collection)
@@ -69,7 +85,6 @@ class CtsCapitainsLocalResolver(Resolver):
         if not name:
             self.name = "repository"
 
-        self.TEXT_CLASS = type(self).TEXT_CLASS
         self.works = []
 
         self.parse(resource)
@@ -94,14 +109,14 @@ class CtsCapitainsLocalResolver(Resolver):
             for __cts__ in textgroups:
                 try:
                     with io.open(__cts__) as __xml__:
-                        textgroup = XmlCtsTextgroupMetadata.parse(
+                        textgroup = self.classes["textgroup"].parse(
                             resource=__xml__
                         )
                         tg_urn = str(textgroup.urn)
 
                     for __subcts__ in glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(__cts__))):
                         with io.open(__subcts__) as __xml__:
-                            work = XmlCtsWorkMetadata.parse(
+                            work = self.classes["work"].parse(
                                 resource=__xml__,
                                 parent=textgroup
                             )
@@ -117,7 +132,7 @@ class CtsCapitainsLocalResolver(Resolver):
                             if os.path.isfile(__text__.path):
                                 try:
                                     with io.open(__text__.path) as f:
-                                        t = CapitainsCtsText(resource=self.xmlparse(f))
+                                        t = self.classes["text"](resource=self.xmlparse(f))
                                         cites = list()
                                         for cite in [c for c in t.citation][::-1]:
                                             if len(cites) >= 1:
@@ -182,7 +197,7 @@ class CtsCapitainsLocalResolver(Resolver):
                 urn = [
                     t.id
                     for t in self.texts
-                    if t.id.startswith(str(urn)) and isinstance(t, XmlCtsEditionMetadata)
+                    if t.id.startswith(str(urn)) and isinstance(t, CtsEditionMetadata)
                 ]
                 if len(urn) > 0:
                     urn = URN(urn[0])
@@ -195,7 +210,7 @@ class CtsCapitainsLocalResolver(Resolver):
 
         if os.path.isfile(text.path):
             with io.open(text.path) as __xml__:
-                resource = self.TEXT_CLASS(urn=urn, resource=self.xmlparse(__xml__))
+                resource = self.classes["text"](urn=urn, resource=self.xmlparse(__xml__))
         else:
             resource = None
             self.logger.warning('The file {} is mentioned in the metadata but does not exist'.format(text.path))
@@ -297,9 +312,10 @@ class CtsCapitainsLocalResolver(Resolver):
         # We store inventory names and if there is only one we recreate the inventory
         inv_names = [text.parent.parent.parent.id for text in texts]
         if len(set(inv_names)) == 1:
-            inventory = XmlCtsTextInventoryMetadata(name=inv_names[0])
+            inventory = self.classes["inventory"](name=inv_names[0])
         else:
-            inventory = XmlCtsTextInventoryMetadata()
+            inventory = self.classes["inventory"]()
+
         # For each text we found using the filter
         for text in texts:
             tg_urn = str(text.parent.parent.urn)
@@ -307,19 +323,19 @@ class CtsCapitainsLocalResolver(Resolver):
             txt_urn = str(text.urn)
             # If we need to generate a textgroup object
             if tg_urn not in inventory.textgroups:
-                XmlCtsTextgroupMetadata(urn=tg_urn, parent=inventory)
+                self.classes["textgroup"](urn=tg_urn, parent=inventory)
             # If we need to generate a work object
             if wk_urn not in inventory.textgroups[tg_urn].works:
-                XmlCtsWorkMetadata(urn=wk_urn, parent=inventory.textgroups[tg_urn])
+                self.classes["work"](urn=wk_urn, parent=inventory.textgroups[tg_urn])
 
-            if isinstance(text, XmlCtsEditionMetadata):
-                x = XmlCtsEditionMetadata(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
+            if isinstance(text, CtsEditionMetadata):
+                x = self.classes["edition"](urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn])
                 x.citation = text.citation
-            elif isinstance(text, XmlCtsTranslationMetadata):
-                x = XmlCtsTranslationMetadata(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
+            elif isinstance(text, CtsTranslationMetadata):
+                x = self.classes["translation"](urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
                 x.citation = text.citation
-            elif isinstance(text, XmlCtsCommentaryMetadata):
-                x = XmlCtsCommentaryMetadata(urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
+            elif isinstance(text, CtsCommentaryMetadata):
+                x = self.classes["commentary"](urn=txt_urn, parent=inventory.textgroups[tg_urn].works[wk_urn], lang=text.lang)
                 x.citation = text.citation
 
         return inventory[objectId]

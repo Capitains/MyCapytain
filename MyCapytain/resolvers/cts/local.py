@@ -85,6 +85,8 @@ class CtsCapitainsLocalResolver(Resolver):
         """ Parse a list of directories and reades it into a collection
 
         :param resource: List of folders
+        :param complete_dispatch: Runs the dispatcher before and after works are parsed. Might have performance impact
+        :type complete_dispatch: bool
         :return: An inventory resource and a list of CtsTextMetadata metadata-objects
         """
         for folder in resource:
@@ -96,23 +98,16 @@ class CtsCapitainsLocalResolver(Resolver):
                             resource=__xml__
                         )
                         tg_urn = str(textgroup.urn)
-                    if tg_urn in self.inventory:
-                        self.inventory[tg_urn].update(textgroup)
-                    else:
-                        self.dispatcher.dispatch(textgroup, path=__cts__)
 
                     for __subcts__ in glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(__cts__))):
                         with io.open(__subcts__) as __xml__:
                             work = XmlCtsWorkMetadata.parse(
                                 resource=__xml__,
-                                parent=self.inventory[tg_urn]
+                                parent=textgroup
                             )
                             work_urn = str(work.urn)
-                            if work_urn in self.inventory[tg_urn].works:
-                                self.inventory[work_urn].update(work)
 
-                        for __textkey__ in work.texts:
-                            __text__ = self.inventory[__textkey__]
+                        for __textkey__, __text__ in work.texts.items():
                             __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
                                 directory=os.path.dirname(__subcts__),
                                 textgroup=__text__.urn.textgroup,
@@ -152,12 +147,23 @@ class CtsCapitainsLocalResolver(Resolver):
                                     )
                             else:
                                 self.logger.error("%s is not present", __text__.path)
+
+                    if tg_urn in self.inventory:
+                        self.inventory[tg_urn].update(textgroup)
+                    else:
+                        self.dispatcher.dispatch(textgroup, path=__cts__)
+
+                    for work_urn, work in textgroup.works.items():
+                        if work_urn in self.inventory[tg_urn].works:
+                            self.inventory[work_urn].update(work)
+
                 except UndispatchedTextError as E:
                     self.logger.error("Error dispatching %s ", __cts__)
                     if self.RAISE_ON_UNDISPATCHED is True:
                         raise E
                 except Exception as E:
                     self.logger.error("Error parsing %s ", __cts__)
+                    raise E
 
         return self.inventory, self.texts
 

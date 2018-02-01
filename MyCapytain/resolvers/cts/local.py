@@ -126,7 +126,8 @@ class CtsCapitainsLocalResolver(Resolver):
                 try:
                     with io.open(__cts__) as __xml__:
                         textgroup = self.classes["textgroup"].parse(
-                            resource=__xml__
+                            resource=__xml__,
+                            _cls_dict=self.classes
                         )
                         tg_urn = str(textgroup.urn)
 
@@ -134,7 +135,8 @@ class CtsCapitainsLocalResolver(Resolver):
                         with io.open(__subcts__) as __xml__:
                             work = self.classes["work"].parse(
                                 resource=__xml__,
-                                parent=textgroup
+                                parent=textgroup,
+                                _cls_dict=self.classes
                             )
 
                         for __textkey__, __text__ in work.texts.items():

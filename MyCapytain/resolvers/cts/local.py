@@ -46,26 +46,38 @@ class CtsCapitainsLocalResolver(Resolver):
         "work": XmlCtsWorkMetadata,
         "textgroup": XmlCtsTextgroupMetadata,
         "inventory": XmlCtsTextInventoryMetadata,
-        "inventory_collection": CtsTextInventoryCollection
+        "inventory_collection": CtsTextInventoryCollection,
+        "citation": XmlCtsCitation
     }
 
     DEFAULT_PAGE = 1
     PER_PAGE = (1, 10, 100)  # Min, Default, Mainvex,
     RAISE_ON_UNDISPATCHED = False
+    RAISE_ON_GENERIC_PARSING_ERROR = True
 
     @property
     def inventory(self):
         return self.__inventory__
 
+    @inventory.setter
+    def inventory(self, value):
+        self.__inventory__ = value
+
     @property
     def texts(self):
         return self.inventory.readableDescendants
 
-    def __init__(self, resource, name=None, logger=None, dispatcher=None):
+    @property
+    def invalid_collections(self):
+        return self.__invalids__
+
+    def __init__(self, resource, name=None, logger=None, dispatcher=None, autoparse=True):
         """ Initiate the XMLResolver
         """
         self.classes = {}
         self.classes.update(type(self).CLASSES)
+
+        self.__invalids__ = []
 
         if dispatcher is None:
             inventory_collection = self.classes["inventory_collection"](identifier="defaultTic")
@@ -87,7 +99,8 @@ class CtsCapitainsLocalResolver(Resolver):
 
         self.works = []
 
-        self.parse(resource)
+        if autoparse:
+            self.parse(resource)
 
     def xmlparse(self, file):
         """ Parse a XML file
@@ -96,12 +109,15 @@ class CtsCapitainsLocalResolver(Resolver):
         """
         return xmlparser(file)
 
+    def read(self, identifier, path=None):
+        with open(path) as f:
+            o = self.classes["text"](urn=identifier, resource=self.xmlparse(f))
+        return o
+
     def parse(self, resource):
-        """ Parse a list of directories and reades it into a collection
+        """ Parse a list of directories and reads it into a collection
 
         :param resource: List of folders
-        :param complete_dispatch: Runs the dispatcher before and after works are parsed. Might have performance impact
-        :type complete_dispatch: bool
         :return: An inventory resource and a list of CtsTextMetadata metadata-objects
         """
         for folder in resource:
@@ -120,7 +136,6 @@ class CtsCapitainsLocalResolver(Resolver):
                                 resource=__xml__,
                                 parent=textgroup
                             )
-                            work_urn = str(work.urn)
 
                         for __textkey__, __text__ in work.texts.items():
                             __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
@@ -131,46 +146,46 @@ class CtsCapitainsLocalResolver(Resolver):
                             )
                             if os.path.isfile(__text__.path):
                                 try:
-                                    with io.open(__text__.path) as f:
-                                        t = self.classes["text"](resource=self.xmlparse(f))
-                                        cites = list()
-                                        for cite in [c for c in t.citation][::-1]:
-                                            if len(cites) >= 1:
-                                                cites.append(XmlCtsCitation(
-                                                    xpath=cite.xpath.replace("'", '"'),
-                                                    scope=cite.scope.replace("'", '"'),
-                                                    name=cite.name,
-                                                    child=cites[-1]
-                                                ))
-                                            else:
-                                                cites.append(XmlCtsCitation(
-                                                    xpath=cite.xpath.replace("'", '"'),
-                                                    scope=cite.scope.replace("'", '"'),
-                                                    name=cite.name
-                                                ))
-                                        del t
+                                    text = self.read(__text__.id, path=__text__.path)
+                                    cites = list()
+                                    for cite in [c for c in text.citation][::-1]:
+                                        if len(cites) >= 1:
+                                            cites.append(self.classes["citation"](
+                                                xpath=cite.xpath.replace("'", '"'),
+                                                scope=cite.scope.replace("'", '"'),
+                                                name=cite.name,
+                                                child=cites[-1]
+                                            ))
+                                        else:
+                                            cites.append(self.classes["citation"](
+                                                xpath=cite.xpath.replace("'", '"'),
+                                                scope=cite.scope.replace("'", '"'),
+                                                name=cite.name
+                                            ))
+                                    del text
                                     __text__.citation = cites[-1]
                                     self.logger.info("%s has been parsed ", __text__.path)
-                                    if __text__.citation.isEmpty() is False:
-                                        self.texts.append(__text__)
-                                    else:
+                                    if __text__.citation.isEmpty():
                                         self.logger.error("%s has no passages", __text__.path)
+                                        self.__invalids__.append(__text__.id)
                                 except Exception:
                                     self.logger.error(
                                         "%s does not accept parsing at some level (most probably citation) ",
                                         __text__.path
                                     )
+                                    self.__invalids__.append(__text__.id)
                             else:
                                 self.logger.error("%s is not present", __text__.path)
+                                self.__invalids__.append(__text__.id)
 
-                    if tg_urn in self.inventory:
-                        self.inventory[tg_urn].update(textgroup)
+                    if tg_urn in self.dispatcher.collection:
+                        self.dispatcher.collection[tg_urn].update(textgroup)
                     else:
                         self.dispatcher.dispatch(textgroup, path=__cts__)
 
                     for work_urn, work in textgroup.works.items():
-                        if work_urn in self.inventory[tg_urn].works:
-                            self.inventory[work_urn].update(work)
+                        if work_urn in self.dispatcher.collection[tg_urn].works:
+                            self.dispatcher.collection[work_urn].update(work)
 
                 except UndispatchedTextError as E:
                     self.logger.error("Error dispatching %s ", __cts__)
@@ -178,9 +193,11 @@ class CtsCapitainsLocalResolver(Resolver):
                         raise E
                 except Exception as E:
                     self.logger.error("Error parsing %s ", __cts__)
-                    raise E
+                    if self.RAISE_ON_GENERIC_PARSING_ERROR:
+                        raise E
 
-        return self.inventory, self.texts
+        self.inventory = self.dispatcher.collection
+        return self.inventory
 
     def __getText__(self, urn):
         """ Returns a CtsTextMetadata object

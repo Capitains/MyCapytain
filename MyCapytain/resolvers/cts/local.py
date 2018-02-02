@@ -139,7 +139,7 @@ class CtsCapitainsLocalResolver(Resolver):
                                 _cls_dict=self.classes
                             )
 
-                        for __textkey__, __text__ in work.texts.items():
+                        for __textkey__, __text__ in work.children.items():
                             __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
                                 directory=os.path.dirname(__subcts__),
                                 textgroup=__text__.urn.textgroup,

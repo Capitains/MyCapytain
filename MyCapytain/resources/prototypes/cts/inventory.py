@@ -445,7 +445,7 @@ class CtsWorkMetadata(PrototypeCtsCollection):
         :return: Dictionary of texts
         :rtype: defaultdict(:class:`PrototypeTexts`)
         """
-        return self.__children__
+        return self.children
 
     @property
     def lang(self):
@@ -480,7 +480,7 @@ class CtsWorkMetadata(PrototypeCtsCollection):
         elif self.urn != other.urn:
             raise InvalidURN("Cannot add CtsWorkMetadata %s to CtsWorkMetadata %s " % (self.urn, other.urn))
 
-        for urn, text in other.texts.items():
+        for urn, text in other.children.items():
             self.texts[urn] = text
             self.texts[urn].parent = self
             self.texts[urn].resource = None
@@ -566,7 +566,7 @@ class CtsTextgroupMetadata(PrototypeCtsCollection):
         :return: Dictionary of works
         :rtype: defaultdict(:class:`PrototypeWorks`)
         """
-        return self.__children__
+        return self.children
 
     def update(self, other):
         """ Merge two Textgroup Objects.
@@ -646,7 +646,7 @@ class CtsTextInventoryMetadata(PrototypeCtsCollection):
         :return: Dictionary of textgroups
         :rtype: defaultdict(:class:`CtsTextgroupMetadata`)
         """
-        return self.__children__
+        return self.children
 
     def __len__(self):
         """ Get the number of text in the Inventory

@@ -28,7 +28,6 @@ class PrototypeCtsCollection(Collection):
     :type identifier: str,URN
     :cvar CTS_MODEL: String Representation of the type of collection
     """
-    CTS_MODEL = "CtsCollection"
     DC_TITLE_KEY = None
     CTS_PROPERTIES = []
     CTS_LINKS = []
@@ -38,10 +37,6 @@ class PrototypeCtsCollection(Collection):
 
     def __init__(self, identifier=""):
         super(PrototypeCtsCollection, self).__init__(identifier)
-
-        if hasattr(type(self), "CTS_MODEL"):
-            self.graph.set((self.asNode(), RDF.type, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
-            self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.isA, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
 
         self.__urn__ = ""
 

@@ -178,6 +178,17 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
                 obj.metadata["namespaceMapping"][namespaceMapping.get("abbreviation")] = namespaceMapping.get("nsURI")
         """
 
+    def __init__(self, *args, **kwargs):
+        super(XmlCtsTextMetadata, self).__init__(*args, **kwargs)
+        self._path = None
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        self._path = value
 
 class XmlCtsEditionMetadata(cts.CtsEditionMetadata, XmlCtsTextMetadata):
     """ Create an edition subtyped CtsTextMetadata object

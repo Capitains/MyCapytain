@@ -140,45 +140,47 @@ class CtsCapitainsLocalResolver(Resolver):
                             )
 
                         for __textkey__, __text__ in work.children.items():
-                            __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
-                                directory=os.path.dirname(__subcts__),
-                                textgroup=__text__.urn.textgroup,
-                                work=__text__.urn.work,
-                                version=__text__.urn.version
-                            )
-                            if os.path.isfile(__text__.path):
-                                try:
-                                    text = self.read(__text__.id, path=__text__.path)
-                                    cites = list()
-                                    for cite in [c for c in text.citation][::-1]:
-                                        if len(cites) >= 1:
-                                            cites.append(self.classes["citation"](
-                                                xpath=cite.xpath.replace("'", '"'),
-                                                scope=cite.scope.replace("'", '"'),
-                                                name=cite.name,
-                                                child=cites[-1]
-                                            ))
-                                        else:
-                                            cites.append(self.classes["citation"](
-                                                xpath=cite.xpath.replace("'", '"'),
-                                                scope=cite.scope.replace("'", '"'),
-                                                name=cite.name
-                                            ))
-                                    del text
-                                    __text__.citation = cites[-1]
-                                    self.logger.info("%s has been parsed ", __text__.path)
-                                    if __text__.citation.isEmpty():
-                                        self.logger.error("%s has no passages", __text__.path)
+                            # This if allows to avoid reparsing of a single file if it was already parsed
+                            if (not __text__.citation or __text__.citation.isEmpty()) and __text__.path is None:
+                                __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
+                                    directory=os.path.dirname(__subcts__),
+                                    textgroup=__text__.urn.textgroup,
+                                    work=__text__.urn.work,
+                                    version=__text__.urn.version
+                                )
+                                if os.path.isfile(__text__.path):
+                                    try:
+                                        text = self.read(__text__.id, path=__text__.path)
+                                        cites = list()
+                                        for cite in [c for c in text.citation][::-1]:
+                                            if len(cites) >= 1:
+                                                cites.append(self.classes["citation"](
+                                                    xpath=cite.xpath.replace("'", '"'),
+                                                    scope=cite.scope.replace("'", '"'),
+                                                    name=cite.name,
+                                                    child=cites[-1]
+                                                ))
+                                            else:
+                                                cites.append(self.classes["citation"](
+                                                    xpath=cite.xpath.replace("'", '"'),
+                                                    scope=cite.scope.replace("'", '"'),
+                                                    name=cite.name
+                                                ))
+                                        del text
+                                        __text__.citation = cites[-1]
+                                        self.logger.info("%s has been parsed ", __text__.path)
+                                        if __text__.citation.isEmpty():
+                                            self.logger.error("%s has no passages", __text__.path)
+                                            self.__invalids__.append(__text__.id)
+                                    except Exception:
+                                        self.logger.error(
+                                            "%s does not accept parsing at some level (most probably citation) ",
+                                            __text__.path
+                                        )
                                         self.__invalids__.append(__text__.id)
-                                except Exception:
-                                    self.logger.error(
-                                        "%s does not accept parsing at some level (most probably citation) ",
-                                        __text__.path
-                                    )
+                                else:
+                                    self.logger.error("%s is not present", __text__.path)
                                     self.__invalids__.append(__text__.id)
-                            else:
-                                self.logger.error("%s is not present", __text__.path)
-                                self.__invalids__.append(__text__.id)
 
                     if tg_urn in self.dispatcher.collection:
                         self.dispatcher.collection[tg_urn].update(textgroup)

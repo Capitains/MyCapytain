@@ -259,10 +259,19 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
                 o.set_cts_property("title", child.text, lg)
 
         # Parse children
-        xpathDict(xml=xml, xpath='ti:edition', cls=_cls_dict.get("edition", XmlCtsEditionMetadata), parent=o)
-        xpathDict(xml=xml, xpath='ti:translation', cls=_cls_dict.get("translation", XmlCtsTranslationMetadata), parent=o)
+        xpathDict(
+            xml=xml, xpath='ti:edition', cls=_cls_dict.get("edition", XmlCtsEditionMetadata), parent=o,
+            _cls_dict=_cls_dict
+        )
+        xpathDict(
+            xml=xml, xpath='ti:translation', cls=_cls_dict.get("translation", XmlCtsTranslationMetadata), parent=o,
+            _cls_dict=_cls_dict
+        )
         # Added for commentary
-        xpathDict(xml=xml, xpath='ti:commentary', cls=_cls_dict.get("commentary", XmlCtsCommentaryMetadata), parent=o)
+        xpathDict(
+            xml=xml, xpath='ti:commentary', cls=_cls_dict.get("commentary", XmlCtsCommentaryMetadata), parent=o,
+            _cls_dict=_cls_dict
+        )
 
         __parse_structured_metadata__(o, xml)
 

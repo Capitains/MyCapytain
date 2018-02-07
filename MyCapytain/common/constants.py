@@ -100,7 +100,7 @@ class Mimetypes:
 
 
 def gen_graph(g=None):
-    if not g:
+    if g is None:
         g = Graph()
     g.bind("", RDF_NAMESPACES.CTS)
     g.bind("dts", RDF_NAMESPACES.DTS)

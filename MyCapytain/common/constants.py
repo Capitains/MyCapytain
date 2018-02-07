@@ -99,13 +99,18 @@ class Mimetypes:
     PLAINTEXT = "text/plain"
 
 
+def gen_graph():
+    g = Graph()
+    g.bind("", RDF_NAMESPACES.CTS)
+    g.bind("dts", RDF_NAMESPACES.DTS)
+    g.bind("tei", RDF_NAMESPACES.TEI)
+    g.bind("skos", SKOS)
+    g.bind("cpt", RDF_NAMESPACES.CAPITAINS)
+    return g
+
+
 global __MYCAPYTAIN_TRIPLE_GRAPH__
-__MYCAPYTAIN_TRIPLE_GRAPH__ = Graph()
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("", RDF_NAMESPACES.CTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", RDF_NAMESPACES.DTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", RDF_NAMESPACES.TEI)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("skos", SKOS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("cpt", RDF_NAMESPACES.CAPITAINS)
+__MYCAPYTAIN_TRIPLE_GRAPH__ = gen_graph()
 
 
 def set_graph(graph):

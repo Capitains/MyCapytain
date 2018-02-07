@@ -99,8 +99,9 @@ class Mimetypes:
     PLAINTEXT = "text/plain"
 
 
-def gen_graph():
-    g = Graph()
+def gen_graph(g=None):
+    if not g:
+        g = Graph()
     g.bind("", RDF_NAMESPACES.CTS)
     g.bind("dts", RDF_NAMESPACES.DTS)
     g.bind("tei", RDF_NAMESPACES.TEI)

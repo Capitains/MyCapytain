@@ -130,14 +130,12 @@ class PrototypeCtsCollection(Collection):
         :param lines: New Line Character (Can be empty)
         :return: String representation of XML Nodes
         """
-        if namespaces is True:
-            attrs.update(self.__namespaces_header__(cpt=(output == Mimetypes.XML.CapiTainS.CTS)))
 
         TYPE_URI = self.TYPE_URI
         if TYPE_URI == RDF_NAMESPACES.CTS.term("CtsTextInventoryCollection"):
             TYPE_URI = RDF_NAMESPACES.CTS.term("TextInventory")
 
-        strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)]
+        strings = []
         for pred in self.CTS_PROPERTIES:
             for obj in self.metadata.get(pred):
                 strings.append(
@@ -161,6 +159,11 @@ class PrototypeCtsCollection(Collection):
             strings.append(obj.export(output, namespaces=False))
 
         strings.append(make_xml_node(self.graph, TYPE_URI, close=True))
+
+        if namespaces is True:
+            attrs.update(self.__namespaces_header__(cpt=(output == Mimetypes.XML.CapiTainS.CTS)))
+
+        strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)] + strings
 
         return lines.join(strings)
 

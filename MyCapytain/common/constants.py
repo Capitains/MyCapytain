@@ -99,19 +99,30 @@ class Mimetypes:
     PLAINTEXT = "text/plain"
 
 
-def gen_graph(g=None):
-    if g is None:
-        g = Graph()
-    g.bind("", RDF_NAMESPACES.CTS)
-    g.bind("dts", RDF_NAMESPACES.DTS)
-    g.bind("tei", RDF_NAMESPACES.TEI)
-    g.bind("skos", SKOS)
-    g.bind("cpt", RDF_NAMESPACES.CAPITAINS)
-    return g
+GRAPH_BINDINGS = {
+    "": RDF_NAMESPACES.CTS,
+    "dts": RDF_NAMESPACES.DTS,
+    "tei": RDF_NAMESPACES.TEI,
+    "skos": SKOS,
+    "cpt": RDF_NAMESPACES.CAPITAINS
+}
+
+
+def bind_graph(graph=None):
+    """ Bind a graph with generic MyCapytain prefixes
+
+    :param graph: Graph (Optional)
+    :return: Bound graph
+    """
+    if graph is None:
+        graph = Graph()
+    for prefix, ns in GRAPH_BINDINGS.items():
+        graph.bind(prefix, ns, True)
+    return graph
 
 
 global __MYCAPYTAIN_TRIPLE_GRAPH__
-__MYCAPYTAIN_TRIPLE_GRAPH__ = gen_graph()
+__MYCAPYTAIN_TRIPLE_GRAPH__ = bind_graph()
 
 
 def set_graph(graph):

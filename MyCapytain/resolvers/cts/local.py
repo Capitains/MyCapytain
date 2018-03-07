@@ -114,91 +114,117 @@ class CtsCapitainsLocalResolver(Resolver):
             o = self.classes["text"](urn=identifier, resource=self.xmlparse(f))
         return o
 
+    def _parse_textgroup(self, cts_file):
+        try:
+            with io.open(cts_file) as __xml__:
+                return self.classes["textgroup"].parse(
+                    resource=__xml__,
+                    _cls_dict=self.classes
+                )
+        except Exception as E:
+            self.logger.error("Error parsing %s ", cts_file)
+            if self.RAISE_ON_GENERIC_PARSING_ERROR:
+                raise E
+
+    def _parse_work(self, cts_file, textgroup):
+        with io.open(cts_file) as __xml__:
+            work, texts = self.classes["work"].parse(
+                resource=__xml__,
+                parent=textgroup,
+                _cls_dict=self.classes,
+                _with_children=True
+            )
+
+        return work, texts
+
+    def _parse_text(self, text, directory):
+        __textkey__, __text__ = text.id, text
+        # This if allows to avoid reparsing of a single file if it was already parsed
+        __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
+            directory=directory,
+            textgroup=__text__.urn.textgroup,
+            work=__text__.urn.work,
+            version=__text__.urn.version
+        )
+        if os.path.isfile(__text__.path):
+            try:
+                text = self.read(__text__.id, path=__text__.path)
+                cites = list()
+                for cite in [c for c in text.citation][::-1]:
+                    if len(cites) >= 1:
+                        cites.append(self.classes["citation"](
+                            xpath=cite.xpath.replace("'", '"'),
+                            scope=cite.scope.replace("'", '"'),
+                            name=cite.name,
+                            child=cites[-1]
+                        ))
+                    else:
+                        cites.append(self.classes["citation"](
+                            xpath=cite.xpath.replace("'", '"'),
+                            scope=cite.scope.replace("'", '"'),
+                            name=cite.name
+                        ))
+                del text
+                __text__.citation = cites[-1]
+                self.logger.info("%s has been parsed ", __text__.path)
+                if __text__.citation.isEmpty():
+                    self.logger.error("%s has no passages", __text__.path)
+                    self.__invalids__.append(__text__.id)
+            except Exception:
+                self.logger.error(
+                    "%s does not accept parsing at some level (most probably citation) ",
+                    __text__.path
+                )
+                self.__invalids__.append(__text__.id)
+        else:
+            self.logger.error("%s is not present", __text__.path)
+            self.__invalids__.append(__text__.id)
+
+    def _dispatch(self, textgroup, directory):
+        if textgroup.id in self.dispatcher.collection:
+            self.dispatcher.collection[textgroup.id].update(textgroup)
+        else:
+            self.dispatcher.dispatch(textgroup, path=directory)
+
+        for work_urn, work in textgroup.works.items():
+            if work_urn in self.dispatcher.collection[textgroup.id].works:
+                self.dispatcher.collection[work_urn].update(work)
+
+    def _dispatch_container(self, textgroup, directory):
+        try:
+            self._dispatch(textgroup, directory)
+        except UndispatchedTextError as E:
+            self.logger.error("Error dispatching %s ", directory)
+            if self.RAISE_ON_UNDISPATCHED is True:
+                raise E
+
     def parse(self, resource):
         """ Parse a list of directories and reads it into a collection
 
         :param resource: List of folders
         :return: An inventory resource and a list of CtsTextMetadata metadata-objects
         """
+        textgroups = []
         for folder in resource:
-            textgroups = glob("{base_folder}/data/*/__cts__.xml".format(base_folder=folder))
-            for __cts__ in textgroups:
-                try:
-                    with io.open(__cts__) as __xml__:
-                        textgroup = self.classes["textgroup"].parse(
-                            resource=__xml__,
-                            _cls_dict=self.classes
-                        )
-                        tg_urn = str(textgroup.urn)
+            cts_files = glob("{base_folder}/data/*/__cts__.xml".format(base_folder=folder))
+            for cts_file in cts_files:
+                textgroup = self._parse_textgroup(cts_file)
 
-                    for __subcts__ in glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(__cts__))):
-                        with io.open(__subcts__) as __xml__:
-                            work = self.classes["work"].parse(
-                                resource=__xml__,
-                                parent=textgroup,
-                                _cls_dict=self.classes
-                            )
+                works = glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(cts_file)))
+                for cts_work_file in works:
+                    work, texts = self._parse_work(cts_work_file, textgroup)
 
-                        for __textkey__, __text__ in work.children.items():
-                            # This if allows to avoid reparsing of a single file if it was already parsed
-                            if (not __text__.citation or __text__.citation.isEmpty()) and __text__.path is None:
-                                __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
-                                    directory=os.path.dirname(__subcts__),
-                                    textgroup=__text__.urn.textgroup,
-                                    work=__text__.urn.work,
-                                    version=__text__.urn.version
-                                )
-                                if os.path.isfile(__text__.path):
-                                    try:
-                                        text = self.read(__text__.id, path=__text__.path)
-                                        cites = list()
-                                        for cite in [c for c in text.citation][::-1]:
-                                            if len(cites) >= 1:
-                                                cites.append(self.classes["citation"](
-                                                    xpath=cite.xpath.replace("'", '"'),
-                                                    scope=cite.scope.replace("'", '"'),
-                                                    name=cite.name,
-                                                    child=cites[-1]
-                                                ))
-                                            else:
-                                                cites.append(self.classes["citation"](
-                                                    xpath=cite.xpath.replace("'", '"'),
-                                                    scope=cite.scope.replace("'", '"'),
-                                                    name=cite.name
-                                                ))
-                                        del text
-                                        __text__.citation = cites[-1]
-                                        self.logger.info("%s has been parsed ", __text__.path)
-                                        if __text__.citation.isEmpty():
-                                            self.logger.error("%s has no passages", __text__.path)
-                                            self.__invalids__.append(__text__.id)
-                                    except Exception:
-                                        self.logger.error(
-                                            "%s does not accept parsing at some level (most probably citation) ",
-                                            __text__.path
-                                        )
-                                        self.__invalids__.append(__text__.id)
-                                else:
-                                    self.logger.error("%s is not present", __text__.path)
-                                    self.__invalids__.append(__text__.id)
+                    directory = os.path.dirname(cts_work_file)
+                    for text in texts:
+                        self._parse_text(text, directory)
 
-                    if tg_urn in self.dispatcher.collection:
-                        self.dispatcher.collection[tg_urn].update(textgroup)
-                    else:
-                        self.dispatcher.dispatch(textgroup, path=__cts__)
+                textgroups.append(
+                    (textgroup, cts_file)
+                )
 
-                    for work_urn, work in textgroup.works.items():
-                        if work_urn in self.dispatcher.collection[tg_urn].works:
-                            self.dispatcher.collection[work_urn].update(work)
-
-                except UndispatchedTextError as E:
-                    self.logger.error("Error dispatching %s ", __cts__)
-                    if self.RAISE_ON_UNDISPATCHED is True:
-                        raise E
-                except Exception as E:
-                    self.logger.error("Error parsing %s ", __cts__)
-                    if self.RAISE_ON_GENERIC_PARSING_ERROR:
-                        raise E
+        # Dispatching routine at the end of each
+        for textgroup, textgroup_path in textgroups:
+            self._dispatch_container(textgroup, textgroup_path)
 
         self.inventory = self.dispatcher.collection
         return self.inventory

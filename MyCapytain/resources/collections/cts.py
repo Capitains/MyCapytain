@@ -79,12 +79,14 @@ def xpathDict(xml, xpath, cls, parent, **kwargs):
     :rtype: collections.defaultdict.<basestring, inventory.Resource>
     :returns: Dictionary of children
     """
+    children = []
     for child in xml.xpath(xpath, namespaces=XPATH_NAMESPACES):
-        cls.parse(
+        children.append(cls.parse(
             resource=child,
             parent=parent,
             **kwargs
-        )
+        ))
+    return children
 
 
 def __parse_structured_metadata__(obj, xml):
@@ -237,7 +239,7 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
     """
 
     @staticmethod
-    def parse(resource, parent=None, _cls_dict=_CLASSES_DICT):
+    def parse(resource, parent=None, _cls_dict=_CLASSES_DICT, _with_children=False):
         """ Parse a resource
 
         :param resource: Element rerpresenting a work
@@ -259,22 +261,28 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
                 o.set_cts_property("title", child.text, lg)
 
         # Parse children
-        xpathDict(
-            xml=xml, xpath='ti:edition', cls=_cls_dict.get("edition", XmlCtsEditionMetadata), parent=o,
+        children = []
+        children.extend(xpathDict(
+            xml=xml, xpath='ti:edition',
+            cls=_cls_dict.get("edition", XmlCtsEditionMetadata), parent=o,
             _cls_dict=_cls_dict
-        )
-        xpathDict(
-            xml=xml, xpath='ti:translation', cls=_cls_dict.get("translation", XmlCtsTranslationMetadata), parent=o,
+        ))
+        children.extend(xpathDict(
+            xml=xml, xpath='ti:translation',
+            cls=_cls_dict.get("translation", XmlCtsTranslationMetadata), parent=o,
             _cls_dict=_cls_dict
-        )
+        ))
         # Added for commentary
-        xpathDict(
-            xml=xml, xpath='ti:commentary', cls=_cls_dict.get("commentary", XmlCtsCommentaryMetadata), parent=o,
+        children.extend(xpathDict(
+            xml=xml, xpath='ti:commentary',
+            cls=_cls_dict.get("commentary", XmlCtsCommentaryMetadata), parent=o,
             _cls_dict=_cls_dict
-        )
+        ))
 
         __parse_structured_metadata__(o, xml)
 
+        if _with_children:
+            return o, children
         return o
 
 

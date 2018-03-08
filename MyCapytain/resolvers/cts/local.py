@@ -67,17 +67,11 @@ class CtsCapitainsLocalResolver(Resolver):
     def texts(self):
         return self.inventory.readableDescendants
 
-    @property
-    def invalid_collections(self):
-        return self.__invalids__
-
     def __init__(self, resource, name=None, logger=None, dispatcher=None, autoparse=True):
         """ Initiate the XMLResolver
         """
         self.classes = {}
         self.classes.update(type(self).CLASSES)
-
-        self.__invalids__ = []
 
         if dispatcher is None:
             inventory_collection = self.classes["inventory_collection"](identifier="defaultTic")
@@ -109,24 +103,72 @@ class CtsCapitainsLocalResolver(Resolver):
         """
         return xmlparser(file)
 
-    def read(self, identifier, path=None):
+    def read(self, identifier, path):
+        """ Retrieve and parse a text given an identifier
+
+        :param identifier: Identifier of the text
+        :type identifier: str
+        :param path: Path of the text
+        :type path: str
+        :return: Parsed Text
+        :rtype: CapitainsCtsText
+        """
         with open(path) as f:
             o = self.classes["text"](urn=identifier, resource=self.xmlparse(f))
         return o
 
-    def _parse_textgroup(self, cts_file):
+    def _parse_textgroup_wrapper(self, cts_file):
+        """ Wraps with a Try/Except the textgroup parsing from a cts file
+
+        :param cts_file: Path to the CTS File
+        :type cts_file: str
+        :return: CtsTextgroupMetadata
+        """
         try:
-            with io.open(cts_file) as __xml__:
-                return self.classes["textgroup"].parse(
-                    resource=__xml__,
-                    _cls_dict=self.classes
-                )
+            return self._parse_textgroup(cts_file)
+        except Exception as E:
+            self.logger.error("Error parsing %s ", cts_file)
+            if self.RAISE_ON_GENERIC_PARSING_ERROR:
+                raise E
+
+    def _parse_textgroup(self, cts_file):
+        """ Parses a textgroup from a cts file
+
+        :param cts_file: Path to the CTS File
+        :type cts_file: str
+        :return: CtsTextgroupMetadata and Current file
+        """
+        with io.open(cts_file) as __xml__:
+            return self.classes["textgroup"].parse(
+                resource=__xml__,
+                _cls_dict=self.classes
+            ), cts_file
+
+    def _parse_work_wrapper(self, cts_file, textgroup):
+        """ Wraps with a Try/Except the Work parsing from a cts file
+
+        :param cts_file: Path to the CTS File
+        :type cts_file: str
+        :param textgroup: Textgroup to which the Work is a part of
+        :type textgroup: CtsTextgroupMetadata
+        :return: Parsed Work and the Texts, as well as the current file directory
+        """
+        try:
+            return self._parse_work(cts_file, textgroup)
         except Exception as E:
             self.logger.error("Error parsing %s ", cts_file)
             if self.RAISE_ON_GENERIC_PARSING_ERROR:
                 raise E
 
     def _parse_work(self, cts_file, textgroup):
+        """ Parses a work from a cts file
+
+        :param cts_file: Path to the CTS File
+        :type cts_file: str
+        :param textgroup: Textgroup to which the Work is a part of
+        :type textgroup: CtsTextgroupMetadata
+        :return: Parsed Work and the Texts, as well as the current file directory
+        """
         with io.open(cts_file) as __xml__:
             work, texts = self.classes["work"].parse(
                 resource=__xml__,
@@ -135,20 +177,28 @@ class CtsCapitainsLocalResolver(Resolver):
                 _with_children=True
             )
 
-        return work, texts
+        return work, texts, os.path.dirname(cts_file)
 
     def _parse_text(self, text, directory):
-        __textkey__, __text__ = text.id, text
-        # This if allows to avoid reparsing of a single file if it was already parsed
-        __text__.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
+        """ Complete the TextMetadata object with its citation scheme by parsing the original text
+
+        :param text: Text Metadata collection
+        :type text: XmlCtsTextMetadata
+        :param directory: Directory in which the metadata was found and where the text file should be
+        :type directory: str
+        :returns: True if all went well
+        :rtype: bool
+        """
+        text_id, text_metadata = text.id, text
+        text_metadata.path = "{directory}/{textgroup}.{work}.{version}.xml".format(
             directory=directory,
-            textgroup=__text__.urn.textgroup,
-            work=__text__.urn.work,
-            version=__text__.urn.version
+            textgroup=text_metadata.urn.textgroup,
+            work=text_metadata.urn.work,
+            version=text_metadata.urn.version
         )
-        if os.path.isfile(__text__.path):
+        if os.path.isfile(text_metadata.path):
             try:
-                text = self.read(__text__.id, path=__text__.path)
+                text = self.read(text_id, path=text_metadata.path)
                 cites = list()
                 for cite in [c for c in text.citation][::-1]:
                     if len(cites) >= 1:
@@ -165,22 +215,28 @@ class CtsCapitainsLocalResolver(Resolver):
                             name=cite.name
                         ))
                 del text
-                __text__.citation = cites[-1]
-                self.logger.info("%s has been parsed ", __text__.path)
-                if __text__.citation.isEmpty():
-                    self.logger.error("%s has no passages", __text__.path)
-                    self.__invalids__.append(__text__.id)
+                text_metadata.citation = cites[-1]
+                self.logger.info("%s has been parsed ", text_metadata.path)
+                if text_metadata.citation.isEmpty():
+                    self.logger.error("%s has no passages", text_metadata.path)
+                    return False
+                return True
             except Exception:
                 self.logger.error(
                     "%s does not accept parsing at some level (most probably citation) ",
-                    __text__.path
+                    text_metadata.path
                 )
-                self.__invalids__.append(__text__.id)
+                return False
         else:
-            self.logger.error("%s is not present", __text__.path)
-            self.__invalids__.append(__text__.id)
+            self.logger.error("%s is not present", text_metadata.path)
+            return False
 
     def _dispatch(self, textgroup, directory):
+        """ Run the dispatcher over a textgroup.
+
+        :param textgroup: Textgroup object that needs to be dispatched
+        :param directory: Directory in which the textgroup was found
+        """
         if textgroup.id in self.dispatcher.collection:
             self.dispatcher.collection[textgroup.id].update(textgroup)
         else:
@@ -191,12 +247,28 @@ class CtsCapitainsLocalResolver(Resolver):
                 self.dispatcher.collection[work_urn].update(work)
 
     def _dispatch_container(self, textgroup, directory):
+        """ Run the dispatcher over a textgroup within a try/except block
+
+        .. note:: This extraction allows to change the dispatch routine \
+            without having to care for the error dispatching
+
+        :param textgroup: Textgroup object that needs to be dispatched
+        :param directory: Directory in which the textgroup was found
+        """
         try:
             self._dispatch(textgroup, directory)
         except UndispatchedTextError as E:
             self.logger.error("Error dispatching %s ", directory)
             if self.RAISE_ON_UNDISPATCHED is True:
                 raise E
+
+    def _clean_invalids(self, invalids):
+        """ Optionally remove texts that were found to be invalid
+
+        :param invalids: List of text identifiers
+        :type invalids: [CtsTextMetadata]
+        """
+        pass
 
     def parse(self, resource):
         """ Parse a list of directories and reads it into a collection
@@ -205,22 +277,29 @@ class CtsCapitainsLocalResolver(Resolver):
         :return: An inventory resource and a list of CtsTextMetadata metadata-objects
         """
         textgroups = []
+        texts = []
+        invalids = []
+
         for folder in resource:
             cts_files = glob("{base_folder}/data/*/__cts__.xml".format(base_folder=folder))
             for cts_file in cts_files:
-                textgroup = self._parse_textgroup(cts_file)
+                textgroup, cts_file = self._parse_textgroup(cts_file)
+                textgroups.append((textgroup, cts_file))
 
-                works = glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(cts_file)))
-                for cts_work_file in works:
-                    work, texts = self._parse_work(cts_work_file, textgroup)
+        for textgroup, cts_textgroup_file in textgroups:
+            cts_work_files = glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(cts_textgroup_file)))
 
-                    directory = os.path.dirname(cts_work_file)
-                    for text in texts:
-                        self._parse_text(text, directory)
+            for cts_work_file in cts_work_files:
+                _, parsed_texts, directory = self._parse_work(cts_work_file, textgroup)
+                texts.extend([(text, directory) for text in parsed_texts])
 
-                textgroups.append(
-                    (textgroup, cts_file)
-                )
+        for text, directory in texts:
+            # If text_id is not none, the text parsing errored
+            if not self._parse_text(text, directory):
+                invalids.append(text)
+
+        # Clean invalids if there was a need
+        self._clean_invalids(invalids)
 
         # Dispatching routine at the end of each
         for textgroup, textgroup_path in textgroups:

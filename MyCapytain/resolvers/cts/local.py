@@ -298,12 +298,12 @@ class CtsCapitainsLocalResolver(Resolver):
             if not self._parse_text(text, directory):
                 invalids.append(text)
 
-        # Clean invalids if there was a need
-        self._clean_invalids(invalids)
-
-        # Dispatching routine at the end of each
+        # Dispatching routine
         for textgroup, textgroup_path in textgroups:
             self._dispatch_container(textgroup, textgroup_path)
+
+        # Clean invalids if there was a need
+        self._clean_invalids(invalids)
 
         self.inventory = self.dispatcher.collection
         return self.inventory

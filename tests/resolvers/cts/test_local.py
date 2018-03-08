@@ -771,3 +771,47 @@ class TextXMLFolderResolverDispatcher(TestCase):
             len(all.readableDescendants), 26,
             "There should be all 26 readable descendants in the master collection"
         )
+
+    def test_post_work_dispatching_active(self):
+        """ Dispatching is working after editions, we dispatch based on citation scheme"""
+        tic = CtsTextInventoryCollection()
+        poetry = CtsTextInventoryMetadata("urn:perseus:poetry", parent=tic)
+        prose = CtsTextInventoryMetadata("urn:perseus:prose", parent=tic)
+
+        dispatcher = CollectionDispatcher(tic, default_inventory_name="urn:perseus:prose")
+
+        @dispatcher.inventory("urn:perseus:poetry")
+        def dispatchPoetry(collection, **kwargs):
+            for readable in collection.readableDescendants:
+                for citation in readable.citation:
+                    if citation.name == "line":
+                        return True
+            return False
+
+        resolver = CtsCapitainsLocalResolver(
+            ["./tests/testing_data/latinLit2"],
+            dispatcher=dispatcher
+        )
+
+        all = resolver.getMetadata().export(Mimetypes.XML.CTS)
+        poetry_stuff = resolver.getMetadata("urn:perseus:poetry").export(Mimetypes.XML.CTS)
+        prose_stuff = resolver.getMetadata("urn:perseus:prose").export(Mimetypes.XML.CTS)
+        get_graph().remove((None, None, None))
+        del poetry, prose
+        poetry, prose = XmlCtsTextInventoryMetadata.parse(poetry_stuff), XmlCtsTextInventoryMetadata.parse(prose_stuff)
+        self.assertEqual(
+            len(poetry.textgroups), 3,
+            "There should be 3 textgroups in Poetry (Martial, Ovid and Juvenal)"
+        )
+        self.assertIsInstance(poetry, CtsTextInventoryMetadata, "should be textinventory")
+        self.assertEqual(
+            len(prose.textgroups), 1,
+            "There should be one textgroup in Prose (Greek texts)"
+        )
+        get_graph().remove((None, None, None))
+        del poetry, prose
+        all = XmlCtsTextInventoryMetadata.parse(all)
+        self.assertEqual(
+            len(all.readableDescendants), 26,
+            "There should be all 26 readable descendants in the master collection"
+        )

@@ -665,15 +665,14 @@ class Citation(Exportable):
         """ Initialize a XmlCtsCitation object
         """
         self.__name = None
-        self.__xpath = None
-        self.__scope = None
         self.__refsDecl = None
         self.__child = None
 
         self.name = name
-        self.scope = scope
-        self.xpath = xpath
-        self.refsDecl = refsDecl
+        if scope and xpath:
+            self._fromScopeXpathToRefsDecl(scope, xpath)
+        else:
+            self.refsDecl = refsDecl
 
         if child is not None:
             self.child = child
@@ -698,13 +697,13 @@ class Citation(Exportable):
         :type: basestring
         :Example: //tei:l[@n="?"]
         """
-        return self.__xpath
+        return self._parseXpathScope()[1]
 
     @xpath.setter
-    def xpath(self, val):
-        if val is not None:
-            self.__xpath = val
-            self.__upRefsDecl()
+    def xpath(self, new_xpath):
+        if new_xpath is not None and self.refsDecl:
+            current_scope, current_xpath = self._parseXpathScope()
+            self._fromScopeXpathToRefsDecl(current_scope, new_xpath)
 
     @property
     def scope(self):
@@ -713,13 +712,13 @@ class Citation(Exportable):
         :type: basestring
         :Example: /tei:TEI/tei:text/tei:body/tei:div
         """
-        return self.__scope
+        return self._parseXpathScope()[0]
         
     @scope.setter
-    def scope(self, val):
-        if val is not None:
-            self.__scope = val
-            self.__upRefsDecl()
+    def scope(self, new_scope):
+        if new_scope is not None and self.refsDecl:
+            current_scope, current_xpath = self._parseXpathScope()
+            self._fromScopeXpathToRefsDecl(new_scope, current_xpath)
 
     @property
     def refsDecl(self):
@@ -734,7 +733,6 @@ class Citation(Exportable):
     def refsDecl(self, val):
         if val is not None:
             self.__refsDecl = val
-            self.__upXpathScope()
 
     @property
     def child(self):
@@ -760,28 +758,28 @@ class Citation(Exportable):
         )
         return refs[-1]
 
-    def __upXpathScope(self):
+    def _parseXpathScope(self):
         """ Update xpath and scope property when refsDecl is updated
-        
-        """
-        rd = self.__refsDecl
-        matches = REFSDECL_SPLITTER.findall(rd)
-        self.__scope = REFSDECL_REPLACER.sub("?", "".join(matches[0:-1]))
-        self.__xpath = REFSDECL_REPLACER.sub("?", matches[-1])
 
-    def __upRefsDecl(self):
+        :returns: Scope, Xpath
+        """
+        rd = self.refsDecl
+        matches = REFSDECL_SPLITTER.findall(rd)
+        return REFSDECL_REPLACER.sub("?", "".join(matches[0:-1])), REFSDECL_REPLACER.sub("?", matches[-1])
+
+    def _fromScopeXpathToRefsDecl(self, scope, xpath):
         """ Update xpath and scope property when refsDecl is updated
         
         """
-        if self.__scope is not None and self.__xpath is not None:
-            xpath = self.__scope + self.__xpath
-            i = xpath.find("?")
+        if scope is not None and xpath is not None:
+            _xpath = scope + xpath
+            i = _xpath.find("?")
             ii = 1
             while i >= 0:
-                xpath = xpath[:i] + "$" + str(ii) + xpath[i+1:]
-                i = xpath.find("?")
+                _xpath = _xpath[:i] + "$" + str(ii) + _xpath[i+1:]
+                i = _xpath.find("?")
                 ii += 1
-            self.__refsDecl = xpath
+            self.refsDecl = _xpath
 
     def __iter__(self):
         """ Iteration method
@@ -879,7 +877,7 @@ class Citation(Exportable):
         :return: True if nothing was setup
         :rtype: bool
         """
-        return self.refsDecl is None and self.scope is None and self.xpath is None
+        return self.refsDecl is None
 
     def __export__(self, output=None, **kwargs):
         if output == Mimetypes.XML.CTS:
@@ -916,6 +914,11 @@ class Citation(Exportable):
                     label=label,
                     regexp="\.".join(["(\w+)"]*self.refsDecl.count("$"))
                 )
+
+    def export(self, output=None, **kwargs):
+        if self.refsDecl:
+            return super(Citation, self).export(output=output, **kwargs)
+        return ""
 
     @staticmethod
     def ingest(resource, xpath=".//tei:cRefPattern"):

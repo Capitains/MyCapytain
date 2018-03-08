@@ -250,6 +250,7 @@ class TestURNImplementation(unittest.TestCase):
         a.namespace = "greekLit"
         self.assertEqual(str(a), "urn:cts:greekLit:phi1293.phi001.perseus-eng2:2.2")
 
+
 class TestCitation(unittest.TestCase):
     """ Test the citation object """
     def test_updateRefsdecl(self):

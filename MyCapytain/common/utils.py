@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.common.reference
-   :synopsis: Common useful tools and constants
+.. module:: MyCapytain.common.utils
+   :synopsis: Common useful tools
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
@@ -10,7 +10,7 @@
 from __future__ import unicode_literals
 
 import re
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict, defaultdict, namedtuple
 from copy import copy
 from functools import reduce
 from io import IOBase, StringIO
@@ -20,6 +20,8 @@ from lxml.objectify import ObjectifiedElement, parse, SubElement, Element
 from six import text_type
 from xml.sax.saxutils import escape
 from rdflib import BNode, Graph, Literal, URIRef
+from urllib.parse import urlparse, parse_qs, urljoin
+import link_header
 
 from MyCapytain.common.constants import XPATH_NAMESPACES
 
@@ -462,3 +464,45 @@ def expand_namespace(nsmap, string):
         if isinstance(string, str) and isinstance(ns, str) and string.startswith(ns+":"):
             return string.replace(ns+":", nsmap[ns])
     return string
+
+
+_Route = namedtuple("Route", ["path", "query_dict"])
+_Navigation = namedtuple("Navigation", ["prev", "next", "last", "current", "first"])
+
+
+def parse_pagination(headers):
+    """ Parses headers to create a pagination objects
+
+    :param headers: HTTP Headers
+    :type headers: dict
+    :return: Navigation object for pagination
+    :rtype: _Navigation
+    """
+    links = {
+        link.rel: parse_qs(link.href).get("page", None)
+        for link in link_header.parse(headers.get("Link", "")).links
+    }
+    return _Navigation(
+        links.get("previous", [None])[0],
+        links.get("next", [None])[0],
+        links.get("last", [None])[0],
+        links.get("current", [None])[0],
+        links.get("first", [None])[0]
+    )
+
+
+def parse_uri(uri, endpoint_uri):
+    """ Parse a URI into a Route namedtuple
+
+    :param uri: URI or relative URI
+    :type uri: str
+    :param endpoint_uri: URI of the endpoint
+    :type endpoint_uri: str
+    :return: Parsed route
+    :rtype: _Route
+    """
+    temp_parse = urlparse(uri)
+    return _Route(
+        urljoin(endpoint_uri, temp_parse.path),
+        parse_qs(temp_parse.query)
+    )

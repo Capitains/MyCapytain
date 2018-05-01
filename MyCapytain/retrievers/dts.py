@@ -13,9 +13,9 @@ import requests
 from MyCapytain.common.utils import parse_uri, parse_pagination
 
 
-class DTS_Retriever(MyCapytain.retrievers.prototypes.API):
+class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
     def __init__(self, endpoint):
-        super(DTS_Retriever, self).__init__(endpoint)
+        super(HttpDtsRetriever, self).__init__(endpoint)
         self._routes = None
 
     def call(self, route, parameters, mimetype="application/ld+json"):

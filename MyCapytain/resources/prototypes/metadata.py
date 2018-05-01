@@ -182,8 +182,8 @@ class Collection(Exportable):
         :return:
         """
         self.__parent__ = parent
-        self.graph.set(
-            (self.asNode(), RDF_NAMESPACES.DTS.parent, parent.asNode())
+        self.graph.add(
+            (self.asNode(), RDF_NAMESPACES.CAPITAINS.parent, parent.asNode())
         )
         parent.__add_member__(self)
 
@@ -347,7 +347,7 @@ class Collection(Exportable):
                     for member in self.members
                 ]
             if self.parent:
-                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.parents)] = [
+                o["@graph"][self.graph.qname(RDF_NAMESPACES.CAPITAINS.parents)] = [
                     {
                         "@id": member.id,
                         RDFSLabel: LiteralToDict(member.get_label()) or member.id,

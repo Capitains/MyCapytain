@@ -24,7 +24,8 @@ class Metadata(Exportable):
     :cvar DEFAULT_EXPORT: Default export (CTS XML Inventory)
     :cvar STORE: RDF Store
     """
-    EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.XML.RDFa, Mimetypes.JSON.LD, Mimetypes.XML.CapiTainS.CTS]
+    EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.XML.RDFa, Mimetypes.JSON.LD,
+                 Mimetypes.XML.CapiTainS.CTS]
     DEFAULT_EXPORT = Mimetypes.JSON.Std
     
     def __init__(self, node=None, *args, **kwargs):
@@ -85,6 +86,9 @@ class Metadata(Exportable):
         :param lang: Language of the triple if applicable
         :rtype: Literal or BNode or URIRef
         """
+        if not isinstance(key, URIRef):
+            key = URIRef(key)
+
         if lang is not None:
             default = None
             for o in self.graph.objects(self.asNode(), key):

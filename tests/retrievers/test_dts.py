@@ -2,7 +2,7 @@ import unittest
 
 import responses
 
-from MyCapytain.retrievers.dts import DTS_Retriever
+from MyCapytain.retrievers.dts import HttpDtsRetriever
 from MyCapytain.common.utils import _Navigation
 from urllib.parse import parse_qs, urlparse, urljoin
 
@@ -15,7 +15,7 @@ class TestEndpointsCts5(unittest.TestCase):
     """ Test Cts5 Endpoint request making """
 
     def setUp(self):
-        self.cli = DTS_Retriever(_SERVER_URI)
+        self.cli = HttpDtsRetriever(_SERVER_URI)
 
     @property
     def calls(self):

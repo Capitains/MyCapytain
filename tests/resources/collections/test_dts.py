@@ -1,4 +1,5 @@
 from MyCapytain.resources.collections.dts import DTSCollection
+from MyCapytain.common.constants import Mimetypes
 from unittest import TestCase
 import json
 
@@ -17,4 +18,5 @@ class TestDtsCollection(TestCase):
 
     def test_parse(self):
         coll = self.get_collection(1)
-        DTSCollection.parse(coll)
+        from pprint import pprint
+        pprint(DTSCollection.parse(coll).export(Mimetypes.JSON.DTS.Std))

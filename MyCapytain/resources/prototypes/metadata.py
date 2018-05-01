@@ -312,11 +312,19 @@ class Collection(Exportable):
 
             RDFSLabel = self.graph.qname(RDFS.label)
             RDFType = self.graph.qname(RDF.type)
+
             store = Subgraph(get_graph().namespace_manager)
             store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
-            metadata = {}
+
+            extensions = {}
+            dublincore = {}
+
             for _, predicate, obj in store.graph:
                 k = self.graph.qname(predicate)
+                if str(k).startswith(DC):
+                    metadata = dublincore
+                else:
+                    metadata = extensions
                 if k in metadata:
                     if isinstance(metadata[k], list):
                         metadata[k].append(LiteralToDict(obj))
@@ -324,14 +332,16 @@ class Collection(Exportable):
                         metadata[k] = [metadata[k], LiteralToDict(obj)]
                 else:
                     metadata[k] = LiteralToDict(obj)
+
             o = {
                 "@context": bindings,
                 "@graph": {
                     "@id": self.id,
                     RDFType: str(self.type),
                     RDFSLabel: LiteralToDict(self.get_label()) or self.id,
-                    self.graph.qname(RDF_NAMESPACES.DTS.size): len(self.members),
-                    self.graph.qname(RDF_NAMESPACES.DTS.metadata): metadata
+                    self.graph.qname(RDF_NAMESPACES.DTS.totalItems): self.size,
+                    self.graph.qname(RDF_NAMESPACES.DTS.dublincore): dublincore,
+                    self.graph.qname(RDF_NAMESPACES.DTS.extensions): extensions
                 }
             }
             version = self.version

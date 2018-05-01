@@ -7,6 +7,7 @@ from MyCapytain.common.constants import RDF_NAMESPACES
 
 _hyd = RDF_NAMESPACES.HYDRA
 _dts = RDF_NAMESPACES.DTS
+_empty_extensions = [{}]
 
 
 class DTSCollection(Collection):
@@ -35,6 +36,9 @@ class DTSCollection(Collection):
         for val_dict in collection[str(_hyd.title)]:
             obj.set_label(val_dict["@value"], None)
 
+        for val_dict in collection["@type"]:
+            obj.type = val_dict
+
         for val_dict in collection[str(_hyd.totalItems)]:
             obj.metadata.add(_hyd.totalItems, val_dict["@value"], 0)
 
@@ -46,7 +50,7 @@ class DTSCollection(Collection):
             for value_dict in value_set:
                 obj.metadata.add(term, value_dict["@value"], value_dict.get("@language", None))
 
-        for key, value_set in collection[str(_dts.extensions)][0].items():
+        for key, value_set in collection.get(str(_dts.extensions), _empty_extensions)[0].items():
             term = URIRef(key)
             for value_dict in value_set:
                 obj.metadata.add(term, value_dict["@value"], value_dict.get("@language", None))

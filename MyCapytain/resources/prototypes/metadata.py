@@ -292,6 +292,28 @@ class Collection(Exportable):
 
         return bindings
 
+    @staticmethod
+    def _export_base_dts(graph, obj, nsm):
+        """ Export the base DTS information in a simple reusable way
+
+        :param graph: Current graph where the information lie
+        :param obj: Object for which we build info
+        :param nsm: Namespace manager
+        :return: Dict
+        """
+
+        o = {
+            "@id": str(obj.asNode()),
+            "@type": nsm.qname(obj.type),
+            nsm.qname(RDF_NAMESPACES.HYDRA.title): str(obj.get_label()),
+            nsm.qname(RDF_NAMESPACES.DTS.totalItems): obj.size
+        }
+
+        for desc in graph.objects(obj.asNode(), RDF_NAMESPACES.HYDRA.description):
+            o[nsm.qname(RDF_NAMESPACES.HYDRA.description)] = str(desc)
+
+        return o
+
     def __export__(self, output=None, domain=""):
         """ Export the collection item in the Mimetype required.
 
@@ -352,15 +374,8 @@ class Collection(Exportable):
                 else:
                     metadata[k] = LiteralToDict(obj)
 
-            o = {
-                "@context": bindings,
-                "@graph": {
-                    "@id": self.id,
-                    "@type": graph.qname(self.type),
-                    graph.qname(RDF_NAMESPACES.HYDRA.title): str(self.get_label()),
-                    graph.qname(RDF_NAMESPACES.DTS.totalItems): self.size
-                }
-            }
+            o = {"@context": bindings}
+            o.update(self._export_base_dts(graph, self, nsm))
 
             if extensions:
                 o[graph.qname(RDF_NAMESPACES.DTS.extensions)] = extensions
@@ -368,17 +383,9 @@ class Collection(Exportable):
             if dublincore:
                 o[graph.qname(RDF_NAMESPACES.DTS.dublincore)] = dublincore
 
-            for desc in self.graph.objects(self.asNode(), RDF_NAMESPACES.HYDRA.description):
-                o[self.graph.qname(RDF_NAMESPACES.HYDRA.description)] = str(desc)
-
             if self.size:
-                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.members)] = [
-                    {
-                        "@id": member.id,
-                        graph.qname(RDF_NAMESPACES.HYDRA.title): str(member.get_label()) or member.id,
-                        graph.qname(RDF_NAMESPACES.HYDRA.totalItems): member.size,
-
-                    }
+                o[self.graph.qname(RDF_NAMESPACES.DTS.members)] = [
+                    self._export_base_dts(self.graph, member, nsm)
                     for member in self.members
                 ]
 

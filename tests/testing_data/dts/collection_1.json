@@ -7,7 +7,7 @@
     },
     "@id": "general",
     "@type": "Collection",
-    "totalItems": "2",
+    "totalItems": 3,
     "title": "Collection Générale de l'École Nationale des Chartes",
     "dts:dublincore": {
         "dc:publisher": ["École Nationale des Chartes", "https://viaf.org/viaf/167874585"],

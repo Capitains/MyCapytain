@@ -1,13 +1,15 @@
 from MyCapytain.resources.prototypes.metadata import Collection
-from rdflib import URIRef
-from pyld import jsonld
 from MyCapytain.errors import JsonLdCollectionMissing
 from MyCapytain.common.constants import RDF_NAMESPACES
+
+from rdflib import URIRef
+from pyld import jsonld
 
 
 _hyd = RDF_NAMESPACES.HYDRA
 _dts = RDF_NAMESPACES.DTS
 _cap = RDF_NAMESPACES.CAPITAINS
+_tei = RDF_NAMESPACES.TEI
 _empty_extensions = [{}]
 
 
@@ -61,6 +63,11 @@ class DTSCollection(Collection):
             term = URIRef(key)
             for value_dict in value_set:
                 obj.metadata.add(term, value_dict["@value"], value_dict.get("@language", None))
+
+        if str(_tei.refsDecl) in collection:
+            for citation in collection[str(_tei.refsDecl)]:
+                # Need to have citation set before going further.
+                continue
 
         for member in collection.get(str(_hyd.member), []):
             subcollection = DTSCollection.parse(member)

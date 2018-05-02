@@ -306,7 +306,7 @@ class Collection(Exportable):
             "@id": str(obj.asNode()),
             "@type": nsm.qname(obj.type),
             nsm.qname(RDF_NAMESPACES.HYDRA.title): str(obj.get_label()),
-            nsm.qname(RDF_NAMESPACES.DTS.totalItems): obj.size
+            nsm.qname(RDF_NAMESPACES.HYDRA.totalItems): obj.size
         }
 
         for desc in graph.objects(obj.asNode(), RDF_NAMESPACES.HYDRA.description):
@@ -345,10 +345,14 @@ class Collection(Exportable):
                 prefix, namespace, name = nsm.compute_qname(predicate)
                 bindings[prefix] = str(URIRef(namespace))
 
+            if "cap" in bindings:
+                del bindings["cap"]
+
             # Builds the specific Store data
             extensions = {}
             dublincore = {}
-            ignore_ns = [str(RDF_NAMESPACES.HYDRA), str(RDF_NAMESPACES.DTS), str(RDF), str(RDFS)]
+            ignore_ns = [str(RDF_NAMESPACES.HYDRA), str(RDF_NAMESPACES.DTS),
+                         str(RDF_NAMESPACES.CAPITAINS), str(RDF), str(RDFS)]
 
             # Builds the .dublincore and .extensions graphs
             for _, predicate, obj in store.graph:
@@ -373,6 +377,8 @@ class Collection(Exportable):
                         metadata[k] = [metadata[k], LiteralToDict(obj)]
                 else:
                     metadata[k] = LiteralToDict(obj)
+                    if isinstance(metadata[k], dict):
+                        metadata[k] = [metadata[k]]
 
             o = {"@context": bindings}
             o.update(self._export_base_dts(graph, self, nsm))
@@ -384,7 +390,7 @@ class Collection(Exportable):
                 o[graph.qname(RDF_NAMESPACES.DTS.dublincore)] = dublincore
 
             if self.size:
-                o[self.graph.qname(RDF_NAMESPACES.DTS.members)] = [
+                o[graph.qname(RDF_NAMESPACES.HYDRA.member)] = [
                     self._export_base_dts(self.graph, member, nsm)
                     for member in self.members
                 ]

@@ -459,7 +459,7 @@ class TextXMLFolderResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["dts:members"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959",
              "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
             "There should be 4 Members in DTS JSON"
@@ -502,7 +502,7 @@ class TextXMLFolderResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["dts:members"]],
             ["urn:cts:latinLit:phi1294.phi002.opp-eng3", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"],
             "There should be two members in DTS JSON"
         )

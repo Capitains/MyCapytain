@@ -81,7 +81,7 @@ def LiteralToDict(value):
     """
     if isinstance(value, Literal):
         if value.language is not None:
-            return {"@value": str(value), "@lang": value.language}
+            return {"@value": str(value), "@language": value.language}
         return value.toPython()
     elif isinstance(value, URIRef):
         return {"@id": str(value)}

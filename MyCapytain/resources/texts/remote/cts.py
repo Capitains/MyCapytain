@@ -13,7 +13,7 @@ from __future__ import unicode_literals
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
-from MyCapytain.common.reference import URN, Reference
+from MyCapytain.common.reference._capitains_cts import Reference, URN
 from MyCapytain.resources.collections import cts as CtsCollection
 from MyCapytain.resources.prototypes import text as prototypes
 from MyCapytain.resources.texts.base.tei import TEIResource

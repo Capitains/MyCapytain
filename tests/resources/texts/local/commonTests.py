@@ -10,7 +10,7 @@ from six import text_type as str
 
 import MyCapytain.errors
 from MyCapytain.common.constants import Mimetypes
-from MyCapytain.common.reference import Reference, URN, Citation
+from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
 

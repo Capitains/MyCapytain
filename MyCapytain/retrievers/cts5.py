@@ -8,7 +8,7 @@
 
 """
 import MyCapytain.retrievers.prototypes
-from MyCapytain.common.reference import Reference
+from MyCapytain.common.reference._capitains_cts import Reference
 import requests
 
 

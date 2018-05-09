@@ -146,7 +146,7 @@ class TestDtsCollection(TestCase):
                     'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
                     'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
                     'skos': 'http://www.w3.org/2004/02/skos/core#',
-                    "tei": "http://www.tei-c.org/ns/1.0"
+                    #  "tei": "http://www.tei-c.org/ns/1.0"
                 },
                 "@id": "urn:cts:latinLit:phi1103.phi001",
                 "@type": "hydra:Collection",

@@ -7,7 +7,7 @@ from io import open
 
 from MyCapytain.resources.texts.remote.cts import CtsPassage, CtsText
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
-from MyCapytain.common.reference import Reference, Citation, URN
+from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES

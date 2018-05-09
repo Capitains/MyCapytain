@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 from past.builtins import basestring
 from six import text_type as str
 import unittest
-from MyCapytain.common.reference import URN, Reference, Citation, NodeId
+from MyCapytain.common.reference._base import NodeId
+from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
 
 
 class TestReferenceImplementation(unittest.TestCase):

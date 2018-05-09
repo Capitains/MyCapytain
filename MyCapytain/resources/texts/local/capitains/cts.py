@@ -14,7 +14,7 @@ import warnings
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
-from MyCapytain.common.reference import URN, Citation, Reference
+from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.texts.base.tei import TEIResource
@@ -424,7 +424,7 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
-    :type urn: MyCapytain.common.reference.URN
+    :type urn: MyCapytain.common.reference._capitains_cts.URN
     :param resource: A resource
     :type resource: lxml.etree._Element
     :param citation: Highest XmlCtsCitation level

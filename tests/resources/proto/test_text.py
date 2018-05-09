@@ -4,6 +4,9 @@ from six import text_type as str
 
 import unittest
 
+import MyCapytain.common.reference._capitains_cts
+from MyCapytain.common.reference._capitains_cts import URN
+
 from MyCapytain.resources.prototypes.text import *
 import MyCapytain.common.reference
 import MyCapytain.common.metadata
@@ -26,12 +29,12 @@ class TestProtoResource(unittest.TestCase):
         a = CtsNode()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
-        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)
+        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference._capitains_cts.URN), True)
         self.assertEqual(str(a.urn), "urn:cts:latinLit:tg.wk.v")
 
         # Test for URN
-        a.urn = MyCapytain.common.reference.URN("urn:cts:latinLit:tg.wk.v2") 
-        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)
+        a.urn = MyCapytain.common.reference._capitains_cts.URN("urn:cts:latinLit:tg.wk.v2")
+        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference._capitains_cts.URN), True)
         self.assertEqual(str(a.urn), "urn:cts:latinLit:tg.wk.v2")
 
         # Test it fails if not basestring or URN
@@ -93,12 +96,12 @@ class TestProtoText(unittest.TestCase):
         a = CitableText()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
-        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)
+        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference._capitains_cts.URN), True)
         self.assertEqual(str(a.urn), "urn:cts:latinLit:tg.wk.v")
 
         # Test for URN
-        a.urn = MyCapytain.common.reference.URN("urn:cts:latinLit:tg.wk.v2") 
-        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference.URN), True)
+        a.urn = MyCapytain.common.reference._capitains_cts.URN("urn:cts:latinLit:tg.wk.v2")
+        self.assertEqual(isinstance(a.urn, MyCapytain.common.reference._capitains_cts.URN), True)
         self.assertEqual(str(a.urn), "urn:cts:latinLit:tg.wk.v2")
 
         # Test it fails if not basestring or URN
@@ -120,9 +123,9 @@ class TestProtoText(unittest.TestCase):
     def test_citation(self):
         """ Test citation property setter and getter """
         a = CitableText()
-        a.citation = MyCapytain.common.reference.Citation(name="label")
-        self.assertIsInstance(a.citation, MyCapytain.common.reference.Citation)
+        a.citation = MyCapytain.common.reference._capitains_cts.Citation(name="label")
+        self.assertIsInstance(a.citation, MyCapytain.common.reference._capitains_cts.Citation)
 
         #On init ?
-        b = CitableText(citation=MyCapytain.common.reference.Citation(name="label"))
+        b = CitableText(citation=MyCapytain.common.reference._capitains_cts.Citation(name="label"))
         self.assertEqual(b.citation.name, "label")

@@ -3,11 +3,10 @@ from copy import copy
 
 from lxml.etree import _Element
 
-from MyCapytain.common.base import Exportable
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES, XPATH_NAMESPACES
 from MyCapytain.common.utils import make_xml_node
 
-from ._base import BaseCitation
+from ._base import BaseCitation, BasePassageId
 
 REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
 REFSDECL_REPLACER = re.compile(r"\$[0-9]+")
@@ -27,7 +26,7 @@ def __childOrNone__(liste):
         return None
 
 
-class Reference(object):
+class Reference(BasePassageId):
     """ A reference object giving information
 
     :param reference: CapitainsCtsPassage Reference part of a Urn
@@ -109,19 +108,27 @@ class Reference(object):
     def start(self):
         """ Quick access property for start list
 
-        :rtype: Reference
+        :rtype: end
         """
         if self.parsed[0][0] and len(self.parsed[0][0]):
-            return Reference(self.parsed[0][0])
+            return self.parsed[0][0]
 
     @property
     def end(self):
         """ Quick access property for reference end list
 
-        :rtype: Reference
+        :rtype: str
         """
         if self.parsed[1][0] and len(self.parsed[1][0]):
-            return Reference(self.parsed[1][0])
+            return self.parsed[1][0]
+
+    @property
+    def is_range(self):
+        """ Whether the reference in a starrt
+
+        :rtype: str
+        """
+        return self.parsed[1][0] and len(self.parsed[1][0])
 
     @property
     def list(self):

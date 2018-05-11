@@ -2,6 +2,32 @@ from MyCapytain.common.base import Exportable
 from copy import copy
 
 
+class BasePassageId:
+    def __init__(self, start=None, end=None):
+        self._start = start
+        self._end = end
+
+    @property
+    def is_range(self):
+        return self._end is not None
+
+    @property
+    def start(self):
+        """ Quick access property for start part
+
+        :rtype: str
+        """
+        return self._start
+
+    @property
+    def end(self):
+        """ Quick access property for reference end list
+
+        :rtype: str
+        """
+        return self._end
+
+
 class BaseCitation(Exportable):
     def __repr__(self):
         return self.name

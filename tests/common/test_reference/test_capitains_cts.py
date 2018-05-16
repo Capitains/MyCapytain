@@ -31,36 +31,36 @@ class TestReferenceImplementation(unittest.TestCase):
 
     def test_properties(self):
         a = Reference("1.1@Achilles-1.10@Atreus[3]")
-        self.assertEqual(str(a.start), "1.1@Achilles")
-        self.assertEqual(a.start.list, ["1", "1"])
-        self.assertEqual(a.start.subreference[0], "Achilles")
-        self.assertEqual(str(a.end), "1.10@Atreus[3]")
-        self.assertEqual(a.end.list, ["1", "10"])
-        self.assertEqual(a.end.subreference[1], 3)
-        self.assertEqual(a.end.subreference, ("Atreus", 3))
+        self.assertEqual(a.start, "1.1@Achilles")
+        self.assertEqual(Reference(a.start).list, ["1", "1"])
+        self.assertEqual(Reference(a.start).subreference[0], "Achilles")
+        self.assertEqual(a.end, "1.10@Atreus[3]")
+        self.assertEqual(Reference(a.end).list, ["1", "10"])
+        self.assertEqual(Reference(a.end).subreference[1], 3)
+        self.assertEqual(Reference(a.end).subreference, ("Atreus", 3))
 
     def test_Unicode_Support(self):
         a = Reference("1.1@καὶ[0]-1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(str(a.start), "1.1@καὶ[0]")
-        self.assertEqual(a.start.list, ["1", "1"])
-        self.assertEqual(a.start.subreference[0], "καὶ")
-        self.assertEqual(str(a.end), "1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(a.end.list, ["1", "10"])
-        self.assertEqual(a.end.subreference[1], 3)
-        self.assertEqual(a.end.subreference, ("Ἀλκιβιάδου", 3))
+        self.assertEqual(a.start, "1.1@καὶ[0]")
+        self.assertEqual(Reference(a.start).list, ["1", "1"])
+        self.assertEqual(Reference(a.start).subreference[0], "καὶ")
+        self.assertEqual(a.end, "1.10@Ἀλκιβιάδου[3]")
+        self.assertEqual(Reference(a.end).list, ["1", "10"])
+        self.assertEqual(Reference(a.end).subreference[1], 3)
+        self.assertEqual(Reference(a.end).subreference, ("Ἀλκιβιάδου", 3))
 
     def test_NoWord_Support(self):
         a = Reference("1.1@[0]-1.10@Ἀλκιβιάδου[3]")
         self.assertEqual(str(a.start), "1.1@[0]")
-        self.assertEqual(a.start.subreference[0], "")
-        self.assertEqual(a.start.subreference[1], 0)
+        self.assertEqual(Reference(a.start).subreference[0], "")
+        self.assertEqual(Reference(a.start).subreference[1], 0)
 
     def test_No_End_Support(self):
         a = Reference("1.1@[0]")
         self.assertEqual(a.end, None)
-        self.assertEqual(str(a.start), "1.1@[0]")
-        self.assertEqual(a.start.subreference[0], "")
-        self.assertEqual(a.start.subreference[1], 0)
+        self.assertEqual(a.start, "1.1@[0]")
+        self.assertEqual(Reference(a.start).subreference[0], "")
+        self.assertEqual(Reference(a.start).subreference[1], 0)
 
     def test_equality(self):
         a = Reference("1.1@[0]")
@@ -209,8 +209,8 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.upTo(URN.PASSAGE_START), "urn:cts:greekLit:textgroup.work:1")
         self.assertEqual(a.upTo(URN.PASSAGE_END), "urn:cts:greekLit:textgroup.work:2")
         self.assertEqual(a.reference, Reference("1-2"))
-        self.assertEqual(a.reference.start, Reference("1"))
-        self.assertEqual(a.reference.end, Reference("2"))
+        self.assertEqual(a.reference.start, "1")
+        self.assertEqual(a.reference.end, "2")
         self.assertIsNone(a.version)
 
     def test_warning_on_empty(self):

@@ -1,5 +1,6 @@
 from MyCapytain.common.base import Exportable
 from copy import copy
+from abc import abstractmethod
 
 
 class BasePassageId:
@@ -28,8 +29,28 @@ class BasePassageId:
         return self._end
 
 
-class BaseCitation(Exportable):
+class CitationSet:
+    """ A citation set is a collection of citations that can be matched using
+    a .match() function
+
+    """
+    @abstractmethod
+    def match(self, passageId):
+        """ Given a specific passageId, matches the citation to a specific citation object
+
+        :param passageId: Passage Identifier
+        :return: Citation that matches the passageId
+        :rtype: BaseCitation
+        """
+
+
+class BaseCitation(Exportable, CitationSet):
     def __repr__(self):
+        """
+
+        :return: String representation of the object
+        :rtype: str
+        """
         return "<{} name({})>".format(type(self).__name__, self.name)
 
     def __init__(self, name=None, children=None, root=None):
@@ -37,7 +58,10 @@ class BaseCitation(Exportable):
 
         :param name: Name of the citation level
         :type name: str
-        :param children:
+        :param children: list of children
+        :type children: [BaseCitation]
+        :param root: Root of the citation group
+        :type root: CitationSet
         """
         self._name = None
         self._children = []
@@ -48,14 +72,29 @@ class BaseCitation(Exportable):
 
     @property
     def is_root(self):
+        """
+        :return: If the current object is the root of the citation set, True
+        :rtype: bool
+        """
         return self._root is None
 
     @property
     def root(self):
+        """ Returns the root of the citation set
+
+        :return: Root of the Citation set
+        :rtype: CitationSet
+        """
         return self._root
 
     @root.setter
     def root(self, value):
+        """ Set the root to which the current citation is connected to
+
+        :param value: CitationSet root of the Citation graph
+        :type value: CitationSet
+        :return:
+        """
         self._root = value
 
     @property
@@ -140,14 +179,6 @@ class BaseCitation(Exportable):
         :returns: Number of nested citations
         """
         return 0
-
-    def match(self, passageId):
-        """ Given a specific passageId, matches the citation to a specific citation object
-
-        :param passageId: Passage Identifier
-        :return: Citation that matches the passageId
-        :rtype: BaseCitation
-        """
 
     def __getstate__(self):
         """ Pickling method

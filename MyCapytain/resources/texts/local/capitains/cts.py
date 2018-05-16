@@ -63,9 +63,9 @@ class __SharedMethods__:
             start, end = subreference, subreference
             subreference = Reference(".".join(subreference))
         elif not subreference.end:
-            start, end = subreference.start.list, subreference.start.list
+            start = end = Reference(subreference.start).list
         else:
-            start, end = subreference.start.list, subreference.end.list
+            start, end = Reference(subreference.start).list, Reference(subreference.end).list
 
         if len(start) > len(self.citation):
             raise ReferenceError("URN is deeper than citation scheme")
@@ -190,16 +190,17 @@ class __SharedMethods__:
                 else:
                     xml = self.getTextualNode(subreference=reference)
                     common = []
-                    for index in range(0, len(reference.start.list)):
+                    ref = Reference(reference.start)
+                    for index in range(0, len(ref.list)):
                         if index == (len(common) - 1):
-                            common.append(reference.start.list[index])
+                            common.append(ref.list[index])
                         else:
                             break
 
                     passages = [common]
                     depth = len(common)
                     if not level:
-                        level = len(reference.start.list) + 1
+                        level = len(ref.list) + 1
 
             else:
                 raise TypeError()
@@ -525,9 +526,9 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         self.__depth__ = self.__depth_2__ = 1
 
         if self.reference.start:
-            self.__depth_2__ = self.__depth__ = len(self.reference.start)
+            self.__depth_2__ = self.__depth__ = len(Reference(self.reference.start))
         if self.reference and self.reference.end:
-            self.__depth_2__ = len(self.reference.end)
+            self.__depth_2__ = len(Reference(self.reference.end))
 
         self.__prevnext__ = None  # For caching purpose
 
@@ -597,10 +598,10 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
 
         if self.reference.end:
-            start, end = str(self.reference.start), str(self.reference.end)
+            start, end = self.reference.start, self.reference.end
             range_length = len(self.getReffs(level=0))
         else:
-            start = end = str(self.reference.start)
+            start = end = self.reference.start
             range_length = 1
 
         start = document_references.index(start)

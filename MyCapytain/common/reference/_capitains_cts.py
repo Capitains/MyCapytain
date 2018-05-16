@@ -45,8 +45,10 @@ class Reference(BasePassageId):
         >>>    b == Reference("1.1") && b != a
 
     .. note::
-        While Reference(...).subreference and .list are not available for range, Reference(..).start.subreference \
-        and Reference(..).end.subreference as well as .list are available
+        Reference(...).subreference and .list are not available for range. You will need to convert .start or .end to
+        a Reference
+
+        >>>    ref = Reference('1.2.3')
     """
 
     def __init__(self, reference=""):
@@ -96,7 +98,7 @@ class Reference(BasePassageId):
         :rtype: Reference
         """
         if not self.end:
-            return self
+            return str(self)
         elif len(self.start) < len(self.end) and len(self.start):
             return self.start
         elif len(self.start) > len(self.end) and len(self.end):
@@ -167,7 +169,7 @@ class Reference(BasePassageId):
 
         :rtype: int
         """
-        return len(self.highest.list)
+        return len(Reference(self.highest).list)
 
     def __str__(self):
         """ Return full reference in string format
@@ -834,7 +836,7 @@ class Citation(BaseCitation):
             return REFERENCE_REPLACER.sub(replacement, xpath)
         else:
             if isinstance(passage, Reference):
-                passage = passage.list or passage.start.list
+                passage = passage.list or Reference(passage.start).list
             elif passage is None:
                 return REFERENCE_REPLACER.sub(
                     r"\1",

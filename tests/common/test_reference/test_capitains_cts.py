@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from past.builtins import basestring
-from six import text_type as str
 import unittest
-from MyCapytain.common.reference._base import NodeId
-from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
+
+from six import text_type as str
+from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.reference import Reference, URN, Citation
 
 
 class TestReferenceImplementation(unittest.TestCase):
@@ -380,30 +378,43 @@ class TestCitation(unittest.TestCase):
         self.assertEqual(c.fill([None, None]), "/TEI/text/body/div/div[@n]//l[@n]")
         self.assertEqual(c.fill(["1", None]), "/TEI/text/body/div/div[@n='1']//l[@n]")
 
+    def test_ingest_and_match(self):
+        """ Ensure matching and parsing XML works correctly """
+        xml = xmlparser("""<TEI xmlns="http://www.tei-c.org/ns/1.0">
+         <refsDecl n="CTS">
+            <cRefPattern n="line"
+                         matchPattern="(\w+).(\w+).(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:l[@n='$3'])">
+                <p>This pointer pattern extracts book and poem and line</p>
+            </cRefPattern>
+            <cRefPattern n="poem"
+                         matchPattern="(\w+).(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
+                <p>This pointer pattern extracts book and poem</p>
+            </cRefPattern>
+            <cRefPattern n="book"
+                         matchPattern="(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                <p>This pointer pattern extracts book</p>
+            </cRefPattern>
+        </refsDecl>
+        </TEI>""")
+        citation = Citation.ingest(xml)
+        # The citation that should be returned is the root
+        self.assertEqual(citation.name, "book", "Name should have been parsed")
+        self.assertEqual(citation.child.name, "poem", "Name of child should have been parsed")
+        self.assertEqual(citation.child.child.name, "line", "Name of descendants should have been parsed")
 
-class TestNodeId(unittest.TestCase):
-    def test_setup(self):
-        """ Ensure basic properties works """
-        n = NodeId(children=["1", "b", "d"])
-        self.assertEqual(n.childIds, ["1", "b", "d"])
-        self.assertEqual(n.lastId, "d")
-        self.assertEqual(n.firstId, "1")
-        self.assertEqual(n.depth, None)
-        self.assertEqual(n.parentId, None)
-        self.assertEqual(n.id, None)
-        self.assertEqual(n.prevId, None)
-        self.assertEqual(n.nextId, None)
-        self.assertEqual(n.siblingsId, (None, None))
+        self.assertEqual(citation.is_root, True, "Root should be true on root")
+        self.assertEqual(citation.match("1.2"), citation.child, "Matching should make use of root matching")
+        self.assertEqual(citation.match("1.2.4"), citation.child.child, "Matching should make use of root matching")
+        self.assertEqual(citation.match("1"), citation, "Matching should make use of root matching")
 
-        n = NodeId(parent="1", identifier="1.1")
-        self.assertEqual(n.parentId, "1")
-        self.assertEqual(n.id, "1.1")
+        self.assertEqual(citation.child.match("1.2").name, "poem", "Matching should retrieve poem at 2nd level")
+        self.assertEqual(citation.child.match("1.2.4").name, "line", "Matching should retrieve line at 3rd level")
+        self.assertEqual(citation.child.match("1").name, "book", "Matching retrieve book at 1st level")
 
-        n = NodeId(siblings=("1", "1.1"), depth=5)
-        self.assertEqual(n.prevId, "1")
-        self.assertEqual(n.nextId, "1.1")
-        self.assertEqual(n.childIds, [])
-        self.assertEqual(n.firstId, None)
-        self.assertEqual(n.lastId, None)
-        self.assertEqual(n.siblingsId, ("1", "1.1"))
-        self.assertEqual(n.depth, 5)
+        citation = citation.child
+        self.assertEqual(citation.child.match("1.2").name, "poem", "Matching should retrieve poem at 2nd level")
+        self.assertEqual(citation.child.match("1.2.4").name, "line", "Matching should retrieve line at 3rd level")
+        self.assertEqual(citation.child.match("1").name, "book", "Matching retrieve book at 1st level")

@@ -30,9 +30,9 @@ class BasePassageId:
 
 class BaseCitation(Exportable):
     def __repr__(self):
-        return self.name
+        return "<{} name({})>".format(type(self).__name__, self.name)
 
-    def __init__(self, name=None, children=None):
+    def __init__(self, name=None, children=None, root=None):
         """ Initialize a BaseCitation object
 
         :param name: Name of the citation level
@@ -41,9 +41,22 @@ class BaseCitation(Exportable):
         """
         self._name = None
         self._children = []
+        self._root = root
 
         self.name = name
         self.children = children
+
+    @property
+    def is_root(self):
+        return self._root is None
+
+    @property
+    def root(self):
+        return self._root
+
+    @root.setter
+    def root(self, value):
+        self._root = value
 
     @property
     def name(self):
@@ -76,6 +89,7 @@ class BaseCitation(Exportable):
                 elif not isinstance(citation, self.__class__):
                     raise TypeError("Citation children should be Citation")
                 else:
+                    citation.root = self.root
                     final_value.append(citation)
 
         self._children = final_value

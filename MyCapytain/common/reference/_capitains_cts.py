@@ -734,6 +734,10 @@ class Citation(BaseCitation):
     def child(self, val):
         if val:
             self.children = [val]
+            if self.is_root:
+                val.root = self
+            else:
+                val.root = self.root
         else:
             self.children = []
 
@@ -784,8 +788,17 @@ class Citation(BaseCitation):
         return len([x for x in self])
 
     def match(self, passageId):
-        ref = Reference(passageId)
-        return self[len(ref)-1]
+        """ Given a passageId matches a citation level
+
+        :param passageId: A passage to match
+        :return:
+        """
+        if not isinstance(passageId, Reference):
+            passageId = Reference(passageId)
+
+        if self.is_root:
+            return self[len(passageId)-1]
+        return self.root.match(passageId)
 
     def fill(self, passage=None, xpath=None):
         """ Fill the xpath with given informations
@@ -913,18 +926,20 @@ class Citation(BaseCitation):
             return None
 
         resource = resource.xpath(xpath, namespaces=XPATH_NAMESPACES)
-        resources = []
+        citations = []
 
         for x in range(0, len(resource)):
-            resources.append(
+            citations.append(
                 Citation(
                     name=resource[x].get("n"),
                     refsDecl=resource[x].get("replacementPattern")[7:-1],
-                    child=__childOrNone__(resources)
+                    child=__childOrNone__(citations)
                 )
             )
-
-        return resources[-1]
+        if len(citations) > 1:
+            for citation in citations[:-1]:
+                citation.root = citations[-1]
+        return citations[-1]
 
 
 def _ref_replacer(match, passage):

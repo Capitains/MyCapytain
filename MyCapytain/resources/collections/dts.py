@@ -66,6 +66,7 @@ class DTSCollection(Collection):
 
         if str(_tei.refsDecl) in collection:
             for citation in collection[str(_tei.refsDecl)]:
+                print(citation)
                 # Need to have citation set before going further.
                 continue
 

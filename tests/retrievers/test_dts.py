@@ -11,7 +11,7 @@ _SERVER_URI = "http://domainname.com/api/dts/"
 patch_args = ("MyCapytain.retrievers.dts.requests.get", )
 
 
-class TestEndpointsCts5(unittest.TestCase):
+class TestDtsParsing(unittest.TestCase):
     """ Test Cts5 Endpoint request making """
 
     def setUp(self):

@@ -1,6 +1,6 @@
 from MyCapytain.common.base import Exportable
 from copy import copy
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 
 
 class BasePassageId:
@@ -63,6 +63,8 @@ class BaseCitation(Exportable, CitationSet):
         :param root: Root of the citation group
         :type root: CitationSet
         """
+        super(BaseCitation, self).__init__()
+
         self._name = None
         self._children = []
         self._root = root
@@ -151,6 +153,7 @@ class BaseCitation(Exportable, CitationSet):
             yield from child
 
     @property
+    @abstractmethod
     def depth(self):
         """ Depth of the citation scheme
 
@@ -161,6 +164,7 @@ class BaseCitation(Exportable, CitationSet):
         """
         return 1
 
+    @abstractmethod
     def __getitem__(self, item):
         """ Returns the citations at the given level.
 
@@ -191,6 +195,7 @@ class BaseCitation(Exportable, CitationSet):
         self.__dict__ = dic
         return self
 
+    @abstractmethod
     def isEmpty(self):
         """ Check if the citation has not been set
 
@@ -198,15 +203,6 @@ class BaseCitation(Exportable, CitationSet):
         :rtype: bool
         """
         return True
-
-    @staticmethod
-    def ingest(resource, *args, **kwargs):
-        """ Static method to ingest a resource and produce a BaseCitation
-
-        :return: BaseCitation root given the resource given
-        :rtype: BaseCitation
-        """
-        pass
 
 
 class NodeId(object):

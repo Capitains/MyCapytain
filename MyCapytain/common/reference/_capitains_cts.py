@@ -848,17 +848,6 @@ class Citation(BaseCitation):
                 self.refsDecl
             )
 
-    def __getstate__(self):
-        """ Pickling method
-
-        :return: dict
-        """
-        return copy(self.__dict__)
-
-    def __setstate__(self, dic):
-        self.__dict__ = dic
-        return self
-
     def isEmpty(self):
         """ Check if the citation has not been set
 

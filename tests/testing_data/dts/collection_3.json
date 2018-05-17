@@ -3,7 +3,7 @@
         "@vocab": "https://www.w3.org/ns/hydra/core#",
         "dc": "http://purl.org/dc/terms/",
         "dts": "https://w3id.org/dts/api#",
-        "tei": "http://www.tei-c.org/ns/1.0"
+        "tei": "http://www.tei-c.org/ns/1.0/"
     },
     "@id": "urn:cts:latinLit:phi1103.phi001",
     "@type": "Collection",
@@ -53,12 +53,12 @@
                 {
                     "tei:matchPattern":  "(\\w+)",
                     "tei:replacementPattern": "#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])",
-                    "@type": "poem"
+                    "tei:type": "poem"
                 },
                 {
                     "tei:matchPattern":  "(\\w+)\\.(\\w+)",
                     "tei:replacementPattern": "#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']//tei:l[@n='$2'])",
-                    "@type": "line"
+                    "tei:type": "line"
                 }
             ]
         }

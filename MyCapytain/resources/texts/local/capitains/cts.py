@@ -249,7 +249,6 @@ class __SharedMethods__:
                 warnings.warn(message, DuplicateReference)
             del duplicates
             empties = [n for n in passages if n.strip('.') != n or n == '']
-            print(passages)
             if len(empties) > 0:
                 message = '{} empty references at level {}'.format(len(empties), level)
                 warnings.warn(message, EmptyReference)

@@ -11,7 +11,7 @@ This module contains methods to parse local resources using TEI/Epidoc guideline
 
 import warnings
 
-from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError
+from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
 from MyCapytain.common.reference import URN, Citation, Reference
@@ -248,6 +248,10 @@ class __SharedMethods__:
                 message = ", ".join(duplicates)
                 warnings.warn(message, DuplicateReference)
             del duplicates
+            empties = [n for n in passages if n.strip('.') != n or n == '']
+            if len(empties) > 0:
+                message = '{} empty references at level {}'.format(len(empties), level)
+                warnings.warn(message, EmptyReference)
 
         return passages
 

@@ -68,25 +68,21 @@
             <div type="edition" n="urn:cts:latinLit:phi1294.phi002.perseus-lat2" xml:lang="lat">
                 <div type="textpart" subtype="book" n="1">
                     <div type="textpart" subtype="poem" n="pr">
-                        <l n="1">Spero me secutum in libellis meis tale temperamen-</l>
-                        <l n="1">tum, ut de illis queri non possit quisquis de se bene </l>
+                        <l n="">Spero me secutum in libellis meis tale temperamen-</l>
                     </div>
                 </div>
-                <div type="textpart" subtype="book" n="1">
-                    <div type="textpart" subtype="poem" n="2">
+                <div type="textpart" subtype="book" n="2">
+                    <div type="textpart" subtype="poem" n="">
                         <l n="1">Spero me secutum in libellis meis tale temperamen-</l>
-                        <l n="1">tum, ut de illis queri non possit quisquis de se bene </l>
                     </div>
                 </div>
-                <div type="textpart" subtype="book" n="3">
+                <div type="textpart" subtype="book" n="">
                     <div type="textpart" subtype="poem" n="1">
                         <l n="1">Spero me secutum in libellis meis tale temperamen-</l>
-                    </div>
-                    <div type="textpart" subtype="poem" n="1">
-                        <l n="2">Spero me secutum in libellis meis tale temperamen-</l>
                     </div>
                 </div>
             </div>
         </body>
     </text>
 </TEI>
+

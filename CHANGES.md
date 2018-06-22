@@ -1,3 +1,7 @@
+### 2018-06-22 2.0.7 @sonofmun
+
+- Added exception for empty references
+
 ### 2017-11-16 2.0.6 @ponteineptique
 
 - Added a way to specify the joining string for Plaintext export in TEIResource (Fixed #146)

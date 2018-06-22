@@ -60,3 +60,8 @@ class UndispatchedTextError(Exception, MyCapytainException):
 class UnknownCollection(KeyError, MyCapytainException):
     """ A collection is unknown to its ancestor
     """
+
+
+class EmptyReference(SyntaxWarning, MyCapytainException):
+    """ Error generated when a duplicate is found in Reference
+    """

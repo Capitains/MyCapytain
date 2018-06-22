@@ -27,23 +27,23 @@
             </sourceDesc>
         </fileDesc>
         <encodingDesc>
-         <refsDecl n="CTS">
-            <cRefPattern n="line"
-                         matchPattern="(\w+).(\w+).(\w+)"
-                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:l[@n='$3'])">
-                <p>This pointer pattern extracts book and poem and line</p>
-            </cRefPattern>
-            <cRefPattern n="poem"
-                         matchPattern="(\w+).(\w+)"
-                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
-                <p>This pointer pattern extracts book and poem</p>
-            </cRefPattern>
-            <cRefPattern n="book"
-                         matchPattern="(\w+)"
-                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
-                <p>This pointer pattern extracts book</p>
-            </cRefPattern>
-        </refsDecl>
+            <refsDecl n="CTS">
+                <cRefPattern n="line"
+                    matchPattern="(\w+).(\w+).(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:l[@n='$3'])">
+                    <p>This pointer pattern extracts book and poem and line</p>
+                </cRefPattern>
+                <cRefPattern n="poem"
+                    matchPattern="(\w+).(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
+                    <p>This pointer pattern extracts book and poem</p>
+                </cRefPattern>
+                <cRefPattern n="book"
+                    matchPattern="(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                    <p>This pointer pattern extracts book</p>
+                </cRefPattern>
+            </refsDecl>
             <refsDecl xml:id="TEI.2">
                 <refState unit="book"/>
                 <refState unit="poem"/>
@@ -62,21 +62,21 @@
         </revisionDesc>
     </teiHeader>
     <text n="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
-
-         xml:id="stoa0045.stoa0">
+        
+        xml:id="stoa0045.stoa0">
         <body>
             <div type="edition" n="urn:cts:latinLit:phi1294.phi002.perseus-lat2" xml:lang="lat">
                 <div type="textpart" subtype="book" n="1">
                     <div type="textpart" subtype="poem" n="pr">
+                        <l n="">Spero me secutum in libellis meis tale temperamen-</l>
+                    </div>
+                </div>
+                <div type="textpart" subtype="book" n="2">
+                    <div type="textpart" subtype="poem" n="">
                         <l n="1">Spero me secutum in libellis meis tale temperamen-</l>
                     </div>
                 </div>
-                <div type="textpart" subtype="book" n="1">
-                    <div type="textpart" subtype="poem" n="2">
-                        <l n="1">Spero me secutum in libellis meis tale temperamen-</l>
-                    </div>
-                </div>
-                <div type="textpart" subtype="book" n="3">
+                <div type="textpart" subtype="book" n="">
                     <div type="textpart" subtype="poem" n="1">
                         <l n="1">Spero me secutum in libellis meis tale temperamen-</l>
                     </div>
@@ -85,3 +85,4 @@
         </body>
     </text>
 </TEI>
+

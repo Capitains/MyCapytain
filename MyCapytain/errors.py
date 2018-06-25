@@ -68,6 +68,7 @@ class EmptyReference(SyntaxWarning, MyCapytainException):
     
 class CitationDepthError(UnknownObjectError, MyCapytainException):
     """ Error generated when the depth of a requested citation is deeper than the citation scheme of the text
+    """
 
 
 class MissingRefsDecl(Exception, MyCapytainException):

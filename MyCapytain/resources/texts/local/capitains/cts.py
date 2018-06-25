@@ -11,7 +11,7 @@ This module contains methods to parse local resources using TEI/Epidoc guideline
 
 import warnings
 
-from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError
+from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
 from MyCapytain.common.reference import URN, Citation, Reference
@@ -455,6 +455,8 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
             citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=XPATH_NAMESPACES)
             if len(citation):
                 self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")
+            else:
+                raise MissingRefsDecl("No reference declaration (refsDecl) found.")
 
     def test(self):
         """ Parse the object and generate the children

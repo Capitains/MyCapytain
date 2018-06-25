@@ -66,6 +66,6 @@ class EmptyReference(SyntaxWarning, MyCapytainException):
     """
 
 
-class MissingRefsDecl(KeyError, MyCapytainException):
+class MissingRefsDecl(Exception, MyCapytainException):
     """ A text has no properly encoded refsDecl
     """

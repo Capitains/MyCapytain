@@ -430,7 +430,7 @@ class CapitainsXmlTextTest(TestCase):
     def test_citation_length_error(self, simple):
         """ In range, passage in between could be removed from the original text by error
         """
-        with self.assertRaises(ReferenceError):
+        with self.assertRaises(MyCapytain.errors.CitationDepthError):
             self.TEI.getTextualNode(["1", "pr", "2", "5"], simple=simple)
 
     def test_ensure_passage_is_not_removed(self):

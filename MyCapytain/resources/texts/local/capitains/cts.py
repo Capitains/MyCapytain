@@ -11,7 +11,7 @@ This module contains methods to parse local resources using TEI/Epidoc guideline
 
 import warnings
 
-from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, MissingRefsDecl
+from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
 from MyCapytain.common.reference import URN, Citation, Reference
@@ -68,7 +68,7 @@ class __SharedMethods__:
             start, end = subreference.start.list, subreference.end.list
 
         if len(start) > len(self.citation):
-            raise ReferenceError("URN is deeper than citation scheme")
+            raise CitationDepthError("URN is deeper than citation scheme")
 
         if simple is True:
             return self._getSimplePassage(subreference)

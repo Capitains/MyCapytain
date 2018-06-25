@@ -64,3 +64,8 @@ class UnknownCollection(KeyError, MyCapytainException):
 class EmptyReference(SyntaxWarning, MyCapytainException):
     """ Error generated when a duplicate is found in Reference
     """
+
+
+class MissingRefsDecl(Exception, MyCapytainException):
+    """ A text has no properly encoded refsDecl
+    """

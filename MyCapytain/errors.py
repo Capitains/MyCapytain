@@ -64,3 +64,8 @@ class UnknownCollection(KeyError, MyCapytainException):
 class EmptyReference(SyntaxWarning, MyCapytainException):
     """ Error generated when a duplicate is found in Reference
     """
+
+
+class CitationDepthError(UnknownObjectError, MyCapytainException):
+    """ Error generated when the depth of a requested citation is deeper than the citation scheme of the text
+    """

@@ -245,10 +245,8 @@ class CapitainsXmlTextTest(TestCase):
 
     def test_xml_no_refs_Decl(self):
         """ Test the result of parsing when there is no citation """
-        text = self.parse("tests/testing_data/texts/refsDeclButNoCTS.xml")
-        self.assertEqual(
-            text.citation.isEmpty(), True, "There should be no citation"
-        )
+        with self.assertRaises(MyCapytain.errors.MissingRefsDecl):
+            self.parse("tests/testing_data/texts/refsDeclButNoCTS.xml")
 
     def test_xml_with_xml_id(self):
         """ Test that xml:id is Citation xpath works fine in passage retriaval """

@@ -223,9 +223,11 @@ class CapitainsXmlTextTest(TestCase):
         self.assertEqual(len(w), 3, "There should be warning on each level")
         self.assertEqual(issubclass(w[-1].category, MyCapytain.errors.EmptyReference), True,
                          "Warning should be EmptyReference")
-        self.assertEqual(str(w[0].message), "1 empty reference(s) at citation level 1",
+        self.assertEqual([str(s.message) for s in w],
+                         ["1 empty reference(s) at citation level 1",
+                          "1 empty reference(s) at citation level 2",
+                          "1 empty reference(s) at citation level 3"],
                          "Warning message should indicate number of references and the level at which they occur")
-
 
     def test_wrong_main_scope(self):
         with open("tests/testing_data/texts/sample2.xml", "rb") as f:

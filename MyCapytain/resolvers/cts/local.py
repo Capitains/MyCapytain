@@ -140,8 +140,7 @@ class CtsCapitainsLocalResolver(Resolver):
         """
         with io.open(cts_file) as __xml__:
             return self.classes["textgroup"].parse(
-                resource=__xml__,
-                _cls_dict=self.classes
+                resource=__xml__
             ), cts_file
 
     def _parse_work_wrapper(self, cts_file, textgroup):
@@ -173,7 +172,6 @@ class CtsCapitainsLocalResolver(Resolver):
             work, texts = self.classes["work"].parse(
                 resource=__xml__,
                 parent=textgroup,
-                _cls_dict=self.classes,
                 _with_children=True
             )
 

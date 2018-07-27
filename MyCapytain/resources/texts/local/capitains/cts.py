@@ -251,7 +251,6 @@ class __SharedMethods__:
             empties = [n for n in passages if n.rstrip('.') != n or n == '']
             if len(empties) > 0:
                 message = '{} empty reference(s) at citation level {}'.format(len(empties), level)
-                print(empties)
                 warnings.warn(message, EmptyReference)
 
         return passages

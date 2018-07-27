@@ -1,3 +1,7 @@
+### 2018-07-27 2.0.9 @sonofmun
+
+ - Removed a random print statement that had been used for debugging empty references
+
 ### 2018-06-25 2.0.8 @sonofmun
 
 - Corrected error on the empty references exception from 2.0.7

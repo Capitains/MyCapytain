@@ -24,8 +24,8 @@ class DTSCollection(Collection):
             return int(value)
         return 0
 
-    @staticmethod
-    def parse(resource, direction="children"):
+    @classmethod
+    def parse(cls, resource, direction="children"):
         """ Given a dict representation of a json object, generate a DTS Collection
 
         :param resource:
@@ -34,12 +34,13 @@ class DTSCollection(Collection):
         :return: DTSCollection parsed
         :rtype: DTSCollection
         """
+
         collection = jsonld.expand(resource)
         if len(collection) == 0:
             raise JsonLdCollectionMissing("Missing collection in JSON")
         collection = collection[0]
 
-        obj = DTSCollection(identifier=resource["@id"])
+        obj = cls(identifier=resource["@id"])
 
         # We retrieve first the descriptiooon and label that are dependant on Hydra
         for val_dict in collection[str(_hyd.title)]:
@@ -71,8 +72,7 @@ class DTSCollection(Collection):
                 continue
 
         for member in collection.get(str(_hyd.member), []):
-            subcollection = DTSCollection.parse(member)
+            subcollection = cls.parse(member)
             if direction == "children":
                 subcollection.parent = obj
-
         return obj

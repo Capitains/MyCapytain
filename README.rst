@@ -2,16 +2,12 @@
    :target: https://travis-ci.org/Capitains/MyCapytain
 .. image:: https://coveralls.io/repos/Capitains/MyCapytain/badge.svg?branch=master 
    :target: https://coveralls.io/r/Capitains/MyCapytain?branch=master
-.. image:: https://gemnasium.com/Capitains/MyCapytain.svg 
-   :target: https://gemnasium.com/Capitains/MyCapytain
 .. image:: https://badge.fury.io/py/MyCapytain.svg 
    :target: http://badge.fury.io/py/MyCapytain
 .. image:: https://readthedocs.org/projects/mycapytain/badge/?version=latest
    :target: http://mycapytain.readthedocs.org
 .. image:: https://zenodo.org/badge/3923/Capitains/MyCapytain.svg
    :target: https://zenodo.org/badge/latestdoi/3923/Capitains/MyCapytain
-.. image:: https://img.shields.io/pypi/dm/MyCapytain.svg
-   :target: https://pypi.python.org/pypi/MyCapytain
 .. image:: https://api.codacy.com/project/badge/grade/8e63e69a94274422865e4f275dbf08ea
    :target: https://www.codacy.com/app/leponteineptique/MyCapytain
 .. image:: https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg

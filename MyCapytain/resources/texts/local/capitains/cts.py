@@ -11,7 +11,7 @@ This module contains methods to parse local resources using TEI/Epidoc guideline
 
 import warnings
 
-from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError
+from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
 from MyCapytain.common.reference import URN, Citation, Reference
@@ -68,7 +68,7 @@ class __SharedMethods__:
             start, end = subreference.start.list, subreference.end.list
 
         if len(start) > len(self.citation):
-            raise ReferenceError("URN is deeper than citation scheme")
+            raise CitationDepthError("URN is deeper than citation scheme")
 
         if simple is True:
             return self._getSimplePassage(subreference)
@@ -248,6 +248,11 @@ class __SharedMethods__:
                 message = ", ".join(duplicates)
                 warnings.warn(message, DuplicateReference)
             del duplicates
+            empties = [n for n in passages if n.rstrip('.') != n or n == '']
+            if len(empties) > 0:
+                message = '{} empty reference(s) at citation level {}'.format(len(empties), level)
+                print(empties)
+                warnings.warn(message, EmptyReference)
 
         return passages
 
@@ -450,6 +455,8 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
             citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=XPATH_NAMESPACES)
             if len(citation):
                 self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")
+            else:
+                raise MissingRefsDecl("No reference declaration (refsDecl) found.")
 
     def test(self):
         """ Parse the object and generate the children

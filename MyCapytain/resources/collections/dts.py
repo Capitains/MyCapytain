@@ -3,15 +3,17 @@ from rdflib import URIRef
 
 
 class DTSCollection(Collection):
-    @staticmethod
-    def parse(resource, mimetype="application/json+ld"):
+    CLASS_SHORT = DTSCollectionShort
+
+    @classmethod
+    def parse(cls, resource, mimetype="application/json+ld"):
         """ Given a dict representation of a json object, generate a DTS Collection
 
         :param resource:
         :param mimetype:
         :return:
         """
-        obj = DTSCollection(identifier=resource["@id"])
+        obj = cls(identifier=resource["@id"])
         obj.type = resource["type"]
         obj.version = resource["version"]
         for label in resource["label"]:
@@ -35,27 +37,27 @@ class DTSCollection(Collection):
                     obj.metadata.add(term, value)
 
         for member in resource["members"]["contents"]:
-            subobj = DTSCollectionShort.parse(member)
+            subobj = cls.CLASS_SHORT.parse(member)
             subobj.parent = member
 
         last = obj
         for member in resource["parents"]:
-            subobj = DTSCollectionShort.parse(member)
+            subobj = cls.CLASS_SHORT.parse(member)
             last.parent = subobj
 
         return obj
 
 
 class DTSCollectionShort(DTSCollection):
-    @staticmethod
-    def parse(resource):
+    @classmethod
+    def parse(cls, resource):
         """ Given a dict representation of a json object, generate a DTS Collection
 
         :param resource:
         :param mimetype:
         :return:
         """
-        obj = DTSCollectionShort(identifier=resource["@id"])
+        obj = cls(identifier=resource["@id"])
         obj.type = resource["type"]
         obj.model = resource["model"]
         for label in resource["label"]:

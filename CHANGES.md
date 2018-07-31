@@ -1,3 +1,13 @@
+### 2018-06-25 2.0.8 @sonofmun
+
+- Corrected error on the empty references exception from 2.0.7
+- Now raises an exception when there is no refsDecl found (MissingRefsDecl)
+- The exception now raised by a citation request that is deeper than the citation scheme is a CitationDepthError
+
+### 2018-06-22 2.0.7 @sonofmun
+
+- Added exception for empty references
+
 ### 2017-11-16 2.0.6 @ponteineptique
 
 - Added a way to specify the joining string for Plaintext export in TEIResource (Fixed #146)

@@ -211,6 +211,24 @@ class CapitainsXmlTextTest(TestCase):
                          "Warning should be DuplicateReference")
         self.assertEqual(str(w[0].message), "1", "Warning message should be list of duplicate")
 
+    def test_empty_ref_warning(self):
+        with open("tests/testing_data/texts/empty_references.xml") as xml:
+            text = CapitainsCtsText(resource=xml)
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            for i in [1, 2, 3]:
+                text.getValidReff(level=i, _debug=True)
+
+        self.assertEqual(len(w), 3, "There should be warning on each level")
+        self.assertEqual(issubclass(w[-1].category, MyCapytain.errors.EmptyReference), True,
+                         "Warning should be EmptyReference")
+        self.assertEqual([str(s.message) for s in w],
+                         ["1 empty reference(s) at citation level 1",
+                          "1 empty reference(s) at citation level 2",
+                          "1 empty reference(s) at citation level 3"],
+                         "Warning message should indicate number of references and the level at which they occur")
+
     def test_wrong_main_scope(self):
         with open("tests/testing_data/texts/sample2.xml", "rb") as f:
             with self.assertRaises(MyCapytain.errors.RefsDeclError):
@@ -229,10 +247,8 @@ class CapitainsXmlTextTest(TestCase):
 
     def test_xml_no_refs_Decl(self):
         """ Test the result of parsing when there is no citation """
-        text = self.parse("tests/testing_data/texts/refsDeclButNoCTS.xml")
-        self.assertEqual(
-            text.citation.isEmpty(), True, "There should be no citation"
-        )
+        with self.assertRaises(MyCapytain.errors.MissingRefsDecl):
+            self.parse("tests/testing_data/texts/refsDeclButNoCTS.xml")
 
     def test_xml_with_xml_id(self):
         """ Test that xml:id is Citation xpath works fine in passage retriaval """
@@ -414,7 +430,7 @@ class CapitainsXmlTextTest(TestCase):
     def test_citation_length_error(self, simple):
         """ In range, passage in between could be removed from the original text by error
         """
-        with self.assertRaises(ReferenceError):
+        with self.assertRaises(MyCapytain.errors.CitationDepthError):
             self.TEI.getTextualNode(["1", "pr", "2", "5"], simple=simple)
 
     def test_ensure_passage_is_not_removed(self):

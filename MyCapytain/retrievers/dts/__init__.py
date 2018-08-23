@@ -10,7 +10,7 @@
 import MyCapytain.retrievers.prototypes
 from MyCapytain import __version__
 import requests
-from MyCapytain.common.utils import parse_uri, parse_pagination
+from MyCapytain.common.utils import parse_uri
 
 
 class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
@@ -50,7 +50,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         request.raise_for_status()
         if request.encoding is None:
             request.encoding = "utf-8"
-        return request.text, parse_pagination(request.headers)
+        return request
 
     @property
     def routes(self):
@@ -88,8 +88,8 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         :param collection_id: Id of the collection to retrieve
         :param nav: Direction of the navigation
         :param page: Page to retrieve
-        :return: Response and Navigation Tuple
-        :rtype: (str, MyCapytain.common.utils._Navigation)
+        :return: Request made
+        :rtype: requests.Request
         """
         return self.call(
             "collections",
@@ -98,4 +98,63 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
                 "nav": nav,
                 "page": page
             }
+        )
+
+    def get_navigation(
+            self, collection_id,
+            level=None, ref=None, group_size=None, max_=None, exclude=None,
+            page=None):
+        """ Make a navigation request on the DTS API
+
+        :param collection_id: Id of the collection
+        :param level: Lever at which the references should be listed
+        :param ref: If ref is a tuple, it is treated as a range. String or int are treated as single ref
+        :param group_size: Size of the ranges the server should produce
+        :param max_: Maximum number of results
+        :param exclude: Exclude specific metadata.
+        :param page: Page
+        :return: Request made
+        :rtype: requests.Request
+        """
+        parameters = {
+            "id": collection_id,
+            "level": level,
+            "groupSize": group_size,
+            "max": max_,
+            "exclude": exclude,
+            "page": page
+        }
+        if isinstance(ref, tuple):
+            parameters["start"], parameters["end"] = ref
+        elif ref:
+            parameters["ref"] = ref
+
+        return self.call(
+            "navigation",
+            parameters
+        )
+
+    def get_document(
+            self,
+            collection_id, ref=None, mimetype="application/tei+xml, application/xml"):
+        """ Make a navigation request on the DTS API
+
+        :param collection_id: Id of the collection
+        :param ref: If ref is a tuple, it is treated as a range. String or int are treated as single ref
+        :param mimetype: Media type to request
+        :return: Request made
+        :rtype: requests.Request
+        """
+        parameters = {
+            "id": collection_id
+        }
+        if isinstance(ref, tuple):
+            parameters["start"], parameters["end"] = ref
+        elif ref:
+            parameters["ref"] = ref
+
+        return self.call(
+            "navigation",
+            parameters,
+            mimetype=mimetype
         )

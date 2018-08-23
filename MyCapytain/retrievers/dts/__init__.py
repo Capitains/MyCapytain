@@ -88,8 +88,8 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         :param collection_id: Id of the collection to retrieve
         :param nav: Direction of the navigation
         :param page: Page to retrieve
-        :return: Request made
-        :rtype: requests.Request
+        :return: Response
+        :rtype: requests.Response
         """
         return self.call(
             "collections",
@@ -113,8 +113,8 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         :param max_: Maximum number of results
         :param exclude: Exclude specific metadata.
         :param page: Page
-        :return: Request made
-        :rtype: requests.Request
+        :return: Response
+        :rtype: requests.Response
         """
         parameters = {
             "id": collection_id,
@@ -142,8 +142,8 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         :param collection_id: Id of the collection
         :param ref: If ref is a tuple, it is treated as a range. String or int are treated as single ref
         :param mimetype: Media type to request
-        :return: Request made
-        :rtype: requests.Request
+        :return: Response
+        :rtype: requests.Response
         """
         parameters = {
             "id": collection_id

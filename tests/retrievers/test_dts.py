@@ -135,7 +135,7 @@ class TestDtsParsing(unittest.TestCase):
         self.add_collection_response()
 
         req = self.cli.get_collection()
-        response, pagination = req.data, parse_pagination(req.headers)
+        response, pagination = req.text, parse_pagination(req.headers)
         self.assertEqual(
             pagination,
             _Navigation("18", "20", "500", None, "1")
@@ -157,7 +157,7 @@ class TestDtsParsing(unittest.TestCase):
             nav="parents",
             page=19
         )
-        response, pagination = req.data, parse_pagination(req.headers)
+        response, pagination = req.text, parse_pagination(req.headers)
 
         self.assertEqual(
             pagination,

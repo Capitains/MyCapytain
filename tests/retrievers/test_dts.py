@@ -5,7 +5,7 @@ import responses
 from MyCapytain.retrievers.dts import HttpDtsRetriever
 from MyCapytain.common.utils import _Navigation
 from urllib.parse import parse_qs, urlparse, urljoin
-
+from MyCapytain.common.utils import parse_pagination
 
 _SERVER_URI = "http://domainname.com/api/dts/"
 patch_args = ("MyCapytain.retrievers.dts.requests.get", )
@@ -134,7 +134,8 @@ class TestDtsParsing(unittest.TestCase):
         self.add_index_response()
         self.add_collection_response()
 
-        response, pagination = self.cli.get_collection()
+        req = self.cli.get_collection()
+        response, pagination = req.data, parse_pagination(req.headers)
         self.assertEqual(
             pagination,
             _Navigation("18", "20", "500", None, "1")
@@ -151,11 +152,12 @@ class TestDtsParsing(unittest.TestCase):
         self.add_collection_response(
             uri=_SERVER_URI+"?api=collections&id=Hello&page=19&nav=parents"
         )
-        response, pagination = self.cli.get_collection(
+        req = self.cli.get_collection(
             collection_id="Hello",
             nav="parents",
             page=19
         )
+        response, pagination = req.data, parse_pagination(req.headers)
 
         self.assertEqual(
             pagination,

@@ -110,7 +110,7 @@ class Reference(BasePassageId):
     def start(self):
         """ Quick access property for start list
 
-        :rtype: end
+        :rtype: str
         """
         if self.parsed[0][0] and len(self.parsed[0][0]):
             return self.parsed[0][0]

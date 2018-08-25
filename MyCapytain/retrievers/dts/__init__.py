@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-.. module:: MyCapytain.retrievers.cts5
-   :synopsis: Cts5 endpoint implementation
+.. module:: MyCapytain.retrievers.dts
+   :synopsis: DTS endpoint implementation
 
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
@@ -154,7 +154,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
             parameters["ref"] = ref
 
         return self.call(
-            "navigation",
+            "document",
             parameters,
             mimetype=mimetype
         )

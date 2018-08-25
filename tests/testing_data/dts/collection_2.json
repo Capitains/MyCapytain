@@ -1,0 +1,47 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#",
+        "tei": "http://www.tei-c.org/ns/1.0"
+    },
+    "@id": "lasciva_roma",
+    "@type": "Collection",
+    "totalItems": 2,
+    "title" : "Lasciva Roma",
+    "description": "Collection of primary sources of interest in the studies of Ancient World's sexuality",
+    "dts:dublincore": {
+        "dc:creator": [
+            "Thibault Clérice", "http://orcid.org/0000-0003-1852-9204"
+        ],
+        "dc:title" : [
+            {"@language": "lat", "@value": "Lasciva Roma"}
+        ],
+        "dc:description": [
+            {
+                "@language": "eng",
+                "@value": "Collection of primary sources of interest in the studies of Ancient World's sexuality"
+            }
+        ]
+    },
+    "member": [
+        {
+            "@id" : "urn:cts:latinLit:phi1103.phi001",
+            "title" : "Priapeia",
+            "dts:dublincore": {
+                "dc:type": [
+                    "http://chs.harvard.edu/xmlns/cts#work"
+                ],
+                "dc:creator": [
+                    {"@language": "eng", "@value": "Anonymous"}
+                ],
+                "dc:language": ["lat", "eng"],
+                "dc:description": [
+                    { "@language": "eng", "@value": "Anonymous lascivious Poems" }
+                ]
+            },
+            "@type" : "Collection",
+            "totalItems": 1
+        }
+    ]
+}

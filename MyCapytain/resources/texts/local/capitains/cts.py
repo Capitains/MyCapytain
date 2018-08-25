@@ -14,7 +14,7 @@ import warnings
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
-from MyCapytain.common.reference import URN, Citation, Reference
+from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.texts.base.tei import TEIResource
@@ -63,9 +63,9 @@ class __SharedMethods__:
             start, end = subreference, subreference
             subreference = Reference(".".join(subreference))
         elif not subreference.end:
-            start, end = subreference.start.list, subreference.start.list
+            start = end = Reference(subreference.start).list
         else:
-            start, end = subreference.start.list, subreference.end.list
+            start, end = Reference(subreference.start).list, Reference(subreference.end).list
 
         if len(start) > len(self.citation):
             raise CitationDepthError("URN is deeper than citation scheme")
@@ -190,16 +190,17 @@ class __SharedMethods__:
                 else:
                     xml = self.getTextualNode(subreference=reference)
                     common = []
-                    for index in range(0, len(reference.start.list)):
+                    ref = Reference(reference.start)
+                    for index in range(0, len(ref.list)):
                         if index == (len(common) - 1):
-                            common.append(reference.start.list[index])
+                            common.append(ref.list[index])
                         else:
                             break
 
                     passages = [common]
                     depth = len(common)
                     if not level:
-                        level = len(reference.start.list) + 1
+                        level = len(ref.list) + 1
 
             else:
                 raise TypeError()
@@ -429,7 +430,7 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
-    :type urn: MyCapytain.common.reference.URN
+    :type urn: MyCapytain.common.reference._capitains_cts.URN
     :param resource: A resource
     :type resource: lxml.etree._Element
     :param citation: Highest XmlCtsCitation level
@@ -532,9 +533,9 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         self.__depth__ = self.__depth_2__ = 1
 
         if self.reference.start:
-            self.__depth_2__ = self.__depth__ = len(self.reference.start)
+            self.__depth_2__ = self.__depth__ = len(Reference(self.reference.start))
         if self.reference and self.reference.end:
-            self.__depth_2__ = len(self.reference.end)
+            self.__depth_2__ = len(Reference(self.reference.end))
 
         self.__prevnext__ = None  # For caching purpose
 
@@ -604,10 +605,10 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
 
         if self.reference.end:
-            start, end = str(self.reference.start), str(self.reference.end)
+            start, end = self.reference.start, self.reference.end
             range_length = len(self.getReffs(level=0))
         else:
-            start = end = str(self.reference.start)
+            start = end = self.reference.start
             range_length = 1
 
         start = document_references.index(start)

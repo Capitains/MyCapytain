@@ -14,6 +14,11 @@ class MyCapytainException(BaseException):
     """
 
 
+class JsonLdCollectionMissing(MyCapytainException):
+    """ Error thrown when a JSON LD has now first ressource
+    """
+
+
 class DuplicateReference(SyntaxWarning, MyCapytainException):
     """ Error generated when a duplicate is found in Reference
     """

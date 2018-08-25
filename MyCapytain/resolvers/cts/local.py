@@ -7,7 +7,7 @@ import os.path
 from glob import glob
 from math import ceil
 
-from MyCapytain.common.reference import URN, Reference
+from MyCapytain.common.reference._capitains_cts import Reference, URN
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver

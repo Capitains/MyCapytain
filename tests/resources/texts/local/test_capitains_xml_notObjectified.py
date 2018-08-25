@@ -8,6 +8,7 @@ import xmlunittest
 from lxml import etree
 
 import MyCapytain.common.reference
+import MyCapytain.common.reference._capitains_cts
 import MyCapytain.errors
 import MyCapytain.resources.texts.base.tei
 import MyCapytain.resources.texts.local.capitains.cts
@@ -60,8 +61,8 @@ class TestLocalXMLPassageImplementation(CapitainsXmlPassageTests, unittest.TestC
     simple = False
 
     def setUp(self):
-        self.URN = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
+        self.URN = MyCapytain.common.reference._capitains_cts.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.URN_2 = MyCapytain.common.reference._capitains_cts.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
         self.TEI = MyCapytain.resources.texts.local.capitains.cts.CapitainsCtsText(resource=objectifiedParser(self.text))
         with open("tests/testing_data/latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml", "rb") as f:
@@ -79,8 +80,8 @@ class TestLocalXMLSimplePassageImplementation(CapitainsXmlPassageTests, unittest
     simple = True
 
     def setUp(self):
-        self.URN = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        self.URN_2 = MyCapytain.common.reference.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
+        self.URN = MyCapytain.common.reference._capitains_cts.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        self.URN_2 = MyCapytain.common.reference._capitains_cts.URN("urn:cts:latinLit:phi1294.phi002.perseus-lat3")
         self.text = open("tests/testing_data/texts/sample.xml", "rb")
         self.TEI = MyCapytain.resources.texts.local.capitains.cts.CapitainsCtsText(resource=objectifiedParser(self.text))
         with open("tests/testing_data/latinLit/data/phi1294/phi002/phi1294.phi002.perseus-lat2.xml", "rb") as f:
@@ -98,4 +99,4 @@ class TestPassageRange(CapitainsXMLRangePassageTests, unittest.TestCase):
             self.text = MyCapytain.resources.texts.local.capitains.cts.CapitainsCtsText(
                 resource=objectifiedParser(text), urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
             )
-        self.passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.2-1.pr.7"))
+        self.passage = self.text.getTextualNode(MyCapytain.common.reference._capitains_cts.Reference("1.pr.2-1.pr.7"))

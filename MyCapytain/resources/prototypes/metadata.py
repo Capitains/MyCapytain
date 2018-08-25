@@ -13,7 +13,8 @@ from MyCapytain.common.utils import Subgraph, LiteralToDict
 from MyCapytain.common.constants import RDF_NAMESPACES, RDFLIB_MAPPING, Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
-from rdflib.namespace import SKOS, DC
+from rdflib.namespace import SKOS, DC, DCTERMS
+from copy import deepcopy
 
 
 class Collection(Exportable):
@@ -182,8 +183,8 @@ class Collection(Exportable):
         :return:
         """
         self.__parent__ = parent
-        self.graph.set(
-            (self.asNode(), RDF_NAMESPACES.DTS.parent, parent.asNode())
+        self.graph.add(
+            (self.asNode(), RDF_NAMESPACES.CAPITAINS.parent, parent.asNode())
         )
         parent.__add_member__(self)
 
@@ -291,6 +292,28 @@ class Collection(Exportable):
 
         return bindings
 
+    @staticmethod
+    def _export_base_dts(graph, obj, nsm):
+        """ Export the base DTS information in a simple reusable way
+
+        :param graph: Current graph where the information lie
+        :param obj: Object for which we build info
+        :param nsm: Namespace manager
+        :return: Dict
+        """
+
+        o = {
+            "@id": str(obj.asNode()),
+            "@type": nsm.qname(obj.type),
+            nsm.qname(RDF_NAMESPACES.HYDRA.title): str(obj.get_label()),
+            nsm.qname(RDF_NAMESPACES.HYDRA.totalItems): obj.size
+        }
+
+        for desc in graph.objects(obj.asNode(), RDF_NAMESPACES.HYDRA.description):
+            o[nsm.qname(RDF_NAMESPACES.HYDRA.description)] = str(desc)
+
+        return o
+
     def __export__(self, output=None, domain=""):
         """ Export the collection item in the Mimetype required.
 
@@ -304,19 +327,49 @@ class Collection(Exportable):
         """
 
         if output == Mimetypes.JSON.DTS.Std:
+
+            # Set-up a derived Namespace Manager
             nm = self.graph.namespace_manager
+            nsm = deepcopy(nm)
+            nsm.bind("hydra", RDF_NAMESPACES.HYDRA)
+            nsm.bind("dct", DCTERMS)
+
+            # Set-up a derived graph
+            store = Subgraph(nsm)
+            store.graphiter(self.graph, self.asNode(), ascendants=0, descendants=1)
+            graph = store.graph
+
+            # Build the JSON-LD @context
             bindings = {}
-            for predicate in set(self.graph.predicates()):
-                prefix, namespace, name = nm.compute_qname(predicate)
+            for predicate in set(graph.predicates()):
+                prefix, namespace, name = nsm.compute_qname(predicate)
                 bindings[prefix] = str(URIRef(namespace))
 
-            RDFSLabel = self.graph.qname(RDFS.label)
-            RDFType = self.graph.qname(RDF.type)
-            store = Subgraph(get_graph().namespace_manager)
-            store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
-            metadata = {}
+            if "cap" in bindings:
+                del bindings["cap"]
+
+            # Builds the specific Store data
+            extensions = {}
+            dublincore = {}
+            ignore_ns = [str(RDF_NAMESPACES.HYDRA), str(RDF_NAMESPACES.DTS),
+                         str(RDF_NAMESPACES.CAPITAINS), str(RDF), str(RDFS)]
+
+            # Builds the .dublincore and .extensions graphs
             for _, predicate, obj in store.graph:
-                k = self.graph.qname(predicate)
+                k = graph.qname(predicate)
+                prefix, namespace, name = nsm.compute_qname(predicate)
+                namespace = str(namespace)
+
+                # Ignore namespaces that are part of the root DTS object
+                if namespace in ignore_ns:
+                    continue
+
+                # Switch to the correct container depending on namespaces
+                if namespace == str(DCTERMS):
+                    metadata = dublincore
+                else:
+                    metadata = extensions
+
                 if k in metadata:
                     if isinstance(metadata[k], list):
                         metadata[k].append(LiteralToDict(obj))
@@ -324,37 +377,24 @@ class Collection(Exportable):
                         metadata[k] = [metadata[k], LiteralToDict(obj)]
                 else:
                     metadata[k] = LiteralToDict(obj)
-            o = {
-                "@context": bindings,
-                "@graph": {
-                    "@id": self.id,
-                    RDFType: str(self.type),
-                    RDFSLabel: LiteralToDict(self.get_label()) or self.id,
-                    self.graph.qname(RDF_NAMESPACES.DTS.size): len(self.members),
-                    self.graph.qname(RDF_NAMESPACES.DTS.metadata): metadata
-                }
-            }
-            version = self.version
-            if version is not None:
-                o["@graph"]["version"] = str(version)
-            if len(self.members):
-                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.members)] = [
-                    {
-                        "@id": member.id,
-                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
-                        self.graph.qname(RDF_NAMESPACES.DTS.url): domain + member.id
-                    }
+                    if isinstance(metadata[k], dict):
+                        metadata[k] = [metadata[k]]
+
+            o = {"@context": bindings}
+            o.update(self._export_base_dts(graph, self, nsm))
+
+            if extensions:
+                o[graph.qname(RDF_NAMESPACES.DTS.extensions)] = extensions
+
+            if dublincore:
+                o[graph.qname(RDF_NAMESPACES.DTS.dublincore)] = dublincore
+
+            if self.size:
+                o[graph.qname(RDF_NAMESPACES.HYDRA.member)] = [
+                    self._export_base_dts(self.graph, member, nsm)
                     for member in self.members
                 ]
-            if self.parent:
-                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.parents)] = [
-                    {
-                        "@id": member.id,
-                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
-                        self.graph.qname(RDF_NAMESPACES.DTS.url): domain + member.id
-                    }
-                    for member in self.parents
-                ]
+
             del store
             return o
         elif output == Mimetypes.JSON.LD\

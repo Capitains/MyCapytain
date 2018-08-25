@@ -26,9 +26,10 @@ class RDF_NAMESPACES:
     :type CAPITAINS: Namespace
     """
     CTS = Namespace("http://chs.harvard.edu/xmlns/cts/")
-    DTS = Namespace("http://w3id.org/dts-ontology/")
+    DTS = Namespace("https://w3id.org/dts/api#")
     TEI = Namespace("http://www.tei-c.org/ns/1.0/")
     CAPITAINS = Namespace("http://purl.org/capitains/ns/1.0#")
+    HYDRA = Namespace("https://www.w3.org/ns/hydra/core#")
 
 
 class Mimetypes:

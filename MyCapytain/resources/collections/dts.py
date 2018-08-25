@@ -1,65 +1,78 @@
 from MyCapytain.resources.prototypes.metadata import Collection
+from MyCapytain.errors import JsonLdCollectionMissing
+from MyCapytain.common.constants import RDF_NAMESPACES
+
 from rdflib import URIRef
+from pyld import jsonld
+
+
+_hyd = RDF_NAMESPACES.HYDRA
+_dts = RDF_NAMESPACES.DTS
+_cap = RDF_NAMESPACES.CAPITAINS
+_tei = RDF_NAMESPACES.TEI
+_empty_extensions = [{}]
 
 
 class DTSCollection(Collection):
-    CLASS_SHORT = DTSCollectionShort
+    def __init__(self, identifier="", *args, **kwargs):
+        super(DTSCollection, self).__init__(identifier, *args, **kwargs)
+        self._expanded = False  # Not sure I'll keep this
+
+    @property
+    def size(self):
+        for value in self.metadata.get_single(RDF_NAMESPACES.HYDRA.totalItems):
+            return int(value)
+        return 0
 
     @classmethod
-    def parse(cls, resource, mimetype="application/json+ld"):
+    def parse(cls, resource, direction="children"):
         """ Given a dict representation of a json object, generate a DTS Collection
 
         :param resource:
-        :param mimetype:
-        :return:
+        :type resource: dict
+        :param direction: Direction of the hydra:members value
+        :return: DTSCollection parsed
+        :rtype: DTSCollection
         """
+
+        collection = jsonld.expand(resource)
+        if len(collection) == 0:
+            raise JsonLdCollectionMissing("Missing collection in JSON")
+        collection = collection[0]
+
         obj = cls(identifier=resource["@id"])
-        obj.type = resource["type"]
-        obj.version = resource["version"]
-        for label in resource["label"]:
-            obj.set_label(label["value"], label["lang"])
-        for key, value in resource["metadata"].items():
+
+        # We retrieve first the descriptiooon and label that are dependant on Hydra
+        for val_dict in collection[str(_hyd.title)]:
+            obj.set_label(val_dict["@value"], None)
+
+        for val_dict in collection["@type"]:
+            obj.type = val_dict
+
+        for val_dict in collection[str(_hyd.totalItems)]:
+            obj.metadata.add(_hyd.totalItems, val_dict["@value"], 0)
+
+        for val_dict in collection.get(str(_hyd.description), []):
+            obj.metadata.add(_hyd.description, val_dict["@value"], None)
+
+        for key, value_set in collection.get(str(_dts.dublincore), _empty_extensions)[0].items():
             term = URIRef(key)
-            if isinstance(value, list):
-                if isinstance(value[0], dict):
-                    for subvalue in value:
-                        obj.metadata.add(term, subvalue["@value"], subvalue["@lang"])
-                else:
-                    for subvalue in value:
-                        if subvalue.startswith("http") or subvalue.startswith("urn"):
-                            obj.metadata.add(term, URIRef(subvalue))
-                        else:
-                            obj.metadata.add(term, subvalue)
-            else:
-                if value.startswith("http") or value.startswith("urn"):
-                    obj.metadata.add(term, URIRef(value))
-                else:
-                    obj.metadata.add(term, value)
+            for value_dict in value_set:
+                obj.metadata.add(term, value_dict["@value"], value_dict.get("@language", None))
 
-        for member in resource["members"]["contents"]:
-            subobj = cls.CLASS_SHORT.parse(member)
-            subobj.parent = member
+        for key, value_set in collection.get(str(_dts.extensions), _empty_extensions)[0].items():
+            term = URIRef(key)
+            for value_dict in value_set:
+                obj.metadata.add(term, value_dict["@value"], value_dict.get("@language", None))
 
-        last = obj
-        for member in resource["parents"]:
-            subobj = cls.CLASS_SHORT.parse(member)
-            last.parent = subobj
+        if str(_tei.refsDecl) in collection:
+            for citation in collection[str(_tei.refsDecl)]:
+                print(citation)
+                # Need to have citation set before going further.
+                continue
 
-        return obj
-
-
-class DTSCollectionShort(DTSCollection):
-    @classmethod
-    def parse(cls, resource):
-        """ Given a dict representation of a json object, generate a DTS Collection
-
-        :param resource:
-        :param mimetype:
-        :return:
-        """
-        obj = cls(identifier=resource["@id"])
-        obj.type = resource["type"]
-        obj.model = resource["model"]
-        for label in resource["label"]:
-            obj.set_label(label["value"], label["lang"])
+        for member in collection.get(str(_hyd.member), []):
+            subcollection = cls.parse(member)
+            if direction == "children":
+                subcollection.parent = obj
         return obj

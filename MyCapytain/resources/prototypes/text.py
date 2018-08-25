@@ -10,7 +10,9 @@
 from six import text_type
 from rdflib.namespace import DC
 from rdflib import BNode, URIRef
-from MyCapytain.common.reference import URN, Citation, NodeId
+from MyCapytain.common.reference import URN
+from MyCapytain.common.reference._base import NodeId
+from MyCapytain.common.reference._capitains_cts import Citation
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES
 from MyCapytain.common.base import Exportable
@@ -370,7 +372,7 @@ class CtsNode(InteractiveTextualNode):
     """ Initiate a Resource object
     
     :param urn: A URN identifier
-    :type urn: URN
+    :type urn: MyCapytain.common.reference._capitains_cts.URN
     :param metadata: Collection Information about the Item
     :type metadata: Collection
     :param citation: XmlCtsCitation system of the text
@@ -399,7 +401,7 @@ class CtsNode(InteractiveTextualNode):
     def urn(self):
         """ URN Identifier of the object
 
-        :rtype: URN
+        :rtype: MyCapytain.common.reference._capitains_cts.URN
         """
         return self.__urn__
     
@@ -408,7 +410,7 @@ class CtsNode(InteractiveTextualNode):
         """ Set the urn
 
         :param value: URN to be saved
-        :type value:  URN
+        :type value:  MyCapytain.common.reference._capitains_cts.URN
         :raises: *TypeError* when the value is not URN compatible
 
         """
@@ -477,7 +479,7 @@ class Passage(CtsNode):
     """ CapitainsCtsPassage objects possess metadata informations
 
     :param urn: A URN identifier
-    :type urn: URN
+    :type urn: MyCapytain.common.reference._capitains_cts.URN
     :param metadata: Collection Information about the Item
     :type metadata: Collection
     :param citation: XmlCtsCitation system of the text

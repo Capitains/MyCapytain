@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from MyCapytain.common.reference import Reference, Citation
+from MyCapytain.common.reference._capitains_cts import Reference, Citation
 from MyCapytain.resources.texts.base.tei import TEIResource
 from MyCapytain.common.constants import Mimetypes
 from MyCapytain.common.utils import xmlparser

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from MyCapytain.resolvers.cts.local import CtsCapitainsLocalResolver
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES, get_graph
-from MyCapytain.common.reference import URN, Reference
+from MyCapytain.common.reference._capitains_cts import Reference, URN
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
@@ -459,7 +459,7 @@ class TextXMLFolderResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["hydra:member"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959",
              "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
             "There should be 4 Members in DTS JSON"
@@ -502,7 +502,7 @@ class TextXMLFolderResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["hydra:member"]],
             ["urn:cts:latinLit:phi1294.phi002.opp-eng3", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"],
             "There should be two members in DTS JSON"
         )

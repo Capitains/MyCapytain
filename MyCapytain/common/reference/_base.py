@@ -1,7 +1,6 @@
 from MyCapytain.common.base import Exportable
-
 from copy import copy
-from abc import abstractmethod
+from abc import abstractmethod, abstractproperty
 
 
 class BasePassageId:
@@ -35,9 +34,6 @@ class CitationSet:
     a .match() function
 
     """
-    def __init__(self, children=None):
-        self._children = children or list()
-
     @abstractmethod
     def match(self, passageId):
         """ Given a specific passageId, matches the citation to a specific citation object
@@ -46,50 +42,6 @@ class CitationSet:
         :return: Citation that matches the passageId
         :rtype: BaseCitation
         """
-
-    @property
-    def children(self):
-        """ Children of a citation
-
-        :rtype: [BaseCitation]
-        """
-        return self._children or []
-
-    @children.setter
-    def children(self, val):
-        final_value = []
-        if val is not None:
-            for citation in val:
-                if citation is None:
-                    continue
-                elif not isinstance(citation, self.__class__):
-                    raise TypeError("Citation children should be Citation")
-                else:
-                    citation.root = self.root
-                    final_value.append(citation)
-
-        self._children = final_value
-
-    def __iter__(self):
-        """ Iteration method
-
-        Loop over the citation children
-
-        :Example:
-            >>>    c = BaseCitation(name="line")
-            >>>    b = BaseCitation(name="poem", children=[c])
-            >>>    b2 = BaseCitation(name="paragraph")
-            >>>    a = BaseCitation(name="book", children=[b])
-            >>>    [e for e in a] == [a, b, c, b2],
-
-        """
-        yield from [self]
-        for child in self.children:
-            yield from child
-
-    @property
-    def is_root(self):
-        return True
 
 
 class BaseCitation(Exportable, CitationSet):
@@ -111,13 +63,14 @@ class BaseCitation(Exportable, CitationSet):
         :param root: Root of the citation group
         :type root: CitationSet
         """
-        super(BaseCitation, self).__init__(children=children)
+        super(BaseCitation, self).__init__()
 
         self._name = None
-        self._root = None
+        self._children = []
+        self._root = root
 
         self.name = name
-        self.root = root
+        self.children = children
 
     @property
     def is_root(self):
@@ -160,6 +113,46 @@ class BaseCitation(Exportable, CitationSet):
         self._name = val
 
     @property
+    def children(self):
+        """ Children of a citation
+
+        :rtype: [BaseCitation]
+        """
+        return self._children or []
+
+    @children.setter
+    def children(self, val):
+        final_value = []
+        if val is not None:
+            for citation in val:
+                if citation is None:
+                    continue
+                elif not isinstance(citation, self.__class__):
+                    raise TypeError("Citation children should be Citation")
+                else:
+                    citation.root = self.root
+                    final_value.append(citation)
+
+        self._children = final_value
+
+    def __iter__(self):
+        """ Iteration method
+
+        Loop over the citation children
+
+        :Example:
+            >>>    c = BaseCitation(name="line")
+            >>>    b = BaseCitation(name="poem", children=[c])
+            >>>    b2 = BaseCitation(name="paragraph")
+            >>>    a = BaseCitation(name="book", children=[b])
+            >>>    [e for e in a] == [a, b, c, b2],
+
+        """
+        yield from [self]
+        for child in self.children:
+            yield from child
+
+    @property
     @abstractmethod
     def depth(self):
         """ Depth of the citation scheme
@@ -179,7 +172,7 @@ class BaseCitation(Exportable, CitationSet):
         :type item: int
         :rtype: list(BaseCitation) or BaseCitation
 
-        .. note:: Should it be a dict or or always a list ?
+        .. note:: Should it be a or or always a list ?
         """
         return []
 

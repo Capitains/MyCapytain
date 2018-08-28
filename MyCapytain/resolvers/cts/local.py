@@ -215,7 +215,7 @@ class CtsCapitainsLocalResolver(Resolver):
                 del text
                 text_metadata.citation = cites[-1]
                 self.logger.info("%s has been parsed ", text_metadata.path)
-                if text_metadata.citation.isEmpty():
+                if text_metadata.citation.is_empty():
                     self.logger.error("%s has no passages", text_metadata.path)
                     return False
                 return True

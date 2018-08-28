@@ -471,7 +471,7 @@ class CtsNode(InteractiveTextualNode):
             self.metadata.add(RDF_NAMESPACES.CTS.description, lang=lang, value=str(node))
             self.set_description(str(node), lang)
 
-        if self.citation.isEmpty() and not edition.citation.isEmpty():
+        if self.citation.is_empty() and not edition.citation.is_empty():
             self.citation = edition.citation
 
 

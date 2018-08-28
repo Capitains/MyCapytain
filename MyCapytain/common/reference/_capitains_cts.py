@@ -848,7 +848,7 @@ class Citation(BaseCitation):
                 self.refsDecl
             )
 
-    def isEmpty(self):
+    def is_empty(self):
         """ Check if the citation has not been set
 
         :return: True if nothing was setup

@@ -1,4 +1,5 @@
 from MyCapytain.common.base import Exportable
+from MyCapytain.common.constants import get_graph, Mimetypes, RDF_NAMESPACES
 from MyCapytain.errors import CitationDepthError
 from copy import copy
 from abc import abstractmethod
@@ -30,12 +31,17 @@ class BasePassageId:
         return self._end
 
 
-class CitationSet:
+class BaseCitationSet(Exportable):
     """ A citation set is a collection of citations that optionnaly can be matched using a .match() function
 
     :param children: List of Citation
     :type children: [BaseCitation]
     """
+
+    def __repr__(self):
+        return "<MyCapytain.common.reference.BaseCitationSet object at %s>" % id(self)
+
+    EXPORT_TO = [Mimetypes.JSON.DTS.Std]
 
     def __init__(self, children=None):
         self._children = []
@@ -79,10 +85,10 @@ class CitationSet:
         Loop over the citation children
 
         :Example:
-            >>>    c = BaseCitation(name="line")
-            >>>    b = BaseCitation(name="poem", children=[c])
-            >>>    b2 = BaseCitation(name="paragraph")
-            >>>    a = BaseCitation(name="book", children=[b])
+            >>>    c = BaseCitationSet(name="line")
+            >>>    b = BaseCitationSet(name="poem", children=[c])
+            >>>    b2 = BaseCitationSet(name="paragraph")
+            >>>    a = BaseCitationSet(name="book", children=[b])
             >>>    [e for e in a] == [a, b, c, b2],
 
         """
@@ -102,9 +108,8 @@ class CitationSet:
     def depth(self):
         """ Depth of the citation scheme
 
-        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 2
+        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 1
 
-        .. toDo:: It seems that we should be more pythonic and have depth == 0 means there is still an object...
 
         :rtype: int
         :return: Depth of the citation scheme
@@ -164,8 +169,28 @@ class CitationSet:
     def is_root(self):
         return True
 
+    def __export__(self, output=None, context=False, namespace_manager=None, **kwargs):
+        if output == Mimetypes.JSON.DTS.Std:
+            if not namespace_manager:
+                namespace_manager = get_graph().namespace_manager
 
-class BaseCitation(Exportable, CitationSet):
+            _out = [
+                cite.export(output, context=False, namespace_manager=namespace_manager)
+                for cite in self.children
+            ]
+
+            if context:
+                cite_structure_term = str(namespace_manager.qname(RDF_NAMESPACES.DTS.term("citeStructure")))
+                _out = {
+                    "@context": {
+                        cite_structure_term.split(":")[0]: str(RDF_NAMESPACES.DTS)
+                    },
+                    cite_structure_term: _out
+                }
+            return _out
+
+
+class BaseCitation(BaseCitationSet):
     def __repr__(self):
         """
 
@@ -182,7 +207,7 @@ class BaseCitation(Exportable, CitationSet):
         :param children: list of children
         :type children: [BaseCitation]
         :param root: Root of the citation group
-        :type root: CitationSet
+        :type root: BaseCitationSet
         """
         super(BaseCitation, self).__init__()
 
@@ -212,7 +237,7 @@ class BaseCitation(Exportable, CitationSet):
         """ Returns the root of the citation set
 
         :return: Root of the Citation set
-        :rtype: CitationSet
+        :rtype: BaseCitationSet
         """
         if self._root is None:
             return self
@@ -223,7 +248,7 @@ class BaseCitation(Exportable, CitationSet):
         """ Set the root to which the current citation is connected to
 
         :param value: CitationSet root of the Citation graph
-        :type value: CitationSet
+        :type value: BaseCitationSet
         :return:
         """
         self._root = value
@@ -257,6 +282,29 @@ class BaseCitation(Exportable, CitationSet):
         yield from [self]
         for child in self.children:
             yield from child
+
+    def __export__(self, output=None, context=False, namespace_manager=None, **kwargs):
+        if output == Mimetypes.JSON.DTS.Std:
+            if not namespace_manager:
+                namespace_manager = get_graph().namespace_manager
+
+            cite_type_term = str(namespace_manager.qname(RDF_NAMESPACES.DTS.term("citeType")))
+            cite_structure_term = str(namespace_manager.qname(RDF_NAMESPACES.DTS.term("citeStructure")))
+
+            _out = {
+                cite_type_term: self.name
+            }
+
+            if not self.is_empty():
+                _out[cite_structure_term] = [
+                    cite.export(output, context=False, namespace_manager=namespace_manager)
+                    for cite in self.children
+                ]
+
+            if context:
+                _out["@context"] = {cite_type_term.split(":")[0]: str(RDF_NAMESPACES.DTS)}
+
+            return _out
 
 
 class NodeId(object):

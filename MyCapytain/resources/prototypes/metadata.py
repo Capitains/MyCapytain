@@ -9,12 +9,21 @@
 
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.errors import UnknownCollection
-from MyCapytain.common.utils import Subgraph, LiteralToDict
+from MyCapytain.common.utils import Subgraph, literal_to_dict
 from MyCapytain.common.constants import RDF_NAMESPACES, RDFLIB_MAPPING, Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
+from MyCapytain.common.reference import BaseCitationSet
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
-from rdflib.namespace import SKOS, DC, DCTERMS
-from copy import deepcopy
+from rdflib.namespace import SKOS, DC, DCTERMS, NamespaceManager
+
+
+_ns_hydra_str = str(RDF_NAMESPACES.HYDRA)
+_ns_cts_str = str(RDF_NAMESPACES.CTS)
+_ns_dts_str = str(RDF_NAMESPACES.DTS)
+_ns_dct_str = str(DCTERMS)
+_ns_cap_str = str(RDF_NAMESPACES.CAPITAINS)
+_ns_rdf_str = str(RDF)
+_ns_rdfs_str = str(RDFS)
 
 
 class Collection(Exportable):
@@ -292,8 +301,8 @@ class Collection(Exportable):
 
         return bindings
 
-    @staticmethod
-    def _export_base_dts(graph, obj, nsm):
+    @classmethod
+    def _export_base_dts(cls, graph, obj, nsm):
         """ Export the base DTS information in a simple reusable way
 
         :param graph: Current graph where the information lie
@@ -314,7 +323,7 @@ class Collection(Exportable):
 
         return o
 
-    def __export__(self, output=None, domain=""):
+    def __export__(self, output=None, domain="", namespace_manager=None):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
@@ -329,30 +338,39 @@ class Collection(Exportable):
         if output == Mimetypes.JSON.DTS.Std:
 
             # Set-up a derived Namespace Manager
-            nm = self.graph.namespace_manager
-            nsm = deepcopy(nm)
-            nsm.bind("hydra", RDF_NAMESPACES.HYDRA)
-            nsm.bind("dct", DCTERMS)
+            if not namespace_manager:
+                nsm = {
+                    prefix: ns
+                    for prefix, ns in self.graph.namespace_manager.namespaces()
+                    if str(ns) not in [_ns_cap_str, _ns_cts_str, _ns_dts_str, _ns_dct_str, _ns_hydra_str]
+                }
+                nsm[""] = RDF_NAMESPACES.HYDRA
+                nsm["cts"] = RDF_NAMESPACES.CTS
+                nsm["dts"] = RDF_NAMESPACES.DTS
+                nsm["dct"] = DCTERMS
+
+            else:
+                nsm = namespace_manager.namespaces()
 
             # Set-up a derived graph
             store = Subgraph(nsm)
             store.graphiter(self.graph, self.asNode(), ascendants=0, descendants=1)
             graph = store.graph
+            nsm = store.graph.namespace_manager
 
             # Build the JSON-LD @context
+
+            ignore_ns_for_bindings = [_ns_cap_str, _ns_hydra_str, _ns_rdf_str, _ns_rdfs_str]
             bindings = {}
             for predicate in set(graph.predicates()):
                 prefix, namespace, name = nsm.compute_qname(predicate)
-                bindings[prefix] = str(URIRef(namespace))
-
-            if "cap" in bindings:
-                del bindings["cap"]
+                if prefix not in bindings and str(namespace) not in ignore_ns_for_bindings:
+                    bindings[prefix] = str(URIRef(namespace))
 
             # Builds the specific Store data
             extensions = {}
             dublincore = {}
-            ignore_ns = [str(RDF_NAMESPACES.HYDRA), str(RDF_NAMESPACES.DTS),
-                         str(RDF_NAMESPACES.CAPITAINS), str(RDF), str(RDFS)]
+            ignore_ns = [_ns_cap_str, _ns_hydra_str, _ns_rdf_str, _ns_rdfs_str, _ns_dts_str]
 
             # Builds the .dublincore and .extensions graphs
             for _, predicate, obj in store.graph:
@@ -372,16 +390,17 @@ class Collection(Exportable):
 
                 if k in metadata:
                     if isinstance(metadata[k], list):
-                        metadata[k].append(LiteralToDict(obj))
+                        metadata[k].append(literal_to_dict(obj))
                     else:
-                        metadata[k] = [metadata[k], LiteralToDict(obj)]
+                        metadata[k] = [metadata[k], literal_to_dict(obj)]
                 else:
-                    metadata[k] = LiteralToDict(obj)
+                    metadata[k] = literal_to_dict(obj)
                     if isinstance(metadata[k], dict):
                         metadata[k] = [metadata[k]]
 
             o = {"@context": bindings}
             o.update(self._export_base_dts(graph, self, nsm))
+            o["@context"]["@vocab"] = _ns_hydra_str
 
             if extensions:
                 o[graph.qname(RDF_NAMESPACES.DTS.extensions)] = extensions
@@ -394,6 +413,17 @@ class Collection(Exportable):
                     self._export_base_dts(self.graph, member, nsm)
                     for member in self.members
                 ]
+
+            # If the system handles citation structure
+            if hasattr(self, "citation") and \
+                    isinstance(self.citation, BaseCitationSet) and \
+                    not self.citation.is_empty():
+
+                o[graph.qname(RDF_NAMESPACES.DTS.term("citeStructure"))] = self.citation.export(
+                    Mimetypes.JSON.DTS.Std,
+                    context=False,
+                    namespace_manager=nsm
+                )
 
             del store
             return o

@@ -1,5 +1,5 @@
-from MyCapytain.common.reference import DtsCitationRoot
-from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes
+from MyCapytain.common.reference import DtsCitationSet, DtsCitation
+from MyCapytain.common.constants import RDF_NAMESPACES
 from unittest import TestCase
 from pyld import jsonld
 
@@ -22,11 +22,9 @@ _ex_1 = [
 _ex_2 = [
     {
         "dts:citeType": "poem",
-        "dts:citeStructure": [
-            {
-                "dts:citeType": "line"
-            }
-        ]
+        "dts:citeStructure": {
+            "dts:citeType": "line"
+        }
     }
 ]
 
@@ -67,7 +65,7 @@ def _context(ex):
 class TestDtsCitation(TestCase):
     def test_ingest_multiple(self):
         """ Test a simple ingest """
-        cite = DtsCitationRoot.ingest(_context(_ex_1))
+        cite = DtsCitationSet.ingest(_context(_ex_1))
         children = {c.name: c for c in cite}
 
         self.assertEqual(2, cite.depth, "There should be 2 levels of citation")
@@ -78,8 +76,8 @@ class TestDtsCitation(TestCase):
         self.assertCountEqual(list(cite[-2]), [children["poem"], children["front"]], "-2 level  == level 0")
         self.assertCountEqual(list(cite[-2]), list(cite[0]), "-2 level  == level 0")
 
-        self.assertEqual(cite.is_empty(), False, "The CitationSet is not empty")
-        self.assertEqual(cite.is_root(), True, "The CitationSet is the root")
+        self.assertEqual(cite.is_empty(), False, "The BaseCitationSet is not empty")
+        self.assertEqual(cite.is_root(), True, "The BaseCitationSet is the root")
 
         self.assertEqual(children["line"].is_root(), False)
         self.assertEqual(children["line"].is_set(), True, "The Citation is set")
@@ -88,7 +86,7 @@ class TestDtsCitation(TestCase):
 
     def test_ingest_multiple_deeper(self):
         """ Test a simple ingest """
-        cite = DtsCitationRoot.ingest(_context(_ex_3))
+        cite = DtsCitationSet.ingest(_context(_ex_3))
         children = {c.name: c for c in cite}
 
         self.assertEqual(3, cite.depth, "There should be 3 levels of citation")
@@ -103,15 +101,15 @@ class TestDtsCitation(TestCase):
         self.assertCountEqual(list(cite[-3]), [children["front"], children["poem"]], "-3 level  == level 0")
         self.assertCountEqual(list(cite[-3]), list(cite[0]), "-3 level  == level 0")
 
-        self.assertEqual(cite.is_empty(), False, "The CitationSet is not empty")
-        self.assertEqual(cite.is_root(), True, "The CitationSet is the root")
+        self.assertEqual(cite.is_empty(), False, "The BaseCitationSet is not empty")
+        self.assertEqual(cite.is_root(), True, "The BaseCitationSet is the root")
 
         self.assertEqual(children["word"].is_root(), False)
         self.assertIs(children["word"].root, cite, "The root is tied to its children")
 
     def test_ingest_simple_line(self):
         """ Test a simple ingest """
-        cite = DtsCitationRoot.ingest(_context(_ex_2))
+        cite = DtsCitationSet.ingest(_context(_ex_2))
         children = {c.name: c for c in cite}
 
         self.assertEqual(2, cite.depth, "There should be 3 levels of citation")
@@ -123,8 +121,11 @@ class TestDtsCitation(TestCase):
         self.assertCountEqual(list(cite[-2]), [children["poem"]], "-2 level  == level 0")
         self.assertCountEqual(list(cite[-2]), list(cite[0]), "-32 level  == level 0")
 
-        self.assertEqual(cite.is_empty(), False, "The CitationSet is not empty")
-        self.assertEqual(cite.is_root(), True, "The CitationSet is the root")
+        self.assertIsInstance(cite, DtsCitationSet, "Root should be a DtsCitationSet")
+        self.assertEqual([type(child) for child in cite.children], [DtsCitation], "Children should be DtsCitation")
+
+        self.assertEqual(cite.is_empty(), False, "The BaseCitationSet is not empty")
+        self.assertEqual(cite.is_root(), True, "The BaseCitationSet is the root")
 
         self.assertEqual(children["poem"].is_root(), False)
         self.assertIs(children["poem"].root, cite, "The root is tied to its children")

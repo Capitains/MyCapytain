@@ -1,4 +1,4 @@
-from ._base import CitationSet, BaseCitation
+from ._base import BaseCitationSet, BaseCitation
 from MyCapytain.common.constants import RDF_NAMESPACES
 
 
@@ -20,7 +20,7 @@ class DtsCitation(BaseCitation):
             DTS Collection Endpoint (as expanded JSON-LD)
         :type resource: dict
         :param root: Root of the citation tree
-        :type root: CitationSet
+        :type root: BaseCitationSet
         :return:
         """
         cite = cls(
@@ -35,10 +35,13 @@ class DtsCitation(BaseCitation):
         raise NotImplementedError("Passage Match is not part of the DTS Standard Citation")
 
 
-class DtsCitationRoot(CitationSet):
+class DtsCitationSet(BaseCitationSet):
     """ Set of citation that are supposed
 
     """
+
+    def __repr__(self):
+        return "<MyCapytain.common.reference.DtsCitationSet object at %s>" % id(self)
 
     CitationClass = DtsCitation
 

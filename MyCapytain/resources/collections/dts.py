@@ -1,6 +1,8 @@
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.errors import JsonLdCollectionMissing
+from MyCapytain.common.reference import DtsCitationSet
 from MyCapytain.common.constants import RDF_NAMESPACES
+from MyCapytain.common.utils import dict_to_literal
 
 from rdflib import URIRef
 from pyld import jsonld
@@ -14,15 +16,33 @@ _empty_extensions = [{}]
 
 
 class DTSCollection(Collection):
+
+    CitationSet = DtsCitationSet
+
     def __init__(self, identifier="", *args, **kwargs):
         super(DTSCollection, self).__init__(identifier, *args, **kwargs)
         self._expanded = False  # Not sure I'll keep this
+        self._citation = DtsCitationSet()
+
+    @property
+    def citation(self):
+        return self._citation
+
+    @citation.setter
+    def citation(self, citation: CitationSet):
+        self._citation = citation
 
     @property
     def size(self):
         for value in self.metadata.get_single(RDF_NAMESPACES.HYDRA.totalItems):
             return int(value)
         return 0
+
+    @property
+    def readable(self):
+        if self.type == RDF_NAMESPACES.HYDRA.Resource:
+            return True
+        return False
 
     @classmethod
     def parse(cls, resource, direction="children"):
@@ -49,6 +69,11 @@ class DTSCollection(Collection):
         for val_dict in collection["@type"]:
             obj.type = val_dict
 
+        # We retrieve the Citation System
+        _cite_structure_term = str(_dts.term("citeStructure"))
+        if _cite_structure_term in collection and collection[_cite_structure_term]:
+            obj.citation = cls.CitationSet.ingest(collection[_cite_structure_term])
+
         for val_dict in collection[str(_hyd.totalItems)]:
             obj.metadata.add(_hyd.totalItems, val_dict["@value"], 0)
 
@@ -58,21 +83,17 @@ class DTSCollection(Collection):
         for key, value_set in collection.get(str(_dts.dublincore), _empty_extensions)[0].items():
             term = URIRef(key)
             for value_dict in value_set:
-                obj.metadata.add(term, value_dict["@value"], value_dict.get("@language", None))
+                obj.metadata.add(term, *dict_to_literal(value_dict))
 
         for key, value_set in collection.get(str(_dts.extensions), _empty_extensions)[0].items():
             term = URIRef(key)
             for value_dict in value_set:
-                obj.metadata.add(term, value_dict["@value"], value_dict.get("@language", None))
-
-        if str(_tei.refsDecl) in collection:
-            for citation in collection[str(_tei.refsDecl)]:
-                print(citation)
-                # Need to have citation set before going further.
-                continue
+                print(value_dict)
+                obj.metadata.add(term, *dict_to_literal(value_dict))
 
         for member in collection.get(str(_hyd.member), []):
             subcollection = cls.parse(member)
             if direction == "children":
                 subcollection.parent = obj
+
         return obj

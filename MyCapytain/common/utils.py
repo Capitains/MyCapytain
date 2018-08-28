@@ -20,6 +20,7 @@ from lxml.objectify import ObjectifiedElement, parse, SubElement, Element
 from six import text_type
 from xml.sax.saxutils import escape
 from rdflib import BNode, Graph, Literal, URIRef
+from rdflib.namespace import NamespaceManager
 from urllib.parse import urlparse, parse_qs, urljoin
 import link_header
 
@@ -72,7 +73,7 @@ def make_xml_node(graph, name, close=False, attributes=None, text="", complete=F
     return "<{}>".format(name)
 
 
-def LiteralToDict(value):
+def literal_to_dict(value):
     """ Transform an object value into a dict readable value
 
     :param value: Object of a triple which is not a BNode
@@ -90,14 +91,24 @@ def LiteralToDict(value):
     return str(value)
 
 
+def dict_to_literal(dict_container: dict):
+    if isinstance(dict_container["@value"], int):
+        return dict_container["@value"],
+    else:
+        return dict_container["@value"], dict_container.get("@language", None)
+
+
 class Subgraph(object):
     """ Utility class to generate subgraph around one or more items
 
     :param
     """
-    def __init__(self, namespace_manager):
+    def __init__(self, bindings: dict = None):
         self.graph = Graph()
-        self.graph.namespace_manager = namespace_manager
+        self.graph.namespace_manager = NamespaceManager(self.graph)
+        for prefix, namespace in bindings.items():
+            self.graph.namespace_manager.bind(prefix, namespace)
+
         self.downwards = defaultdict(lambda: True)
         self.updwards = defaultdict(lambda: True)
 

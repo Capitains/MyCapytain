@@ -44,10 +44,6 @@ class CitationSet:
             self.children = children
 
     @property
-    def is_root(self):
-        return True
-
-    @property
     def children(self):
         """ Children of a citation
 
@@ -165,6 +161,9 @@ class CitationSet:
         """
         return len(self.children) == 0
 
+    def is_root(self):
+        return True
+
 
 class BaseCitation(Exportable, CitationSet):
     def __repr__(self):
@@ -194,13 +193,19 @@ class BaseCitation(Exportable, CitationSet):
         self.children = children
         self.root = root
 
-    @property
     def is_root(self):
         """
         :return: If the current object is the root of the citation set, True
         :rtype: bool
         """
         return self._root is None
+
+    def is_set(self):
+        """ Checks that the current object is set
+
+        :rtype: bool
+        """
+        return self.name is not None
 
     @property
     def root(self):

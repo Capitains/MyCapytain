@@ -405,7 +405,7 @@ class TestCitation(unittest.TestCase):
         self.assertEqual(citation.child.name, "poem", "Name of child should have been parsed")
         self.assertEqual(citation.child.child.name, "line", "Name of descendants should have been parsed")
 
-        self.assertEqual(citation.is_root, True, "Root should be true on root")
+        self.assertEqual(citation.is_root(), True, "Root should be true on root")
         self.assertEqual(citation.match("1.2"), citation.child, "Matching should make use of root matching")
         self.assertEqual(citation.match("1.2.4"), citation.child.child, "Matching should make use of root matching")
         self.assertEqual(citation.match("1"), citation, "Matching should make use of root matching")

@@ -79,9 +79,11 @@ class TestDtsCitation(TestCase):
         self.assertCountEqual(list(cite[-2]), list(cite[0]), "-2 level  == level 0")
 
         self.assertEqual(cite.is_empty(), False, "The CitationSet is not empty")
-        self.assertEqual(cite.is_root, True, "The CitationSet is the root")
+        self.assertEqual(cite.is_root(), True, "The CitationSet is the root")
 
-        self.assertEqual(children["line"].is_root, False)
+        self.assertEqual(children["line"].is_root(), False)
+        self.assertEqual(children["line"].is_set(), True, "The Citation is set")
+        self.assertEqual(children["line"].is_empty(), True, "The citation has no more levels")
         self.assertIs(children["line"].root, cite, "The root is tied to its children")
 
     def test_ingest_multiple_deeper(self):
@@ -102,9 +104,9 @@ class TestDtsCitation(TestCase):
         self.assertCountEqual(list(cite[-3]), list(cite[0]), "-3 level  == level 0")
 
         self.assertEqual(cite.is_empty(), False, "The CitationSet is not empty")
-        self.assertEqual(cite.is_root, True, "The CitationSet is the root")
+        self.assertEqual(cite.is_root(), True, "The CitationSet is the root")
 
-        self.assertEqual(children["word"].is_root, False)
+        self.assertEqual(children["word"].is_root(), False)
         self.assertIs(children["word"].root, cite, "The root is tied to its children")
 
     def test_ingest_simple_line(self):
@@ -122,7 +124,7 @@ class TestDtsCitation(TestCase):
         self.assertCountEqual(list(cite[-2]), list(cite[0]), "-32 level  == level 0")
 
         self.assertEqual(cite.is_empty(), False, "The CitationSet is not empty")
-        self.assertEqual(cite.is_root, True, "The CitationSet is the root")
+        self.assertEqual(cite.is_root(), True, "The CitationSet is the root")
 
-        self.assertEqual(children["poem"].is_root, False)
+        self.assertEqual(children["poem"].is_root(), False)
         self.assertIs(children["poem"].root, cite, "The root is tied to its children")

@@ -736,7 +736,7 @@ class Citation(BaseCitation):
     def child(self, val):
         if val:
             self.children = [val]
-            if self.is_root:
+            if self.is_root():
                 val.root = self
             else:
                 val.root = self.root
@@ -798,7 +798,7 @@ class Citation(BaseCitation):
         if not isinstance(passageId, Reference):
             passageId = Reference(passageId)
 
-        if self.is_root:
+        if self.is_root():
             return self[len(passageId)-1]
         return self.root.match(passageId)
 
@@ -848,13 +848,13 @@ class Citation(BaseCitation):
                 self.refsDecl
             )
 
-    def isEmpty(self):
+    def is_set(self):
         """ Check if the citation has not been set
 
         :return: True if nothing was setup
         :rtype: bool
         """
-        return self.refsDecl is None
+        return self.refsDecl is not None
 
     def __export__(self, output=None, **kwargs):
         if output == Mimetypes.XML.CTS:

@@ -452,7 +452,7 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
         :type xml: lxml.etree._Element
         :return: None
         """
-        if self.citation.is_empty():
+        if self.citation.isEmpty():
             citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=XPATH_NAMESPACES)
             if len(citation):
                 self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")

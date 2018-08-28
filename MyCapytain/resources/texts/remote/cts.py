@@ -172,7 +172,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
             self.set_description(node.text, lang)
 
         # Need to code that p
-        if self.citation.is_empty() and xml.xpath("//ti:citation", namespaces=XPATH_NAMESPACES):
+        if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=XPATH_NAMESPACES):
             self.citation = CtsCollection.XmlCtsCitation.ingest(
                 xml,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
@@ -332,7 +332,7 @@ class CtsText(__SharedMethod__, prototypes.CitableText):
 
         :rtype: MyCapytain.resources.texts.tei.XmlCtsCitation
         """
-        if self.citation.is_empty():
+        if self.citation.isEmpty():
             self.getLabel()
         return [
             reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs
@@ -453,7 +453,7 @@ class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
 
         self.__prev__, self.__nextId__ = __SharedMethod__.prevnext(self.response)
 
-        if self.citation.is_empty() and len(self.resource.xpath("//ti:citation", namespaces=XPATH_NAMESPACES)):
+        if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=XPATH_NAMESPACES)):
             self.citation = CtsCollection.XmlCtsCitation.ingest(
                 self.response,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"

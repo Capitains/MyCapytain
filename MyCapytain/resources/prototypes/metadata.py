@@ -323,15 +323,13 @@ class Collection(Exportable):
 
         return o
 
-    def __export__(self, output=None, domain="", namespace_manager=None):
+    def __export__(self, output=None, namespace_manager=None):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
 
         :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
         :type output: str
-        :param domain: Domain (Necessary sometime to express some IDs)
-        :type domain: str
         :return: Object using a different representation
         """
 

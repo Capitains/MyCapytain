@@ -1,6 +1,7 @@
 from MyCapytain.common.base import Exportable
+from MyCapytain.errors import CitationDepthError
 from copy import copy
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 
 
 class BasePassageId:
@@ -30,10 +31,68 @@ class BasePassageId:
 
 
 class CitationSet:
-    """ A citation set is a collection of citations that can be matched using
-    a .match() function
+    """ A citation set is a collection of citations that optionnaly can be matched using a .match() function
 
+    :param children: List of Citation
+    :type children: [BaseCitation]
     """
+
+    def __init__(self, children=None):
+        self._children = []
+
+        if children:
+            self.children = children
+
+    @property
+    def is_root(self):
+        return True
+
+    @property
+    def children(self):
+        """ Children of a citation
+
+        :rtype: [BaseCitation]
+        """
+        return self._children or []
+
+    @children.setter
+    def children(self, val: list):
+        final_value = []
+        if val is not None:
+            for citation in val:
+                if citation is None:
+                    continue
+                elif not isinstance(citation, (BaseCitation, type(self))):
+                    raise TypeError("Citation children should be Citation")
+                else:
+                    if isinstance(self, BaseCitation):
+                        citation.root = self.root
+                    else:
+                        citation.root = self
+                    final_value.append(citation)
+
+        self._children = final_value
+
+    def add_child(self, child):
+        if isinstance(child, BaseCitation):
+            self._children.append(child)
+
+    def __iter__(self):
+        """ Iteration method
+
+        Loop over the citation children
+
+        :Example:
+            >>>    c = BaseCitation(name="line")
+            >>>    b = BaseCitation(name="poem", children=[c])
+            >>>    b2 = BaseCitation(name="paragraph")
+            >>>    a = BaseCitation(name="book", children=[b])
+            >>>    [e for e in a] == [a, b, c, b2],
+
+        """
+        for child in self.children:
+            yield from child
+
     @abstractmethod
     def match(self, passageId):
         """ Given a specific passageId, matches the citation to a specific citation object
@@ -42,6 +101,69 @@ class CitationSet:
         :return: Citation that matches the passageId
         :rtype: BaseCitation
         """
+
+    @property
+    def depth(self):
+        """ Depth of the citation scheme
+
+        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 2
+
+        .. toDo:: It seems that we should be more pythonic and have depth == 0 means there is still an object...
+
+        :rtype: int
+        :return: Depth of the citation scheme
+        """
+        if len(self.children):
+            return 1 + max([child.depth for child in self.children])
+        else:
+            return 0
+
+    def __getitem__(self, item):
+        """ Returns the citations at the given level.
+
+        :param item: Citation level
+        :type item: int
+        :rtype: list(BaseCitation) or BaseCitation
+
+        .. note:: Should it be a or or always a list ?
+        """
+        if item < 0:
+            _item = self.depth + item
+            if _item < 0:
+                raise CitationDepthError("The negative %s is too small " % _item)
+            item = _item
+        if item == 0:
+            yield from self.children
+        else:
+            for child in self.children:
+                yield from child[item - 1]
+
+    def __len__(self):
+        """ Number of citation schemes covered by the object
+
+        :rtype: int
+        :returns: Number of nested citations
+        """
+        return len(self.children) + sum([len(child) for child in self.children])
+
+    def __getstate__(self):
+        """ Pickling method
+
+        :return: dict
+        """
+        return copy(self.__dict__)
+
+    def __setstate__(self, dic):
+        self.__dict__ = dic
+        return self
+
+    def is_empty(self):
+        """ Check if the citation has not been set
+
+        :return: True if nothing was setup
+        :rtype: bool
+        """
+        return len(self.children) == 0
 
 
 class BaseCitation(Exportable, CitationSet):
@@ -66,11 +188,11 @@ class BaseCitation(Exportable, CitationSet):
         super(BaseCitation, self).__init__()
 
         self._name = None
-        self._children = []
-        self._root = root
+        self._root = None
 
         self.name = name
         self.children = children
+        self.root = root
 
     @property
     def is_root(self):
@@ -87,6 +209,8 @@ class BaseCitation(Exportable, CitationSet):
         :return: Root of the Citation set
         :rtype: CitationSet
         """
+        if self._root is None:
+            return self
         return self._root
 
     @root.setter
@@ -112,29 +236,6 @@ class BaseCitation(Exportable, CitationSet):
     def name(self, val):
         self._name = val
 
-    @property
-    def children(self):
-        """ Children of a citation
-
-        :rtype: [BaseCitation]
-        """
-        return self._children or []
-
-    @children.setter
-    def children(self, val):
-        final_value = []
-        if val is not None:
-            for citation in val:
-                if citation is None:
-                    continue
-                elif not isinstance(citation, self.__class__):
-                    raise TypeError("Citation children should be Citation")
-                else:
-                    citation.root = self.root
-                    final_value.append(citation)
-
-        self._children = final_value
-
     def __iter__(self):
         """ Iteration method
 
@@ -151,58 +252,6 @@ class BaseCitation(Exportable, CitationSet):
         yield from [self]
         for child in self.children:
             yield from child
-
-    @property
-    @abstractmethod
-    def depth(self):
-        """ Depth of the citation scheme
-
-        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 2
-
-        :rtype: int
-        :return: Depth of the citation scheme
-        """
-        return 1
-
-    @abstractmethod
-    def __getitem__(self, item):
-        """ Returns the citations at the given level.
-
-        :param item: Citation level
-        :type item: int
-        :rtype: list(BaseCitation) or BaseCitation
-
-        .. note:: Should it be a or or always a list ?
-        """
-        return []
-
-    def __len__(self):
-        """ Number of citation schemes covered by the object
-
-        :rtype: int
-        :returns: Number of nested citations
-        """
-        return 0
-
-    def __getstate__(self):
-        """ Pickling method
-
-        :return: dict
-        """
-        return copy(self.__dict__)
-
-    def __setstate__(self, dic):
-        self.__dict__ = dic
-        return self
-
-    @abstractmethod
-    def isEmpty(self):
-        """ Check if the citation has not been set
-
-        :return: True if nothing was setup
-        :rtype: bool
-        """
-        return True
 
 
 class NodeId(object):

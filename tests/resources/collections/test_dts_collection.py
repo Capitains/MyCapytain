@@ -27,7 +27,7 @@ class TestDtsCollection(TestCase):
         """
         if "member" in exported:
             exported["member"] = sorted(exported["member"], key=lambda x: x["@id"])
-        for key, values in exported["dts:dublincore"].items():
+        for key, values in exported.get("dts:dublincore", {}).items():
             if isinstance(values, list) and isinstance(values[0], str):
                 exported["dts:dublincore"][key] = sorted(values)
             elif isinstance(values, list) and isinstance(values[0], dict):
@@ -190,3 +190,10 @@ class TestDtsCollection(TestCase):
             self.reorder_orderable(coll_4),
             child_collection_exported
         )
+
+    def test_collection_with_cite_depth_but_no_structure(self):
+        coll = self.get_collection(5)
+        parsed = DTSCollection.parse(coll)
+        exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
+        self.assertEqual(exported["dts:citeDepth"], 7, "There should be a cite depth property")
+        self.assertNotIn("dts:citeStructure", exported, "CiteStructure was not defined")

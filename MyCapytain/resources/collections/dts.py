@@ -74,6 +74,10 @@ class DTSCollection(Collection):
         if _cite_structure_term in collection and collection[_cite_structure_term]:
             obj.citation = cls.CitationSet.ingest(collection[_cite_structure_term])
 
+        _cite_depth_term = str(_dts.term("citeDepth"))
+        if _cite_depth_term in collection and collection[_cite_depth_term]:
+            obj.citation.depth = collection[_cite_depth_term][0]["@value"]
+
         for val_dict in collection[str(_hyd.totalItems)]:
             obj.metadata.add(_hyd.totalItems, val_dict["@value"], 0)
 
@@ -88,7 +92,6 @@ class DTSCollection(Collection):
         for key, value_set in collection.get(str(_dts.extensions), _empty_extensions)[0].items():
             term = URIRef(key)
             for value_dict in value_set:
-                print(value_dict)
                 obj.metadata.add(term, *dict_to_literal(value_dict))
 
         for member in collection.get(str(_hyd.member), []):

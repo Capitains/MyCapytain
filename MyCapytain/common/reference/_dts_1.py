@@ -40,6 +40,20 @@ class DtsCitationSet(BaseCitationSet):
 
     """
 
+    def __init__(self, children=None):
+        super(DtsCitationSet, self).__init__(children=children)
+        self._depth = None
+
+    @property
+    def depth(self) -> int:
+        if self._depth:
+            return self._depth
+        return super(DtsCitationSet, self).depth
+
+    @depth.setter
+    def depth(self, value: int):
+        self._depth = value
+
     def __repr__(self):
         return "<MyCapytain.common.reference.DtsCitationSet object at %s>" % id(self)
 

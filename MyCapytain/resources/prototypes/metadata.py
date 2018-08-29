@@ -20,6 +20,7 @@ from rdflib.namespace import SKOS, DC, DCTERMS, NamespaceManager
 _ns_hydra_str = str(RDF_NAMESPACES.HYDRA)
 _ns_cts_str = str(RDF_NAMESPACES.CTS)
 _ns_dts_str = str(RDF_NAMESPACES.DTS)
+_ns_dts_str = str(RDF_NAMESPACES.DTS)
 _ns_dct_str = str(DCTERMS)
 _ns_cap_str = str(RDF_NAMESPACES.CAPITAINS)
 _ns_rdf_str = str(RDF)
@@ -302,7 +303,7 @@ class Collection(Exportable):
         return bindings
 
     @classmethod
-    def _export_base_dts(cls, graph, obj, nsm):
+    def export_base_dts(cls, graph, obj, nsm):
         """ Export the base DTS information in a simple reusable way
 
         :param graph: Current graph where the information lie
@@ -397,7 +398,7 @@ class Collection(Exportable):
                         metadata[k] = [metadata[k]]
 
             o = {"@context": bindings}
-            o.update(self._export_base_dts(graph, self, nsm))
+            o.update(self.export_base_dts(graph, self, nsm))
             o["@context"]["@vocab"] = _ns_hydra_str
 
             if extensions:
@@ -408,20 +409,22 @@ class Collection(Exportable):
 
             if self.size:
                 o[graph.qname(RDF_NAMESPACES.HYDRA.member)] = [
-                    self._export_base_dts(self.graph, member, nsm)
+                    self.export_base_dts(self.graph, member, nsm)
                     for member in self.members
                 ]
 
             # If the system handles citation structure
             if hasattr(self, "citation") and \
-                    isinstance(self.citation, BaseCitationSet) and \
-                    not self.citation.is_empty():
+                    isinstance(self.citation, BaseCitationSet):
+                if self.citation.depth:
+                    o[graph.qname(RDF_NAMESPACES.DTS.term("citeDepth"))] = self.citation.depth
 
-                o[graph.qname(RDF_NAMESPACES.DTS.term("citeStructure"))] = self.citation.export(
-                    Mimetypes.JSON.DTS.Std,
-                    context=False,
-                    namespace_manager=nsm
-                )
+                if not self.citation.is_empty():
+                    o[graph.qname(RDF_NAMESPACES.DTS.term("citeStructure"))] = self.citation.export(
+                        Mimetypes.JSON.DTS.Std,
+                        context=False,
+                        namespace_manager=nsm
+                    )
 
             del store
             return o

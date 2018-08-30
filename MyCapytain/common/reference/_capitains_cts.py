@@ -1,6 +1,6 @@
 import re
 from copy import copy
-
+from typing import List
 from lxml.etree import _Element
 
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES, XPATH_NAMESPACES
@@ -26,49 +26,107 @@ def __childOrNone__(liste):
         return None
 
 
-class Reference(BaseReference):
+class CtsWordReference(str):
+    def __new__(cls, word_reference):
+        word, counter = tuple(SUBREFERENCE.findall(word_reference)[0])
+
+        if len(counter) and word:
+            word, counter = str(word), int(counter)
+        elif len(counter) == 0 and word:
+            word, counter = str(word), 0
+
+        obj = str.__new__(cls, "@"+word_reference)
+        obj.counter = counter
+        obj.word = word
+        return word
+
+    def __iter__(self):
+        return iter([self.word, self.counter])
+
+
+class CtsSinglePassageId(str):
+    def __new__(cls, str_repr: str):
+        # Saving the original ID
+        obj = str.__new__(cls, str_repr)
+
+        # Setting up the properties that can be None
+        obj._sub_reference = None
+
+        # Parsing the reference
+        temp_str_repr = str_repr
+        subreference = temp_str_repr.split("@")
+        if len(subreference) == 2:
+            obj._sub_reference = CtsWordReference(subreference[1])
+            temp_str_repr = subreference[0]
+
+        obj._list = temp_str_repr.split(".")
+        return obj
+
+    @property
+    def list(self):
+        return self._list
+
+    @property
+    def subreference(self):
+        return self._sub_reference
+
+    def __iter__(self):
+        return iter(self.list)
+
+    def __len__(self):
+        return len(self.list)
+
+    @property
+    def depth(self):
+        return len(self.list)
+
+
+class CtsReference(BaseReference):
     """ A reference object giving information
 
     :param reference: CapitainsCtsPassage Reference part of a Urn
     :type reference: basestring
 
     :Example:
-        >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-        >>>    b = Reference(reference="1.1")
-        >>>    Reference("1.1-2.2.2").highest == ["1", "1"]
+        >>>    a = CtsReference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
+        >>>    b = CtsReference(reference="1.1")
+        >>>    CtsReference("1.1-2.2.2").highest == ["1", "1"]
 
     Reference object supports the following magic methods : len(), str() and eq().
 
     :Example:
         >>>    len(a) == 2 && len(b) == 1
         >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
-        >>>    b == Reference("1.1") && b != a
+        >>>    b == CtsReference("1.1") && b != a
 
     .. note::
         Reference(...).subreference and .list are not available for range. You will need to convert .start or .end to
         a Reference
 
-        >>>    ref = Reference('1.2.3')
+        >>>    ref = CtsReference('1.2.3')
     """
 
-    def __init__(self, reference=""):
-        self.reference = reference
-        if reference == "":
-            self.parsed = (self.__model__(), self.__model__())
+    def __new__(cls, reference: str):
+        if "-" not in reference:
+            o = BaseReference.__new__(CtsReference, CtsSinglePassageId(reference))
         else:
-            self.parsed = self.__parse__(reference)
+            _start, _end = tuple(reference.split("-"))
+            o = BaseReference.__new__(CtsReference, CtsSinglePassageId(_start), CtsSinglePassageId(_end))
+
+        o._str_repr = reference
+        return o
 
     @property
     def parent(self):
         """ Parent of the actual URN, for example, 1.1 for 1.1.1
 
-        :rtype: Reference
+        :rtype: CtsReference
         """
         if len(self.parsed[0][1]) == 1 and len(self.parsed[1][1]) <= 1:
             return None
         else:
             if len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) == 0:
-                return Reference("{0}{1}".format(
+                return CtsReference("{0}{1}".format(
                     ".".join(list(self.parsed[0][1])[0:-1]),
                     self.parsed[0][3] or ""
                 ))
@@ -77,9 +135,9 @@ class Reference(BaseReference):
                 last = list(self.parsed[1][1])[0:-1]
                 if first == last and self.parsed[1][3] is None \
                     and self.parsed[0][3] is None:
-                    return Reference(".".join(first))
+                    return CtsReference(".".join(first))
                 else:
-                    return Reference("{0}{1}-{2}{3}".format(
+                    return CtsReference("{0}{1}-{2}{3}".format(
                         ".".join(first),
                         self.parsed[0][3] or "",
                         ".".join(list(self.parsed[1][1])[0:-1]),
@@ -87,7 +145,7 @@ class Reference(BaseReference):
                     ))
 
     @property
-    def highest(self):
+    def highest(self) -> CtsSinglePassageId:
         """ Return highest reference level
 
         For references such as 1.1-1.2.8, with different level, it can be useful to access to the highest node in the
@@ -95,10 +153,10 @@ class Reference(BaseReference):
 
         .. note:: By default, this property returns the start level
 
-        :rtype: Reference
+        :rtype: CtsReference
         """
         if not self.end:
-            return str(self)
+            return self.start
         elif len(self.start) < len(self.end) and len(self.start):
             return self.start
         elif len(self.start) > len(self.end) and len(self.end):
@@ -107,41 +165,20 @@ class Reference(BaseReference):
             return self.start
 
     @property
-    def start(self):
+    def start(self) -> CtsSinglePassageId:
         """ Quick access property for start list
 
         :rtype: str
         """
-        if self.parsed[0][0] and len(self.parsed[0][0]):
-            return self.parsed[0][0]
+        return super(CtsReference, self).start
 
     @property
-    def end(self):
+    def end(self) -> CtsSinglePassageId:
         """ Quick access property for reference end list
 
         :rtype: str
         """
-        if self.parsed[1][0] and len(self.parsed[1][0]):
-            return self.parsed[1][0]
-
-    @property
-    def is_range(self):
-        """ Whether the reference in a starrt
-
-        :rtype: str
-        """
-        return self.parsed[1][0] and len(self.parsed[1][0])
-
-    @property
-    def list(self):
-        """ Return a list version of the object if it is a single passage
-
-        .. note:: Access to start list and end list should be done through obj.start.list and obj.end.list
-
-        :rtype: [str]
-        """
-        if not self.end:
-            return self.parsed[0][1]
+        return super(CtsReference, self).end
 
     @property
     def subreference(self):
@@ -153,9 +190,9 @@ class Reference(BaseReference):
         :rtype: (str, int)
         """
         if not self.end:
-            return Reference.convert_subreference(*self.parsed[0][2])
+            return self.start.subreference
 
-    def __len__(self):
+    def depth(self):
         """ Return depth of highest reference level
 
         For references such as 1.1-1.2.8, or simple references such as 1.a, with different level, it can be useful to
@@ -169,7 +206,7 @@ class Reference(BaseReference):
 
         :rtype: int
         """
-        return len(Reference(self.highest).list)
+        return len(self.highest.list)
 
     def __str__(self):
         """ Return full reference in string format
@@ -178,12 +215,12 @@ class Reference(BaseReference):
         :returns: String representation of Reference Object
 
         :Example:
-            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    b = Reference(reference="1.1")
+            >>>    a = CtsReference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
+            >>>    b = CtsReference(reference="1.1")
             >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
             >>>    str(b) == "1.1"
         """
-        return self.reference
+        return self._str_repr
 
     def __eq__(self, other):
         """ Equality checker for Reference object
@@ -193,85 +230,14 @@ class Reference(BaseReference):
         :returns: Equality between other and self
 
         :Example:
-            >>>    a = Reference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    b = Reference(reference="1.1")
-            >>>    c = Reference(reference="1.1")
+            >>>    a = CtsReference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
+            >>>    b = CtsReference(reference="1.1")
+            >>>    c = CtsReference(reference="1.1")
             >>>    (a == b) == False
             >>>    (c == b) == True
         """
         return (isinstance(other, type(self))
-                and self.reference == str(other))
-
-    def __ne__(self, other):
-        """ Inequality checker for Reference object
-
-        :param other: An object to be checked against
-        :rtype: boolean
-        :returns: Equality between other and self
-        """
-        return not self.__eq__(other)
-
-    @staticmethod
-    def __model__():
-        """ 3-Tuple model for references
-
-        First element is full text reference,
-        Second is list of passage identifiers
-        Third is subreference
-
-        :returns: An empty list to model data
-        :rtype: list
-        """
-        return [None, [], None, None]
-
-    def __regexp__(self, subreference):
-        """ Split components of subreference
-
-        :param subreference: A subreference
-        :type subreference: str
-        :rtype: List.<Tuple>
-        :returns: List where first element is a tuple representing different components
-        """
-        return SUBREFERENCE.findall(subreference)[0]
-
-    def __parse__(self, reference):
-        """ Parse references information
-
-        :param reference: String representation of a reference
-        :type reference: str
-        :returns: Tuple representing each part of the reference
-        :rtype: tuple(str)
-        """
-
-        ref = reference.split("-")
-        element = [self.__model__(), self.__model__()]
-        for i in range(0, len(ref)):
-            r = ref[i]
-            element[i][0] = r
-            subreference = r.split("@")
-            if len(subreference) == 2:
-                element[i][2] = self.__regexp__(subreference[1])
-                element[i][3] = "@" + subreference[1]
-                r = subreference[0]
-            element[i][1] = r.split(".")
-            element[i] = tuple(element[i])
-        return tuple(element)
-
-    @staticmethod
-    def convert_subreference(word, counter):
-        """ Convert a word and a counter into a standard tuple representation
-
-        :param word: Word Element of the subreference
-        :param counter: Index of the Word
-        :return: Tuple representing the element
-        :rtype: (str, int)
-        """
-        if len(counter) and word:
-            return str(word), int(counter)
-        elif len(counter) == 0 and word:
-            return str(word), 0
-        else:
-            return "", 0
+                and str(self) == str(other))
 
 
 class URN(object):
@@ -299,7 +265,7 @@ class URN(object):
         >>>     a != b
         >>>     a > b # It has more member. Only member count is compared
         >>>     b < a
-        >>>     len(a) == 5 # Reference is not counted to not induce count equivalencies with the optional version
+        >>>     len(a) == 5 # CtsReference is not counted to not induce count equivalencies with the optional version
         >>>     len(b) == 4
 
     """
@@ -392,7 +358,7 @@ class URN(object):
     def reference(self):
         """ Reference element of the URN
 
-        :rtype: Reference
+        :rtype: CtsReference
         :return: Reference part of the URN
         """
         return self.__parsed["reference"]
@@ -400,10 +366,10 @@ class URN(object):
     @reference.setter
     def reference(self, value):
         self.__urn = None
-        if isinstance(value, Reference):
+        if isinstance(value, CtsReference):
             self.__parsed["reference"] = value
         else:
-            self.__parsed["reference"] = Reference(value)
+            self.__parsed["reference"] = CtsReference(value)
 
     def __len__(self):
         """ Returns the len of the URN
@@ -475,7 +441,7 @@ class URN(object):
         return isinstance(other, type(self)) and str(self) == str(other)
 
     def __ne__(self, other):
-        """ Inequality checker for Reference object
+        """ Inequality checker for CtsReference object
 
         :param other: An object to be checked against
         :rtype: boolean
@@ -619,7 +585,7 @@ class URN(object):
             parsed["cts_namespace"] = urn[2]
 
             if len(urn) == 5:
-                parsed["reference"] = Reference(urn[4])
+                parsed["reference"] = CtsReference(urn[4])
 
             if len(urn) >= 4:
                 urn = urn[3].split(".")
@@ -795,8 +761,8 @@ class Citation(BaseCitation):
         :param passageId: A passage to match
         :return:
         """
-        if not isinstance(passageId, Reference):
-            passageId = Reference(passageId)
+        if not isinstance(passageId, CtsReference):
+            passageId = CtsReference(passageId)
 
         if self.is_root():
             return self[len(passageId)-1]
@@ -806,7 +772,7 @@ class Citation(BaseCitation):
         """ Fill the xpath with given informations
 
         :param passage: CapitainsCtsPassage reference
-        :type passage: Reference or list or None. Can be list of None and not None
+        :type passage: CtsReference or list or None. Can be list of None and not None
         :param xpath: If set to True, will return the replaced self.xpath value and not the whole self.refsDecl
         :type xpath: Boolean
         :rtype: basestring
@@ -819,7 +785,7 @@ class Citation(BaseCitation):
             # /TEI/text/body/div/div[@n='1']//l[@n]
             print(citation.fill(None))
             # /TEI/text/body/div/div[@n]//l[@n]
-            print(citation.fill(Reference("1.1"))
+            print(citation.fill(CtsReference("1.1"))
             # /TEI/text/body/div/div[@n='1']//l[@n='1']
             print(citation.fill("1", xpath=True)
             # //l[@n='1']
@@ -835,8 +801,8 @@ class Citation(BaseCitation):
 
             return REFERENCE_REPLACER.sub(replacement, xpath)
         else:
-            if isinstance(passage, Reference):
-                passage = passage.list or Reference(passage.start).list
+            if isinstance(passage, CtsReference):
+                passage = passage.list or CtsReference(passage.start).list
             elif passage is None:
                 return REFERENCE_REPLACER.sub(
                     r"\1",

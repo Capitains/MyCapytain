@@ -5,14 +5,14 @@ from copy import copy
 from abc import abstractmethod
 
 
-class BaseReference:
-    def __init__(self, start=None, end=None):
-        self._start = start
-        self._end = end
+class BaseReference(tuple):
+    def __new__(cls, start, end=None):
+        obj = tuple.__new__(cls, (start, end))
 
-    @property
+        return obj
+
     def is_range(self):
-        return self._end is not None
+        return bool(self[1])
 
     @property
     def start(self):
@@ -20,7 +20,7 @@ class BaseReference:
 
         :rtype: str
         """
-        return self._start
+        return self[0]
 
     @property
     def end(self):
@@ -28,7 +28,7 @@ class BaseReference:
 
         :rtype: str
         """
-        return self._end
+        return self[1]
 
 
 class BaseReferenceSet(list):
@@ -36,12 +36,12 @@ class BaseReferenceSet(list):
     def citation(self):
         return self._citation
 
-    def __new__(cls, *args, **kwargs):
-        obj = list.__new__(*args, **kwargs)
+    def __new__(cls, *refs, citation=None):
+        obj = list.__new__(BaseReferenceSet, refs)
         obj._citation = None
 
-        if "citation" in kwargs:
-            obj._citation = kwargs["citation"]
+        if citation:
+            obj._citation = citation
 
         return obj
 

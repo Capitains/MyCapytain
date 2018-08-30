@@ -1,6 +1,6 @@
 import re
 from copy import copy
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple
 from lxml.etree import _Element
 
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES, XPATH_NAMESPACES
@@ -114,8 +114,21 @@ class CtsReference(BaseReference):
         >>>    ref = CtsReference('1.2.3')
     """
 
-    def __new__(cls, reference: str):
-        if "-" not in reference:
+    def __new__(cls, reference: Union[str, Tuple[str, Optional[str]]]):
+        # pickle.load will try to feed the tuple back !
+        if isinstance(reference, tuple):
+            if reference[1]:
+                o = BaseReference.__new__(
+                    CtsReference,
+                    CtsSinglePassageId(reference[0]),
+                    CtsSinglePassageId(reference[1])
+                )
+            else:
+                o = BaseReference.__new__(
+                    CtsReference,
+                    CtsSinglePassageId(reference[0])
+                )
+        elif "-" not in reference:
             o = BaseReference.__new__(CtsReference, CtsSinglePassageId(reference))
         else:
             _start, _end = tuple(reference.split("-"))

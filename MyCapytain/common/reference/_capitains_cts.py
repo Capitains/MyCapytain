@@ -40,6 +40,9 @@ class CtsWordReference(str):
         obj.word = word
         return word
 
+    def tuple(self):
+        return self.word, self.counter
+
     def __iter__(self):
         return iter([self.word, self.counter])
 
@@ -802,7 +805,7 @@ class Citation(BaseCitation):
             return REFERENCE_REPLACER.sub(replacement, xpath)
         else:
             if isinstance(passage, CtsReference):
-                passage = passage.list or CtsReference(passage.start).list
+                passage = passage.start.list
             elif passage is None:
                 return REFERENCE_REPLACER.sub(
                     r"\1",

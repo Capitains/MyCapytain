@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from MyCapytain.resolvers.cts.local import CtsCapitainsLocalResolver
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES, get_graph
-from MyCapytain.common.reference._capitains_cts import Reference, URN
+from MyCapytain.common.reference._capitains_cts import CtsReference, URN
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
@@ -46,7 +46,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "Object has a citation property of length 4"
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.1.1.1")).export(output=Mimetypes.PLAINTEXT),
+            text.getTextualNode(CtsReference("1.1.1.1")).export(output=Mimetypes.PLAINTEXT),
             "Ho ! Saki, pass around and offer the bowl (of love for God) : ### ",
             "It should be possible to retrieve text"
         )

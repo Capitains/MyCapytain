@@ -7,7 +7,7 @@ import os.path
 from glob import glob
 from math import ceil
 
-from MyCapytain.common.reference._capitains_cts import Reference, URN
+from MyCapytain.common.reference._capitains_cts import CtsReference, URN
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver
@@ -469,7 +469,7 @@ class CtsCapitainsLocalResolver(Resolver):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCtsPassage Reference
+        :param subreference: CapitainsCtsPassage CtsReference
         :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
         :type prevnext: boolean
@@ -480,7 +480,7 @@ class CtsCapitainsLocalResolver(Resolver):
         """
         text, text_metadata = self.__getText__(textId)
         if subreference is not None:
-            subreference = Reference(subreference)
+            subreference = CtsReference(subreference)
         passage = text.getTextualNode(subreference)
         if metadata:
             passage.set_metadata_from_collection(text_metadata)
@@ -491,13 +491,13 @@ class CtsCapitainsLocalResolver(Resolver):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCtsPassage Reference
+        :param subreference: CapitainsCtsPassage CtsReference
         :type subreference: str
         :return: Tuple of references
         :rtype: (str, str)
         """
         text, inventory = self.__getText__(textId)
-        passage = text.getTextualNode(Reference(subreference))
+        passage = text.getTextualNode(CtsReference(subreference))
         return passage.siblingsId
 
     def getReffs(self, textId, level=1, subreference=None):
@@ -507,7 +507,7 @@ class CtsCapitainsLocalResolver(Resolver):
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: CapitainsCtsPassage Reference
+        :param subreference: CapitainsCtsPassage CtsReference
         :type subreference: str
         :return: List of references
         :rtype: [str]

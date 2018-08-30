@@ -2,7 +2,7 @@ import unittest
 
 from six import text_type as str
 from MyCapytain.common.utils import xmlparser
-from MyCapytain.common.reference import Reference, URN, Citation
+from MyCapytain.common.reference import CtsReference, URN, Citation
 
 
 class TestReferenceImplementation(unittest.TestCase):
@@ -10,74 +10,74 @@ class TestReferenceImplementation(unittest.TestCase):
     """ Test how reference reacts """
 
     def test_str_function(self):
-        a = Reference("1-1")
+        a = CtsReference("1-1")
         self.assertEqual(str(a), "1-1")
 
     def test_len_ref(self):
-        a = Reference("1.1@Achilles[0]-1.10@Atreus[3]")
+        a = CtsReference("1.1@Achilles[0]-1.10@Atreus[3]")
         self.assertEqual(len(a), 2)
-        a = Reference("1.1.1")
+        a = CtsReference("1.1.1")
         self.assertEqual(len(a), 3)
 
     def test_highest(self):
         self.assertEqual(
-            str((Reference("1.1-1.2.8")).highest), "1.1",
+            str((CtsReference("1.1-1.2.8")).highest), "1.1",
             "1.1 is higher"
         )
         self.assertEqual(
-            str((Reference("1.1-2")).highest), "2",
+            str((CtsReference("1.1-2")).highest), "2",
             "2 is higher"
         )
 
     def test_properties(self):
-        a = Reference("1.1@Achilles-1.10@Atreus[3]")
+        a = CtsReference("1.1@Achilles-1.10@Atreus[3]")
         self.assertEqual(a.start, "1.1@Achilles")
-        self.assertEqual(Reference(a.start).list, ["1", "1"])
-        self.assertEqual(Reference(a.start).subreference[0], "Achilles")
+        self.assertEqual(CtsReference(a.start).list, ["1", "1"])
+        self.assertEqual(CtsReference(a.start).subreference[0], "Achilles")
         self.assertEqual(a.end, "1.10@Atreus[3]")
-        self.assertEqual(Reference(a.end).list, ["1", "10"])
-        self.assertEqual(Reference(a.end).subreference[1], 3)
-        self.assertEqual(Reference(a.end).subreference, ("Atreus", 3))
+        self.assertEqual(CtsReference(a.end).list, ["1", "10"])
+        self.assertEqual(CtsReference(a.end).subreference[1], 3)
+        self.assertEqual(CtsReference(a.end).subreference, ("Atreus", 3))
 
     def test_Unicode_Support(self):
-        a = Reference("1.1@καὶ[0]-1.10@Ἀλκιβιάδου[3]")
+        a = CtsReference("1.1@καὶ[0]-1.10@Ἀλκιβιάδου[3]")
         self.assertEqual(a.start, "1.1@καὶ[0]")
-        self.assertEqual(Reference(a.start).list, ["1", "1"])
-        self.assertEqual(Reference(a.start).subreference[0], "καὶ")
+        self.assertEqual(a.start.list, ["1", "1"])
+        self.assertEqual(a.start.subreference.word, "καὶ")
         self.assertEqual(a.end, "1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(Reference(a.end).list, ["1", "10"])
-        self.assertEqual(Reference(a.end).subreference[1], 3)
-        self.assertEqual(Reference(a.end).subreference, ("Ἀλκιβιάδου", 3))
+        self.assertEqual(a.end.list, ["1", "10"])
+        self.assertEqual(a.end.subreference.word, 3)
+        self.assertEqual(a.end.subreference.tuple, ("Ἀλκιβιάδου", 3))
 
     def test_NoWord_Support(self):
-        a = Reference("1.1@[0]-1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(str(a.start), "1.1@[0]")
-        self.assertEqual(Reference(a.start).subreference[0], "")
-        self.assertEqual(Reference(a.start).subreference[1], 0)
+        a = CtsReference("1.1@[0]-1.10@Ἀλκιβιάδου[3]")
+        self.assertEqual(a.start, "1.1@[0]")
+        self.assertEqual(a.start.subreference.word, "")
+        self.assertEqual(a.start.subreference.counter, 0)
 
     def test_No_End_Support(self):
-        a = Reference("1.1@[0]")
+        a = CtsReference("1.1@[0]")
         self.assertEqual(a.end, None)
         self.assertEqual(a.start, "1.1@[0]")
-        self.assertEqual(Reference(a.start).subreference[0], "")
-        self.assertEqual(Reference(a.start).subreference[1], 0)
+        self.assertEqual(a.start.subreference.word, "")
+        self.assertEqual(a.start.subreference.counter, 0)
 
     def test_equality(self):
-        a = Reference("1.1@[0]")
-        b = Reference("1.1@[0]")
-        c = Reference("1.1@[1]")
+        a = CtsReference("1.1@[0]")
+        b = CtsReference("1.1@[0]")
+        c = CtsReference("1.1@[1]")
         d = "1.1@[0]"
         self.assertEqual(a, b)
         self.assertNotEqual(a, c)
         self.assertNotEqual(a, d)
 
     def test_get_parent(self):
-        a = Reference("1.1")
-        b = Reference("1")
-        c = Reference("1.1-2.3")
-        d = Reference("1.1-1.2")
-        e = Reference("1.1@Something[0]-1.2@SomethingElse[2]")
-        f = Reference("1-2")
+        a = CtsReference("1.1")
+        b = CtsReference("1")
+        c = CtsReference("1.1-2.3")
+        d = CtsReference("1.1-1.2")
+        e = CtsReference("1.1@Something[0]-1.2@SomethingElse[2]")
+        f = CtsReference("1-2")
 
         self.assertEqual(str(a.parent), "1")
         self.assertEqual(b.parent, None)
@@ -104,7 +104,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.textgroup, "tlg0012")
         self.assertEqual(a.work, "tlg001")
         self.assertEqual(a.version, "mth-01")
-        self.assertEqual(a.reference, Reference("1.1@Achilles-1.10@the[2]"))
+        self.assertEqual(a.reference, CtsReference("1.1@Achilles-1.10@the[2]"))
 
     def test_upTo(self):
         a = URN("urn:cts:greekLit:tlg0012.tlg001.mth-01:1.1@Achilles-1.10@the[2]")
@@ -158,7 +158,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.work, "wk")
         self.assertEqual(str(a), "urn:cts:ns:tg.wk")
         a.reference = "1-2"
-        self.assertEqual(a.reference, Reference("1-2"))
+        self.assertEqual(a.reference, CtsReference("1-2"))
         self.assertEqual(str(a), "urn:cts:ns:tg.wk:1-2")
         a.version = "vs"
         self.assertEqual(a.version, "vs")
@@ -194,7 +194,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.upTo(URN.VERSION), "urn:cts:greekLit:textgroup.work.text")
         self.assertEqual(a.upTo(URN.PASSAGE), "urn:cts:greekLit:textgroup.work.text:1")
         self.assertEqual(a.upTo(URN.NO_PASSAGE), "urn:cts:greekLit:textgroup.work.text")
-        self.assertEqual(a.reference, Reference("1"))
+        self.assertEqual(a.reference, CtsReference("1"))
         self.assertIsNone(a.reference.end)
 
     def test_missing_text_in_passage_emptiness(self):
@@ -208,7 +208,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.upTo(URN.PASSAGE), "urn:cts:greekLit:textgroup.work:1-2")
         self.assertEqual(a.upTo(URN.PASSAGE_START), "urn:cts:greekLit:textgroup.work:1")
         self.assertEqual(a.upTo(URN.PASSAGE_END), "urn:cts:greekLit:textgroup.work:2")
-        self.assertEqual(a.reference, Reference("1-2"))
+        self.assertEqual(a.reference, CtsReference("1-2"))
         self.assertEqual(a.reference.start, "1")
         self.assertEqual(a.reference.end, "2")
         self.assertIsNone(a.version)
@@ -236,7 +236,7 @@ class TestURNImplementation(unittest.TestCase):
 
     def test_set(self):
         a = URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        a.reference = Reference("1.1")
+        a.reference = CtsReference("1.1")
         self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
         a.reference = "2.2"
         self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:2.2")
@@ -369,8 +369,8 @@ class TestCitation(unittest.TestCase):
             scope="/TEI/text/body/div/div[@n=\"?\"]",
             xpath="//l[@n=\"?\"]"
         )
-        self.assertEqual(c.fill(Reference("1.2")), "/TEI/text/body/div/div[@n='1']//l[@n='2']")
-        self.assertEqual(c.fill(Reference("1.1")), "/TEI/text/body/div/div[@n='1']//l[@n='1']")
+        self.assertEqual(c.fill(CtsReference("1.2")), "/TEI/text/body/div/div[@n='1']//l[@n='2']")
+        self.assertEqual(c.fill(CtsReference("1.1")), "/TEI/text/body/div/div[@n='1']//l[@n='1']")
         self.assertEqual(c.fill(None), "/TEI/text/body/div/div[@n]//l[@n]")
         self.assertEqual(c.fill("1", xpath=True), "//l[@n='1']")
         self.assertEqual(c.fill("2", xpath=True), "//l[@n='2']")

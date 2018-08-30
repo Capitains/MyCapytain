@@ -20,7 +20,7 @@ class JsonLdCollectionMissing(MyCapytainException):
 
 
 class DuplicateReference(SyntaxWarning, MyCapytainException):
-    """ Error generated when a duplicate is found in Reference
+    """ Error generated when a duplicate is found in CtsReference
     """
 
 
@@ -67,7 +67,7 @@ class UnknownCollection(KeyError, MyCapytainException):
     """
 
 class EmptyReference(SyntaxWarning, MyCapytainException):
-    """ Error generated when a duplicate is found in Reference
+    """ Error generated when a duplicate is found in CtsReference
     """
 
     

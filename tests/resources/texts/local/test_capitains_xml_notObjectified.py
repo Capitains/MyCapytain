@@ -99,4 +99,4 @@ class TestPassageRange(CapitainsXMLRangePassageTests, unittest.TestCase):
             self.text = MyCapytain.resources.texts.local.capitains.cts.CapitainsCtsText(
                 resource=objectifiedParser(text), urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
             )
-        self.passage = self.text.getTextualNode(MyCapytain.common.reference._capitains_cts.Reference("1.pr.2-1.pr.7"))
+        self.passage = self.text.getTextualNode(MyCapytain.common.reference._capitains_cts.CtsReference("1.pr.2-1.pr.7"))

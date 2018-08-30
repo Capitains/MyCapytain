@@ -10,7 +10,7 @@ from six import text_type as str
 
 import MyCapytain.errors
 from MyCapytain.common.constants import Mimetypes
-from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
+from MyCapytain.common.reference._capitains_cts import CtsReference, URN, Citation
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
 
@@ -122,32 +122,32 @@ class CapitainsXmlTextTest(TestCase):
 
         # Test with reference and level
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=Reference("2.1"), level=3)[1]),
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=3)[1]),
             "2.1.2"
         )
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=Reference("2.1"), level=3)[-1]),
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=3)[-1]),
             "2.1.12"
         )
         self.assertEqual(
-            self.TEI.getValidReff(reference=Reference("2.38-2.39"), level=3),
+            self.TEI.getValidReff(reference=CtsReference("2.38-2.39"), level=3),
             ["2.38.1", "2.38.2", "2.39.1", "2.39.2"]
         )
 
         # Test with reference and level autocorrected because too small
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=Reference("2.1"), level=0)[-1]),
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=0)[-1]),
             "2.1.12",
             "Level should be autocorrected to len(citation) + 1"
         )
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=Reference("2.1"), level=2)[-1]),
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=2)[-1]),
             "2.1.12",
             "Level should be autocorrected to len(citation) + 1 even if level == len(citation)"
         )
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=Reference("2.1-2.2")),
+            self.TEI.getValidReff(reference=CtsReference("2.1-2.2")),
             [
                 '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9', '2.1.10', '2.1.11',
                 '2.1.12', '2.2.1', '2.2.2', '2.2.3', '2.2.4', '2.2.5', '2.2.6'
@@ -155,31 +155,31 @@ class CapitainsXmlTextTest(TestCase):
             "It could be possible to ask for range reffs children")
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=Reference("2.1-2.2"), level=2),
+            self.TEI.getValidReff(reference=CtsReference("2.1-2.2"), level=2),
             ['2.1', '2.2'],
             "It could be possible to ask for range References reference at the same level in between milestone")
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=Reference("1.38-2.2"), level=2),
+            self.TEI.getValidReff(reference=CtsReference("1.38-2.2"), level=2),
             ['1.38', '1.39', '2.pr', '2.1', '2.2'],
             "It could be possible to ask for range References reference at the same level in between milestone "
             "across higher levels")
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=Reference("1.1.1-1.1.4"), level=3),
+            self.TEI.getValidReff(reference=CtsReference("1.1.1-1.1.4"), level=3),
             ['1.1.1', '1.1.2', '1.1.3', '1.1.4'],
             "It could be possible to ask for range reffs in between at the same level cross higher level")
 
         # Test when already too deep
         self.assertEqual(
-            self.TEI.getValidReff(reference=Reference("2.1.1"), level=3),
+            self.TEI.getValidReff(reference=CtsReference("2.1.1"), level=3),
             [],
             "Asking for a level too deep should return nothing"
         )
 
         # Test wrong citation
         with self.assertRaises(KeyError):
-            self.TEI.getValidReff(reference=Reference("2.hellno"), level=3)
+            self.TEI.getValidReff(reference=CtsReference("2.hellno"), level=3)
 
     def test_nested_dict(self):
         """ Check the nested dict export of a local.CtsTextMetadata object """
@@ -294,12 +294,12 @@ class CapitainsXmlTextTest(TestCase):
         a = self.TEI.getTextualNode(["1", "pr", "2"], simple=simple)
         self.assertEqual(a.export(output=Mimetypes.PLAINTEXT), "tum, ut de illis queri non possit quisquis de se bene ")
         # With reference
-        a = self.TEI.getTextualNode(Reference("2.5.5"), simple=simple)
+        a = self.TEI.getTextualNode(CtsReference("2.5.5"), simple=simple)
         self.assertEqual(a.export(output=Mimetypes.PLAINTEXT), "Saepe domi non es, cum sis quoque, saepe negaris: ")
 
     @call_with_simple
     def test_get_passage_autoparse(self, simple):
-        a = self.TEI.getTextualNode(Reference("2.5.5"), simple=simple)
+        a = self.TEI.getTextualNode(CtsReference("2.5.5"), simple=simple)
         self.assertEqual(
             a.export(output=Mimetypes.PLAINTEXT), "Saepe domi non es, cum sis quoque, saepe negaris: ",
             "CtsTextMetadata are automatically parsed in GetPassage hypercontext = False"
@@ -307,27 +307,27 @@ class CapitainsXmlTextTest(TestCase):
 
     def test_get_Passage_context_no_double_slash(self):
         """ Check that get CapitainsCtsPassage contexts return right information """
-        simple = self.TEI.getTextualNode(Reference("1.pr.2"))
+        simple = self.TEI.getTextualNode(CtsReference("1.pr.2"))
         str_simple = simple.tostring(encoding=str)
         text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
+            text.getTextualNode(CtsReference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (One reference CapitainsCtsPassage)"
         )
 
-        simple = self.TEI.getTextualNode(Reference("1.pr.2-1.pr.7"))
+        simple = self.TEI.getTextualNode(CtsReference("1.pr.2-1.pr.7"))
         str_simple = simple.tostring(encoding=str)
         text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
+            text.getTextualNode(CtsReference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT
             ).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
@@ -335,7 +335,7 @@ class CapitainsXmlTextTest(TestCase):
             "parent range CapitainsCtsPassage)"
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.pr.3"), simple=True).export(
+            text.getTextualNode(CtsReference("1.pr.3"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "senserit, cum salva infimarum quoque personarum re-",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level same "
@@ -348,20 +348,20 @@ class CapitainsXmlTextTest(TestCase):
             "parent range CapitainsCtsPassage)"
         )
 
-        simple = self.TEI.getTextualNode(Reference("1.pr.2-1.1.6"))
+        simple = self.TEI.getTextualNode(CtsReference("1.pr.2-1.1.6"))
         str_simple = simple.tostring(encoding=str)
         text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
+            text.getTextualNode(CtsReference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCtsPassage)"
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.1.6"), simple=True).export(
+            text.getTextualNode(CtsReference("1.1.6"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCtsPassage)"
@@ -378,20 +378,20 @@ class CapitainsXmlTextTest(TestCase):
             "Ensure passage finding with context is fully TEI / Capitains compliant (Same level range CapitainsCtsPassage)"
         )
 
-        simple = self.TEI.getTextualNode(Reference("1.pr.2-1.2"))
+        simple = self.TEI.getTextualNode(CtsReference("1.pr.2-1.2"))
         str_simple = simple.tostring(encoding=str)
         text = CapitainsCtsText(
             resource=str_simple,
             citation=self.TEI.citation
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.pr.2"), simple=True).export(
+            text.getTextualNode(CtsReference("1.pr.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "tum, ut de illis queri non possit quisquis de se bene",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.1.6"), simple=True).export(
+            text.getTextualNode(CtsReference("1.1.6"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "Rari post cineres habent poetae.",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
@@ -436,14 +436,14 @@ class CapitainsXmlTextTest(TestCase):
     def test_ensure_passage_is_not_removed(self):
         """ In range, passage in between could be removed from the original text by error
         """
-        self.TEI.getTextualNode(Reference("1.pr.1-1.2.5"))
+        self.TEI.getTextualNode(CtsReference("1.pr.1-1.2.5"))
         orig_refs = self.TEI.getValidReff(level=3)
         self.assertIn("1.pr.1", orig_refs)
         self.assertIn("1.1.1", orig_refs)
         self.assertIn("1.2.4", orig_refs)
         self.assertIn("1.2.5", orig_refs)
 
-        self.TEI.getTextualNode(Reference("1.pr-1.2"))
+        self.TEI.getTextualNode(CtsReference("1.pr-1.2"))
         orig_refs = self.TEI.getValidReff(level=3)
         self.assertIn("1.pr.1", orig_refs)
         self.assertIn("1.1.1", orig_refs)
@@ -451,7 +451,7 @@ class CapitainsXmlTextTest(TestCase):
         self.assertIn("1.2.5", orig_refs)
 
     def test_get_passage_hypercontext_complex_xpath(self):
-        simple = self.text_complex.getTextualNode(Reference("pr.1-1.2"))
+        simple = self.text_complex.getTextualNode(CtsReference("pr.1-1.2"))
         str_simple = simple.tostring(encoding=str)
         text = CapitainsCtsText(
             resource=str_simple,
@@ -459,13 +459,13 @@ class CapitainsXmlTextTest(TestCase):
         )
         self.assertIn(
             "Pervincis tandem",
-            text.getTextualNode(Reference("pr.1"), simple=True).export(
+            text.getTextualNode(CtsReference("pr.1"), simple=True).export(
                 output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]).strip(),
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1.2"), simple=True).export(
+            text.getTextualNode(CtsReference("1.2"), simple=True).export(
                 output=Mimetypes.PLAINTEXT).strip(),
             "lusimus quos in Suebae gratiam virgunculae,",
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
@@ -480,7 +480,7 @@ class CapitainsXmlTextTest(TestCase):
 
     @call_with_simple
     def test_Text_text_function(self, simple):
-        simple = self.seneca.getTextualNode(Reference("1"), simple=simple)
+        simple = self.seneca.getTextualNode(CtsReference("1"), simple=simple)
         str_simple = simple.tostring(encoding=str)
         text = CapitainsCtsText(
             resource=str_simple,
@@ -493,7 +493,7 @@ class CapitainsXmlTextTest(TestCase):
         )
 
     def test_get_passage_hyper_context_double_slash_xpath(self):
-        simple = self.seneca.getTextualNode(Reference("1-10"))
+        simple = self.seneca.getTextualNode(CtsReference("1-10"))
         str_simple = simple.export(
             output=Mimetypes.XML.Std
         )
@@ -502,7 +502,7 @@ class CapitainsXmlTextTest(TestCase):
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1"), simple=True).export(
+            text.getTextualNode(CtsReference("1"), simple=True).export(
                 output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]
             ).strip(),
@@ -510,7 +510,7 @@ class CapitainsXmlTextTest(TestCase):
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
         self.assertEqual(
-            text.getTextualNode(Reference("10"), simple=True).export(
+            text.getTextualNode(CtsReference("10"), simple=True).export(
                 output=Mimetypes.PLAINTEXT
             ).strip(),
             "aversa superis regna manesque impios",
@@ -522,14 +522,14 @@ class CapitainsXmlTextTest(TestCase):
             "Ensure passage finding with context is fully TEI / Capitains compliant (Different level range CapitainsCtsPassage)"
         )
 
-        simple = self.seneca.getTextualNode(Reference("1"))
+        simple = self.seneca.getTextualNode(CtsReference("1"))
         str_simple = simple.tostring(encoding=str)
         text = CapitainsCtsText(
             resource=str_simple,
             citation=self.seneca.citation
         )
         self.assertEqual(
-            text.getTextualNode(Reference("1"), simple=True).export(
+            text.getTextualNode(CtsReference("1"), simple=True).export(
                 output=Mimetypes.PLAINTEXT,
                 exclude=["tei:note"]
             ).strip(),
@@ -697,28 +697,28 @@ class CapitainsXmlPassageTests(TestCase):
         # Ranges
         if simple is False:
             # Start
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-2"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("1-2"), simple=simple).siblingsId
             self.assertEqual((None, "3-4"), (p, str(n)), "First node should have right siblings")
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-5"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("1-5"), simple=simple).siblingsId
             self.assertEqual((None, "6-10"), (p, str(n)), "First node should have right siblings")
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-9"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("1-9"), simple=simple).siblingsId
             self.assertEqual((None, "10-14"), (p, str(n)), "First node should have right siblings")
             # End
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("12-14"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("12-14"), simple=simple).siblingsId
             self.assertEqual(("9-11", None), (str(p), n), "Last node should have right siblings")
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("11-14"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("11-14"), simple=simple).siblingsId
             self.assertEqual(("7-10", None), (str(p), n), "Last node should have right siblings")
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-14"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("5-14"), simple=simple).siblingsId
             self.assertEqual(("1-4", None), (str(p), n), "Should take the rest")
             # Middle
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-6"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("5-6"), simple=simple).siblingsId
             self.assertEqual(("3-4", "7-8"), (str(p), str(n)), "Middle node should have right siblings")
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-8"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("5-8"), simple=simple).siblingsId
             self.assertEqual(("1-4", "9-12"), (str(p), str(n)), "Middle node should have right siblings")
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("5-10"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("5-10"), simple=simple).siblingsId
             self.assertEqual(("1-4", "11-14"), (str(p), str(n)), "Middle node should have right siblings")
             # NONE !
-            p, n = self.FULL_EPIGRAMMATA.getTextualNode(Reference("1-14"), simple=simple).siblingsId
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("1-14"), simple=simple).siblingsId
             self.assertEqual((None, None), (p, n), "If whole range, nothing !")
 
 

@@ -18,7 +18,8 @@ setup(
     "future>=0.16.0",
     "rdflib-jsonld>=0.4.0",
     "LinkHeader>=0.4.3",
-    "pyld>=1.0.3"
+    "pyld>=1.0.3",
+    "typing"
   ],
   tests_require=[
     "mock>=2.0.0",

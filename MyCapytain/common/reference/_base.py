@@ -5,7 +5,7 @@ from copy import copy
 from abc import abstractmethod
 
 
-class BasePassageId:
+class BaseReference:
     def __init__(self, start=None, end=None):
         self._start = start
         self._end = end
@@ -29,6 +29,21 @@ class BasePassageId:
         :rtype: str
         """
         return self._end
+
+
+class BaseReferenceSet(list):
+    @property
+    def citation(self):
+        return self._citation
+
+    def __new__(cls, *args, **kwargs):
+        obj = list.__new__(*args, **kwargs)
+        obj._citation = None
+
+        if "citation" in kwargs:
+            obj._citation = kwargs["citation"]
+
+        return obj
 
 
 class BaseCitationSet(Exportable):

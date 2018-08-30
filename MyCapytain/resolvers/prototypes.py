@@ -7,6 +7,11 @@
 
 """
 
+from typing import Tuple, Union, Optional, Dict, Any
+from MyCapytain.resources.prototypes.metadata import Collection
+from MyCapytain.resources.prototypes.text import TextualNode
+from MyCapytain.common.reference import BaseReference, BaseReferenceSet
+
 
 class Resolver(object):
     """ Resolver provide a native python API which returns python objects.
@@ -14,7 +19,7 @@ class Resolver(object):
     Initiation of resolvers are dependent on the implementation of the prototype
 
     """
-    def getMetadata(self, objectId=None, **filters):
+    def getMetadata(self, objectId: str=None, **filters) -> Collection:
         """ Request metadata about a text or a collection
 
         :param objectId: Object Identifier to filter on
@@ -25,7 +30,13 @@ class Resolver(object):
         """
         raise NotImplementedError()
 
-    def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
+    def getTextualNode(
+            self,
+            textId: str,
+            subreference: Union[str, BaseReference]=None,
+            prevnext: bool=False,
+            metadata: bool=False
+    ) -> TextualNode:
         """ Retrieve a text node from the API
 
         :param textId: CtsTextMetadata Identifier
@@ -41,7 +52,7 @@ class Resolver(object):
         """
         raise NotImplementedError()
 
-    def getSiblings(self, textId, subreference):
+    def getSiblings(self, textId: str, subreference: Union[str, BaseReference]) -> Tuple[str, str]:
         """ Retrieve the siblings of a textual node
 
         :param textId: CtsTextMetadata Identifier
@@ -53,7 +64,14 @@ class Resolver(object):
         """
         raise NotImplementedError()
 
-    def getReffs(self, textId, level=1, subreference=None):
+    def getReffs(
+            self,
+            textId: str,
+            level: int=1,
+            subreference: Union[str, BaseReference]=None,
+            include_descendants: bool=False,
+            additional_parameters: Optional[Dict[str, Any]]=None
+    ) -> BaseReferenceSet:
         """ Retrieve the siblings of a textual node
 
         :param textId: CtsTextMetadata Identifier
@@ -62,7 +80,11 @@ class Resolver(object):
         :type level: int
         :param subreference: CapitainsCtsPassage Reference
         :type subreference: str
+        :param include_descendants:
+        :param additional_parameters:
         :return: List of references
         :rtype: [str]
+
+        ..toDo :: This starts to be a bloated function....
         """
         raise NotImplementedError()

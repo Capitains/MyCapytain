@@ -6,7 +6,7 @@ from lxml.etree import _Element
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES, XPATH_NAMESPACES
 from MyCapytain.common.utils import make_xml_node
 
-from ._base import BaseCitation, BasePassageId
+from ._base import BaseCitation, BaseReference
 
 REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
 REFSDECL_REPLACER = re.compile(r"\$[0-9]+")
@@ -26,7 +26,7 @@ def __childOrNone__(liste):
         return None
 
 
-class Reference(BasePassageId):
+class Reference(BaseReference):
     """ A reference object giving information
 
     :param reference: CapitainsCtsPassage Reference part of a Urn

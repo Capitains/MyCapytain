@@ -131,7 +131,7 @@ class CapitainsXmlTextTest(TestCase):
         )
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("2.38-2.39"), level=3),
-            ["2.38.1", "2.38.2", "2.39.1", "2.39.2"]
+            [CtsReference("2.38.1"), CtsReference("2.38.2"), CtsReference("2.39.1"), CtsReference("2.39.2")]
         )
 
         # Test with reference and level autocorrected because too small
@@ -148,26 +148,26 @@ class CapitainsXmlTextTest(TestCase):
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("2.1-2.2")),
-            [
+            [CtsReference(ref) for ref in[
                 '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9', '2.1.10', '2.1.11',
                 '2.1.12', '2.2.1', '2.2.2', '2.2.3', '2.2.4', '2.2.5', '2.2.6'
-            ],
+            ]],
             "It could be possible to ask for range reffs children")
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("2.1-2.2"), level=2),
-            ['2.1', '2.2'],
+            [CtsReference('2.1'), CtsReference('2.2')],
             "It could be possible to ask for range References reference at the same level in between milestone")
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("1.38-2.2"), level=2),
-            ['1.38', '1.39', '2.pr', '2.1', '2.2'],
+            [CtsReference(ref) for ref in ['1.38', '1.39', '2.pr', '2.1', '2.2']],
             "It could be possible to ask for range References reference at the same level in between milestone "
             "across higher levels")
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("1.1.1-1.1.4"), level=3),
-            ['1.1.1', '1.1.2', '1.1.3', '1.1.4'],
+            [CtsReference(ref) for ref in ['1.1.1', '1.1.2', '1.1.3', '1.1.4']],
             "It could be possible to ask for range reffs in between at the same level cross higher level")
 
         # Test when already too deep
@@ -264,11 +264,11 @@ class CapitainsXmlTextTest(TestCase):
             "Word should be there !"
         )
         self.assertEqual(
-            text.getReffs(level=2), [
+            text.getReffs(level=2), [CtsReference(ref) for ref in [
                 '1.C_w_000001', '1.C_w_000002', '1.C_w_000003', '1.C_w_000004', '1.C_w_000005',
                 '1.C_w_000006', '1.C_w_000007', '2.C_w_000008', '2.C_w_000009', '2.C_w_000010',
                 '2.C_w_000011', '2.C_w_000012', '2.C_w_000013', '2.C_w_000014'
-            ],
+            ]],
             "XML:IDs and N should be retrieved."
         )
 
@@ -579,7 +579,7 @@ class CapitainsXmlPassageTests(TestCase):
         """ Test next property """
         # Normal passage checking
         # self.TEI.parse()
-        p = self.TEI.getTextualNode(["1", "pr", "1"], simple=simple)
+        p = self.TEI.getTextualNode("1.pr.1", simple=simple)
         self.assertEqual(str(p.next.reference), "1.pr.2")
 
         # End of lowest level passage checking but not end of parent level
@@ -742,7 +742,7 @@ class CapitainsXMLRangePassageTests(TestCase):
 
     def test_errors(self):
         """ Ensure that some results throws errors according to some standards """
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.2-1.2"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.2-1.2"))
         with self.assertRaises(MyCapytain.errors.InvalidSiblingRequest, msg="Different range passage have no siblings"):
             a = passage.next
 
@@ -750,7 +750,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             a = passage.prev
 
     def test_prevnext_on_first_passage(self):
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.1-1.2.1"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.1-1.2.1"))
         self.assertEqual(
             str(passage.nextId), "1.2.2-1.5.2",
             "Next reff should be the same length as sibling"
@@ -761,7 +761,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext_on_close_to_first_passage(self):
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.10-1.2.1"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.10-1.2.1"))
         self.assertEqual(
             str(passage.nextId), "1.2.2-1.4.1",
             "Next reff should be the same length as sibling"
@@ -772,7 +772,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext_on_last_passage(self):
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39.2-2.40.8"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39.2-2.40.8"))
         self.assertEqual(
             passage.nextId, None,
             "Next reff should be none if we are on the last passage of the text"
@@ -783,7 +783,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext_on_close_to_last_passage(self):
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39.2-2.40.5"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39.2-2.40.5"))
         self.assertEqual(
             str(passage.nextId), "2.40.6-2.40.8",
             "Next reff should finish at the end of the text, no matter the length of the reference"
@@ -794,7 +794,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_prevnext(self):
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.5-1.pr.6"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.5-1.pr.6"))
         self.assertEqual(
             str(passage.nextId), "1.pr.7-1.pr.8",
             "Next reff should be the same length as sibling"
@@ -803,7 +803,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             str(passage.prevId), "1.pr.3-1.pr.4",
             "Prev reff should be the same length as sibling"
         )
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr.5"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.5"))
         self.assertEqual(
             str(passage.nextId), "1.pr.6",
             "Next reff should be the same length as sibling"
@@ -813,7 +813,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             "Prev reff should be the same length as sibling"
         )
 
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("1.pr"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr"))
         self.assertEqual(
             str(passage.nextId), "1.1",
             "Next reff should be the same length as sibling"
@@ -823,7 +823,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             "Prev reff should be None when at the start"
         )
 
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.40"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.40"))
         self.assertEqual(
             str(passage.prevId), "2.39",
             "Prev reff should be the same length as sibling"
@@ -834,7 +834,7 @@ class CapitainsXMLRangePassageTests(TestCase):
         )
 
     def test_first_list(self):
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39"))
         self.assertEqual(
             str(passage.firstId), "2.39.1",
             "First reff should be the first"
@@ -844,7 +844,7 @@ class CapitainsXMLRangePassageTests(TestCase):
             "Last reff should be the last"
         )
 
-        passage = self.text.getTextualNode(MyCapytain.common.reference.Reference("2.39-2.40"))
+        passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39-2.40"))
         self.assertEqual(
             str(passage.firstId), "2.39.1",
             "First reff should be the first"

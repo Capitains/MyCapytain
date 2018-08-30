@@ -225,9 +225,9 @@ class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
             textId = "{}:{}".format(textId, subreference)
         if subreference:
             if isinstance(subreference, CtsReference):
-                depth += len(subreference)
+                depth += subreference.depth
             else:
-                depth += len(CtsReference(subreference))
+                depth += (CtsReference(subreference)).depth
         if level:
             level = max(depth, level)
         return self.getValidReff(urn=textId, level=level)

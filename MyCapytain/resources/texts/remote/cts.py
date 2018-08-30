@@ -20,7 +20,7 @@ from MyCapytain.resources.texts.base.tei import TEIResource
 from MyCapytain.errors import MissingAttribute
 
 
-class __SharedMethod__(prototypes.InteractiveTextualNode):
+class _SharedMethod(prototypes.InteractiveTextualNode):
     """ Set of methods shared by CtsTextMetadata and CapitainsCtsPassage
 
     :param retriever: Retriever used to retrieve other data
@@ -35,10 +35,10 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :rtype: int
         """
         if self.urn.reference:
-            return len(self.urn.reference)
+            return self.urn.reference.depth
 
     def __init__(self, retriever=None, *args, **kwargs):
-        super(__SharedMethod__, self).__init__(*args, **kwargs)
+        super(_SharedMethod, self).__init__(*args, **kwargs)
         self.__retriever__ = retriever
         self.__first__ = False
         self.__last__ = False
@@ -201,7 +201,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :type reference: Union[CtsReference, str]
         :return: (Previous CapitainsCtsPassage CtsReference,Next CapitainsCtsPassage CtsReference)
         """
-        _prev, _next = __SharedMethod__.prevnext(
+        _prev, _next = _SharedMethod.prevnext(
             self.retriever.getPrevNextUrn(
                 urn="{}:{}".format(
                     str(
@@ -232,7 +232,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
                 )
         else:
             urn = str(self.urn)
-        _first = __SharedMethod__.firstUrn(
+        _first = _SharedMethod.firstUrn(
             self.retriever.getFirstUrn(
                 urn
             )
@@ -307,7 +307,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         return _prev, _next
 
 
-class CtsText(__SharedMethod__, prototypes.CitableText):
+class CtsText(_SharedMethod, prototypes.CitableText):
     """ API CtsTextMetadata object
 
     :param urn: A URN identifier
@@ -372,7 +372,7 @@ class CtsText(__SharedMethod__, prototypes.CitableText):
         return self.getTextualNode().export(output, exclude)
 
 
-class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
+class CtsPassage(_SharedMethod, prototypes.Passage, TEIResource):
     """ CapitainsCtsPassage representing
 
     :param urn:
@@ -451,7 +451,7 @@ class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
         self.response = self.resource
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=XPATH_NAMESPACES)[0]
 
-        self.__prev__, self.__nextId__ = __SharedMethod__.prevnext(self.response)
+        self.__prev__, self.__nextId__ = _SharedMethod.prevnext(self.response)
 
         if not self.citation.is_set() and len(self.resource.xpath("//ti:citation", namespaces=XPATH_NAMESPACES)):
             self.citation = CtsCollection.XmlCtsCitation.ingest(

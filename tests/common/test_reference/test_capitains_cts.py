@@ -13,11 +13,11 @@ class TestReferenceImplementation(unittest.TestCase):
         a = CtsReference("1-1")
         self.assertEqual(str(a), "1-1")
 
-    def test_len_ref(self):
+    def test_depth_ref(self):
         a = CtsReference("1.1@Achilles[0]-1.10@Atreus[3]")
-        self.assertEqual(len(a), 2)
+        self.assertEqual(a.depth, 2)
         a = CtsReference("1.1.1")
-        self.assertEqual(len(a), 3)
+        self.assertEqual(a.depth, 3)
 
     def test_highest(self):
         self.assertEqual(
@@ -32,12 +32,12 @@ class TestReferenceImplementation(unittest.TestCase):
     def test_properties(self):
         a = CtsReference("1.1@Achilles-1.10@Atreus[3]")
         self.assertEqual(a.start, "1.1@Achilles")
-        self.assertEqual(CtsReference(a.start).list, ["1", "1"])
-        self.assertEqual(CtsReference(a.start).subreference[0], "Achilles")
+        self.assertEqual(a.start.list, ["1", "1"])
+        self.assertEqual(a.start.subreference.word, "Achilles")
         self.assertEqual(a.end, "1.10@Atreus[3]")
-        self.assertEqual(CtsReference(a.end).list, ["1", "10"])
-        self.assertEqual(CtsReference(a.end).subreference[1], 3)
-        self.assertEqual(CtsReference(a.end).subreference, ("Atreus", 3))
+        self.assertEqual(a.end.list, ["1", "10"])
+        self.assertEqual(a.end.subreference.counter, 3)
+        self.assertEqual(a.end.subreference.tuple(), ("Atreus", 3))
 
     def test_Unicode_Support(self):
         a = CtsReference("1.1@καὶ[0]-1.10@Ἀλκιβιάδου[3]")
@@ -46,8 +46,8 @@ class TestReferenceImplementation(unittest.TestCase):
         self.assertEqual(a.start.subreference.word, "καὶ")
         self.assertEqual(a.end, "1.10@Ἀλκιβιάδου[3]")
         self.assertEqual(a.end.list, ["1", "10"])
-        self.assertEqual(a.end.subreference.word, 3)
-        self.assertEqual(a.end.subreference.tuple, ("Ἀλκιβιάδου", 3))
+        self.assertEqual(a.end.subreference.counter, 3)
+        self.assertEqual(a.end.subreference.tuple(), ("Ἀλκιβιάδου", 3))
 
     def test_NoWord_Support(self):
         a = CtsReference("1.1@[0]-1.10@Ἀλκιβιάδου[3]")
@@ -79,9 +79,10 @@ class TestReferenceImplementation(unittest.TestCase):
         e = CtsReference("1.1@Something[0]-1.2@SomethingElse[2]")
         f = CtsReference("1-2")
 
-        self.assertEqual(str(a.parent), "1")
+        self.assertEqual(a.parent, CtsReference("1"))
         self.assertEqual(b.parent, None)
         self.assertEqual(str(c.parent), "1-2")
+        self.assertEqual(c.parent, CtsReference("1-2"), "Output should also be CtsReference")
         self.assertEqual(str(d.parent), "1")
         self.assertEqual(str(e.parent), "1@Something[0]-1@SomethingElse[2]")
         self.assertEqual(f.parent, None)

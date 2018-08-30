@@ -37,7 +37,7 @@ class BaseReferenceSet(list):
         return self._citation
 
     def __new__(cls, *refs, citation=None):
-        obj = list.__new__(BaseReferenceSet, refs)
+        obj = list.__new__(cls, refs)
         obj._citation = None
 
         if citation:
@@ -130,7 +130,7 @@ class BaseCitationSet(Exportable):
         :return: Depth of the citation scheme
         """
         if len(self.children):
-            return 1 + max([child.depth for child in self.children])
+            return max([child.depth for child in self.children])
         else:
             return 0
 
@@ -320,6 +320,21 @@ class BaseCitation(BaseCitationSet):
                 _out["@context"] = {cite_type_term.split(":")[0]: str(RDF_NAMESPACES.DTS)}
 
             return _out
+
+    @property
+    def depth(self):
+        """ Depth of the citation scheme
+
+        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 1
+
+
+        :rtype: int
+        :return: Depth of the citation scheme
+        """
+        if len(self.children):
+            return 1 + max([child.depth for child in self.children])
+        else:
+            return 1
 
 
 class NodeId(object):

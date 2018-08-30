@@ -1,12 +1,12 @@
 import re
 from copy import copy
-from typing import List
+from typing import Optional, List, Union
 from lxml.etree import _Element
 
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES, XPATH_NAMESPACES
 from MyCapytain.common.utils import make_xml_node
 
-from ._base import BaseCitation, BaseReference
+from ._base import BaseCitation, BaseReference, BaseReferenceSet
 
 REFSDECL_SPLITTER = re.compile(r"/+[*()|\sa-zA-Z0-9:\[\]@=\\{$'\".\s]+")
 REFSDECL_REPLACER = re.compile(r"\$[0-9]+")
@@ -27,18 +27,19 @@ def __childOrNone__(liste):
 
 
 class CtsWordReference(str):
-    def __new__(cls, word_reference):
+    def __new__(cls, word_reference: str):
         word, counter = tuple(SUBREFERENCE.findall(word_reference)[0])
 
-        if len(counter) and word:
-            word, counter = str(word), int(counter)
-        elif len(counter) == 0 and word:
-            word, counter = str(word), 0
+        if counter:
+            counter = int(counter)
+        else:
+            counter = 0
 
         obj = str.__new__(cls, "@"+word_reference)
         obj.counter = counter
         obj.word = word
-        return word
+
+        return obj
 
     def tuple(self):
         return self.word, self.counter
@@ -58,30 +59,34 @@ class CtsSinglePassageId(str):
         # Parsing the reference
         temp_str_repr = str_repr
         subreference = temp_str_repr.split("@")
+
         if len(subreference) == 2:
             obj._sub_reference = CtsWordReference(subreference[1])
             temp_str_repr = subreference[0]
 
-        obj._list = temp_str_repr.split(".")
+        obj._list = temp_str_repr
         return obj
 
     @property
-    def list(self):
-        return self._list
+    def list(self) -> List[str]:
+        return list(iter(self))
 
     @property
-    def subreference(self):
-        return self._sub_reference
+    def subreference(self) -> Optional[CtsWordReference]:
+        subref = self.split("@")
+        if len(subref) == 2:
+            return CtsWordReference(subref[1])
 
-    def __iter__(self):
-        return iter(self.list)
+    def __iter__(self) -> List[str]:
+        subref = self.split("@")[0]
+        yield from subref.split(".")
 
-    def __len__(self):
-        return len(self.list)
+    def __len__(self) -> int:
+        return self.count(".") + 1
 
     @property
-    def depth(self):
-        return len(self.list)
+    def depth(self) -> int:
+        return self.count(".") + 1
 
 
 class CtsReference(BaseReference):
@@ -125,26 +130,29 @@ class CtsReference(BaseReference):
 
         :rtype: CtsReference
         """
-        if len(self.parsed[0][1]) == 1 and len(self.parsed[1][1]) <= 1:
+        if self.start.depth == 1 and (self.end is None or self.end.depth <= 1):
             return None
         else:
-            if len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) == 0:
+            if self.start.depth > 1 and (self.end is None or self.end.depth == 0):
                 return CtsReference("{0}{1}".format(
-                    ".".join(list(self.parsed[0][1])[0:-1]),
-                    self.parsed[0][3] or ""
+                    ".".join(self.start.list[:-1]),
+                    self.start.subreference or ""
                 ))
-            elif len(self.parsed[0][1]) > 1 and len(self.parsed[1][1]) > 1:
-                first = list(self.parsed[0][1])[0:-1]
-                last = list(self.parsed[1][1])[0:-1]
-                if first == last and self.parsed[1][3] is None \
-                    and self.parsed[0][3] is None:
-                    return CtsReference(".".join(first))
+            elif self.start.depth > 1 and self.end is not None and self.end.depth > 1:
+                _start = self.start.list[0:-1]
+                _end = self.end.list[0:-1]
+                if _start == _end and \
+                        self.start.subreference is None and \
+                        self.end.subreference is None:
+                    return CtsReference(
+                        ".".join(_start)
+                    )
                 else:
                     return CtsReference("{0}{1}-{2}{3}".format(
-                        ".".join(first),
-                        self.parsed[0][3] or "",
-                        ".".join(list(self.parsed[1][1])[0:-1]),
-                        self.parsed[1][3] or ""
+                        ".".join(_start),
+                        self.start.subreference or "",
+                        ".".join(_end),
+                        self.end.subreference or ""
                     ))
 
     @property
@@ -195,6 +203,7 @@ class CtsReference(BaseReference):
         if not self.end:
             return self.start.subreference
 
+    @property
     def depth(self):
         """ Return depth of highest reference level
 
@@ -225,22 +234,17 @@ class CtsReference(BaseReference):
         """
         return self._str_repr
 
-    def __eq__(self, other):
-        """ Equality checker for Reference object
 
-        :param other: An object to be checked against
-        :rtype: boolean
-        :returns: Equality between other and self
+class CtsReferenceSet(BaseReferenceSet):
+    def __contains__(self, item):
+        return BaseReferenceSet.__contains__(self, item) or \
+                CtsReference(item)
 
-        :Example:
-            >>>    a = CtsReference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    b = CtsReference(reference="1.1")
-            >>>    c = CtsReference(reference="1.1")
-            >>>    (a == b) == False
-            >>>    (c == b) == True
-        """
-        return (isinstance(other, type(self))
-                and str(self) == str(other))
+    def index(self, obj: Union[str, CtsReference], *args, **kwargs) -> int:
+        _o = obj
+        if not isinstance(obj, CtsReference):
+            _o = CtsReference(obj)
+        return super(CtsReferenceSet, self).index(_o)
 
 
 class URN(object):
@@ -768,7 +772,7 @@ class Citation(BaseCitation):
             passageId = CtsReference(passageId)
 
         if self.is_root():
-            return self[len(passageId)-1]
+            return self[passageId.depth-1]
         return self.root.match(passageId)
 
     def fill(self, passage=None, xpath=None):

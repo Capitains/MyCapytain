@@ -14,7 +14,7 @@ import warnings
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
-from MyCapytain.common.reference._capitains_cts import CtsReference, URN, Citation
+from MyCapytain.common.reference import CtsReference, URN, Citation, CtsReferenceSet
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.texts.base.tei import TEIResource
@@ -68,7 +68,7 @@ class _SharedMethods:
         else:
             start, end = subreference.start.list, subreference.end.list
 
-        if len(start) > len(self.citation):
+        if len(start) > self.citation.root.depth:
             raise CitationDepthError("URN is deeper than citation scheme")
 
         if simple is True:
@@ -120,7 +120,7 @@ class _SharedMethods:
             )
 
         resource = self.resource.xpath(
-            self.citation[reference.depth()-1].fill(reference),
+            self.citation[reference.depth-1].fill(reference),
             namespaces=XPATH_NAMESPACES
         )
 
@@ -147,7 +147,7 @@ class _SharedMethods:
             text = self
         return text
 
-    def getReffs(self, level=1, subreference=None):
+    def getReffs(self, level=1, subreference=None) -> CtsReferenceSet:
         """ CtsReference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
@@ -166,7 +166,7 @@ class _SharedMethods:
             subreference = CtsReference(subreference)
         return self.getValidReff(level, subreference)
 
-    def getValidReff(self, level=None, reference=None, _debug=False):
+    def getValidReff(self, level: int=None, reference: CtsReference=None, _debug: bool=False) -> CtsReferenceSet:
         """ Retrieve valid passages directly
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
@@ -176,7 +176,6 @@ class _SharedMethods:
         :param _debug: Check on passages duplicates
         :type _debug: bool
         :returns: List of levels
-        :rtype: list(basestring, str)
 
         .. note:: GetValidReff works for now as a loop using CapitainsCtsPassage, subinstances of CtsTextMetadata, to retrieve the valid \
         informations. Maybe something is more powerfull ?
@@ -213,7 +212,7 @@ class _SharedMethods:
         if level <= len(passages[0]) and reference is not None:
             level = len(passages[0]) + 1
         if level > len(self.citation):
-            return []
+            return CtsReferenceSet()
 
         nodes = [None] * (level - depth)
 
@@ -256,7 +255,7 @@ class _SharedMethods:
                 print(empties)
                 warnings.warn(message, EmptyReference)
 
-        return passages
+        return CtsReferenceSet([CtsReference(reff) for reff in passages])
 
     def xpath(self, *args, **kwargs):
         """ Perform XPath on the passage XML
@@ -305,7 +304,7 @@ class __SimplePassage__(_SharedMethods, TEIResource, text.Passage):
         self.__children__ = None
         self.__depth__ = 0
         if reference is not None:
-            self.__depth__ = len(reference)
+            self.__depth__ = reference.depth
         self.__prevnext__ = None
 
     @property
@@ -391,29 +390,29 @@ class __SimplePassage__(_SharedMethods, TEIResource, text.Passage):
         if self.__prevnext__ is not None:
             return self.__prevnext__
 
-        document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
+        document_references = self.__text__.getReffs(level=self.depth)
 
         range_length = 1
         if self.reference.end is not None:
             range_length = len(self.getReffs())
 
-        start = document_references.index(str(self.reference.start))
+        start = document_references.index(self.reference.start)
 
         if start == 0:
             # If the passage is already at the beginning
             _prev = None
         elif start - range_length < 0:
-            _prev = CtsReference(document_references[0])
+            _prev = document_references[0]
         else:
-            _prev = CtsReference(document_references[start - 1])
+            _prev = document_references[start - 1]
 
         if start + 1 == len(document_references):
             # If the passage is already at the end
             _next = None
         elif start + range_length > len(document_references):
-            _next = CtsReference(document_references[-1])
+            _next = document_references[-1]
         else:
-            _next = CtsReference(document_references[start + 1])
+            _next = document_references[start + 1]
 
         self.__prevnext__ = (_prev, _next)
         return self.__prevnext__
@@ -533,10 +532,10 @@ class CapitainsCtsPassage(_SharedMethods, TEIResource, text.Passage):
         self.__children__ = None
         self.__depth__ = self.__depth_2__ = 1
 
-        if self.reference.start:
-            self.__depth_2__ = self.__depth__ = len(CtsReference(self.reference.start))
-        if self.reference and self.reference.end:
-            self.__depth_2__ = len(CtsReference(self.reference.end))
+        if self.reference and self.reference.start:
+            self.__depth_2__ = self.__depth__ = self.reference.start.depth
+        if self.reference.is_range() and self.reference.end:
+            self.__depth_2__ = self.reference.end.depth
 
         self.__prevnext__ = None  # For caching purpose
 
@@ -603,7 +602,7 @@ class CapitainsCtsPassage(_SharedMethods, TEIResource, text.Passage):
         if self.__prevnext__:
             return self.__prevnext__
 
-        document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
+        document_references = self.__text__.getReffs(level=self.depth)
 
         if self.reference.end:
             start, end = self.reference.start, self.reference.end

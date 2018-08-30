@@ -52,7 +52,7 @@ class Resolver(object):
         """
         raise NotImplementedError()
 
-    def getSiblings(self, textId: str, subreference: Union[str, BaseReference]) -> Tuple[str, str]:
+    def getSiblings(self, textId: str, subreference: Union[str, BaseReference]) -> Tuple[BaseReference, BaseReference]:
         """ Retrieve the siblings of a textual node
 
         :param textId: CtsTextMetadata Identifier

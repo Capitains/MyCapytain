@@ -114,27 +114,41 @@ class CtsReference(BaseReference):
         >>>    ref = CtsReference('1.2.3')
     """
 
-    def __new__(cls, reference: Union[str, Tuple[str, Optional[str]]]):
+    def __new__(cls, *references):
         # pickle.load will try to feed the tuple back !
-        if isinstance(reference, tuple):
-            if reference[1]:
+        if len(references) == 2:
+            start, end = references
+            o = BaseReference.__new__(
+                CtsReference,
+                CtsSinglePassageId(start),
+                CtsSinglePassageId(end)
+            )
+            o._str_repr = start + "-" + end
+            return o
+
+        references, *_ = references
+        if isinstance(references, tuple):
+            if references[1]:
                 o = BaseReference.__new__(
                     CtsReference,
-                    CtsSinglePassageId(reference[0]),
-                    CtsSinglePassageId(reference[1])
+                    CtsSinglePassageId(references[0]),
+                    CtsSinglePassageId(references[1])
                 )
             else:
                 o = BaseReference.__new__(
                     CtsReference,
-                    CtsSinglePassageId(reference[0])
+                    CtsSinglePassageId(references[0])
                 )
-        elif "-" not in reference:
-            o = BaseReference.__new__(CtsReference, CtsSinglePassageId(reference))
-        else:
-            _start, _end = tuple(reference.split("-"))
-            o = BaseReference.__new__(CtsReference, CtsSinglePassageId(_start), CtsSinglePassageId(_end))
+            o._str_repr = references
 
-        o._str_repr = reference
+        elif isinstance(references, str):
+            if "-" not in references:
+                o = BaseReference.__new__(CtsReference, CtsSinglePassageId(references))
+            else:
+                _start, _end = tuple(references.split("-"))
+                o = BaseReference.__new__(CtsReference, CtsSinglePassageId(_start), CtsSinglePassageId(_end))
+            o._str_repr = references
+
         return o
 
     @property

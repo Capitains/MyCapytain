@@ -25,6 +25,7 @@ from urllib.parse import urlparse, parse_qs, urljoin
 import link_header
 
 from MyCapytain.common.constants import XPATH_NAMESPACES
+from MyCapytain.errors import CapitainsXPathError
 
 __strip = re.compile("([ ]{2,})+")
 __parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)

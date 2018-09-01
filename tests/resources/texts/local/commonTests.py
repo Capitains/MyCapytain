@@ -10,7 +10,7 @@ from six import text_type as str
 
 import MyCapytain.errors
 from MyCapytain.common.constants import Mimetypes
-from MyCapytain.common.reference._capitains_cts import CtsReference, URN, Citation
+from MyCapytain.common.reference._capitains_cts import CtsReference, URN, Citation, CtsReferenceSet
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
 
@@ -131,7 +131,7 @@ class CapitainsXmlTextTest(TestCase):
         )
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("2.38-2.39"), level=3),
-            [CtsReference("2.38.1"), CtsReference("2.38.2"), CtsReference("2.39.1"), CtsReference("2.39.2")]
+            (CtsReference("2.38.1"), CtsReference("2.38.2"), CtsReference("2.39.1"), CtsReference("2.39.2"))
         )
 
         # Test with reference and level autocorrected because too small
@@ -148,34 +148,32 @@ class CapitainsXmlTextTest(TestCase):
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("2.1-2.2")),
-            [CtsReference(ref) for ref in[
+            CtsReferenceSet(CtsReference(ref) for ref in[
                 '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9', '2.1.10', '2.1.11',
                 '2.1.12', '2.2.1', '2.2.2', '2.2.3', '2.2.4', '2.2.5', '2.2.6'
-            ]],
+            ]),
             "It could be possible to ask for range reffs children")
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("2.1-2.2"), level=2),
-            [CtsReference('2.1'), CtsReference('2.2')],
+            CtsReferenceSet(CtsReference('2.1'), CtsReference('2.2')),
             "It could be possible to ask for range References reference at the same level in between milestone")
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("1.38-2.2"), level=2),
-            [CtsReference(ref) for ref in ['1.38', '1.39', '2.pr', '2.1', '2.2']],
+            CtsReferenceSet(CtsReference(ref) for ref in ['1.38', '1.39', '2.pr', '2.1', '2.2']),
             "It could be possible to ask for range References reference at the same level in between milestone "
             "across higher levels")
 
         self.assertEqual(
             self.TEI.getValidReff(reference=CtsReference("1.1.1-1.1.4"), level=3),
-            [CtsReference(ref) for ref in ['1.1.1', '1.1.2', '1.1.3', '1.1.4']],
+            CtsReferenceSet(CtsReference(ref) for ref in ['1.1.1', '1.1.2', '1.1.3', '1.1.4']),
             "It could be possible to ask for range reffs in between at the same level cross higher level")
 
-        # Test when already too deep
-        self.assertEqual(
-            self.TEI.getValidReff(reference=CtsReference("2.1.1"), level=3),
-            [],
+        # Test level too deep
+        with self.assertRaises(MyCapytain.errors.CitationDepthError):
             "Asking for a level too deep should return nothing"
-        )
+            self.TEI.getValidReff(reference=CtsReference("2.1.1"), level=3)
 
         # Test wrong citation
         with self.assertRaises(KeyError):
@@ -264,11 +262,11 @@ class CapitainsXmlTextTest(TestCase):
             "Word should be there !"
         )
         self.assertEqual(
-            text.getReffs(level=2), [CtsReference(ref) for ref in [
+            text.getReffs(level=2), CtsReferenceSet(CtsReference(ref) for ref in [
                 '1.C_w_000001', '1.C_w_000002', '1.C_w_000003', '1.C_w_000004', '1.C_w_000005',
                 '1.C_w_000006', '1.C_w_000007', '2.C_w_000008', '2.C_w_000009', '2.C_w_000010',
                 '2.C_w_000011', '2.C_w_000012', '2.C_w_000013', '2.C_w_000014'
-            ]],
+            ]),
             "XML:IDs and N should be retrieved."
         )
 

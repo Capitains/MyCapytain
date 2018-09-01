@@ -5,47 +5,6 @@ from copy import copy
 from abc import abstractmethod
 
 
-class BaseReference(tuple):
-    def __new__(cls, start, end=None):
-        obj = tuple.__new__(cls, (start, end))
-
-        return obj
-
-    def is_range(self):
-        return bool(self[1])
-
-    @property
-    def start(self):
-        """ Quick access property for start part
-
-        :rtype: str
-        """
-        return self[0]
-
-    @property
-    def end(self):
-        """ Quick access property for reference end list
-
-        :rtype: str
-        """
-        return self[1]
-
-
-class BaseReferenceSet(list):
-    @property
-    def citation(self):
-        return self._citation
-
-    def __new__(cls, *refs, citation=None):
-        obj = list.__new__(cls, refs)
-        obj._citation = None
-
-        if citation:
-            obj._citation = citation
-
-        return obj
-
-
 class BaseCitationSet(Exportable):
     """ A citation set is a collection of citations that optionnaly can be matched using a .match() function
 
@@ -335,6 +294,55 @@ class BaseCitation(BaseCitationSet):
             return 1 + max([child.depth for child in self.children])
         else:
             return 1
+
+
+class BaseReference(tuple):
+    def __new__(cls, *refs):
+        if len(refs) == 1 and not isinstance(refs[0], tuple):
+            refs = refs[0], None
+        obj = tuple.__new__(cls, refs)
+
+        return obj
+
+    def is_range(self):
+        return bool(self[1])
+
+    @property
+    def start(self):
+        """ Quick access property for start part
+
+        :rtype: str
+        """
+        return self[0]
+
+    @property
+    def end(self):
+        """ Quick access property for reference end list
+
+        :rtype: str
+        """
+        return self[1]
+
+
+class BaseReferenceSet(tuple):
+    def __new__(cls, *refs, citation: BaseCitationSet=None, level: int=1):
+        if len(refs) == 1 and not isinstance(refs, BaseReference):
+            refs = refs[0]
+        obj = tuple.__new__(cls, refs)
+        obj._citation = None
+        obj._level = level
+
+        if citation:
+            obj._citation = citation
+        return obj
+
+    @property
+    def citation(self) -> BaseCitationSet:
+        return self._citation
+
+    @property
+    def level(self) -> int:
+        return self._level
 
 
 class NodeId(object):

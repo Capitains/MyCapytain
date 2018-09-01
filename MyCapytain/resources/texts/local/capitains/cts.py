@@ -162,7 +162,7 @@ class _SharedMethods:
         if not subreference:
             if hasattr(self, "reference"):
                 subreference = self.reference
-        else:
+        elif not isinstance(subreference, CtsReference):
             subreference = CtsReference(subreference)
         return self.getValidReff(level, subreference)
 
@@ -212,7 +212,7 @@ class _SharedMethods:
         if level <= len(passages[0]) and reference is not None:
             level = len(passages[0]) + 1
         if level > len(self.citation):
-            return CtsReferenceSet()
+            raise CitationDepthError("The required level is too deep")
 
         nodes = [None] * (level - depth)
 
@@ -255,7 +255,12 @@ class _SharedMethods:
                 print(empties)
                 warnings.warn(message, EmptyReference)
 
-        return CtsReferenceSet([CtsReference(reff) for reff in passages])
+        references = CtsReferenceSet(
+            [CtsReference(reff) for reff in passages],
+            citation=self.citation,
+            level=level
+        )
+        return references
 
     def xpath(self, *args, **kwargs):
         """ Perform XPath on the passage XML

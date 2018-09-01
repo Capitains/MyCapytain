@@ -79,3 +79,12 @@ class CitationDepthError(UnknownObjectError, MyCapytainException):
 class MissingRefsDecl(Exception, MyCapytainException):
     """ A text has no properly encoded refsDecl
     """
+
+
+class CapitainsXPathError(Exception):
+    def __init__(self, message):
+        super(CapitainsXPathError, self).__init__()
+        self.message = message
+
+    def __repr__(self):
+        return "CapitainsXPathError("+self.message+")"

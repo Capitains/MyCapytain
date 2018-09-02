@@ -74,8 +74,9 @@ class _SharedMethods:
         if simple is True:
             return self._getSimplePassage(subreference)
 
-        citation_start = [citation for citation in self.citation][len(start)-1]
-        citation_end = [citation for citation in self.citation][len(end)-1]
+        citation_start = self.citation.root[len(start)-1]
+        citation_end = self.citation.root[len(end)-1]
+
         start, end = citation_start.fill(passage=start), citation_end.fill(passage=end)
         start, end = normalizeXpath(start.split("/")[2:]), normalizeXpath(end.split("/")[2:])
 
@@ -92,11 +93,12 @@ class _SharedMethods:
             urn, subreference = URN("{}:{}".format(self.urn, subreference)), subreference
         else:
             urn, subreference = None, subreference
+
         return CapitainsCtsPassage(
             urn=urn,
             resource=root,
             text=self,
-            citation=self.citation,
+            citation=citation_start,
             reference=subreference
         )
 
@@ -115,12 +117,13 @@ class _SharedMethods:
                 resource=self.resource,
                 reference=None,
                 urn=self.urn,
-                citation=self.citation,
+                citation=self.citation.root,
                 text=self
             )
 
+        subcitation = self.citation.root[reference.depth-1]
         resource = self.resource.xpath(
-            self.citation[reference.depth-1].fill(reference),
+            subcitation.fill(reference),
             namespaces=XPATH_NAMESPACES
         )
 
@@ -131,7 +134,7 @@ class _SharedMethods:
             resource[0],
             reference=reference,
             urn=self.urn,
-            citation=self.citation,
+            citation=subcitation,
             text=self.textObject
         )
 
@@ -211,12 +214,12 @@ class _SharedMethods:
             level = 1
         if level <= len(passages[0]) and reference is not None:
             level = len(passages[0]) + 1
-        if level > len(self.citation):
+        if level > len(self.citation.root):
             raise CitationDepthError("The required level is too deep")
 
         nodes = [None] * (level - depth)
 
-        citations = [citation for citation in self.citation]
+        citations = [citation for citation in self.citation.root]
 
         while len(nodes) >= 1:
             passages = [
@@ -332,7 +335,7 @@ class __SimplePassage__(_SharedMethods, TEIResource, text.Passage):
         :rtype: None, CtsReference
         :returns: Dictionary of chidren, where key are subreferences
         """
-        if self.depth >= len(self.citation):
+        if self.depth >= len(self.citation.root):
             return []
         elif self.__children__ is not None:
             return self.__children__
@@ -558,7 +561,7 @@ class CapitainsCtsPassage(_SharedMethods, TEIResource, text.Passage):
         :returns: Dictionary of chidren, where key are subreferences
         """
         self.__raiseDepth__()
-        if self.depth >= len(self.citation):
+        if self.depth >= len(self.citation.root):
             return []
         elif self.__children__ is not None:
             return self.__children__

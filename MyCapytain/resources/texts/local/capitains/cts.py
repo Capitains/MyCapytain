@@ -260,7 +260,7 @@ class _SharedMethods:
 
         references = CtsReferenceSet(
             [CtsReference(reff) for reff in passages],
-            citation=self.citation,
+            citation=self.citation.root[level-1],
             level=level
         )
         return references

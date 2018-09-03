@@ -92,9 +92,6 @@ class CtsSinglePassageId(str):
 class CtsReference(BaseReference):
     """ A reference object giving information
 
-    :param reference: CapitainsCtsPassage Reference part of a Urn
-    :type reference: basestring
-
     :Example:
         >>>    a = CtsReference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
         >>>    b = CtsReference(reference="1.1")
@@ -127,7 +124,9 @@ class CtsReference(BaseReference):
             return o
 
         references, *_ = references
-        if isinstance(references, tuple):
+        if not references:
+            return None
+        elif isinstance(references, tuple):
             if references[1]:
                 o = BaseReference.__new__(
                     CtsReference,
@@ -139,7 +138,7 @@ class CtsReference(BaseReference):
                     CtsReference,
                     CtsSinglePassageId(references[0])
                 )
-            o._str_repr = references
+            o._str_repr = "-".join([r for r in references if r])
 
         elif isinstance(references, str):
             if "-" not in references:

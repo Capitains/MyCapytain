@@ -90,9 +90,9 @@ class _SharedMethods:
         root = passageLoop(xml, root, start, end)
 
         if self.urn:
-            urn, subreference = URN("{}:{}".format(self.urn, subreference)), subreference
+            urn = URN("{}:{}".format(self.urn, subreference))
         else:
-            urn, subreference = None, subreference
+            urn = None
 
         return CapitainsCtsPassage(
             urn=urn,
@@ -650,7 +650,7 @@ class CapitainsCtsPassage(_SharedMethods, TEIResource, text.Passage):
             else:
                 _next = "{}-{}".format(document_references[end+1], document_references[end + range_length])
 
-        self.__prevnext__ = (_prev, _next)
+        self.__prevnext__ = (CtsReference(_prev), CtsReference(_next))
         return self.__prevnext__
 
     @property

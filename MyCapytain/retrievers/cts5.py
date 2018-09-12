@@ -8,7 +8,7 @@
 
 """
 import MyCapytain.retrievers.prototypes
-from MyCapytain.common.reference._capitains_cts import Reference
+from MyCapytain.common.reference._capitains_cts import CtsReference
 import requests
 
 
@@ -224,10 +224,10 @@ class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
         if subreference:
             textId = "{}:{}".format(textId, subreference)
         if subreference:
-            if isinstance(subreference, Reference):
-                depth += len(subreference)
+            if isinstance(subreference, CtsReference):
+                depth += subreference.depth
             else:
-                depth += len(Reference(subreference))
+                depth += (CtsReference(subreference)).depth
         if level:
             level = max(depth, level)
         return self.getValidReff(urn=textId, level=level)

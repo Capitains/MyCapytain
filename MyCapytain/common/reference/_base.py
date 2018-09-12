@@ -1,116 +1,27 @@
 from MyCapytain.common.base import Exportable
+from MyCapytain.common.constants import get_graph, Mimetypes, RDF_NAMESPACES
+from MyCapytain.errors import CitationDepthError
 from copy import copy
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 
 
-class BasePassageId:
-    def __init__(self, start=None, end=None):
-        self._start = start
-        self._end = end
+class BaseCitationSet(Exportable):
+    """ A citation set is a collection of citations that optionnaly can be matched using a .match() function
 
-    @property
-    def is_range(self):
-        return self._end is not None
-
-    @property
-    def start(self):
-        """ Quick access property for start part
-
-        :rtype: str
-        """
-        return self._start
-
-    @property
-    def end(self):
-        """ Quick access property for reference end list
-
-        :rtype: str
-        """
-        return self._end
-
-
-class CitationSet:
-    """ A citation set is a collection of citations that can be matched using
-    a .match() function
-
+    :param children: List of Citation
+    :type children: [BaseCitation]
     """
-    @abstractmethod
-    def match(self, passageId):
-        """ Given a specific passageId, matches the citation to a specific citation object
 
-        :param passageId: Passage Identifier
-        :return: Citation that matches the passageId
-        :rtype: BaseCitation
-        """
-
-
-class BaseCitation(Exportable, CitationSet):
     def __repr__(self):
-        """
+        return "<MyCapytain.common.reference.BaseCitationSet object at %s>" % id(self)
 
-        :return: String representation of the object
-        :rtype: str
-        """
-        return "<{} name({})>".format(type(self).__name__, self.name)
+    EXPORT_TO = [Mimetypes.JSON.DTS.Std]
 
-    def __init__(self, name=None, children=None, root=None):
-        """ Initialize a BaseCitation object
-
-        :param name: Name of the citation level
-        :type name: str
-        :param children: list of children
-        :type children: [BaseCitation]
-        :param root: Root of the citation group
-        :type root: CitationSet
-        """
-        super(BaseCitation, self).__init__()
-
-        self._name = None
+    def __init__(self, children=None):
         self._children = []
-        self._root = root
 
-        self.name = name
-        self.children = children
-
-    @property
-    def is_root(self):
-        """
-        :return: If the current object is the root of the citation set, True
-        :rtype: bool
-        """
-        return self._root is None
-
-    @property
-    def root(self):
-        """ Returns the root of the citation set
-
-        :return: Root of the Citation set
-        :rtype: CitationSet
-        """
-        return self._root
-
-    @root.setter
-    def root(self, value):
-        """ Set the root to which the current citation is connected to
-
-        :param value: CitationSet root of the Citation graph
-        :type value: CitationSet
-        :return:
-        """
-        self._root = value
-
-    @property
-    def name(self):
-        """ Type of the citation represented
-
-        :rtype: str
-        :example: Book, Chapter, Textpart, Section, Poem...
-        """
-        return self._name
-
-    @name.setter
-    def name(self, val):
-        self._name = val
+        if children:
+            self.children = children
 
     @property
     def children(self):
@@ -121,19 +32,226 @@ class BaseCitation(Exportable, CitationSet):
         return self._children or []
 
     @children.setter
-    def children(self, val):
+    def children(self, val: list):
+        """ Sets children
+
+        :param val: List of citation children
+        """
         final_value = []
         if val is not None:
             for citation in val:
                 if citation is None:
                     continue
-                elif not isinstance(citation, self.__class__):
+                elif not isinstance(citation, (BaseCitation, type(self))):
                     raise TypeError("Citation children should be Citation")
                 else:
-                    citation.root = self.root
+                    if isinstance(self, BaseCitation):
+                        citation.root = self.root
+                    else:
+                        citation.root = self
                     final_value.append(citation)
 
         self._children = final_value
+
+    def add_child(self, child):
+        """ Adds a child to the CitationSet
+
+        :param child: Child citation to add
+        :return:
+        """
+        if isinstance(child, BaseCitation):
+            self._children.append(child)
+
+    def __iter__(self):
+        """ Iteration method
+
+        Loop over the citation children
+
+        :Example:
+            >>>    c = BaseCitationSet(name="line")
+            >>>    b = BaseCitationSet(name="poem", children=[c])
+            >>>    b2 = BaseCitationSet(name="paragraph")
+            >>>    a = BaseCitationSet(name="book", children=[b])
+            >>>    [e for e in a] == [a, b, c, b2],
+
+        """
+        for child in self.children:
+            yield from child
+
+    @abstractmethod
+    def match(self, passageId):
+        """ Given a specific passageId, matches the citation to a specific citation object
+
+        :param passageId: Passage Identifier
+        :return: Citation that matches the passageId
+        :rtype: BaseCitation
+        """
+
+    @property
+    def depth(self):
+        """ Depth of the citation scheme
+
+        .. example:: If we have a Book, Poem, Line system,
+         and the citation we are looking at is Poem, depth is 2
+
+
+        :rtype: int
+        :return: Depth of the citation scheme
+        """
+        if len(self.children):
+            return max([child.depth for child in self.children])
+        else:
+            return 0
+
+    def __getitem__(self, item):
+        """ Returns the citations at the given level.
+
+        :param item: Citation level
+        :type item: int
+        :rtype: list(BaseCitation) or BaseCitation
+
+        """
+        if item < 0:
+            _item = self.depth + item
+            if _item < 0:
+                raise CitationDepthError("The negative %s is too small " % _item)
+            item = _item
+        if item == 0:
+            yield from self.children
+        else:
+            for child in self.children:
+                yield from child[item - 1]
+
+    def __len__(self):
+        """ Number of citation schemes covered by the object
+
+        :rtype: int
+        :returns: Number of nested citations
+        """
+        return len(self.children) + sum([len(child) for child in self.children])
+
+    def __getstate__(self):
+        """ Pickling method
+
+        :return: dict
+        """
+        return copy(self.__dict__)
+
+    def __setstate__(self, dic):
+        self.__dict__ = dic
+        return self
+
+    def is_empty(self) -> bool:
+        """ Check if the citation has not been set
+
+        :return: True if nothing was setup
+        :rtype: bool
+        """
+        return len(self.children) == 0
+
+    def is_root(self) -> bool:
+        """ Check if the Citation is the root
+
+        :return:
+        """
+        return True
+
+    def __export__(self, output=None, context=False, namespace_manager=None, **kwargs):
+        if output == Mimetypes.JSON.DTS.Std:
+            if not namespace_manager:
+                namespace_manager = get_graph().namespace_manager
+
+            _out = [
+                cite.export(output, context=False, namespace_manager=namespace_manager)
+                for cite in self.children
+            ]
+
+            if context:
+                cite_structure_term = str(namespace_manager.qname(RDF_NAMESPACES.DTS.term("citeStructure")))
+                _out = {
+                    "@context": {
+                        cite_structure_term.split(":")[0]: str(RDF_NAMESPACES.DTS)
+                    },
+                    cite_structure_term: _out
+                }
+            return _out
+
+
+class BaseCitation(BaseCitationSet):
+    def __repr__(self):
+        """
+
+        :return: String representation of the object
+        :rtype: str
+        """
+        return "<{} name({})>".format(type(self).__name__, self.name)
+
+    def __init__(self, name: str=None, children: list=None, root: BaseCitationSet=None):
+        """ Initialize a BaseCitation object
+
+        :param name: Name of the citation level
+        :type name: str
+        :param children: list of children
+        :type children: [BaseCitation]
+        :param root: Root of the citation group
+        :type root: BaseCitationSet
+        """
+        super(BaseCitation, self).__init__()
+
+        self._name = None
+        self._root = None
+
+        self.name = name
+        self.children = children
+        self.root = root
+
+    def is_root(self) -> str:
+        """
+        :return: If the current object is the root of the citation set, True
+        :rtype: bool
+        """
+        return self._root is None
+
+    def is_set(self) -> bool:
+        """ Checks that the current object is set
+
+        :rtype: bool
+        """
+        return self.name is not None
+
+    @property
+    def root(self) -> BaseCitationSet:
+        """ Returns the root of the citation set
+
+        :return: Root of the Citation set
+        :rtype: BaseCitationSet
+        """
+        if self._root is None:
+            return self
+        return self._root
+
+    @root.setter
+    def root(self, value):
+        """ Set the root to which the current citation is connected to
+
+        :param value: CitationSet root of the Citation graph
+        :type value: BaseCitationSet
+        :return:
+        """
+        self._root = value
+
+    @property
+    def name(self) -> str:
+        """ Type of the citation represented
+
+        :rtype: str
+        :example: Book, Chapter, Textpart, Section, Poem...
+        """
+        return self._name
+
+    @name.setter
+    def name(self, val):
+        self._name = val
 
     def __iter__(self):
         """ Iteration method
@@ -152,57 +270,105 @@ class BaseCitation(Exportable, CitationSet):
         for child in self.children:
             yield from child
 
+    def __export__(self, output=None, context=False, namespace_manager=None, **kwargs):
+        if output == Mimetypes.JSON.DTS.Std:
+            if not namespace_manager:
+                namespace_manager = get_graph().namespace_manager
+
+            cite_type_term = str(namespace_manager.qname(RDF_NAMESPACES.DTS.term("citeType")))
+            cite_structure_term = str(namespace_manager.qname(RDF_NAMESPACES.DTS.term("citeStructure")))
+
+            _out = {
+                cite_type_term: self.name
+            }
+
+            if not self.is_empty():
+                _out[cite_structure_term] = [
+                    cite.export(output, context=False, namespace_manager=namespace_manager)
+                    for cite in self.children
+                ]
+
+            if context:
+                _out["@context"] = {cite_type_term.split(":")[0]: str(RDF_NAMESPACES.DTS)}
+
+            return _out
+
     @property
-    @abstractmethod
-    def depth(self):
+    def depth(self) -> int:
         """ Depth of the citation scheme
 
-        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 2
+        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 1
+
 
         :rtype: int
         :return: Depth of the citation scheme
         """
-        return 1
+        if len(self.children):
+            return 1 + max([child.depth for child in self.children])
+        else:
+            return 1
 
-    @abstractmethod
-    def __getitem__(self, item):
-        """ Returns the citations at the given level.
 
-        :param item: Citation level
-        :type item: int
-        :rtype: list(BaseCitation) or BaseCitation
+class BaseReference(tuple):
+    """ BaseReference represents a passage identifier, range or not
 
-        .. note:: Should it be a or or always a list ?
+    It is made of two major properties : .start and .end
+
+    To check if the object is a range, you can use the method .is_range()
+    """
+    def __new__(cls, *refs):
+        if len(refs) == 1 and not isinstance(refs[0], tuple):
+            refs = refs[0], None
+        obj = tuple.__new__(cls, refs)
+
+        return obj
+
+    def is_range(self) -> int:
+        return bool(self[1])
+
+    @property
+    def start(self):
+        """ Quick access property for start part
+
+        :rtype: str
         """
-        return []
+        return self[0]
 
-    def __len__(self):
-        """ Number of citation schemes covered by the object
+    @property
+    def end(self):
+        """ Quick access property for reference end list
 
-        :rtype: int
-        :returns: Number of nested citations
+        :rtype: str
         """
-        return 0
+        return self[1]
 
-    def __getstate__(self):
-        """ Pickling method
 
-        :return: dict
-        """
-        return copy(self.__dict__)
+class BaseReferenceSet(tuple):
+    """ A BaseReferenceSet is a set of Reference (= a bag of identifier)
+    that can carry citation and level information (what kind of reference is this reference ?
+    Where am I in the levels of the current document ?)
 
-    def __setstate__(self, dic):
-        self.__dict__ = dic
-        return self
+    It can be iterate like a tuple and has a .citation and .level property
 
-    @abstractmethod
-    def isEmpty(self):
-        """ Check if the citation has not been set
+    """
+    def __new__(cls, *refs, citation: BaseCitationSet=None, level: int=1):
+        if len(refs) == 1 and not isinstance(refs, BaseReference):
+            refs = refs[0]
+        obj = tuple.__new__(cls, refs)
+        obj._citation = None
+        obj._level = level
 
-        :return: True if nothing was setup
-        :rtype: bool
-        """
-        return True
+        if citation:
+            obj._citation = citation
+        return obj
+
+    @property
+    def citation(self) -> BaseCitationSet:
+        return self._citation
+
+    @property
+    def level(self) -> int:
+        return self._level
 
 
 class NodeId(object):

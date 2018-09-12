@@ -102,7 +102,7 @@ class TEIResource(InteractiveTextualNode):
             reffs = self.getReffs(level=len(self.citation))
             text = nested_ordered_dictionary()
             for reff in reffs:
-                _r = reff.split(".")
+                _r = str(reff).split(".")  # Only works for non range of course
                 nested_set(text, _r, self.getTextualNode(_r).export(
                     Mimetypes.PLAINTEXT,
                     exclude=exclude,

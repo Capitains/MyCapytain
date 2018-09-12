@@ -227,23 +227,23 @@ class TextualGraph(TextualNode):
     def getTextualNode(self, subreference):
         """ Retrieve a passage and store it in the object
 
-        :param subreference: Reference of the passage to retrieve
-        :type subreference: str or Node or Reference
+        :param subreference: CtsReference of the passage to retrieve
+        :type subreference: str or Node or CtsReference
         :rtype: TextualNode
         :returns: Object representing the passage
 
-        :raises: *TypeError* when reference is not a list or a Reference
+        :raises: *TypeError* when reference is not a list or a CtsReference
         """
 
         raise NotImplementedError()
 
     def getReffs(self, level=1, subreference=None):
-        """ Reference available at a given level
+        """ CtsReference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
         :param passage: Subreference (optional)
-        :type passage: Reference
+        :type passage: CtsReference
         :rtype: [text_type]
         :returns: List of levels
         """
@@ -429,7 +429,7 @@ class CtsNode(InteractiveTextualNode):
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
         :param passage: Subreference (optional)
-        :type passage: Reference
+        :type passage: CtsReference
         :rtype: List.text_type
         :returns: List of levels
         """
@@ -471,7 +471,7 @@ class CtsNode(InteractiveTextualNode):
             self.metadata.add(RDF_NAMESPACES.CTS.description, lang=lang, value=str(node))
             self.set_description(str(node), lang)
 
-        if self.citation.isEmpty() and not edition.citation.isEmpty():
+        if not self.citation.is_set() and edition.citation.is_set():
             self.citation = edition.citation
 
 

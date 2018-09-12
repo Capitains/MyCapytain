@@ -14,7 +14,7 @@ import warnings
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
-from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
+from MyCapytain.common.reference import CtsReference, URN, Citation, CtsReferenceSet
 
 from MyCapytain.resources.prototypes import text
 from MyCapytain.resources.texts.base.tei import TEIResource
@@ -39,7 +39,7 @@ def __makePassageKwargs__(urn, reference):
     return kwargs
 
 
-class __SharedMethods__:
+class _SharedMethods:
     """ Set of shared methods between objects in local TEI. Avoid recoding functions
     """
 
@@ -47,7 +47,7 @@ class __SharedMethods__:
         """ Finds a passage in the current text
 
         :param subreference: Identifier of the subreference / passages
-        :type subreference: Union[list, Reference]
+        :type subreference: Union[list, CtsReference]
         :param simple: If set to true, retrieves nodes up to the given one, cleaning non required siblings.
         :type simple: boolean
         :rtype: CapitainsCtsPassage, ContextPassage
@@ -57,24 +57,26 @@ class __SharedMethods__:
         if subreference is None:
             return self._getSimplePassage()
 
-        if isinstance(subreference, str):
-            subreference = Reference(subreference)
-        if isinstance(subreference, list):
-            start, end = subreference, subreference
-            subreference = Reference(".".join(subreference))
-        elif not subreference.end:
-            start = end = Reference(subreference.start).list
-        else:
-            start, end = Reference(subreference.start).list, Reference(subreference.end).list
+        if not isinstance(subreference, CtsReference):
+            if isinstance(subreference, str):
+                subreference = CtsReference(subreference)
+            elif isinstance(subreference, list):
+                subreference = CtsReference(".".join(subreference))
 
-        if len(start) > len(self.citation):
+        if not subreference.end:
+            start = end = subreference.start.list
+        else:
+            start, end = subreference.start.list, subreference.end.list
+
+        if len(start) > self.citation.root.depth:
             raise CitationDepthError("URN is deeper than citation scheme")
 
         if simple is True:
             return self._getSimplePassage(subreference)
 
-        citation_start = [citation for citation in self.citation][len(start)-1]
-        citation_end = [citation for citation in self.citation][len(end)-1]
+        citation_start = self.citation.root[len(start)-1]
+        citation_end = self.citation.root[len(end)-1]
+
         start, end = citation_start.fill(passage=start), citation_end.fill(passage=end)
         start, end = normalizeXpath(start.split("/")[2:]), normalizeXpath(end.split("/")[2:])
 
@@ -88,14 +90,15 @@ class __SharedMethods__:
         root = passageLoop(xml, root, start, end)
 
         if self.urn:
-            urn, subreference = URN("{}:{}".format(self.urn, subreference)), subreference
+            urn = URN("{}:{}".format(self.urn, subreference))
         else:
-            urn, subreference = None, subreference
+            urn = None
+
         return CapitainsCtsPassage(
             urn=urn,
             resource=root,
             text=self,
-            citation=self.citation,
+            citation=citation_start,
             reference=subreference
         )
 
@@ -114,12 +117,13 @@ class __SharedMethods__:
                 resource=self.resource,
                 reference=None,
                 urn=self.urn,
-                citation=self.citation,
+                citation=self.citation.root,
                 text=self
             )
 
+        subcitation = self.citation.root[reference.depth-1]
         resource = self.resource.xpath(
-            self.citation[len(reference)-1].fill(reference),
+            subcitation.fill(reference),
             namespaces=XPATH_NAMESPACES
         )
 
@@ -130,7 +134,7 @@ class __SharedMethods__:
             resource[0],
             reference=reference,
             urn=self.urn,
-            citation=self.citation,
+            citation=subcitation,
             text=self.textObject
         )
 
@@ -146,8 +150,8 @@ class __SharedMethods__:
             text = self
         return text
 
-    def getReffs(self, level=1, subreference=None):
-        """ Reference available at a given level
+    def getReffs(self, level=1, subreference=None) -> CtsReferenceSet:
+        """ CtsReference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
@@ -161,21 +165,20 @@ class __SharedMethods__:
         if not subreference:
             if hasattr(self, "reference"):
                 subreference = self.reference
-        else:
-            subreference = Reference(subreference)
+        elif not isinstance(subreference, CtsReference):
+            subreference = CtsReference(subreference)
         return self.getValidReff(level, subreference)
 
-    def getValidReff(self, level=None, reference=None, _debug=False):
+    def getValidReff(self, level: int=None, reference: CtsReference=None, _debug: bool=False) -> CtsReferenceSet:
         """ Retrieve valid passages directly
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: int
         :param reference: CapitainsCtsPassage Reference
-        :type reference: Reference
+        :type reference: CtsReference
         :param _debug: Check on passages duplicates
         :type _debug: bool
         :returns: List of levels
-        :rtype: list(basestring, str)
 
         .. note:: GetValidReff works for now as a loop using CapitainsCtsPassage, subinstances of CtsTextMetadata, to retrieve the valid \
         informations. Maybe something is more powerfull ?
@@ -183,24 +186,24 @@ class __SharedMethods__:
         depth = 0
         xml = self.textObject.xml
         if reference:
-            if isinstance(reference, Reference):
+            if isinstance(reference, CtsReference):
                 if reference.end is None:
-                    passages = [reference.list]
+                    passages = [reference.start.list]
                     depth = len(passages[0])
                 else:
                     xml = self.getTextualNode(subreference=reference)
                     common = []
-                    ref = Reference(reference.start)
-                    for index in range(0, len(ref.list)):
+
+                    for index in range(0, len(reference.start)):
                         if index == (len(common) - 1):
-                            common.append(ref.list[index])
+                            common.append(reference.start.list[index])
                         else:
                             break
 
                     passages = [common]
                     depth = len(common)
                     if not level:
-                        level = len(ref.list) + 1
+                        level = len(reference.start.list) + 1
 
             else:
                 raise TypeError()
@@ -211,12 +214,12 @@ class __SharedMethods__:
             level = 1
         if level <= len(passages[0]) and reference is not None:
             level = len(passages[0]) + 1
-        if level > len(self.citation):
-            return []
+        if level > len(self.citation.root):
+            raise CitationDepthError("The required level is too deep")
 
         nodes = [None] * (level - depth)
 
-        citations = [citation for citation in self.citation]
+        citations = [citation for citation in self.citation.root]
 
         while len(nodes) >= 1:
             passages = [
@@ -255,7 +258,12 @@ class __SharedMethods__:
                 print(empties)
                 warnings.warn(message, EmptyReference)
 
-        return passages
+        references = CtsReferenceSet(
+            [CtsReference(reff) for reff in passages],
+            citation=self.citation.root[level-1],
+            level=level
+        )
+        return references
 
     def xpath(self, *args, **kwargs):
         """ Perform XPath on the passage XML
@@ -279,13 +287,13 @@ class __SharedMethods__:
         return etree.tostring(self.resource, *args, **kwargs)
 
 
-class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
+class __SimplePassage__(_SharedMethods, TEIResource, text.Passage):
     """ CapitainsCtsPassage for simple and quick parsing of texts
 
     :param resource: Element representing the passage
     :type resource: etree._Element
     :param reference: CapitainsCtsPassage reference
-    :type reference: Reference
+    :type reference: CtsReference
     :param urn: URN of the source text or of the passage
     :type urn: URN
     :param citation: XmlCtsCitation scheme of the text
@@ -304,15 +312,15 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         self.__children__ = None
         self.__depth__ = 0
         if reference is not None:
-            self.__depth__ = len(reference)
+            self.__depth__ = reference.depth
         self.__prevnext__ = None
 
     @property
     def reference(self):
-        """ URN CapitainsCtsPassage Reference
+        """ URN CapitainsCtsPassage CtsReference
 
-        :return: Reference
-        :rtype: Reference
+        :return: CtsReference
+        :rtype: CtsReference
         """
         return self.__reference__
 
@@ -324,10 +332,10 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
     def childIds(self):
         """ Children of the passage
 
-        :rtype: None, Reference
+        :rtype: None, CtsReference
         :returns: Dictionary of chidren, where key are subreferences
         """
-        if self.depth >= len(self.citation):
+        if self.depth >= len(self.citation.root):
             return []
         elif self.__children__ is not None:
             return self.__children__
@@ -341,7 +349,7 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
         :param subreference: Subreference (optional)
-        :type subreference: Reference
+        :type subreference: CtsReference
         :rtype: List.basestring
         :returns: List of levels
         """
@@ -356,8 +364,8 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         :param subreference:
         :return:
         """
-        if not isinstance(subreference, Reference):
-            subreference = Reference(subreference)
+        if not isinstance(subreference, CtsReference):
+            subreference = CtsReference(subreference)
         return self.textObject.getTextualNode(subreference)
 
     @property
@@ -365,7 +373,7 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         """ Next passage
 
         :returns: Next passage at same level
-        :rtype: None, Reference
+        :rtype: None, CtsReference
         """
         return self.siblingsId[1]
 
@@ -374,7 +382,7 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         """ Get the Previous passage reference
 
         :returns: Previous passage reference at the same level
-        :rtype: None, Reference
+        :rtype: None, CtsReference
         """
         return self.siblingsId[0]
 
@@ -390,29 +398,29 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         if self.__prevnext__ is not None:
             return self.__prevnext__
 
-        document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
+        document_references = self.__text__.getReffs(level=self.depth)
 
         range_length = 1
         if self.reference.end is not None:
             range_length = len(self.getReffs())
 
-        start = document_references.index(str(self.reference.start))
+        start = document_references.index(self.reference.start)
 
         if start == 0:
             # If the passage is already at the beginning
             _prev = None
         elif start - range_length < 0:
-            _prev = Reference(document_references[0])
+            _prev = document_references[0]
         else:
-            _prev = Reference(document_references[start-1])
+            _prev = document_references[start - 1]
 
         if start + 1 == len(document_references):
             # If the passage is already at the end
             _next = None
         elif start + range_length > len(document_references):
-            _next = Reference(document_references[-1])
+            _next = document_references[-1]
         else:
-            _next = Reference(document_references[start + 1])
+            _next = document_references[start + 1]
 
         self.__prevnext__ = (_prev, _next)
         return self.__prevnext__
@@ -426,7 +434,7 @@ class __SimplePassage__(__SharedMethods__, TEIResource, text.Passage):
         return self.__text__
 
 
-class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
+class CapitainsCtsText(_SharedMethods, TEIResource, text.CitableText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
@@ -452,7 +460,7 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
         :type xml: lxml.etree._Element
         :return: None
         """
-        if self.citation.isEmpty():
+        if not self.citation.is_set():
             citation = xml.xpath("//tei:refsDecl[@n='CTS']", namespaces=XPATH_NAMESPACES)
             if len(citation):
                 self.citation = Citation.ingest(resource=citation[0], xpath=".//tei:cRefPattern")
@@ -471,7 +479,7 @@ class CapitainsCtsText(__SharedMethods__, TEIResource, text.CitableText):
             raise E
 
 
-class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
+class CapitainsCtsPassage(_SharedMethods, TEIResource, text.Passage):
     """ CapitainsCtsPassage class for local texts which rebuilds the tree up to the passage.
 
         For design purposes, some people would prefer the output of GetPassage to be consistent. ContextPassage rebuilds
@@ -503,7 +511,7 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
             </TEI>
 
         :param reference: CapitainsCtsPassage reference
-        :type reference: Reference
+        :type reference: CtsReference
         :param urn: URN of the source text or of the passage
         :type urn: URN
         :param citation: XmlCtsCitation scheme of the text
@@ -532,16 +540,16 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         self.__children__ = None
         self.__depth__ = self.__depth_2__ = 1
 
-        if self.reference.start:
-            self.__depth_2__ = self.__depth__ = len(Reference(self.reference.start))
-        if self.reference and self.reference.end:
-            self.__depth_2__ = len(Reference(self.reference.end))
+        if self.reference and self.reference.start:
+            self.__depth_2__ = self.__depth__ = self.reference.start.depth
+        if self.reference.is_range() and self.reference.end:
+            self.__depth_2__ = self.reference.end.depth
 
         self.__prevnext__ = None  # For caching purpose
 
     @property
     def reference(self):
-        """ Reference of the object
+        """ CtsReference of the object
         """
         return self.__reference__
 
@@ -549,11 +557,11 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
     def childIds(self):
         """ Children of the passage
 
-        :rtype: None, Reference
+        :rtype: None, CtsReference
         :returns: Dictionary of chidren, where key are subreferences
         """
         self.__raiseDepth__()
-        if self.depth >= len(self.citation):
+        if self.depth >= len(self.citation.root):
             return []
         elif self.__children__ is not None:
             return self.__children__
@@ -566,7 +574,7 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         """ Next passage
 
         :returns: Next passage at same level
-        :rtype: None, Reference
+        :rtype: None, CtsReference
         """
         return self.siblingsId[1]
 
@@ -575,7 +583,7 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         """ Get the Previous passage reference
 
         :returns: Previous passage reference at the same level
-        :rtype: None, Reference
+        :rtype: None, CtsReference
         """
         return self.siblingsId[0]
 
@@ -602,7 +610,7 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         if self.__prevnext__:
             return self.__prevnext__
 
-        document_references = list(map(str, self.__text__.getReffs(level=self.depth)))
+        document_references = self.__text__.getReffs(level=self.depth)
 
         if self.reference.end:
             start, end = self.reference.start, self.reference.end
@@ -642,7 +650,7 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
             else:
                 _next = "{}-{}".format(document_references[end+1], document_references[end + range_length])
 
-        self.__prevnext__ = (_prev, _next)
+        self.__prevnext__ = (CtsReference(_prev), CtsReference(_next))
         return self.__prevnext__
 
     @property
@@ -650,19 +658,19 @@ class CapitainsCtsPassage(__SharedMethods__, TEIResource, text.Passage):
         """ Next CapitainsCtsPassage (Interactive CapitainsCtsPassage)
         """
         if self.nextId is not None:
-            return __SharedMethods__.getTextualNode(self.__text__, self.nextId)
+            return _SharedMethods.getTextualNode(self.__text__, self.nextId)
 
     @property
     def prev(self):
         """ Previous CapitainsCtsPassage (Interactive CapitainsCtsPassage)
         """
         if self.prevId is not None:
-            return __SharedMethods__.getTextualNode(self.__text__, self.prevId)
+            return _SharedMethods.getTextualNode(self.__text__, self.prevId)
 
     def getTextualNode(self, subreference=None, *args, **kwargs):
-        if not isinstance(subreference, Reference):
-            subreference = Reference(subreference)
-        X = __SharedMethods__.getTextualNode(self, subreference)
+        if not isinstance(subreference, CtsReference):
+            subreference = CtsReference(subreference)
+        X = _SharedMethods.getTextualNode(self, subreference)
         X.__text__ = self.__text__
         return X
 

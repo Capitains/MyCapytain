@@ -731,6 +731,6 @@ class CtsTextInventoryCollection(PrototypeCtsCollection):
             )
         elif output == Mimetypes.JSON.DTS.Std:
             if len(self.members) > 1:
-                return Collection.__export__(self, output=output, domain=domain)
+                return Collection.__export__(self, output=output)
             else:
-                return self.members[0].export(output=output, domain=domain)
+                return self.members[0].export(output=output)

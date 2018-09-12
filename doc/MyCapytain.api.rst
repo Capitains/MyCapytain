@@ -23,17 +23,28 @@ Constants
 URN, References and Citations
 *****************************
 
+MyCapytain Base Objects
++++++++++++++++++++++++
+
 .. autoclass:: MyCapytain.common.reference.NodeId
-    :members:
+.. autoclass:: MyCapytain.common.reference.BaseCitationSet
+.. autoclass:: MyCapytain.common.reference.BaseReference
+.. autoclass:: MyCapytain.common.reference.BaseReferenceSet
 
-.. autoclass:: MyCapytain.common.reference.URN
-    :members:
-
-.. autoclass:: MyCapytain.common.reference.Reference
-    :members:
+Canonical Text Services Objects
++++++++++++++++++++++++++++++++
 
 .. autoclass:: MyCapytain.common.reference.Citation
-    :members: fill, __iter__, __len__
+.. autoclass:: MyCapytain.common.reference.CtsReference
+.. autoclass:: MyCapytain.common.reference.CtsReferenceSet
+
+Distributed Text Services Objects
++++++++++++++++++++++++++++++++++
+
+.. autoclass:: MyCapytain.common.reference.URN
+.. autoclass:: MyCapytain.common.reference.DtsCitation
+.. autoclass:: MyCapytain.common.reference.DtsCitationSet
+
 
 Metadata containers
 *******************

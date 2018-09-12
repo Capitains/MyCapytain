@@ -7,7 +7,7 @@ from io import open
 
 from MyCapytain.resources.texts.remote.cts import CtsPassage, CtsText
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
-from MyCapytain.common.reference._capitains_cts import Reference, URN, Citation
+from MyCapytain.common.reference._capitains_cts import CtsReference, URN, Citation
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
@@ -115,7 +115,7 @@ class TestAPIText(unittest.TestCase):
         )
 
         # Test with a ref as subreference
-        reffs = text.getValidReff(reference=Reference("1.pr"))
+        reffs = text.getValidReff(reference=CtsReference("1.pr"))
         requests.assert_called_with(
             "http://services.perseids.org/remote/cts",
             params={
@@ -154,7 +154,7 @@ class TestAPIText(unittest.TestCase):
         requests.return_value.text = GET_PASSAGE
 
         # Test with -1
-        _ = text.getTextualNode(subreference=Reference("1.1"))
+        _ = text.getTextualNode(subreference=CtsReference("1.1"))
         requests.assert_called_with(
             "http://services.perseids.org/remote/cts",
             params={

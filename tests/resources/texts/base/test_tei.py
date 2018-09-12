@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from MyCapytain.common.reference._capitains_cts import Reference, Citation
+from MyCapytain.common.reference._capitains_cts import CtsReference, Citation
 from MyCapytain.resources.texts.base.tei import TEIResource
 from MyCapytain.common.constants import Mimetypes
 from MyCapytain.common.utils import xmlparser
@@ -65,7 +65,7 @@ class TestTEICitation(unittest.TestCase):
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\' and @type=\'section\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
         self.assertEqual(
-            a.child.child.fill(Reference("1.2.3")),
+            a.child.child.fill(CtsReference("1.2.3")),
             "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'1\' and @type=\'section\']/tei:div[@n=\'2\']/tei:l[@n=\'3\']"
         )
 

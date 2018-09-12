@@ -49,16 +49,12 @@
             "dts:passage": "/api/dts/documents?id=urn:cts:latinLit:phi1103.phi001.lascivaroma-lat1",
             "dts:references": "/api/dts/navigation?id=urn:cts:latinLit:phi1103.phi001.lascivaroma-lat1",
             "dts:download": "https://raw.githubusercontent.com/lascivaroma/priapeia/master/data/phi1103/phi001/phi1103.phi001.lascivaroma-lat1.xml",
-            "tei:refsDecl": [
+            "dts:citeStructure": [
                 {
-                    "tei:matchPattern":  "(\\w+)",
-                    "tei:replacementPattern": "#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])",
-                    "tei:type": "poem"
-                },
-                {
-                    "tei:matchPattern":  "(\\w+)\\.(\\w+)",
-                    "tei:replacementPattern": "#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']//tei:l[@n='$2'])",
-                    "tei:type": "line"
+                    "dts:citeType": "poem",
+                    "dts:citeStructure": {
+                        "dts:citeType": "line"
+                    }
                 }
             ]
         }

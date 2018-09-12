@@ -13,14 +13,14 @@ from __future__ import unicode_literals
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
-from MyCapytain.common.reference._capitains_cts import Reference, URN
+from MyCapytain.common.reference._capitains_cts import CtsReference, URN
 from MyCapytain.resources.collections import cts as CtsCollection
 from MyCapytain.resources.prototypes import text as prototypes
 from MyCapytain.resources.texts.base.tei import TEIResource
 from MyCapytain.errors import MissingAttribute
 
 
-class __SharedMethod__(prototypes.InteractiveTextualNode):
+class _SharedMethod(prototypes.InteractiveTextualNode):
     """ Set of methods shared by CtsTextMetadata and CapitainsCtsPassage
 
     :param retriever: Retriever used to retrieve other data
@@ -35,10 +35,10 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :rtype: int
         """
         if self.urn.reference:
-            return len(self.urn.reference)
+            return self.urn.reference.depth
 
     def __init__(self, retriever=None, *args, **kwargs):
-        super(__SharedMethod__, self).__init__(*args, **kwargs)
+        super(_SharedMethod, self).__init__(*args, **kwargs)
         self.__retriever__ = retriever
         self.__first__ = False
         self.__last__ = False
@@ -59,7 +59,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
         :param reference: CapitainsCtsPassage reference
-        :type reference: Reference
+        :type reference: CtsReference
         :rtype: list(str)
         :returns: List of levels
         """
@@ -83,16 +83,16 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
     def getTextualNode(self, subreference=None):
         """ Retrieve a passage and store it in the object
 
-        :param subreference: Reference of the passage (Note : if given a list, this should be a list of string that \
+        :param subreference: CtsReference of the passage (Note : if given a list, this should be a list of string that \
         compose the reference)
-        :type subreference: Union[Reference, URN, str, list]
+        :type subreference: Union[CtsReference, URN, str, list]
         :rtype: CtsPassage
         :returns: Object representing the passage
-        :raises: *TypeError* when reference is not a list or a Reference
+        :raises: *TypeError* when reference is not a list or a CtsReference
         """
         if isinstance(subreference, URN):
             urn = str(subreference)
-        elif isinstance(subreference, Reference):
+        elif isinstance(subreference, CtsReference):
             urn = "{0}:{1}".format(self.urn, str(subreference))
         elif isinstance(subreference, str):
             if ":" in subreference:
@@ -115,7 +115,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
         :param subreference: Subreference (optional)
-        :type subreference: Reference
+        :type subreference: CtsReference
         :rtype: [text_type]
         :returns: List of levels
         """
@@ -128,7 +128,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         """ Retrieve a passage and informations around it and store it in the object
 
         :param reference: Reference of the passage
-        :type reference: Reference or List of text_type
+        :type reference: CtsReference or List of text_type
         :rtype: CtsPassage
         :returns: Object representing the passage
         :raises: *TypeError* when reference is not a list or a Reference
@@ -172,7 +172,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
             self.set_description(node.text, lang)
 
         # Need to code that p
-        if self.citation.isEmpty() and xml.xpath("//ti:citation", namespaces=XPATH_NAMESPACES):
+        if not self.citation.is_set() and xml.xpath("//ti:citation", namespaces=XPATH_NAMESPACES):
             self.citation = CtsCollection.XmlCtsCitation.ingest(
                 xml,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"
@@ -197,11 +197,11 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
     def getPrevNextUrn(self, reference):
         """ Get the previous URN of a reference of the text
 
-        :param reference: Reference from which to find siblings
-        :type reference: Union[Reference, str]
-        :return: (Previous CapitainsCtsPassage Reference,Next CapitainsCtsPassage Reference)
+        :param reference: CtsReference from which to find siblings
+        :type reference: Union[CtsReference, str]
+        :return: (Previous CapitainsCtsPassage CtsReference,Next CapitainsCtsPassage CtsReference)
         """
-        _prev, _next = __SharedMethod__.prevnext(
+        _prev, _next = _SharedMethod.prevnext(
             self.retriever.getPrevNextUrn(
                 urn="{}:{}".format(
                     str(
@@ -217,8 +217,8 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
     def getFirstUrn(self, reference=None):
         """ Get the first children URN for a given resource
 
-        :param reference: Reference from which to find child (If None, find first reference)
-        :type reference: Reference, str
+        :param reference: CtsReference from which to find child (If None, find first reference)
+        :type reference: CtsReference, str
         :return: Children URN
         :rtype: URN
         """
@@ -232,7 +232,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
                 )
         else:
             urn = str(self.urn)
-        _first = __SharedMethod__.firstUrn(
+        _first = _SharedMethod.firstUrn(
             self.retriever.getFirstUrn(
                 urn
             )
@@ -307,7 +307,7 @@ class __SharedMethod__(prototypes.InteractiveTextualNode):
         return _prev, _next
 
 
-class CtsText(__SharedMethod__, prototypes.CitableText):
+class CtsText(_SharedMethod, prototypes.CitableText):
     """ API CtsTextMetadata object
 
     :param urn: A URN identifier
@@ -332,7 +332,7 @@ class CtsText(__SharedMethod__, prototypes.CitableText):
 
         :rtype: MyCapytain.resources.texts.tei.XmlCtsCitation
         """
-        if self.citation.isEmpty():
+        if not self.citation.is_set():
             self.getLabel()
         return [
             reff for reffs in [self.getValidReff(level=i) for i in range(1, len(self.citation) + 1)] for reff in reffs
@@ -372,7 +372,7 @@ class CtsText(__SharedMethod__, prototypes.CitableText):
         return self.getTextualNode().export(output, exclude)
 
 
-class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
+class CtsPassage(_SharedMethod, prototypes.Passage, TEIResource):
     """ CapitainsCtsPassage representing
 
     :param urn:
@@ -415,7 +415,7 @@ class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
     def parentId(self):
         """ Shortcut for getting the parent passage identifier
 
-        :rtype: Reference
+        :rtype: CtsReference
         :returns: Following passage reference
         """
         return str(self.urn.reference.parent)
@@ -424,7 +424,7 @@ class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
     def nextId(self):
         """ Shortcut for getting the following passage identifier
 
-        :rtype: Reference
+        :rtype: CtsReference
         :returns: Following passage reference
         """
         if self.__nextId__ is False:
@@ -436,7 +436,7 @@ class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
     def siblingsId(self):
         """ Shortcut for getting the previous and next passage identifier
 
-        :rtype: Reference
+        :rtype: CtsReference
         :returns: Following passage reference
         """
         if self.__nextId__ is False or self.__prev__ is False:
@@ -451,9 +451,9 @@ class CtsPassage(__SharedMethod__, prototypes.Passage, TEIResource):
         self.response = self.resource
         self.resource = self.resource.xpath("//ti:passage/tei:TEI", namespaces=XPATH_NAMESPACES)[0]
 
-        self.__prev__, self.__nextId__ = __SharedMethod__.prevnext(self.response)
+        self.__prev__, self.__nextId__ = _SharedMethod.prevnext(self.response)
 
-        if self.citation.isEmpty() and len(self.resource.xpath("//ti:citation", namespaces=XPATH_NAMESPACES)):
+        if not self.citation.is_set() and len(self.resource.xpath("//ti:citation", namespaces=XPATH_NAMESPACES)):
             self.citation = CtsCollection.XmlCtsCitation.ingest(
                 self.response,
                 xpath=".//ti:citation[not(ancestor::ti:citation)]"

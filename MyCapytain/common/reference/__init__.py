@@ -6,5 +6,6 @@
 .. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
 
 """
-from ._base import NodeId
-from ._capitains_cts import Citation, Reference, URN
+from ._base import NodeId, BaseCitationSet, BaseReference, BaseReferenceSet
+from ._capitains_cts import Citation, CtsReference, CtsReferenceSet, URN
+from ._dts_1 import DtsCitation, DtsCitationSet

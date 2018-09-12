@@ -7,7 +7,7 @@ import os.path
 from glob import glob
 from math import ceil
 
-from MyCapytain.common.reference._capitains_cts import Reference, URN
+from MyCapytain.common.reference._capitains_cts import CtsReference, URN
 from MyCapytain.common.utils import xmlparser
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver
@@ -215,7 +215,7 @@ class CtsCapitainsLocalResolver(Resolver):
                 del text
                 text_metadata.citation = cites[-1]
                 self.logger.info("%s has been parsed ", text_metadata.path)
-                if text_metadata.citation.isEmpty():
+                if not text_metadata.citation.is_set():
                     self.logger.error("%s has no passages", text_metadata.path)
                     return False
                 return True
@@ -469,7 +469,7 @@ class CtsCapitainsLocalResolver(Resolver):
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCtsPassage Reference
+        :param subreference: CapitainsCtsPassage CtsReference
         :type subreference: str
         :param prevnext: Retrieve graph representing previous and next passage
         :type prevnext: boolean
@@ -479,25 +479,27 @@ class CtsCapitainsLocalResolver(Resolver):
         :rtype: CapitainsCtsPassage
         """
         text, text_metadata = self.__getText__(textId)
-        if subreference is not None:
-            subreference = Reference(subreference)
+        if subreference is not None and not isinstance(subreference, CtsReference):
+            subreference = CtsReference(subreference)
         passage = text.getTextualNode(subreference)
         if metadata:
             passage.set_metadata_from_collection(text_metadata)
         return passage
 
-    def getSiblings(self, textId, subreference):
+    def getSiblings(self, textId, subreference: CtsReference):
         """ Retrieve the siblings of a textual node
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str
-        :param subreference: CapitainsCtsPassage Reference
+        :param subreference: CapitainsCtsPassage CtsReference
         :type subreference: str
         :return: Tuple of references
         :rtype: (str, str)
         """
         text, inventory = self.__getText__(textId)
-        passage = text.getTextualNode(Reference(subreference))
+        if not isinstance(subreference, CtsReference):
+            subreference = CtsReference(subreference)
+        passage = text.getTextualNode(subreference)
         return passage.siblingsId
 
     def getReffs(self, textId, level=1, subreference=None):
@@ -507,7 +509,7 @@ class CtsCapitainsLocalResolver(Resolver):
         :type textId: str
         :param level: Depth for retrieval
         :type level: int
-        :param subreference: CapitainsCtsPassage Reference
+        :param subreference: CapitainsCtsPassage CtsReference
         :type subreference: str
         :return: List of references
         :rtype: [str]

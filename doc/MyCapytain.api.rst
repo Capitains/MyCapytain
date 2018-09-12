@@ -23,17 +23,7 @@ Constants
 URN, References and Citations
 *****************************
 
-.. autoclass:: MyCapytain.common.reference.NodeId
-    :members:
-
-.. autoclass:: MyCapytain.common.reference.URN
-    :members:
-
-.. autoclass:: MyCapytain.common.reference.Reference
-    :members:
-
-.. autoclass:: MyCapytain.common.reference.Citation
-    :members: fill, __iter__, __len__
+.. automodule:: MyCapytain.common.reference
 
 Metadata containers
 *******************

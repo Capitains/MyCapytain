@@ -33,6 +33,10 @@ class BaseCitationSet(Exportable):
 
     @children.setter
     def children(self, val: list):
+        """ Sets children
+
+        :param val: List of citation children
+        """
         final_value = []
         if val is not None:
             for citation in val:
@@ -50,6 +54,11 @@ class BaseCitationSet(Exportable):
         self._children = final_value
 
     def add_child(self, child):
+        """ Adds a child to the CitationSet
+
+        :param child: Child citation to add
+        :return:
+        """
         if isinstance(child, BaseCitation):
             self._children.append(child)
 
@@ -82,7 +91,8 @@ class BaseCitationSet(Exportable):
     def depth(self):
         """ Depth of the citation scheme
 
-        .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 1
+        .. example:: If we have a Book, Poem, Line system,
+         and the citation we are looking at is Poem, depth is 2
 
 
         :rtype: int
@@ -100,7 +110,6 @@ class BaseCitationSet(Exportable):
         :type item: int
         :rtype: list(BaseCitation) or BaseCitation
 
-        .. note:: Should it be a or or always a list ?
         """
         if item < 0:
             _item = self.depth + item
@@ -132,7 +141,7 @@ class BaseCitationSet(Exportable):
         self.__dict__ = dic
         return self
 
-    def is_empty(self):
+    def is_empty(self) -> bool:
         """ Check if the citation has not been set
 
         :return: True if nothing was setup
@@ -140,7 +149,11 @@ class BaseCitationSet(Exportable):
         """
         return len(self.children) == 0
 
-    def is_root(self):
+    def is_root(self) -> bool:
+        """ Check if the Citation is the root
+
+        :return:
+        """
         return True
 
     def __export__(self, output=None, context=False, namespace_manager=None, **kwargs):
@@ -173,7 +186,7 @@ class BaseCitation(BaseCitationSet):
         """
         return "<{} name({})>".format(type(self).__name__, self.name)
 
-    def __init__(self, name=None, children=None, root=None):
+    def __init__(self, name: str=None, children: list=None, root: BaseCitationSet=None):
         """ Initialize a BaseCitation object
 
         :param name: Name of the citation level
@@ -192,14 +205,14 @@ class BaseCitation(BaseCitationSet):
         self.children = children
         self.root = root
 
-    def is_root(self):
+    def is_root(self) -> str:
         """
         :return: If the current object is the root of the citation set, True
         :rtype: bool
         """
         return self._root is None
 
-    def is_set(self):
+    def is_set(self) -> bool:
         """ Checks that the current object is set
 
         :rtype: bool
@@ -207,7 +220,7 @@ class BaseCitation(BaseCitationSet):
         return self.name is not None
 
     @property
-    def root(self):
+    def root(self) -> BaseCitationSet:
         """ Returns the root of the citation set
 
         :return: Root of the Citation set
@@ -228,7 +241,7 @@ class BaseCitation(BaseCitationSet):
         self._root = value
 
     @property
-    def name(self):
+    def name(self) -> str:
         """ Type of the citation represented
 
         :rtype: str
@@ -281,7 +294,7 @@ class BaseCitation(BaseCitationSet):
             return _out
 
     @property
-    def depth(self):
+    def depth(self) -> int:
         """ Depth of the citation scheme
 
         .. example:: If we have a Book, Poem, Line system, and the citation we are looking at is Poem, depth is 1
@@ -297,6 +310,12 @@ class BaseCitation(BaseCitationSet):
 
 
 class BaseReference(tuple):
+    """ BaseReference represents a passage identifier, range or not
+
+    It is made of two major properties : .start and .end
+
+    To check if the object is a range, you can use the method .is_range()
+    """
     def __new__(cls, *refs):
         if len(refs) == 1 and not isinstance(refs[0], tuple):
             refs = refs[0], None
@@ -304,7 +323,7 @@ class BaseReference(tuple):
 
         return obj
 
-    def is_range(self):
+    def is_range(self) -> int:
         return bool(self[1])
 
     @property
@@ -325,6 +344,13 @@ class BaseReference(tuple):
 
 
 class BaseReferenceSet(tuple):
+    """ A BaseReferenceSet is a set of Reference (= a bag of identifier)
+    that can carry citation and level information (what kind of reference is this reference ?
+    Where am I in the levels of the current document ?)
+
+    It can be iterate like a tuple and has a .citation and .level property
+
+    """
     def __new__(cls, *refs, citation: BaseCitationSet=None, level: int=1):
         if len(refs) == 1 and not isinstance(refs, BaseReference):
             refs = refs[0]

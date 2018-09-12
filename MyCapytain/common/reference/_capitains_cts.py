@@ -1,5 +1,4 @@
 import re
-from copy import copy
 from typing import Optional, List, Union, Tuple
 from lxml.etree import _Element
 
@@ -14,7 +13,7 @@ SUBREFERENCE = re.compile(r"(\w*)\[?([0-9]*)\]?", re.UNICODE)
 REFERENCE_REPLACER = re.compile(r"(@[a-zA-Z0-9:]+)(=)([\\$'\"?0-9]{3,6})")
 
 
-def __childOrNone__(liste):
+def _child_or_none(liste):
     """ Used to parse resources in XmlCtsCitation
 
     :param liste: List of item
@@ -27,6 +26,13 @@ def __childOrNone__(liste):
 
 
 class CtsWordReference(str):
+    """ A CTSWordReference is the specific part of a CTS identifier that
+    identifies a word in a given passage. It contains the text in its
+    .word property and the index of this word in its .counter identifier
+
+    It can be returned as a tuple using .tuple()
+
+    """
     def __new__(cls, word_reference: str):
         word, counter = tuple(SUBREFERENCE.findall(word_reference)[0])
 
@@ -41,7 +47,7 @@ class CtsWordReference(str):
 
         return obj
 
-    def tuple(self):
+    def tuple(self) -> Tuple[str, int]:
         return self.word, self.counter
 
     def __iter__(self):
@@ -49,6 +55,21 @@ class CtsWordReference(str):
 
 
 class CtsSinglePassageId(str):
+    """ A CtsSinglePassageId identifies part of a range, or a non-range passage
+    such as 1.1.1 or 1.2.2 in 1.2.2-1.2.3.
+
+    It provides a list version of itself through the .list property and
+    links to its subreference using the .subreference property (Word and Index identifier)
+
+    If you iter over it, it returns each passage of the hierarchy, so
+
+    >>> iter((CtsSinglePassageId("1.2.3"))) == iter(["1", "2", "3"])
+
+    len() and .depth returns the depth of the passage
+
+    >>> (CtsSinglePassageId("1.2.4")).depth == 3
+    >>> len(CtsSinglePassageId("1.2.4")) == 3
+    """
     def __new__(cls, str_repr: str):
         # Saving the original ID
         obj = str.__new__(cls, str_repr)
@@ -93,9 +114,9 @@ class CtsReference(BaseReference):
     """ A reference object giving information
 
     :Example:
-        >>>    a = CtsReference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-        >>>    b = CtsReference(reference="1.1")
-        >>>    CtsReference("1.1-2.2.2").highest == ["1", "1"]
+        >>>    a = CtsReference("1.1@Achiles[1]-1.2@Zeus[1]")
+        >>>    b = CtsReference("1.1")
+        >>>    CtsReference("1.1-2.2.2").highest == CtsSinglePassageId("1.1")
 
     Reference object supports the following magic methods : len(), str() and eq().
 
@@ -151,7 +172,7 @@ class CtsReference(BaseReference):
         return o
 
     @property
-    def parent(self):
+    def parent(self) -> Optional['CtsReference']:
         """ Parent of the actual URN, for example, 1.1 for 1.1.1
 
         :rtype: CtsReference
@@ -253,8 +274,8 @@ class CtsReference(BaseReference):
         :returns: String representation of Reference Object
 
         :Example:
-            >>>    a = CtsReference(reference="1.1@Achiles[1]-1.2@Zeus[1]")
-            >>>    b = CtsReference(reference="1.1")
+            >>>    a = CtsReference("1.1@Achiles[1]-1.2@Zeus[1]")
+            >>>    b = CtsReference("1.1")
             >>>    str(a) == "1.1@Achiles[1]-1.2@Zeus[1]"
             >>>    str(b) == "1.1"
         """
@@ -262,9 +283,12 @@ class CtsReference(BaseReference):
 
 
 class CtsReferenceSet(BaseReferenceSet):
-    def __contains__(self, item):
+    """ A CTS version of the BaseReferenceSet
+
+    """
+    def __contains__(self, item: str) -> bool:
         return BaseReferenceSet.__contains__(self, item) or \
-                CtsReference(item)
+               BaseReferenceSet.__contains__(self, CtsReference(item))
 
     def index(self, obj: Union[str, CtsReference], *args, **kwargs) -> int:
         _o = obj
@@ -923,7 +947,7 @@ class Citation(BaseCitation):
                 Citation(
                     name=resource[x].get("n"),
                     refsDecl=resource[x].get("replacementPattern")[7:-1],
-                    child=__childOrNone__(citations)
+                    child=_child_or_none(citations)
                 )
             )
         if len(citations) > 1:

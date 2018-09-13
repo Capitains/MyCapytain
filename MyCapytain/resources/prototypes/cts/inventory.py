@@ -11,7 +11,7 @@ from six import text_type
 
 from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
 from MyCapytain.common.reference._capitains_cts import URN
-from MyCapytain.common.utils import make_xml_node, xmlparser
+from MyCapytain.common.utils.xml import make_xml_node, xmlparser
 from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict

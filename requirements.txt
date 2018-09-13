@@ -9,3 +9,4 @@ responses>=0.8.1
 LinkHeader==0.4.3
 pyld==1.0.3
 typing
+requests_mock

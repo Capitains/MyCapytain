@@ -11,7 +11,7 @@
 from __future__ import unicode_literals
 
 from MyCapytain.common.metadata import Metadata
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 from MyCapytain.common.reference._capitains_cts import CtsReference, URN
 from MyCapytain.resources.collections import cts as CtsCollection

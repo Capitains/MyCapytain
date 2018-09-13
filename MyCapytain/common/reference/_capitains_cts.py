@@ -3,7 +3,7 @@ from typing import Optional, List, Union, Tuple
 from lxml.etree import _Element
 
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES, XPATH_NAMESPACES
-from MyCapytain.common.utils import make_xml_node
+from MyCapytain.common.utils.xml import make_xml_node
 
 from ._base import BaseCitation, BaseReference, BaseReferenceSet
 

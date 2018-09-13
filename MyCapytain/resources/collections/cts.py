@@ -15,7 +15,8 @@ from lxml.objectify import IntElement, FloatElement
 
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
-from MyCapytain.common.utils import xmlparser, expand_namespace
+from MyCapytain.common.utils import expand_namespace
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 
 

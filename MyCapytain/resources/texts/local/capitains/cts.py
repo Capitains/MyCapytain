@@ -12,7 +12,7 @@ This module contains methods to parse local resources using TEI/Epidoc guideline
 import warnings
 
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
-from MyCapytain.common.utils import copyNode, passageLoop, normalizeXpath
+from MyCapytain.common.utils.xml import copyNode, normalizeXpath, passageLoop
 from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
 from MyCapytain.common.reference import CtsReference, URN, Citation, CtsReferenceSet
 

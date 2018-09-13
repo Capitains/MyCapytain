@@ -8,7 +8,7 @@
 
 """
 from __future__ import unicode_literals
-from MyCapytain.common.utils import make_xml_node
+from MyCapytain.common.utils.xml import make_xml_node
 from MyCapytain.common.constants import Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from rdflib import BNode, Literal, Graph, URIRef, term

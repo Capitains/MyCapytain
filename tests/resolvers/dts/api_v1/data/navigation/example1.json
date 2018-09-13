@@ -1,0 +1,15 @@
+{
+    "@context": {
+        "hydra": "https://www.w3.org/ns/hydra/core#",
+        "@vocab": "https://w3id.org/dts/api#"
+    },
+    "@id":"/api/dts/navigation/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc",
+    "citeDepth" : 2,
+    "level": 1,
+    "hydra:member": [
+      {"ref": "1"},
+      {"ref": "2"},
+      {"ref": "3"}
+    ],
+    "passage": "/dts/api/document/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc{&ref}{&start}{&end}"
+}

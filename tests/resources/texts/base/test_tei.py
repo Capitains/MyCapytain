@@ -6,7 +6,7 @@ import unittest
 from MyCapytain.common.reference._capitains_cts import CtsReference, Citation
 from MyCapytain.resources.texts.base.tei import TEIResource
 from MyCapytain.common.constants import Mimetypes
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils.xml import xmlparser
 
 
 class TestTEICitation(unittest.TestCase):

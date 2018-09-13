@@ -9,7 +9,8 @@ Shared elements for TEI XmlCtsCitation
 from lxml.etree import tostring
 
 from MyCapytain.common.constants import Mimetypes, XPATH_NAMESPACES
-from MyCapytain.common.utils import xmlparser, nested_ordered_dictionary, nested_set, normalize
+from MyCapytain.common.utils import nested_ordered_dictionary, nested_set, normalize
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 
 

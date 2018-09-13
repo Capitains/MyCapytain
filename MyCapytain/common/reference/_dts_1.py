@@ -1,10 +1,26 @@
-from ._base import BaseCitationSet, BaseCitation
+from ._base import BaseCitationSet, BaseCitation, BaseReference, BaseReferenceSet
+from ..metadata import Metadata
 from MyCapytain.common.constants import RDF_NAMESPACES
 
 
 _dts = RDF_NAMESPACES.DTS
 _cite_type_term = str(_dts.term("citeType"))
 _cite_structure_term = str(_dts.term("citeStructure"))
+
+
+class DtsReference(BaseReference):
+    def __new__(cls, *refs, metadata: Metadata=None):
+        o = super(DtsReference).__new__(*refs)
+        if metadata:
+            o._metadata = metadata
+        else:
+            o._metadata = Metadata()  # toDo : Figure how to deal with Refs ID in the Sparql Graph
+
+
+class DtsReferenceSet(BaseReferenceSet):
+    def __contains__(self, item: str) -> bool:
+        return BaseReferenceSet.__contains__(self, item) or \
+               BaseReferenceSet.__contains__(self, DtsReference(item))
 
 
 class DtsCitation(BaseCitation):

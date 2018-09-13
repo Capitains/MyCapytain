@@ -1,34 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-.. module:: MyCapytain.common.utils
-   :synopsis: Common useful tools
-
-.. moduleauthor:: Thibault Clérice <leponteineptique@gmail.com>
-
-
-"""
-from __future__ import unicode_literals
-
-import re
-from collections import OrderedDict, defaultdict, namedtuple
 from copy import copy
-from functools import reduce
-from io import IOBase, StringIO
-
-from lxml import etree
-from lxml.objectify import ObjectifiedElement, parse, SubElement, Element
-from six import text_type
+from io import StringIO, IOBase
 from xml.sax.saxutils import escape
-from rdflib import BNode, Graph, Literal, URIRef
-from rdflib.namespace import NamespaceManager
-from urllib.parse import urlparse, parse_qs, urljoin
-import link_header
+
+from lxml.etree import SubElement
+import lxml.etree as etree
+from lxml.objectify import ObjectifiedElement, parse, Element
+from six import text_type
 
 from MyCapytain.common.constants import XPATH_NAMESPACES
-from MyCapytain.errors import CapitainsXPathError
 
-__strip = re.compile("([ ]{2,})+")
-__parser__ = etree.XMLParser(collect_ids=False, resolve_entities=False)
+
+_parser = etree.XMLParser(collect_ids=False, resolve_entities=False)
 
 
 def make_xml_node(graph, name, close=False, attributes=None, text="", complete=False, innerXML=""):
@@ -74,96 +56,6 @@ def make_xml_node(graph, name, close=False, attributes=None, text="", complete=F
     return "<{}>".format(name)
 
 
-def literal_to_dict(value):
-    """ Transform an object value into a dict readable value
-
-    :param value: Object of a triple which is not a BNode
-    :type value: Literal or URIRef
-    :return: dict or str or list
-    """
-    if isinstance(value, Literal):
-        if value.language is not None:
-            return {"@value": str(value), "@language": value.language}
-        return value.toPython()
-    elif isinstance(value, URIRef):
-        return {"@id": str(value)}
-    elif value is None:
-        return None
-    return str(value)
-
-
-def dict_to_literal(dict_container: dict):
-    if isinstance(dict_container["@value"], int):
-        return dict_container["@value"],
-    else:
-        return dict_container["@value"], dict_container.get("@language", None)
-
-
-class Subgraph(object):
-    """ Utility class to generate subgraph around one or more items
-
-    :param
-    """
-    def __init__(self, bindings: dict = None):
-        self.graph = Graph()
-        self.graph.namespace_manager = NamespaceManager(self.graph)
-        for prefix, namespace in bindings.items():
-            self.graph.namespace_manager.bind(prefix, namespace)
-
-        self.downwards = defaultdict(lambda: True)
-        self.updwards = defaultdict(lambda: True)
-
-    def graphiter(self, graph, target, ascendants=0, descendants=1):
-        """ Iter on a graph to finds object connected
-
-        :param graph: Graph to serialize
-        :type graph: Graph
-        :param target: Node to iterate over
-        :type target: Node
-        :param ascendants: Number of level to iter over upwards (-1 = No Limit)
-        :param descendants: Number of level to iter over downwards (-1 = No limit)
-        :return:
-        """
-
-        asc = 0 + ascendants
-        if asc != 0:
-            asc -= 1
-
-        desc = 0 + descendants
-        if desc != 0:
-            desc -= 1
-
-        t = str(target)
-
-        if descendants != 0 and self.downwards[t] is True:
-            self.downwards[t] = False
-            for pred, obj in graph.predicate_objects(target):
-                if desc == 0 and isinstance(obj, BNode):
-                    continue
-                self.add((target, pred, obj))
-
-                # Retrieve triples about the object
-                if desc != 0 and self.downwards[str(obj)] is True:
-                    self.graphiter(graph, target=obj, ascendants=0, descendants=desc)
-
-        if ascendants != 0 and self.updwards[t] is True:
-            self.updwards[t] = False
-            for s, p in graph.subject_predicates(object=target):
-                if desc == 0 and isinstance(s, BNode):
-                    continue
-                self.add((s, p, target))
-
-                # Retrieve triples about the parent as object
-                if asc != 0 and self.updwards[str(s)] is True:
-                    self.graphiter(graph, target=s, ascendants=asc, descendants=0)
-
-    def serialize(self, *args, **kwargs):
-        return self.graph.serialize(*args, **kwargs)
-
-    def add(self, *args, **kwargs):
-        self.graph.add(*args, **kwargs)
-
-
 def xmliter(node):
     """ Provides a simple XML Iter method which complies with either _Element or _ObjectifiedElement
 
@@ -174,23 +66,6 @@ def xmliter(node):
         return node.iterchildren()
     else:
         return node
-
-
-def normalize(string):
-    """ Remove double-or-more spaces in a string
-
-    :param string: A string to change
-    :type string: text_type
-    :rtype: text_type
-    :returns: Clean string
-    """
-    return __strip.sub(" ", string)
-
-#: Dictionary of namespace that can be useful
-
-#: Dictionary of RDF Prefixes
-
-#: Mapping of known domains to RDF Classical Prefixes
 
 
 def xmlparser(xml, objectify=True):
@@ -416,105 +291,3 @@ def passageLoop(parent, new_tree, xpath1, xpath2=None, preceding_siblings=False,
                 passageLoop(result_2, node, queue_2, None, preceding_siblings=True)
 
     return new_tree
-
-
-class OrderedDefaultDict(OrderedDict):
-    """ Extension of Default Dict that makes an OrderedDefaultDict
-
-    :param default_factory__: Default class to initiate
-    """
-
-    def __init__(self, default_factory=None, *args, **kwargs):
-        super(OrderedDefaultDict, self).__init__(*args, **kwargs)
-        self.default_factory = default_factory
-
-    def __missing__(self, key):
-        if self.default_factory is None:
-            raise KeyError(key)
-        val = self[key] = self.default_factory()
-        return val
-
-
-def nested_ordered_dictionary():
-    """ Helper to create a nested ordered default dictionary
-
-    :rtype OrderedDefaultDict:
-    :return: Nested Ordered Default Dictionary instance
-    """
-    return OrderedDefaultDict(nested_ordered_dictionary)
-
-
-def nested_get(dictionary, keys):
-    """ Get value in dictionary for dictionary[keys[0]][keys[1]][keys[..n]]
-
-    :param dictionary: An input dictionary
-    :param keys: Keys where to store data
-    :return:
-    """
-    return reduce(lambda d, k: d[k], keys, dictionary)
-
-
-def nested_set(dictionary,  keys, value):
-    """ Set value in dictionary for dictionary[keys[0]][keys[1]][keys[..n]]
-
-    :param dictionary: An input dictionary
-    :param keys: Keys where to store data
-    :param value: Value to set at keys** target
-    :return: None
-    """
-    nested_get(dictionary, keys[:-1])[keys[-1]] = value
-
-
-def expand_namespace(nsmap, string):
-    """ If the string starts with a known prefix in nsmap, replace it by full URI
-
-    :param nsmap: Dictionary of prefix -> uri of namespace
-    :param string: String in which to replace the namespace
-    :return: Expanded string with no namespace
-    """
-    for ns in nsmap:
-        if isinstance(string, str) and isinstance(ns, str) and string.startswith(ns+":"):
-            return string.replace(ns+":", nsmap[ns])
-    return string
-
-
-_Route = namedtuple("Route", ["path", "query_dict"])
-_Navigation = namedtuple("Navigation", ["prev", "next", "last", "current", "first"])
-
-
-def parse_pagination(headers):
-    """ Parses headers to create a pagination objects
-
-    :param headers: HTTP Headers
-    :type headers: dict
-    :return: Navigation object for pagination
-    :rtype: _Navigation
-    """
-    links = {
-        link.rel: parse_qs(link.href).get("page", None)
-        for link in link_header.parse(headers.get("Link", "")).links
-    }
-    return _Navigation(
-        links.get("previous", [None])[0],
-        links.get("next", [None])[0],
-        links.get("last", [None])[0],
-        links.get("current", [None])[0],
-        links.get("first", [None])[0]
-    )
-
-
-def parse_uri(uri, endpoint_uri):
-    """ Parse a URI into a Route namedtuple
-
-    :param uri: URI or relative URI
-    :type uri: str
-    :param endpoint_uri: URI of the endpoint
-    :type endpoint_uri: str
-    :return: Parsed route
-    :rtype: _Route
-    """
-    temp_parse = urlparse(uri)
-    return _Route(
-        urljoin(endpoint_uri, temp_parse.path),
-        parse_qs(temp_parse.query)
-    )

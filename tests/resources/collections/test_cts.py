@@ -5,14 +5,12 @@ import unittest
 from io import open, StringIO
 from operator import attrgetter
 
-from rdflib import Literal, URIRef
-
 import lxml.etree as etree
 import xmlunittest
 
+from MyCapytain.common import constants
 from MyCapytain.resources.collections.cts import *
 from MyCapytain.resources.prototypes.text import CtsNode
-from MyCapytain.common import constants
 
 
 class XML_Compare(object):

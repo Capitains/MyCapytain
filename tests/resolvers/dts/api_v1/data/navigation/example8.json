@@ -1,0 +1,20 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#",
+        "foo": "http://foo.bar/ontology"
+    },
+    "@id":"/api/dts/navigation/?id=http://data.bnf.fr/ark:/12148/cb11936111v",
+    "dts:citeDepth" : 1,
+    "dts:level": 1,
+    "dts:citeType": "letter",
+    "member": [
+      { "dts:ref": "Av", "dts:citeType": "preface"},
+      { "dts:ref": "Pr", "dts:citeType": "preface"},
+      { "dts:ref": "1" },
+      { "dts:ref": "2" },
+      { "dts:ref": "3" }
+    ],
+    "dts:passage": "/dts/api/document/?id=http://data.bnf.fr/ark:/12148/cb11936111v{&ref}{&start}{&end}"
+}

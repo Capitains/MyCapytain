@@ -9,6 +9,7 @@
 """
 import MyCapytain.retrievers.prototypes
 from MyCapytain import __version__
+from MyCapytain.common.reference import BaseReference
 import requests
 from MyCapytain.common.utils import parse_uri
 
@@ -101,15 +102,14 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         )
 
     def get_navigation(
-            self, collection_id,
-            level=None, ref=None, group_size=None, max_=None, exclude=None,
-            page=None):
+            self, collection_id, level=None, ref=None,
+            group_by=None, max_=None, exclude=None, page=None):
         """ Make a navigation request on the DTS API
 
         :param collection_id: Id of the collection
         :param level: Lever at which the references should be listed
         :param ref: If ref is a tuple, it is treated as a range. String or int are treated as single ref
-        :param group_size: Size of the ranges the server should produce
+        :param group_by: Size of the ranges the server should produce
         :param max_: Maximum number of results
         :param exclude: Exclude specific metadata.
         :param page: Page
@@ -119,13 +119,16 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         parameters = {
             "id": collection_id,
             "level": level,
-            "groupSize": group_size,
+            "groupBy": group_by,
             "max": max_,
             "exclude": exclude,
             "page": page
         }
-        if isinstance(ref, tuple):
-            parameters["start"], parameters["end"] = ref
+        if isinstance(ref, BaseReference):
+            if ref.is_range():
+                parameters["start"], parameters["end"] = ref
+            else:
+                parameters["ref"] = ref.start
         elif ref:
             parameters["ref"] = ref
 

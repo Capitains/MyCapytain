@@ -5,6 +5,7 @@
     },
     "@id":"/api/dts/navigation/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc",
     "citeDepth" : 2,
+    "citeType": "poem",
     "level": 1,
     "hydra:member": [
       {"ref": "1"},

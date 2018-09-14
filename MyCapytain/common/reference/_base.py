@@ -319,6 +319,7 @@ class BaseReference(tuple):
     def __new__(cls, *refs):
         if len(refs) == 1 and not isinstance(refs[0], tuple):
             refs = refs[0], None
+
         obj = tuple.__new__(cls, refs)
 
         return obj
@@ -358,7 +359,7 @@ class BaseReferenceSet(tuple):
         obj._citation = None
         obj._level = level
 
-        if citation:
+        if citation is not None:
             obj._citation = citation
         return obj
 
@@ -369,6 +370,14 @@ class BaseReferenceSet(tuple):
     @property
     def level(self) -> int:
         return self._level
+
+    def __repr__(self):
+        return "<{typ} ({repr}) level:{level}, citation:{citation}>".format(
+            typ=type(self).__name__,
+            repr=", ".join([str(s) for s in self]),
+            level=self.level,
+            citation=str(self.citation)
+        )
 
 
 class NodeId(object):

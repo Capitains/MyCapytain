@@ -12,6 +12,7 @@ from MyCapytain.common.utils.xml import make_xml_node
 from MyCapytain.common.constants import Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from rdflib import BNode, Literal, Graph, URIRef, term
+from typing import Union
 
 
 class Metadata(Exportable):
@@ -46,6 +47,17 @@ class Metadata(Exportable):
         :rtype: Graph
         """
         return self.__graph__
+
+    def set(self, key: URIRef, value: Union[Literal, BNode, URIRef, str, int], lang: str=None):
+        if not isinstance(value, Literal) and lang is not None:
+            value = Literal(value, lang=lang)
+        elif not isinstance(value, (BNode, URIRef)):
+            value, _type = term._castPythonToLiteral(value)
+            if _type is None:
+                value = Literal(value)
+            else:
+                value = Literal(value, datatype=_type)
+        self.graph.set((self.asNode(), key, value))
 
     def add(self, key, value, lang=None):
         """ Add a triple to the graph related to this node

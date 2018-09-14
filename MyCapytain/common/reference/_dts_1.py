@@ -9,12 +9,39 @@ _cite_structure_term = str(_dts.term("citeStructure"))
 
 
 class DtsReference(BaseReference):
-    def __new__(cls, *refs, metadata: Metadata=None):
-        o = super(DtsReference).__new__(*refs)
+    def __new__(cls, *refs, metadata: Metadata=None, type_: str=None):
+        o = BaseReference.__new__(cls, *refs)
         if metadata:
             o._metadata = metadata
         else:
             o._metadata = Metadata()  # toDo : Figure how to deal with Refs ID in the Sparql Graph
+
+        if type_:
+            o.type = type_
+        return o
+
+    @property
+    def metadata(self) -> Metadata:
+        return self._metadata
+
+    @property
+    def type(self):
+        return self.metadata.get_single(_dts.term("citeType"))
+
+    @type.setter
+    def type(self, value):
+        self.metadata.set(_dts.term("citeType"), value)
+
+    def __eq__(self, other):
+        return super(DtsReference, self).__eq__(other) and \
+            isinstance(other, DtsReference) and \
+            self.type == other.type
+
+    def __repr__(self):
+        return "<DtsCitation <{}> [{}]>".format(
+            "><".join([str(x) for x in self if x]),
+            self.type
+        )
 
 
 class DtsReferenceSet(BaseReferenceSet):
@@ -22,10 +49,31 @@ class DtsReferenceSet(BaseReferenceSet):
         return BaseReferenceSet.__contains__(self, item) or \
                BaseReferenceSet.__contains__(self, DtsReference(item))
 
+    def __eq__(self, other):
+        return super(DtsReferenceSet, self).__eq__(other) and \
+            self.level == other.level and \
+            isinstance(other, DtsReferenceSet) and \
+            self.citation == other.citation
+
 
 class DtsCitation(BaseCitation):
     def __init__(self, name=None, children=None, root=None):
         super(DtsCitation, self).__init__(name=name, children=children, root=root)
+
+    def __eq__(self, other):
+        return isinstance(other, BaseCitation) and \
+            self.name == other.name and \
+            self.children == other.children and \
+               (
+                   (
+                       not self.is_root() and
+                       not other.is_root() and
+                       self.root == other.root
+                   )
+                   or (
+                       self.is_root() and other.is_root()
+                   )
+               )
 
     @classmethod
     def ingest(cls, resource, root=None, **kwargs):

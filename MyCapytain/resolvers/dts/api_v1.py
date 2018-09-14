@@ -12,34 +12,33 @@ from typing import Union, Optional, Any, Dict
 
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet, \
-    DtsReference, DtsReferenceSet
+    DtsReference, DtsReferenceSet, DtsCitation
 from MyCapytain.retrievers.dts import HttpDtsRetriever
-from MyCapytain.common.utils import dict_to_literal
+from MyCapytain.common.utils.dts import parse_metadata
 
-from rdflib import URIRef
 from pyld.jsonld import expand
 
 
-def _parse_ref(ref_dict):
+_empty = [{"@value": None}]
+
+
+def _parse_ref(ref_dict, default_type :str =None):
     if "https://w3id.org/dts/api#ref" in ref_dict:
-        refs = ref_dict["https://w3id.org/dts/api#"],
+        refs = ref_dict["https://w3id.org/dts/api#ref"][0]["@value"],
     elif "https://w3id.org/dts/api#start" in ref_dict and \
          "https://w3id.org/dts/api#end" in ref_dict:
-        refs = ref_dict["https://w3id.org/dts/api#start"], ref_dict["https://w3id.org/dts/api#end"]
+        refs = (
+            ref_dict["https://w3id.org/dts/api#start"][0]["@value"],
+            ref_dict["https://w3id.org/dts/api#end"][0]["@value"]
+        )
     else:
         return None  # Maybe Raise ?
+    type_ = default_type
+    if "https://w3id.org/dts/api#citeType" in ref_dict:
+        type_ = ref_dict["https://w3id.org/dts/api#citeType"][0]["@value"]
 
-    obj = DtsReference(*refs)
-
-    for key, value_set in ref_dict.get("https://w3id.org/dts/api#dublincore", [{}])[0].items():
-        term = URIRef(key)
-        for value_dict in value_set:
-            obj.metadata.add(term, *dict_to_literal(value_dict))
-
-    for key, value_set in ref_dict.get("https://w3id.org/dts/api#extensions", [{}])[0].items():
-        term = URIRef(key)
-        for value_dict in value_set:
-            obj.metadata.add(term, *dict_to_literal(value_dict))
+    obj = DtsReference(*refs, type_=type_)
+    parse_metadata(obj.metadata, ref_dict)
 
     return obj
 
@@ -77,19 +76,30 @@ class HttpDtsResolver(Resolver):
         reffs = []
         response = self.endpoint.get_navigation(
             textId, level=level, ref=subreference,
-            group_size=additional_parameters.get("group_by", 1),
-            exclude=additional_parameters.get("exclude", None)
+            exclude=additional_parameters.get("exclude", None),
+            group_by=additional_parameters.get("groupBy", 1)
         )
         response.raise_for_status()
 
         data = response.json()
         data = expand(data)
-        members = data[0].get("https://w3id.org/dts/api#member", None)
+
+        default_type = data[0].get("https://w3id.org/dts/api#citeType", _empty)[0]["@value"]
+
+        members = data[0].get("https://www.w3.org/ns/hydra/core#member", [])
 
         reffs.extend([
-            _parse_ref(ref)
+            _parse_ref(ref, default_type=default_type)
             for ref in members
         ])
 
-        reffs = DtsReferenceSet(*reffs)
+        citation = None
+        if default_type:
+            citation = DtsCitation(name=default_type)
 
+        reffs = DtsReferenceSet(
+            *reffs,
+            level=data[0].get("https://w3id.org/dts/api#level", _empty)[0]["@value"],
+            citation=citation
+        )
+        return reffs

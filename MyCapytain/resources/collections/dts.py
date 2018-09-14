@@ -2,9 +2,9 @@ from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.errors import JsonLdCollectionMissing
 from MyCapytain.common.reference import DtsCitationSet
 from MyCapytain.common.constants import RDF_NAMESPACES
-from MyCapytain.common.utils import dict_to_literal
+from MyCapytain.common.utils.dts import parse_metadata
 
-from rdflib import URIRef
+
 from pyld import jsonld
 
 
@@ -84,15 +84,7 @@ class DTSCollection(Collection):
         for val_dict in collection.get(str(_hyd.description), []):
             obj.metadata.add(_hyd.description, val_dict["@value"], None)
 
-        for key, value_set in collection.get(str(_dts.dublincore), _empty_extensions)[0].items():
-            term = URIRef(key)
-            for value_dict in value_set:
-                obj.metadata.add(term, *dict_to_literal(value_dict))
-
-        for key, value_set in collection.get(str(_dts.extensions), _empty_extensions)[0].items():
-            term = URIRef(key)
-            for value_dict in value_set:
-                obj.metadata.add(term, *dict_to_literal(value_dict))
+        parse_metadata(obj.metadata, collection)
 
         for member in collection.get(str(_hyd.member), []):
             subcollection = cls.parse(member)

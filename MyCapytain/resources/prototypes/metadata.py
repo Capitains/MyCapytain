@@ -16,6 +16,7 @@ from MyCapytain.common.base import Exportable
 from MyCapytain.common.reference import BaseCitationSet
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
 from rdflib.namespace import SKOS, DC, DCTERMS
+from typing import List
 
 
 __all__ = [
@@ -162,7 +163,7 @@ class Collection(Exportable):
         ])
 
     @property
-    def children(self):
+    def children(self) -> dict:
         """ Dictionary of childrens {Identifier: Collection}
 
         :rtype: dict
@@ -170,7 +171,7 @@ class Collection(Exportable):
         return self.__children__
 
     @property
-    def parents(self):
+    def parents(self) -> List["Collection"]:
         """ Iterator to find parents of current collection, from closest to furthest
 
         :rtype: Generator[:class:`Collection`]

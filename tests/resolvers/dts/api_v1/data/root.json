@@ -2,7 +2,7 @@
   "@context": "/api/dts/contexts/EntryPoint.jsonld",
   "@id": "/api/dts/",
   "@type": "EntryPoint",
-  "collections": "/api/dts/collections/",
-  "documents": "/api/dts/documents/",
+  "collections": "/api/dts/collections",
+  "documents": "/api/dts/documents",
   "navigation" : "/api/dts/navigation"
 }

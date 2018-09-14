@@ -5,11 +5,12 @@ from MyCapytain.common.constants import RDF_NAMESPACES
 from MyCapytain.common.utils.dts import parse_metadata
 
 
+from typing import List
 from pyld import jsonld
 
 
 __all__ = [
-    "DTSCollection"
+    "DtsCollection"
 ]
 
 
@@ -20,12 +21,12 @@ _tei = RDF_NAMESPACES.TEI
 _empty_extensions = [{}]
 
 
-class DTSCollection(Collection):
+class DtsCollection(Collection):
 
     CitationSet = DtsCitationSet
 
     def __init__(self, identifier="", *args, **kwargs):
-        super(DTSCollection, self).__init__(identifier, *args, **kwargs)
+        super(DtsCollection, self).__init__(identifier, *args, **kwargs)
         self._expanded = False  # Not sure I'll keep this
         self._citation = DtsCitationSet()
 
@@ -57,7 +58,7 @@ class DTSCollection(Collection):
         :type resource: dict
         :param direction: Direction of the hydra:members value
         :return: DTSCollection parsed
-        :rtype: DTSCollection
+        :rtype: DtsCollection
         """
 
         collection = jsonld.expand(resource)
@@ -90,10 +91,39 @@ class DTSCollection(Collection):
             obj.metadata.add(_hyd.description, val_dict["@value"], None)
 
         parse_metadata(obj.metadata, collection)
-
-        for member in collection.get(str(_hyd.member), []):
-            subcollection = cls.parse(member)
-            if direction == "children":
-                subcollection.parent = obj
+        members = cls.parse_member(
+            collection, obj, direction
+        )
+        if direction == "children":
+            obj.children.update({
+                coll.id: coll
+                for coll in members
+            })
+        else:
+            obj.parents.extend(members)
 
         return obj
+
+    @classmethod
+    def parse_member(
+            cls,
+            obj: dict,
+            collection: "DtsCollection",
+            direction) -> List["DtsCollection"]:
+        """ Parse the member value of a Collection response
+        and returns the list of object while setting the graph
+        relationship based on `direction`
+
+        :param obj: PyLD parsed JSON+LD
+        :param collection: Collection attached to the member property
+        :param direction: Direction of the member (children, parent)
+        """
+        members = []
+
+        for member in obj.get(str(_hyd.member), []):
+            subcollection = cls.parse(member)
+            if direction == "children":
+                subcollection.parent = collection
+            members.append(subcollection)
+
+        return members

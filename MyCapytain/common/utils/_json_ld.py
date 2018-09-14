@@ -20,6 +20,8 @@ def literal_to_dict(value):
 
 
 def dict_to_literal(dict_container: dict):
+    """ Transforms a JSON+LD PyLD dictionary into
+    an RDFLib object"""
     if isinstance(dict_container["@value"], int):
         return dict_container["@value"],
     else:

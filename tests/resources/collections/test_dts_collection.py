@@ -1,4 +1,4 @@
-from MyCapytain.resources.collections.dts import DTSCollection
+from MyCapytain.resources.collections.dts import DtsCollection
 from MyCapytain.common.constants import Mimetypes, set_graph, bind_graph
 from unittest import TestCase
 import json
@@ -36,7 +36,7 @@ class TestDtsCollection(TestCase):
 
     def test_simple_collection(self):
         coll = self.get_collection(1)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
 
         self.assertEqual(
@@ -86,7 +86,7 @@ class TestDtsCollection(TestCase):
 
     def test_collection_single_member_with_types(self):
         coll = self.get_collection(2)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
         self.assertEqual(
             exported,
@@ -131,7 +131,7 @@ class TestDtsCollection(TestCase):
 
     def test_collection_with_complex_child(self):
         coll = self.get_collection(3)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
         self.assertEqual(
             exported,
@@ -193,7 +193,7 @@ class TestDtsCollection(TestCase):
 
     def test_collection_with_cite_depth_but_no_structure(self):
         coll = self.get_collection(5)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
         self.assertEqual(exported["dts:citeDepth"], 7, "There should be a cite depth property")
         self.assertNotIn("dts:citeStructure", exported, "CiteStructure was not defined")

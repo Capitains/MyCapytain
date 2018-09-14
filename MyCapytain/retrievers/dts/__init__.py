@@ -14,6 +14,11 @@ import requests
 from MyCapytain.common.utils import parse_uri
 
 
+__all__ = [
+    "HttpDtsRetriever"
+]
+
+
 class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
     def __init__(self, endpoint):
         super(HttpDtsRetriever, self).__init__(endpoint)

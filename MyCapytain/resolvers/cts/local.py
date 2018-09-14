@@ -21,6 +21,11 @@ from MyCapytain.resources.prototypes.cts.inventory import CtsTextInventoryCollec
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
 
+__all__ = [
+    "CtsCapitainsLocalResolver"
+]
+
+
 class CtsCapitainsLocalResolver(Resolver):
     """ XML Folder Based resolver. CtsTextMetadata and metadata resolver based on local directories
 

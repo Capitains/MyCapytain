@@ -15,12 +15,17 @@ from MyCapytain.common.constants import RDF_NAMESPACES, RDFLIB_MAPPING, Mimetype
 from MyCapytain.common.base import Exportable
 from MyCapytain.common.reference import BaseCitationSet
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
-from rdflib.namespace import SKOS, DC, DCTERMS, NamespaceManager
+from rdflib.namespace import SKOS, DC, DCTERMS
+
+
+__all__ = [
+    "Collection",
+    "ResourceCollection"
+]
 
 
 _ns_hydra_str = str(RDF_NAMESPACES.HYDRA)
 _ns_cts_str = str(RDF_NAMESPACES.CTS)
-_ns_dts_str = str(RDF_NAMESPACES.DTS)
 _ns_dts_str = str(RDF_NAMESPACES.DTS)
 _ns_dct_str = str(DCTERMS)
 _ns_cap_str = str(RDF_NAMESPACES.CAPITAINS)

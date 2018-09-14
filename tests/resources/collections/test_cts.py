@@ -11,6 +11,9 @@ import xmlunittest
 from MyCapytain.common import constants
 from MyCapytain.resources.collections.cts import *
 from MyCapytain.resources.prototypes.text import CtsNode
+from MyCapytain.common.utils.xml import xmlparser
+from MyCapytain.common.constants import Mimetypes, RDF_NAMESPACES, XPATH_NAMESPACES
+from rdflib import URIRef, Literal, XSD
 
 
 class XML_Compare(object):

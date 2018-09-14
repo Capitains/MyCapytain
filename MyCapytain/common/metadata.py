@@ -15,6 +15,11 @@ from rdflib import BNode, Literal, Graph, URIRef, term
 from typing import Union
 
 
+__all__ = [
+    "Metadata"
+]
+
+
 class Metadata(Exportable):
     """ A metadatum aggregation object provided to centralize metadata
 

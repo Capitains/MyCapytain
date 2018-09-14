@@ -10,13 +10,21 @@
 from six import text_type
 from rdflib.namespace import DC
 from rdflib import BNode, URIRef
-from MyCapytain.common.reference import URN
-from MyCapytain.common.reference._base import NodeId
-from MyCapytain.common.reference._capitains_cts import Citation
+from MyCapytain.common.reference import URN, Citation, NodeId
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES
 from MyCapytain.common.base import Exportable
 from MyCapytain.resources.prototypes.metadata import Collection
+
+
+__all__ = [
+    "TextualElement",
+    "TextualGraph",
+    "TextualNode",
+    "CitableText",
+    "InteractiveTextualNode",
+    "CtsNode"
+]
 
 
 class TextualElement(Exportable):

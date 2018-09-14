@@ -8,6 +8,11 @@ from MyCapytain.common.utils.dts import parse_metadata
 from pyld import jsonld
 
 
+__all__ = [
+    "DTSCollection"
+]
+
+
 _hyd = RDF_NAMESPACES.HYDRA
 _dts = RDF_NAMESPACES.DTS
 _cap = RDF_NAMESPACES.CAPITAINS

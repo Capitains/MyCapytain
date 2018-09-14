@@ -20,6 +20,18 @@ from copy import deepcopy
 from rdflib import RDF, Literal, URIRef
 from rdflib.namespace import DC
 
+__all__ = [
+    "PrototypeCtsCollection",
+    "CtsTextInventoryCollection",
+    "CtsEditionMetadata",
+    "CtsWorkMetadata",
+    "CtsCommentaryMetadata",
+    "CtsTextgroupMetadata",
+    "CtsTextInventoryMetadata",
+    "CtsTextMetadata",
+    "CtsTranslationMetadata"
+]
+
 
 class PrototypeCtsCollection(Collection):
     """ Resource represents any resource from the inventory

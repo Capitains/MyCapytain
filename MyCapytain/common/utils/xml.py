@@ -10,6 +10,17 @@ from six import text_type
 from MyCapytain.common.constants import XPATH_NAMESPACES
 
 
+__all__ = [
+    "make_xml_node",
+    "xmlparser",
+    "normalizeXpath",
+    "xmliter",
+    "performXpath",
+    "copyNode",
+    "passageLoop"
+]
+
+
 _parser = etree.XMLParser(collect_ids=False, resolve_entities=False)
 
 

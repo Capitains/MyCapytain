@@ -14,7 +14,12 @@ from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.resources.prototypes.text import InteractiveTextualNode
 
 
-class TEIResource(InteractiveTextualNode):
+__all__ = [
+    "TeiResource"
+]
+
+
+class TeiResource(InteractiveTextualNode):
     """ TEI Encoded Resource
 
     :param resource: XML Resource that needs to be parsed into a CapitainsCtsPassage/CtsTextMetadata
@@ -29,16 +34,16 @@ class TEIResource(InteractiveTextualNode):
     DEFAULT_EXPORT = Mimetypes.PLAINTEXT
     PLAINTEXT_STRING_JOIN = " "
 
-    def __init__(self, resource, **kwargs):
-        super(TEIResource, self).__init__(**kwargs)
+    def __init__(self, resource: str, **kwargs):
+        super(TeiResource, self).__init__(**kwargs)
         self.resource = xmlparser(resource)
-        self.__plaintext_string_join__ = ""+self.PLAINTEXT_STRING_JOIN
+        self._plaintext_string_join = "" + self.PLAINTEXT_STRING_JOIN
 
     @property
-    def plaintext_string_join(self):
+    def plaintext_string_join(self) -> str:
         """ String used to join xml node's texts in export
         """
-        return self.__plaintext_string_join__
+        return self._plaintext_string_join
 
     @plaintext_string_join.setter
     def plaintext_string_join(self, value):
@@ -48,7 +53,7 @@ class TEIResource(InteractiveTextualNode):
         :type value: str
         :return:
         """
-        self.__plaintext_string_join__ = value
+        self._plaintext_string_join = value
 
     def __str__(self):
         """ CtsTextMetadata based representation of the passage

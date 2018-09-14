@@ -17,13 +17,19 @@ from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
 from MyCapytain.common.reference import CtsReference, URN, Citation, CtsReferenceSet
 
 from MyCapytain.resources.prototypes import text
-from MyCapytain.resources.texts.base.tei import TEIResource
+from MyCapytain.resources.texts.base.tei import TeiResource
 
 from MyCapytain.errors import InvalidSiblingRequest, InvalidURN
-from lxml import etree
+import lxml.etree as etree
 
 
-def __makePassageKwargs__(urn, reference):
+__all__ = [
+    "CapitainsCtsText",
+    "CapitainsCtsPassage"
+]
+
+
+def _makePassageKwargs(urn, reference):
     """ Little helper used by CapitainsCtsPassage here to comply with parents args
 
     :param urn: URN String
@@ -39,7 +45,7 @@ def __makePassageKwargs__(urn, reference):
     return kwargs
 
 
-class _SharedMethods:
+class _SharedMethods(TeiResource):
     """ Set of shared methods between objects in local TEI. Avoid recoding functions
     """
 
@@ -113,7 +119,7 @@ class _SharedMethods:
         :rtype: CapitainsCtsPassage
         """
         if reference is None:
-            return __SimplePassage__(
+            return _SimplePassage(
                 resource=self.resource,
                 reference=None,
                 urn=self.urn,
@@ -130,7 +136,7 @@ class _SharedMethods:
         if len(resource) != 1:
             raise InvalidURN
 
-        return __SimplePassage__(
+        return _SimplePassage(
             resource[0],
             reference=reference,
             urn=self.urn,
@@ -287,7 +293,7 @@ class _SharedMethods:
         return etree.tostring(self.resource, *args, **kwargs)
 
 
-class __SimplePassage__(_SharedMethods, TEIResource, text.Passage):
+class _SimplePassage(_SharedMethods, text.Passage):
     """ CapitainsCtsPassage for simple and quick parsing of texts
 
     :param resource: Element representing the passage
@@ -302,10 +308,10 @@ class __SimplePassage__(_SharedMethods, TEIResource, text.Passage):
     :type text: CapitainsCtsText
     """
     def __init__(self, resource, reference, citation, text, urn=None):
-        super(__SimplePassage__, self).__init__(
+        super(_SimplePassage, self).__init__(
             resource=resource,
             citation=citation,
-            **__makePassageKwargs__(urn, reference)
+            **_makePassageKwargs(urn, reference)
         )
         self.__text__ = text
         self.__reference__ = reference
@@ -434,7 +440,7 @@ class __SimplePassage__(_SharedMethods, TEIResource, text.Passage):
         return self.__text__
 
 
-class CapitainsCtsText(_SharedMethods, TEIResource, text.CitableText):
+class CapitainsCtsText(_SharedMethods, text.CitableText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
@@ -479,7 +485,7 @@ class CapitainsCtsText(_SharedMethods, TEIResource, text.CitableText):
             raise E
 
 
-class CapitainsCtsPassage(_SharedMethods, TEIResource, text.Passage):
+class CapitainsCtsPassage(_SharedMethods, text.Passage):
     """ CapitainsCtsPassage class for local texts which rebuilds the tree up to the passage.
 
         For design purposes, some people would prefer the output of GetPassage to be consistent. ContextPassage rebuilds
@@ -531,7 +537,7 @@ class CapitainsCtsPassage(_SharedMethods, TEIResource, text.Passage):
         super(CapitainsCtsPassage, self).__init__(
             citation=citation,
             resource=resource,
-            **__makePassageKwargs__(urn, reference)
+            **_makePassageKwargs(urn, reference)
         )
         if urn is not None and urn.reference is not None:
             reference = urn.reference

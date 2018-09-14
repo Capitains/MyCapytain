@@ -4,10 +4,10 @@ from six import text_type as str
 
 import unittest
 
-import MyCapytain.common.reference._capitains_cts
-from MyCapytain.common.reference._capitains_cts import URN
+from MyCapytain.common.reference import URN, Citation
 
 from MyCapytain.resources.prototypes.text import *
+from MyCapytain.common.constants import RDF_NAMESPACES
 import MyCapytain.common.reference
 import MyCapytain.common.metadata
 

@@ -16,8 +16,14 @@ from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPA
 from MyCapytain.common.reference._capitains_cts import CtsReference, URN
 from MyCapytain.resources.collections import cts as CtsCollection
 from MyCapytain.resources.prototypes import text as prototypes
-from MyCapytain.resources.texts.base.tei import TEIResource
+from MyCapytain.resources.texts.base.tei import TeiResource
 from MyCapytain.errors import MissingAttribute
+
+
+__all__ = [
+    "CtsPassage",
+    "CtsText"
+]
 
 
 class _SharedMethod(prototypes.InteractiveTextualNode):
@@ -372,7 +378,7 @@ class CtsText(_SharedMethod, prototypes.CitableText):
         return self.getTextualNode().export(output, exclude)
 
 
-class CtsPassage(_SharedMethod, prototypes.Passage, TEIResource):
+class CtsPassage(_SharedMethod, prototypes.Passage, TeiResource):
     """ CapitainsCtsPassage representing
 
     :param urn:

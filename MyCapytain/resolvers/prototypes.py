@@ -13,6 +13,11 @@ from MyCapytain.resources.prototypes.text import TextualNode
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet
 
 
+__all__ = [
+    "Resolver"
+]
+
+
 class Resolver(object):
     """ Resolver provide a native python API which returns python objects.
 

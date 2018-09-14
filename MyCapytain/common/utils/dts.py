@@ -3,6 +3,11 @@ from rdflib import URIRef
 from ..metadata import Metadata
 
 
+__all__ = [
+    "parse_metadata"
+]
+
+
 def parse_metadata(metadata_obj: Metadata, metadata_dictionary: dict) -> None:
     """ Adds to a Metadata object any DublinCore or dts:Extensions object
     found in the given dictionary

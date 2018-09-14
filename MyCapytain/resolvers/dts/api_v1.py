@@ -19,6 +19,10 @@ from MyCapytain.common.utils.dts import parse_metadata
 from pyld.jsonld import expand
 
 
+__all__ = [
+    "HttpDtsResolver"
+]
+
 _empty = [{"@value": None}]
 
 

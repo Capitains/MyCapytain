@@ -97,7 +97,7 @@ class HttpDtsResolver(Resolver):
         page = 1
         while page:
             kwargs = dict(
-                level = level, ref = subreference,
+                level=level, ref=subreference,
                 exclude=additional_parameters.get("exclude", None),
                 group_by=additional_parameters.get("groupBy", 1)
             )

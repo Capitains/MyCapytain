@@ -1,0 +1,24 @@
+{
+    "@context": {
+        "hydra": "https://www.w3.org/ns/hydra/core#",
+        "@vocab": "https://w3id.org/dts/api#"
+    },
+    "@id":"/api/dts/navigation/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc",
+    "citeDepth" : 2,
+    "citeType": "poem",
+    "level": 1,
+    "hydra:member": [
+      {"ref": "4"},
+      {"ref": "5"},
+      {"ref": "6"}
+    ],
+    "passage": "/dts/api/document/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc{&ref}{&start}{&end}",
+    "hydra:view": {
+        "@id": "/api/dts/collections/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grcs&page=2",
+        "@type": "PartialCollectionView",
+        "hydra:first": "/api/dts/collections/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc&page=1",
+        "hydra:previous": "/api/dts/collections/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc&page=1",
+        "hydra:next": "/api/dts/collections/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc&page=3",
+        "hydra:last": "/api/dts/collections/?id=urn:cts:greekLit:tlg0012.tlg001.opp-grc&page=3"
+    }
+}

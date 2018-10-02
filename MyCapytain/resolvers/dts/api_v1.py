@@ -9,6 +9,7 @@
 """
 
 from typing import Union, Optional, Any, Dict
+import re
 
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet, \
@@ -25,6 +26,7 @@ __all__ = [
 ]
 
 _empty = [{"@value": None}]
+_re_page = re.compile("page=(\d+)")
 
 
 def _parse_ref(ref_dict, default_type :str =None):
@@ -88,33 +90,54 @@ class HttpDtsResolver(Resolver):
         if not additional_parameters:
             additional_parameters = {}
 
-        reffs = []
-        response = self.endpoint.get_navigation(
-            textId, level=level, ref=subreference,
-            exclude=additional_parameters.get("exclude", None),
-            group_by=additional_parameters.get("groupBy", 1)
-        )
-        response.raise_for_status()
+        references = []
+        default_type = None
+        level_ = level
 
-        data = response.json()
-        data = expand(data)
+        page = 1
+        while page:
+            kwargs = dict(
+                level = level, ref = subreference,
+                exclude=additional_parameters.get("exclude", None),
+                group_by=additional_parameters.get("groupBy", 1)
+            )
+            if page != 1:
+                kwargs["page"] = page
 
-        default_type = data[0].get("https://w3id.org/dts/api#citeType", _empty)[0]["@value"]
+            response = self.endpoint.get_navigation(textId, **kwargs)
+            response.raise_for_status()
 
-        members = data[0].get("https://www.w3.org/ns/hydra/core#member", [])
+            data = response.json()
+            data = expand(data)
+            if not len(data):
+                raise Exception("We'll see this one later")  # toDo: What error should it be ?
+            data = data[0]
 
-        reffs.extend([
-            _parse_ref(ref, default_type=default_type)
-            for ref in members
-        ])
+            level_ = data.get("https://w3id.org/dts/api#level", _empty)[0]["@value"]
+            default_type = data.get("https://w3id.org/dts/api#citeType", _empty)[0]["@value"]
+            members = data.get("https://www.w3.org/ns/hydra/core#member", [])
+
+            references.extend([
+                _parse_ref(ref, default_type=default_type)
+                for ref in members
+            ])
+
+            page = None
+            if "https://www.w3.org/ns/hydra/core#view" in data:
+                if "https://www.w3.org/ns/hydra/core#next" in data["https://www.w3.org/ns/hydra/core#view"][0]:
+                    page = _re_page.findall(
+                        data["https://www.w3.org/ns/hydra/core#view"]
+                            [0]["https://www.w3.org/ns/hydra/core#next"]
+                            [0]["@value"]
+                    )[0]
 
         citation = None
         if default_type:
             citation = DtsCitation(name=default_type)
 
         reffs = DtsReferenceSet(
-            *reffs,
-            level=data[0].get("https://w3id.org/dts/api#level", _empty)[0]["@value"],
+            *references,
+            level=level_,
             citation=citation
         )
         return reffs

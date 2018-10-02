@@ -353,3 +353,43 @@ class TestHttpDtsResolverNavigation(unittest.TestCase):
             reffs[4].metadata.export(Mimetypes.JSON.Std),
             "References metadata should be parsed correctly"
         )
+
+    @requests_mock.mock()
+    def test_navigation_paginated(self, mock_set):
+        """ Check that all pagination is browsed """
+        _id = "urn:cts:greekLit:tlg0012.tlg001.opp-grc"
+        mock_set.get(self.root_uri, text=_load_mock("root.json"))
+        mock_set.get(
+            self.root_uri+"/navigation?level=1&groupBy=1&id="+_id,
+            text=_load_mock("navigation", "paginated/page1.json"),
+            complete_qs=True
+        )
+        mock_set.get(
+            self.root_uri+"/navigation?page=2&level=1&groupBy=1&id="+_id,
+            text=_load_mock("navigation", "paginated/page2.json"),
+            complete_qs=True
+        )
+        mock_set.get(
+            self.root_uri+"/navigation?page=3&level=1&groupBy=1&id="+_id,
+            text=_load_mock("navigation", "paginated/page3.json"),
+            complete_qs=True
+        )
+        reffs = self.resolver.getReffs(_id)
+
+        self.assertEqual(
+            DtsReferenceSet(
+                DtsReference("1", type_="poem"),
+                DtsReference("2", type_="poem"),
+                DtsReference("3", type_="poem"),
+                DtsReference("4", type_="poem"),
+                DtsReference("5", type_="poem"),
+                DtsReference("6", type_="poem"),
+                DtsReference("7", type_="poem"),
+                DtsReference("8", type_="poem"),
+                DtsReference("9", type_="poem"),
+                level=1,
+                citation=DtsCitation("poem")
+            ),
+            reffs,
+            "Resolvers follows view property"
+        )

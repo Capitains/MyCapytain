@@ -1,0 +1,64 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#",
+    },
+    "@id": "urn:cts:latinLit:phi1103.phi001",
+    "@type": "Collection",
+    "title" : "Priapeia",
+    "dts:dublincore": {
+        "dc:type": ["http://chs.harvard.edu/xmlns/cts#work"],
+        "dc:creator": [
+            {"@lang": "en", "@value": "Anonymous"}
+        ],
+        "dc:language": ["la", "en"],
+        "dc:title": [{"@lang": "la", "@value": "Priapeia"}],
+        "dc:description": [{
+           "@lang": "en",
+            "@value": "Anonymous lascivious Poems "
+        }]
+    },
+    "totalItems" : 1,
+    "member": [
+        {
+            "@id" : "urn:cts:latinLit:phi1103.phi001.lascivaroma-lat1",
+            "@type": "Resource",
+            "title" : "Priapeia",
+            "description": "Priapeia based on the edition of Aemilius Baehrens",
+            "totalItems": 0,
+            "dts:dublincore": {
+                "dc:title": [{"@lang": "la", "@value": "Priapeia"}],
+                "dc:description": [{
+                   "@lang": "en",
+                   "@value": "Anonymous lascivious Poems "
+                }],
+                "dc:type": [
+                    "http://chs.harvard.edu/xmlns/cts#edition",
+                    "dc:Text"
+                ],
+                "dc:source": ["https://archive.org/details/poetaelatinimino12baeh2"],
+                "dc:dateCopyrighted": 1879,
+                "dc:creator": [
+                    {"@lang": "en", "@value": "Anonymous"}
+                ],
+                "dc:contributor": ["Aemilius Baehrens"],
+                "dc:language": ["la", "en"]
+            },
+            "dts:passage": "/api/dts/documents?id=urn:cts:latinLit:phi1103.phi001.lascivaroma-lat1",
+            "dts:references": "/api/dts/navigation?id=urn:cts:latinLit:phi1103.phi001.lascivaroma-lat1",
+            "dts:download": "https://raw.githubusercontent.com/lascivaroma/priapeia/master/data/phi1103/phi001/phi1103.phi001.lascivaroma-lat1.xml",
+            "dts:citeDepth": 2,
+            "dts:citeStructure": [
+                {
+                    "dts:citeType": "poem",
+                    "dts:citeStructure": [
+                        {
+                            "dts:citeType": "line"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

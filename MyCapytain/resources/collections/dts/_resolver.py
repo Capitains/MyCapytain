@@ -31,6 +31,14 @@ class PaginatedProxy:
     def set(self, value):
         self._proxied = value
 
+    def __iter__(self):
+        return iter(self._proxied)
+
+    def __getitem__(self, item):
+        if isinstance(self._proxied, dict):
+            return self._proxied[item]
+        raise TypeError("'PaginatedProxy' object is not subscriptable")
+
 
 class HttpResolverDtsCollection(DtsCollection):
     def __init__(
@@ -113,6 +121,15 @@ class HttpResolverDtsCollection(DtsCollection):
         if not self._parsed["parents"]:
             self._parse_paginated_members(direction="parents")
         return super(HttpResolverDtsCollection, self).parents
+
+    def retrieve(self):
+        if not self._metadata_parsed:
+            query = self._resolver.endpoint.get_collection(self.id)
+            data = query.json()
+            if not len(data):
+                raise Exception("We'll see this one later")  # toDo: What error should it be ?
+            self._parse_metadata(expand(data)[0])
+        return True
 
     @classmethod
     def parse_member(

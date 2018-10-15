@@ -2,7 +2,7 @@
     "@context": {
         "@vocab": "https://www.w3.org/ns/hydra/core#",
         "dc": "http://purl.org/dc/terms/",
-        "dts": "https://w3id.org/dts/api#",
+        "dts": "https://w3id.org/dts/api#"
     },
     "@id": "urn:cts:latinLit:phi1103.phi001",
     "@type": "Collection",
@@ -10,12 +10,12 @@
     "dts:dublincore": {
         "dc:type": ["http://chs.harvard.edu/xmlns/cts#work"],
         "dc:creator": [
-            {"@lang": "en", "@value": "Anonymous"}
+            {"@language": "en", "@value": "Anonymous"}
         ],
         "dc:language": ["la", "en"],
-        "dc:title": [{"@lang": "la", "@value": "Priapeia"}],
+        "dc:title": [{"@language": "la", "@value": "Priapeia"}],
         "dc:description": [{
-           "@lang": "en",
+           "@language": "en",
             "@value": "Anonymous lascivious Poems "
         }]
     },
@@ -28,9 +28,9 @@
             "description": "Priapeia based on the edition of Aemilius Baehrens",
             "totalItems": 0,
             "dts:dublincore": {
-                "dc:title": [{"@lang": "la", "@value": "Priapeia"}],
+                "dc:title": [{"@language": "la", "@value": "Priapeia"}],
                 "dc:description": [{
-                   "@lang": "en",
+                   "@language": "en",
                    "@value": "Anonymous lascivious Poems "
                 }],
                 "dc:type": [
@@ -40,7 +40,7 @@
                 "dc:source": ["https://archive.org/details/poetaelatinimino12baeh2"],
                 "dc:dateCopyrighted": 1879,
                 "dc:creator": [
-                    {"@lang": "en", "@value": "Anonymous"}
+                    {"@language": "en", "@value": "Anonymous"}
                 ],
                 "dc:contributor": ["Aemilius Baehrens"],
                 "dc:language": ["la", "en"]

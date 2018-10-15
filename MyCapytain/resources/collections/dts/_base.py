@@ -78,50 +78,71 @@ class DtsCollection(Collection):
         :rtype: DtsCollection
         """
 
-        collection = jsonld.expand(resource)
-        if len(collection) == 0:
+        data = jsonld.expand(resource)
+        if len(data) == 0:
             raise JsonLdCollectionMissing("Missing collection in JSON")
-        collection = collection[0]
+        data = data[0]
 
         obj = cls(
             identifier=resource["@id"],
             **additional_parameters
         )
-        # We retrieve first the descriptiooon and label that are dependant on Hydra
-        for val_dict in collection[str(_hyd.title)]:
-            obj.set_label(val_dict["@value"], None)
 
-        for val_dict in collection["@type"]:
-            obj.type = val_dict
+        obj._parse_metadata(data)
+        obj._parse_members(data, direction=direction, **additional_parameters)
 
-        # We retrieve the Citation System
-        _cite_structure_term = str(_dts.term("citeStructure"))
-        if _cite_structure_term in collection and collection[_cite_structure_term]:
-            obj.citation = cls.CitationSet.ingest(collection[_cite_structure_term])
+        return obj
 
-        _cite_depth_term = str(_dts.term("citeDepth"))
-        if _cite_depth_term in collection and collection[_cite_depth_term]:
-            obj.citation.depth = collection[_cite_depth_term][0]["@value"]
+    def _parse_members(self, data, direction: str="children", **additional_parameters: dict):
+        """
 
-        for val_dict in collection[str(_hyd.totalItems)]:
-            obj.metadata.add(_hyd.totalItems, val_dict["@value"], 0)
-
-        for val_dict in collection.get(str(_hyd.description), []):
-            obj.metadata.add(_hyd.description, val_dict["@value"], None)
-
-        parse_metadata(obj.metadata, collection)
-        members = cls.parse_member(
-            collection, obj, direction, **additional_parameters
+        :param data:
+        :param direction:
+        :param additional_parameters:
+        :return:
+        """
+        members = self.parse_member(
+            data, self, direction, **additional_parameters
         )
         if direction == "children":  # ToDo: Should be in a third function ?
-            obj.children.update({
+            self.children.update({
                 coll.id: coll
                 for coll in members
             })
         else:
-            obj.parents.add(members)
+            self.parents.add(members)
 
-        return obj
+    def _parse_metadata(self, data: dict):
+
+        # We retrieve first the descriptiooon and label that are dependant on Hydra
+        for val_dict in data[str(_hyd.title)]:
+            self.set_label(val_dict["@value"], None)
+        for val_dict in data["@type"]:
+            self.type = val_dict
+
+        # We retrieve the Citation System
+        _cite_structure_term = str(_dts.term("citeStructure"))
+        if _cite_structure_term in data and data[_cite_structure_term]:
+            self.citation = self.CitationSet.ingest(data[_cite_structure_term])
+
+        _cite_depth_term = str(_dts.term("citeDepth"))
+        if _cite_depth_term in data and data[_cite_depth_term]:
+            self.citation.depth = data[_cite_depth_term][0]["@value"]
+
+        for val_dict in data[str(_hyd.totalItems)]:
+            self.metadata.add(_hyd.totalItems, val_dict["@value"], 0)
+
+        for val_dict in data.get(str(_hyd.description), []):
+            self.metadata.add(_hyd.description, val_dict["@value"], None)
+
+        parse_metadata(self.metadata, data)
+
+    def retrieve(self) -> bool:
+        """ If needed, retrieves complete metadata
+
+        :return: Status of retrieval
+        """
+        return True
 
     @classmethod
     def parse_member(

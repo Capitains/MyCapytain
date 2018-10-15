@@ -1,5 +1,5 @@
 from .base import *
-from .base import _load_mock, _load_json_mock
+from .base import _load_mock
 
 
 class TestHttpDtsResolverCollection(unittest.TestCase):
@@ -92,6 +92,8 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
             "Unfortunately, before it's resolved, this should not be filled."
         )
 
+        self.assertEqual(collection.size, 1, "Size is parsed through retrieve")
+
         mock_set.get(
             self.root_uri+"/collections?id=urn:cts:latinLit:phi1103.phi001",
             text=_load_mock("collection", "example3.json"),
@@ -99,7 +101,6 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
         )
         collection.retrieve()
 
-        self.assertEqual(collection.size, 1, "Size is parsed through retrieve")
         self.assertEqual(
             str(collection.metadata.get_single("http://purl.org/dc/terms/creator", lang="eng")),
             "Anonymous",

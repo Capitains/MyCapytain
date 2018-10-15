@@ -8,6 +8,7 @@ from MyCapytain.common.reference import DtsReferenceSet, DtsReference, DtsCitati
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.constants import Mimetypes
 from rdflib.term import URIRef
+
 # Set-up for the test classes
 _cur_path = os.path.abspath(
     os.path.join(
@@ -37,7 +38,3 @@ def _load_mock(*files: str) -> str:
     with open(fname) as fopen:
         data = fopen.read()
     return data
-
-
-def _load_json_mock(endpoint: str, example: str) -> typing.Union[dict, list]:
-    return json.loads(_load_mock(endpoint, example))

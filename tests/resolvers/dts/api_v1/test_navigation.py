@@ -1,5 +1,5 @@
 from .base import *
-from .base import _load_mock, _load_json_mock
+from .base import _load_mock
 
 
 class TestHttpDtsResolverNavigation(unittest.TestCase):

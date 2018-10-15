@@ -87,9 +87,9 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
         )
 
         self.assertEqual(
-            str(collection.metadata.get_single("http://purl.org/dc/terms/creator", lang="eng")),
-            "Anonymous",
-            "Unfortunately, before it's resolved, "
+            collection.metadata.get_single("http://purl.org/dc/terms/creator", lang="eng"),
+            None,
+            "Unfortunately, before it's resolved, this should not be filled."
         )
 
         mock_set.get(

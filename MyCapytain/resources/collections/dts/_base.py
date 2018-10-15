@@ -29,6 +29,7 @@ class DtsCollection(Collection):
         super(DtsCollection, self).__init__(identifier, *args, **kwargs)
         self._expanded = False  # Not sure I'll keep this
         self._citation = DtsCitationSet()
+        self._parents = set()
 
     @property
     def citation(self):
@@ -50,8 +51,24 @@ class DtsCollection(Collection):
             return True
         return False
 
+    @property
+    def parents(self):
+        return self._parents
+
+    @parents.setter
+    def parents(self, value):
+        self._parents = value
+
+    @property
+    def parent(self):
+        raise NotImplementedError("In DTS, parent only exists in plural, via .parents")
+
+    @parent.setter
+    def parent(self, value):
+        raise NotImplementedError("In DTS, parent only exists in plural, via .parents")
+
     @classmethod
-    def parse(cls, resource, direction="children"):
+    def parse(cls, resource, direction="children", **additional_parameters) -> "DtsCollection":
         """ Given a dict representation of a json object, generate a DTS Collection
 
         :param resource:
@@ -66,8 +83,10 @@ class DtsCollection(Collection):
             raise JsonLdCollectionMissing("Missing collection in JSON")
         collection = collection[0]
 
-        obj = cls(identifier=resource["@id"])
-
+        obj = cls(
+            identifier=resource["@id"],
+            **additional_parameters
+        )
         # We retrieve first the descriptiooon and label that are dependant on Hydra
         for val_dict in collection[str(_hyd.title)]:
             obj.set_label(val_dict["@value"], None)
@@ -92,15 +111,15 @@ class DtsCollection(Collection):
 
         parse_metadata(obj.metadata, collection)
         members = cls.parse_member(
-            collection, obj, direction
+            collection, obj, direction, **additional_parameters
         )
-        if direction == "children":
+        if direction == "children":  # ToDo: Should be in a third function ?
             obj.children.update({
                 coll.id: coll
                 for coll in members
             })
         else:
-            obj.parents.extend(members)
+            obj.parents.add(members)
 
         return obj
 
@@ -109,7 +128,8 @@ class DtsCollection(Collection):
             cls,
             obj: dict,
             collection: "DtsCollection",
-            direction) -> List["DtsCollection"]:
+            direction: str,
+            **additional_parameters) -> List["DtsCollection"]:
         """ Parse the member value of a Collection response
         and returns the list of object while setting the graph
         relationship based on `direction`
@@ -121,9 +141,9 @@ class DtsCollection(Collection):
         members = []
 
         for member in obj.get(str(_hyd.member), []):
-            subcollection = cls.parse(member)
+            subcollection = cls.parse(member, **additional_parameters)
             if direction == "children":
-                subcollection.parent = collection
+                subcollection.parents.update({collection})
             members.append(subcollection)
 
         return members

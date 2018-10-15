@@ -24,7 +24,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         super(HttpDtsRetriever, self).__init__(endpoint)
         self._routes = None
 
-    def call(self, route, parameters, mimetype="application/ld+json"):
+    def call(self, route, parameters, mimetype="application/ld+json", defaults=None):
         """ Call an endpoint given the parameters
 
         :param route: Named of the route which is called
@@ -35,9 +35,13 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         :type mimetype: str
         :rtype: text
         """
-
+        if not defaults:
+            defaults = {}
         parameters = {
-            key: str(parameters[key]) for key in parameters if parameters[key] is not None
+            key: str(parameters[key])
+            for key in parameters
+            if parameters[key] is not None and
+               parameters[key] != defaults.get(key, None)
         }
         parameters.update(self.routes[route].query_dict)
 
@@ -103,6 +107,11 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
                 "id": collection_id,
                 "nav": nav,
                 "page": page
+            },
+            defaults={
+                "id": None,
+                "nav": "children",
+                "page": 1
             }
         )
 

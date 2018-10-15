@@ -65,8 +65,8 @@ class Collection(Exportable):
             ]
         )
 
-        self.__parent__ = None
-        self.__children__ = {}
+        self._parent = None
+        self._children = {}
 
     def __repr__(self):
         return "%s(%s)" % (self.__class__.__name__, self.id)
@@ -168,7 +168,7 @@ class Collection(Exportable):
 
         :rtype: dict
         """
-        return self.__children__
+        return self._children
 
     @property
     def parents(self) -> List["Collection"]:
@@ -189,7 +189,7 @@ class Collection(Exportable):
 
         :rtype: Collection
         """
-        return self.__parent__
+        return self._parent
 
     @parent.setter
     def parent(self, parent):
@@ -199,13 +199,13 @@ class Collection(Exportable):
         :type parent: Collection
         :return:
         """
-        self.__parent__ = parent
+        self._parent = parent
         self.graph.add(
             (self.asNode(), RDF_NAMESPACES.CAPITAINS.parent, parent.asNode())
         )
-        parent.__add_member__(self)
+        parent._add_member(self)
 
-    def __add_member__(self, member):
+    def _add_member(self, member):
         """ Does not add member if it already knows it.
 
         .. warning:: It should not be called !

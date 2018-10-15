@@ -140,7 +140,7 @@ class TestDtsParsing(unittest.TestCase):
             _Navigation("18", "20", "500", None, "1")
         )
 
-        self.assertInCalls(_SERVER_URI+"collections/", {"nav": ["children"]}, )
+        self.assertInCalls(_SERVER_URI+"collections/", {})
 
     @responses.activate
     def test_querystring_type_of_route(self):

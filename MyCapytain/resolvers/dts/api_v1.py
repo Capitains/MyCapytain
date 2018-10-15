@@ -16,7 +16,7 @@ from MyCapytain.common.reference import BaseReference, BaseReferenceSet, \
     DtsReference, DtsReferenceSet, DtsCitation
 from MyCapytain.retrievers.dts import HttpDtsRetriever
 from MyCapytain.common.utils.dts import parse_metadata
-from MyCapytain.resources.collections.dts import DtsCollection
+from MyCapytain.resources.collections.dts import HttpResolverDtsCollection
 
 from pyld.jsonld import expand
 
@@ -69,13 +69,13 @@ class HttpDtsResolver(Resolver):
         """
         return self._endpoint
 
-    def getMetadata(self, objectId: str=None, **filters) -> DtsCollection:
+    def getMetadata(self, objectId: str=None, **filters) -> HttpResolverDtsCollection:
         req = self.endpoint.get_collection(objectId)
         req.raise_for_status()
 
-        collection = DtsCollection.parse(req.json())
+        collection = HttpResolverDtsCollection.parse(req.json(), resolver=self)
         # Pagination is not completed upon first query.
-        # Pagination will be treated direction in the DtsCollection
+        # Pagination will be treated direction in the HttpResolverDtsCollection
 
         return collection
 

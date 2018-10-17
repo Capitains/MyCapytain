@@ -108,6 +108,45 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
             "Metadata has been retrieved"
         )
 
+        self.assertEqual(
+            {collection_parent}, collection.parents,
+            "The collection parents should be pre-defined"
+        )
+
+    @requests_mock.mock()
+    def test_paginated_member_children(self, mock_set):
+        mock_set.get(self.root_uri, text=_load_mock("root.json"))
+        mock_set.get(
+            self.root_uri+"/collections?id=urn:enc",
+            text=_load_mock("collection", "paginated/page1.json"),
+            complete_qs=True
+        )
+        mock_set.get(
+            self.root_uri+"/collections?id=urn:enc&page=2",
+            text=_load_mock("collection", "paginated/page2.json"),
+            complete_qs=True
+        )
+        mock_set.get(
+            self.root_uri+"/collections?id=urn:enc&page=3",
+            text=_load_mock("collection", "paginated/page3.json"),
+            complete_qs=True
+        )
+        collection = self.resolver.getMetadata("urn:enc")
+        # Size is computed pre-reaching pages
+        self.assertEqual(
+            3, collection.size,
+            "There should be 3 children collection"
+        )
+        self.assertIsInstance(collection.children, PaginatedProxy, "Proxied object is in place")
+        # Then we test the children
+        self.assertEqual(
+            ["urn:enc:membre1", "urn:enc:membre2", "urn:enc:membre3"],
+            sorted(list(collection.children.keys())),
+            "Each page should be reached when iteratin over children"
+        )
+
+        self.assertIsInstance(collection.children, dict, "Proxied object is replaced")
+
     @requests_mock.mock()
     def test_paginated_member_children(self, mock_set):
         mock_set.get(self.root_uri, text=_load_mock("root.json"))

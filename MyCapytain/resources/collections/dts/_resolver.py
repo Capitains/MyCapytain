@@ -26,7 +26,6 @@ class PaginatedProxy:
 
     def __getattr__(self, item):
         if item == "update":
-            print("called")
             return self._proxied.update
         if item == "add":
             return self._proxied.add
@@ -50,6 +49,9 @@ class PaginatedProxy:
         if isinstance(self._proxied, (list, dict, set, tuple)):
             return self._proxied[item]
         raise TypeError("'PaginatedProxy' object is not subscriptable")
+
+    def __eq__(self, other):
+        return self._proxied == other
 
 
 class HttpResolverDtsCollection(DtsCollection):
@@ -96,7 +98,6 @@ class HttpResolverDtsCollection(DtsCollection):
         else:
             page = int(page)
         while page:
-            print(page)
             if page > 1:
                 response = self._resolver.endpoint.get_collection(
                     collection_id=self.id,

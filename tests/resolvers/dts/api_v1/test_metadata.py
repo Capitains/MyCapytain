@@ -8,6 +8,9 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
         self.root_uri = "http://foobar.com/api/dts"
         self.resolver = HttpDtsResolver(self.root_uri)
 
+    def tearDown(self):
+        reset_graph()
+
     @requests_mock.mock()
     def test_simple_root_access(self, mock_set):
         mock_set.get(self.root_uri, text=_load_mock("root.json"))
@@ -180,3 +183,42 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
         )
 
         self.assertIsInstance(collection.children, dict, "Proxied object is replaced")
+
+    @requests_mock.mock()
+    def test_paginated_member_parents(self, mock_set):
+        mock_set.get(self.root_uri, text=_load_mock("root.json"))
+        mock_set.get(
+            self.root_uri+"/collections?id=urn:enc",
+            text=_load_mock("collection", "paginated/parent_root.json"),
+            complete_qs=True
+        )
+        mock_set.get(
+            self.root_uri+"/collections?id=urn:enc&nav=parents",
+            text=_load_mock("collection", "paginated/page1.json"),
+            complete_qs=True
+        )
+        mock_set.get(
+            self.root_uri+"/collections?id=urn:enc&page=2&nav=parents",
+            text=_load_mock("collection", "paginated/page2.json"),
+            complete_qs=True
+        )
+        mock_set.get(
+            self.root_uri+"/collections?id=urn:enc&page=3&nav=parents",
+            text=_load_mock("collection", "paginated/page3.json"),
+            complete_qs=True
+        )
+        collection = self.resolver.getMetadata("urn:enc")
+        # Size is computed pre-reaching pages
+        self.assertEqual(
+            0, collection.size,
+            "There should be no children collections"
+        )
+        self.assertIsInstance(collection.parents, PaginatedProxy, "Proxied object is in place")
+        # Then we test the children
+        self.assertEqual(
+            ["urn:enc:membre1", "urn:enc:membre2", "urn:enc:membre3"],
+            sorted([x.id for x in collection.parents]),
+            "Each page should be reached when iterating over parents"
+        )
+
+        self.assertIsInstance(collection.parents, set, "Proxied object is replaced")

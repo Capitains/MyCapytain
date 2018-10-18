@@ -38,3 +38,9 @@ def _load_mock(*files: str) -> str:
     with open(fname) as fopen:
         data = fopen.read()
     return data
+
+from MyCapytain.common.constants import set_graph, get_graph, bind_graph
+
+
+def reset_graph():
+    set_graph(bind_graph())

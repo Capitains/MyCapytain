@@ -11,6 +11,11 @@ _re_page = re.compile("page=(\d+)")
 
 
 class PaginatedProxy:
+
+    __UPDATES_CALLABLES__ = {
+        "update", "add", "extend"
+    }
+
     def __init__(
             self,
             obj,
@@ -25,28 +30,36 @@ class PaginatedProxy:
         self._update_lambda = update_lambda
 
     def __getattr__(self, item):
-        if item == "update":
-            return self._proxied.update
-        if item == "add":
-            return self._proxied.add
+        if item in self.__UPDATES_CALLABLES__:
+            return getattr(self._proxied, item)
         if item == "set":
             return self.set
-        else:
-            if not self._condition_lambda():
-                self._update_lambda()
-                # Replace the Proxied instance by the actualy proxied value
-                setattr(self._obj, self._attr, self._proxied)
-        return getattr(self._proxied, item)
+        return self._run(item)
 
-    def set(self, value):
+    def _run(self, item=None):
+        if not self._condition_lambda():
+            self._update_lambda()
+            # Replace the Proxied instance by the actualy proxied value
+            setattr(self._obj, self._attr, self._proxied)
+
+        if item:
+            return getattr(self._proxied, item)
+        return self._proxied
+
+    def set(self, value) -> None:
         self._proxied = value
 
     def __iter__(self):
-        if not self._condition_lambda():
-            return iter(self._proxied)
+        return iter(self._run())
 
     def __getitem__(self, item):
         if isinstance(self._proxied, (list, dict, set, tuple)):
+            # If it is in, we do not update the object
+            if item in self._proxied:
+                return self._proxied[item]
+            # If it not in, and we are still in this object,
+            # It means we need to crawl :
+            self._run()
             return self._proxied[item]
         raise TypeError("'PaginatedProxy' object is not subscriptable")
 
@@ -114,12 +127,20 @@ class HttpResolverDtsCollection(DtsCollection):
             data = response.json()
             data = expand(data)[0]
 
-            self.children.update({
-                o.id: o
-                for o in type(self).parse_member(
-                    obj=data, collection=self, direction=direction, resolver=self._resolver
-                )
-            })
+            if direction == "children":
+                self.children.update({
+                    o.id: o
+                    for o in type(self).parse_member(
+                        obj=data, collection=self, direction=direction, resolver=self._resolver
+                    )
+                })
+            else:
+                self.parents.update({
+                    o
+                    for o in type(self).parse_member(
+                        obj=data, collection=self, direction=direction, resolver=self._resolver
+                    )
+                })
             self._last_page_parsed[direction] = page
 
             page = None
@@ -130,8 +151,8 @@ class HttpResolverDtsCollection(DtsCollection):
                             [0]["https://www.w3.org/ns/hydra/core#next"]
                             [0]["@value"]
                     )[0])
-
-        self._parsed[direction] = True
+            else:
+                self._parsed[direction] = True
 
     @property
     def children(self):

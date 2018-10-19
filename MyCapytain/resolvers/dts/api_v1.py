@@ -17,8 +17,8 @@ from MyCapytain.common.reference import BaseReference, BaseReferenceSet, \
 from MyCapytain.retrievers.dts import HttpDtsRetriever
 from MyCapytain.common.utils.dts import parse_metadata
 from MyCapytain.resources.collections.dts import HttpResolverDtsCollection
-
 from pyld.jsonld import expand
+from MyCapytain.resources.texts.remote.dts._resolver_v1 import DtsResolverText, DtsResolverPassage
 
 
 __all__ = [
@@ -141,3 +141,24 @@ class HttpDtsResolver(Resolver):
             citation=citation
         )
         return reffs
+
+    def getTextualNode(
+            self,
+            textId: str,
+            subreference: Union[str, BaseReference]=None,
+            prevnext: bool=False,
+            metadata: bool=False
+    ) -> Union[DtsResolverText, DtsResolverPassage]:
+        """ Retrieve a text node from the API
+
+        :param textId: CtsTextMetadata Identifier
+        :type textId: str
+        :param subreference: CapitainsCtsPassage Reference
+        :type subreference: str
+        :param prevnext: Retrieve graph representing previous and next passage
+        :type prevnext: boolean
+        :param metadata: Retrieve metadata about the passage and the text
+        :type metadata: boolean
+        :return: CapitainsCtsPassage
+        :rtype: CapitainsCtsPassage
+        """

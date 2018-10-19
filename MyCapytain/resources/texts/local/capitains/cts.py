@@ -11,6 +11,7 @@ This module contains methods to parse local resources using TEI/Epidoc guideline
 
 import warnings
 
+from typing import Tuple, Optional
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils.xml import copyNode, normalizeXpath, passageLoop
 from MyCapytain.common.constants import XPATH_NAMESPACES
@@ -29,7 +30,7 @@ __all__ = [
 ]
 
 
-def _makePassageKwargs(urn, reference):
+def _make_passage_kwargs(urn, reference):
     """ Little helper used by CapitainsCtsPassage here to comply with parents args
 
     :param urn: URN String
@@ -59,7 +60,6 @@ class _SharedMethods(TeiResource):
         :rtype: CapitainsCtsPassage, ContextPassage
         :returns: Asked passage
         """
-
         if subreference is None:
             return self._getSimplePassage()
 
@@ -69,16 +69,16 @@ class _SharedMethods(TeiResource):
             elif isinstance(subreference, list):
                 subreference = CtsReference(".".join(subreference))
 
-        if not subreference.end:
-            start = end = subreference.start.list
-        else:
-            start, end = subreference.start.list, subreference.end.list
-
-        if len(start) > self.citation.root.depth:
+        if len(subreference.start) > self.citation.root.depth:
             raise CitationDepthError("URN is deeper than citation scheme")
 
         if simple is True:
             return self._getSimplePassage(subreference)
+
+        if not subreference.is_range():
+            start = end = subreference.start.list
+        else:
+            start, end = subreference.start.list, subreference.end.list
 
         citation_start = self.citation.root[len(start)-1]
         citation_end = self.citation.root[len(end)-1]
@@ -156,26 +156,22 @@ class _SharedMethods(TeiResource):
             text = self
         return text
 
-    def getReffs(self, level=1, subreference=None) -> CtsReferenceSet:
+    def getReffs(self, level: int=1, subreference: CtsReference=None) -> CtsReferenceSet:
         """ CtsReference available at a given level
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
-        :type level: Int
         :param subreference: Subreference (optional)
-        :type subreference: str
-        :rtype: List.basestring
         :returns: List of levels
         """
-        if hasattr(self, "__depth__"):
-            level = level + self.depth
-        if not subreference:
-            if hasattr(self, "reference"):
-                subreference = self.reference
-        elif not isinstance(subreference, CtsReference):
-            subreference = CtsReference(subreference)
-        return self.getValidReff(level, subreference)
 
-    def getValidReff(self, level: int=None, reference: CtsReference=None, _debug: bool=False) -> CtsReferenceSet:
+        if not subreference and hasattr(self, "reference"):
+            subreference = self.reference
+        elif subreference and not isinstance(subreference, CtsReference):
+            subreference = CtsReference(subreference)
+
+        return self.getValidReff(level=level, reference=subreference)
+
+    def getValidReff(self, level: int=1, reference: CtsReference=None, _debug: bool=False) -> CtsReferenceSet:
         """ Retrieve valid passages directly
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
@@ -189,35 +185,50 @@ class _SharedMethods(TeiResource):
         .. note:: GetValidReff works for now as a loop using CapitainsCtsPassage, subinstances of CtsTextMetadata, to retrieve the valid \
         informations. Maybe something is more powerfull ?
         """
+
         depth = 0
         xml = self.textObject.xml
+
         if reference:
             if isinstance(reference, CtsReference):
-                if reference.end is None:
+                if not reference.is_range():
                     passages = [reference.start.list]
                     depth = len(passages[0])
+                    if level == 0:
+                        level = None
+                        if _debug:
+                            warnings.warn("Using level=0 with a Non-range Reference is invalid. Autocorrected to 1")
                 else:
                     xml = self.getTextualNode(subreference=reference)
+
                     common = []
 
-                    for index in range(0, len(reference.start)):
-                        if index == (len(common) - 1):
-                            common.append(reference.start.list[index])
+                    for index, part in enumerate(reference.start.list):
+                        if index <= reference.end.depth:
+                            if part == reference.end.list[index]:
+                                common.append(part)
+                            else:
+                                break
                         else:
                             break
 
                     passages = [common]
                     depth = len(common)
-                    if not level:
-                        level = len(reference.start.list) + 1
 
+                    if level is None:
+                        level = reference.start.depth + depth
+                    elif level == 1:
+                        level = reference.start.depth + 1
+                    elif level == 0:
+                        level = reference.start.depth
             else:
                 raise TypeError()
         else:
             passages = [[]]
 
-        if not level:
+        if level is None:
             level = 1
+
         if level <= len(passages[0]) and reference is not None:
             level = len(passages[0]) + 1
         if level > len(self.citation.root):
@@ -311,15 +322,15 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
         super(_SimplePassage, self).__init__(
             resource=resource,
             citation=citation,
-            **_makePassageKwargs(urn, reference)
+            **_make_passage_kwargs(urn, reference)
         )
-        self.__text__ = text
-        self.__reference__ = reference
-        self.__children__ = None
-        self.__depth__ = 0
+        self._text = text
+        self._reference = reference
+        self._children = None
+        self._depth = 0
         if reference is not None:
-            self.__depth__ = reference.depth
-        self.__prevnext__ = None
+            self._depth = reference.depth
+        self._prev_next = None
 
     @property
     def reference(self):
@@ -328,11 +339,11 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
         :return: CtsReference
         :rtype: CtsReference
         """
-        return self.__reference__
+        return self._reference
 
     @reference.setter
     def reference(self, value):
-        self.__reference__ = value
+        self._reference = value
 
     @property
     def childIds(self):
@@ -343,20 +354,18 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
         """
         if self.depth >= len(self.citation.root):
             return []
-        elif self.__children__ is not None:
-            return self.__children__
+        elif self._children is not None:
+            return self._children
         else:
-            self.__children__ = self.getReffs()
-            return self.__children__
+            self._children = self.getReffs()
+            return self._children
 
-    def getReffs(self, level=1, subreference=None):
+    def getReffs(self, level=1, subreference=None) -> CtsReferenceSet:
         """ Reference available at a given level
 
-        :param level: Depth required. If not set, should retrieve first encountered level (1 based)
-        :type level: Int
+        :param level: Depth required. If not set, should retrieve first encountered level (1 based). 0 retrieves inside
+            a range
         :param subreference: Subreference (optional)
-        :type subreference: CtsReference
-        :rtype: List.basestring
         :returns: List of levels
         """
         level += self.depth
@@ -364,7 +373,7 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
             subreference = self.reference
         return self.textObject.getValidReff(level, reference=subreference)
 
-    def getTextualNode(self, subreference=None):
+    def getTextualNode(self, subreference: CtsReference=None):
         """ Special GetPassage implementation for SimplePassage (Simple is True by default)
 
         :param subreference:
@@ -384,7 +393,7 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
         return self.siblingsId[1]
 
     @property
-    def prevId(self):
+    def prevId(self) -> Optional[CtsReference]:
         """ Get the Previous passage reference
 
         :returns: Previous passage reference at the same level
@@ -393,21 +402,21 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
         return self.siblingsId[0]
 
     @property
-    def siblingsId(self):
+    def siblingsId(self) -> Tuple[CtsReference, CtsReference]:
         """ Siblings Identifiers of the passage
 
         :rtype: (str, str)
         """
 
-        if not self.__text__:
+        if not self._text:
             raise MissingAttribute("CapitainsCtsPassage was iniated without CtsTextMetadata object")
-        if self.__prevnext__ is not None:
-            return self.__prevnext__
+        if self._prev_next is not None:
+            return self._prev_next
 
-        document_references = self.__text__.getReffs(level=self.depth)
+        document_references = self._text.getReffs(level=self.depth)
 
         range_length = 1
-        if self.reference.end is not None:
+        if self.reference.is_range():
             range_length = len(self.getReffs())
 
         start = document_references.index(self.reference.start)
@@ -428,8 +437,8 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
         else:
             _next = document_references[start + 1]
 
-        self.__prevnext__ = (_prev, _next)
-        return self.__prevnext__
+        self._prev_next = (_prev, _next)
+        return self._prev_next
 
     @property
     def textObject(self):
@@ -437,7 +446,7 @@ class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
 
         :rtype: CapitainsCtsText
         """
-        return self.__text__
+        return self._text
 
 
 class CapitainsCtsText(_SharedMethods, PrototypeCtsText):
@@ -458,9 +467,9 @@ class CapitainsCtsText(_SharedMethods, PrototypeCtsText):
         super(CapitainsCtsText, self).__init__(urn=urn, citation=citation, resource=resource)
 
         if self.resource is not None:
-            self.__findCRefPattern(self.resource)
+            self._findCRefPattern(self.resource)
 
-    def __findCRefPattern(self, xml):
+    def _findCRefPattern(self, xml):
         """ Find CRefPattern in the text and set object.citation
         :param xml: Xml Resource
         :type xml: lxml.etree._Element
@@ -537,27 +546,27 @@ class CapitainsCtsPassage(_SharedMethods, PrototypeCtsPassage):
         super(CapitainsCtsPassage, self).__init__(
             citation=citation,
             resource=resource,
-            **_makePassageKwargs(urn, reference)
+            **_make_passage_kwargs(urn, reference)
         )
         if urn is not None and urn.reference is not None:
             reference = urn.reference
-        self.__reference__ = reference
-        self.__text__ = text
-        self.__children__ = None
-        self.__depth__ = self.__depth_2__ = 1
+        self._reference = reference
+        self._text = text
+        self._children = None
+        self._depth = self._depth_2 = 1
 
         if self.reference and self.reference.start:
-            self.__depth_2__ = self.__depth__ = self.reference.start.depth
+            self._depth_2 = self._depth = self.reference.start.depth
         if self.reference.is_range() and self.reference.end:
-            self.__depth_2__ = self.reference.end.depth
+            self._depth_2 = self.reference.end.depth
 
-        self.__prevnext__ = None  # For caching purpose
+        self._prev_next = None  # For caching purpose
 
     @property
     def reference(self):
         """ CtsReference of the object
         """
-        return self.__reference__
+        return self._reference
 
     @property
     def childIds(self):
@@ -566,14 +575,14 @@ class CapitainsCtsPassage(_SharedMethods, PrototypeCtsPassage):
         :rtype: None, CtsReference
         :returns: Dictionary of chidren, where key are subreferences
         """
-        self.__raiseDepth__()
+        self._raise_depth()
         if self.depth >= len(self.citation.root):
             return []
-        elif self.__children__ is not None:
-            return self.__children__
+        elif self._children is not None:
+            return self._children
         else:
-            self.__children__ = self.getReffs()
-            return self.__children__
+            self._children = self.getReffs()
+            return self._children
 
     @property
     def nextId(self):
@@ -593,32 +602,32 @@ class CapitainsCtsPassage(_SharedMethods, PrototypeCtsPassage):
         """
         return self.siblingsId[0]
 
-    def __raiseDepth__(self):
+    def _raise_depth(self):
         """ Simple check that raises an exception if the passage cannot run first, last, next or prev
 
         See object notes
 
         :raise: InvalidSiblingRequest
         """
-        if self.__depth__ != self.__depth_2__:
+        if self._depth != self._depth_2:
             raise InvalidSiblingRequest()
 
     @property
-    def siblingsId(self):
+    def siblingsId(self) -> Tuple[CtsReference, CtsReference]:
         """ Siblings Identifiers of the passage
 
         :rtype: (str, str)
         """
-        self.__raiseDepth__()
+        self._raise_depth()
 
-        if not self.__text__:
+        if not self._text:
             raise MissingAttribute("CapitainsCtsPassage was initiated without CtsTextMetadata object")
-        if self.__prevnext__:
-            return self.__prevnext__
+        if self._prev_next:
+            return self._prev_next
 
-        document_references = self.__text__.getReffs(level=self.depth)
+        document_references = self._text.getReffs(level=self.depth)
 
-        if self.reference.end:
+        if self.reference.is_range():
             start, end = self.reference.start, self.reference.end
             range_length = len(self.getReffs(level=0))
         else:
@@ -656,28 +665,28 @@ class CapitainsCtsPassage(_SharedMethods, PrototypeCtsPassage):
             else:
                 _next = "{}-{}".format(document_references[end+1], document_references[end + range_length])
 
-        self.__prevnext__ = (CtsReference(_prev), CtsReference(_next))
-        return self.__prevnext__
+        self._prev_next = (CtsReference(_prev), CtsReference(_next))
+        return self._prev_next
 
     @property
     def next(self):
         """ Next CapitainsCtsPassage (Interactive CapitainsCtsPassage)
         """
         if self.nextId is not None:
-            return _SharedMethods.getTextualNode(self.__text__, self.nextId)
+            return super(CapitainsCtsPassage, self).getTextualNode(subreference=self.nextId)
 
     @property
     def prev(self):
         """ Previous CapitainsCtsPassage (Interactive CapitainsCtsPassage)
         """
         if self.prevId is not None:
-            return _SharedMethods.getTextualNode(self.__text__, self.prevId)
+            return super(CapitainsCtsPassage, self).getTextualNode(subreference=self.prevId)
 
     def getTextualNode(self, subreference=None, *args, **kwargs):
         if not isinstance(subreference, CtsReference):
             subreference = CtsReference(subreference)
-        X = _SharedMethods.getTextualNode(self, subreference)
-        X.__text__ = self.__text__
+        X = super(CapitainsCtsPassage, self).getTextualNode(subreference=subreference)
+        X._text = self._text
         return X
 
     @property
@@ -686,4 +695,4 @@ class CapitainsCtsPassage(_SharedMethods, PrototypeCtsPassage):
 
         :rtype: CapitainsCtsText
         """
-        return self.__text__
+        return self._text

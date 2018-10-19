@@ -46,7 +46,7 @@ class _SharedMethod(InteractiveTextualNode):
 
     def __init__(self, retriever=None, *args, **kwargs):
         super(_SharedMethod, self).__init__(*args, **kwargs)
-        self.__retriever__ = retriever
+        self._retriever = retriever
         self.__first__ = False
         self.__last__ = False
         if retriever is None:
@@ -58,7 +58,7 @@ class _SharedMethod(InteractiveTextualNode):
 
         :rtype: CitableTextServiceRetriever
         """
-        return self.__retriever__
+        return self._retriever
 
     def getValidReff(self, level=1, reference=None):
         """ Given a resource, CtsText will compute valid reffs

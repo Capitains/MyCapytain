@@ -18,7 +18,7 @@ from MyCapytain.retrievers.dts import HttpDtsRetriever
 from MyCapytain.common.utils.dts import parse_metadata
 from MyCapytain.resources.collections.dts import HttpResolverDtsCollection
 from pyld.jsonld import expand
-from MyCapytain.resources.texts.remote.dts._resolver_v1 import DtsResolverText, DtsResolverPassage
+from MyCapytain.resources.texts.remote.dts import DtsResolverDocument
 
 
 __all__ = [
@@ -29,7 +29,7 @@ _empty = [{"@value": None}]
 _re_page = re.compile("page=(\d+)")
 
 
-def _parse_ref(ref_dict, default_type :str =None):
+def _parse_ref(ref_dict, default_type: str=None):
     if "https://w3id.org/dts/api#ref" in ref_dict:
         refs = ref_dict["https://w3id.org/dts/api#ref"][0]["@value"],
     elif "https://w3id.org/dts/api#start" in ref_dict and \
@@ -148,7 +148,7 @@ class HttpDtsResolver(Resolver):
             subreference: Union[str, BaseReference]=None,
             prevnext: bool=False,
             metadata: bool=False
-    ) -> Union[DtsResolverText, DtsResolverPassage]:
+    ) -> DtsResolverDocument:
         """ Retrieve a text node from the API
 
         :param textId: CtsTextMetadata Identifier
@@ -162,3 +162,9 @@ class HttpDtsResolver(Resolver):
         :return: CapitainsCtsPassage
         :rtype: CapitainsCtsPassage
         """
+        return DtsResolverDocument.parse(
+            identifier=textId,
+            reference=subreference,
+            resolver=self,
+            response=self.endpoint.get_document(collection_id=textId, ref=subreference)
+        )

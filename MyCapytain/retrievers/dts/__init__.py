@@ -171,7 +171,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
             parameters["ref"] = ref
 
         return self.call(
-            "document",
+            "documents",
             parameters,
             mimetype=mimetype
         )

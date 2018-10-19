@@ -293,7 +293,7 @@ class _SharedMethods(TeiResource):
         return etree.tostring(self.resource, *args, **kwargs)
 
 
-class _SimplePassage(_SharedMethods, text.Passage):
+class _SimplePassage(_SharedMethods, text.CtsPassage):
     """ CapitainsCtsPassage for simple and quick parsing of texts
 
     :param resource: Element representing the passage
@@ -440,7 +440,7 @@ class _SimplePassage(_SharedMethods, text.Passage):
         return self.__text__
 
 
-class CapitainsCtsText(_SharedMethods, text.CitableText):
+class CapitainsCtsText(_SharedMethods, text.CtsText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
@@ -485,7 +485,7 @@ class CapitainsCtsText(_SharedMethods, text.CitableText):
             raise E
 
 
-class CapitainsCtsPassage(_SharedMethods, text.Passage):
+class CapitainsCtsPassage(_SharedMethods, text.CtsPassage):
     """ CapitainsCtsPassage class for local texts which rebuilds the tree up to the passage.
 
         For design purposes, some people would prefer the output of GetPassage to be consistent. ContextPassage rebuilds

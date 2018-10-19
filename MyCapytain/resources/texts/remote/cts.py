@@ -60,7 +60,7 @@ class _SharedMethod(prototypes.InteractiveTextualNode):
         return self.__retriever__
 
     def getValidReff(self, level=1, reference=None):
-        """ Given a resource, CitableText will compute valid reffs
+        """ Given a resource, CtsText will compute valid reffs
 
         :param level: Depth required. If not set, should retrieve first encountered level (1 based)
         :type level: Int
@@ -313,7 +313,7 @@ class _SharedMethod(prototypes.InteractiveTextualNode):
         return _prev, _next
 
 
-class CtsText(_SharedMethod, prototypes.CitableText):
+class CtsText(_SharedMethod, prototypes.CtsText):
     """ API CtsTextMetadata object
 
     :param urn: A URN identifier
@@ -334,7 +334,7 @@ class CtsText(_SharedMethod, prototypes.CitableText):
 
     @property
     def reffs(self):
-        """ Get all valid reffs for every part of the CitableText
+        """ Get all valid reffs for every part of the CtsText
 
         :rtype: MyCapytain.resources.texts.tei.XmlCtsCitation
         """
@@ -378,7 +378,7 @@ class CtsText(_SharedMethod, prototypes.CitableText):
         return self.getTextualNode().export(output, exclude)
 
 
-class CtsPassage(_SharedMethod, prototypes.Passage, TeiResource):
+class CtsPassage(_SharedMethod, prototypes.CtsPassage, TeiResource):
     """ CapitainsCtsPassage representing
 
     :param urn:

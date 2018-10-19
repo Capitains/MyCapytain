@@ -2,7 +2,7 @@ from MyCapytain.resolvers.cts.api import HttpCtsResolver
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes
-from MyCapytain.resources.prototypes.text import Passage
+from MyCapytain.resources.prototypes.text import CtsPassage
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsTextMetadata
 from MyCapytain.resources.prototypes.metadata import Collection
 
@@ -50,7 +50,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
 
@@ -86,7 +86,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
 
@@ -122,7 +122,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
@@ -183,7 +183,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
@@ -235,7 +235,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(

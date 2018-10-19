@@ -104,7 +104,7 @@ class Mimetypes:
         class MyCapytain:
             """ MyCapytain Objects
 
-            :cvar ReadableText: MyCapytain.resources.prototypes.text.CitableText
+            :cvar ReadableText: MyCapytain.resources.prototypes.text.CtsText
             """
             TextualElement = "Capitains/TextualElement"
 

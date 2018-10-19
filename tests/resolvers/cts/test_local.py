@@ -10,7 +10,7 @@ from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
 from MyCapytain.resources.prototypes.cts.inventory import CtsTextgroupMetadata, CtsTextMetadata as TextMetadata, \
     CtsTranslationMetadata, CtsTextInventoryMetadata, CtsCommentaryMetadata, CtsTextInventoryCollection
-from MyCapytain.resources.prototypes.text import Passage
+from MyCapytain.resources.prototypes.text import CtsPassage
 from MyCapytain.resolvers.utils import CollectionDispatcher
 from unittest import TestCase
 
@@ -179,7 +179,7 @@ class TextXMLFolderResolver(TestCase):
         """ Test that we can get a full text """
         passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
 
@@ -224,7 +224,7 @@ class TextXMLFolderResolver(TestCase):
 
         # We check we made a reroute to GetPassage request
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
 
@@ -257,7 +257,7 @@ class TextXMLFolderResolver(TestCase):
         passage = self.resolver.getTextualNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2", metadata=True)
 
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
@@ -315,7 +315,7 @@ class TextXMLFolderResolver(TestCase):
         )
 
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
@@ -363,7 +363,7 @@ class TextXMLFolderResolver(TestCase):
             "urn:cts:latinLit:phi1294.phi002.perseus-lat2", subreference="1.1", metadata=True, prevnext=True
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, CtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(

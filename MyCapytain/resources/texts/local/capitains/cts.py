@@ -13,10 +13,10 @@ import warnings
 
 from MyCapytain.errors import DuplicateReference, MissingAttribute, RefsDeclError, EmptyReference, CitationDepthError, MissingRefsDecl
 from MyCapytain.common.utils.xml import copyNode, normalizeXpath, passageLoop
-from MyCapytain.common.constants import XPATH_NAMESPACES, RDF_NAMESPACES
+from MyCapytain.common.constants import XPATH_NAMESPACES
 from MyCapytain.common.reference import CtsReference, URN, Citation, CtsReferenceSet
 
-from MyCapytain.resources.prototypes import text
+from MyCapytain.resources.prototypes.cts.text import PrototypeCtsPassage, PrototypeCtsText
 from MyCapytain.resources.texts.base.tei import TeiResource
 
 from MyCapytain.errors import InvalidSiblingRequest, InvalidURN
@@ -293,7 +293,7 @@ class _SharedMethods(TeiResource):
         return etree.tostring(self.resource, *args, **kwargs)
 
 
-class _SimplePassage(_SharedMethods, text.CtsPassage):
+class _SimplePassage(_SharedMethods, PrototypeCtsPassage):
     """ CapitainsCtsPassage for simple and quick parsing of texts
 
     :param resource: Element representing the passage
@@ -440,7 +440,7 @@ class _SimplePassage(_SharedMethods, text.CtsPassage):
         return self.__text__
 
 
-class CapitainsCtsText(_SharedMethods, text.CtsText):
+class CapitainsCtsText(_SharedMethods, PrototypeCtsText):
     """ Implementation of CTS tools for local files
 
     :param urn: A URN identifier
@@ -485,7 +485,7 @@ class CapitainsCtsText(_SharedMethods, text.CtsText):
             raise E
 
 
-class CapitainsCtsPassage(_SharedMethods, text.CtsPassage):
+class CapitainsCtsPassage(_SharedMethods, PrototypeCtsPassage):
     """ CapitainsCtsPassage class for local texts which rebuilds the tree up to the passage.
 
         For design purposes, some people would prefer the output of GetPassage to be consistent. ContextPassage rebuilds

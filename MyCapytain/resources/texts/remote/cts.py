@@ -13,9 +13,10 @@ from __future__ import unicode_literals
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
-from MyCapytain.common.reference._capitains_cts import CtsReference, URN
+from MyCapytain.common.reference import CtsReference, URN
 from MyCapytain.resources.collections import cts as CtsCollection
-from MyCapytain.resources.prototypes import text as prototypes
+from MyCapytain.resources.prototypes.text import InteractiveTextualNode
+from MyCapytain.resources.prototypes.cts.text import PrototypeCtsText, PrototypeCtsPassage
 from MyCapytain.resources.texts.base.tei import TeiResource
 from MyCapytain.errors import MissingAttribute
 
@@ -26,11 +27,11 @@ __all__ = [
 ]
 
 
-class _SharedMethod(prototypes.InteractiveTextualNode):
+class _SharedMethod(InteractiveTextualNode):
     """ Set of methods shared by CtsTextMetadata and CapitainsCtsPassage
 
     :param retriever: Retriever used to retrieve other data
-    :type retriever: MyCapytain.retrievers.prototypes.CitableTextServiceRetriever
+    :type retriever: MyCapytain.retrievers.PrototypeCitableTextServiceRetriever
     """
 
     @property
@@ -313,7 +314,7 @@ class _SharedMethod(prototypes.InteractiveTextualNode):
         return _prev, _next
 
 
-class CtsText(_SharedMethod, prototypes.CtsText):
+class CtsText(_SharedMethod, PrototypeCtsText):
     """ API CtsTextMetadata object
 
     :param urn: A URN identifier
@@ -378,7 +379,7 @@ class CtsText(_SharedMethod, prototypes.CtsText):
         return self.getTextualNode().export(output, exclude)
 
 
-class CtsPassage(_SharedMethod, prototypes.CtsPassage, TeiResource):
+class CtsPassage(_SharedMethod, PrototypeCtsPassage, TeiResource):
     """ CapitainsCtsPassage representing
 
     :param urn:

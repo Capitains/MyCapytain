@@ -10,7 +10,7 @@ import xmlunittest
 
 from MyCapytain.common import constants
 from MyCapytain.resources.collections.cts import *
-from MyCapytain.resources.prototypes.text import CtsNode
+from MyCapytain.resources.prototypes.cts.text import PrototypeCtsNode
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import Mimetypes, RDF_NAMESPACES, XPATH_NAMESPACES
 from rdflib import URIRef, Literal, XSD
@@ -451,7 +451,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
-        txt_text = CtsNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        txt_text = PrototypeCtsNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(

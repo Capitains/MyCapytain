@@ -6,7 +6,7 @@ import unittest
 
 from MyCapytain.common.reference import URN, Citation
 
-from MyCapytain.resources.prototypes.text import *
+from MyCapytain.resources.prototypes.cts.text import PrototypeCtsText, PrototypeCtsNode
 from MyCapytain.common.constants import RDF_NAMESPACES
 import MyCapytain.common.reference
 import MyCapytain.common.metadata
@@ -15,7 +15,7 @@ import MyCapytain.common.metadata
 class TestProtoResource(unittest.TestCase):
     """ Test for resource, mother class of CtsTextMetadata and CapitainsCtsPassage """
     def test_init(self):
-        a = CtsNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        a = PrototypeCtsNode(urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.id, "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(a.urn, URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2"))
         self.assertIsInstance(a.citation, Citation)
@@ -26,7 +26,7 @@ class TestProtoResource(unittest.TestCase):
 
     def test_urn(self):
         """ Test setters and getters for urn """
-        a = CtsNode()
+        a = PrototypeCtsNode()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
         self.assertEqual(isinstance(a.urn, MyCapytain.common.reference._capitains_cts.URN), True)
@@ -42,7 +42,7 @@ class TestProtoResource(unittest.TestCase):
             a.urn = 2
 
         # Test Resource setting works out as well
-        b = CtsText(urn="urn:cts:latinLit:tg.wk.v")
+        b = PrototypeCtsText(urn="urn:cts:latinLit:tg.wk.v")
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
 
@@ -51,20 +51,20 @@ class TestProtoText(unittest.TestCase):
 
     def test_init(self):
         """ Test init works correctly """
-        a = CtsText("someId")
+        a = PrototypeCtsText("someId")
 
         #  Test with metadata
-        a = CtsText("someId")
+        a = PrototypeCtsText("someId")
         self.assertIsInstance(a.metadata, MyCapytain.common.metadata.Metadata)
 
         m = MyCapytain.common.metadata.Metadata()
         m.add(RDF_NAMESPACES.CTS.title, "I am a metadata", "fre")
-        a = CtsText(metadata=m)
+        a = PrototypeCtsText(metadata=m)
         self.assertEqual(str(a.metadata.get_single(RDF_NAMESPACES.CTS.title, "fre")), "I am a metadata")
 
     def test_proto_reff(self):
         """ Test that getValidReff function are not implemented """
-        a = CtsText()
+        a = PrototypeCtsText()
 
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError):
@@ -77,7 +77,7 @@ class TestProtoText(unittest.TestCase):
 
     def test_proto_passage(self):
         """ Test that getPassage function are not implemented but are consistent"""
-        a = CtsText()
+        a = PrototypeCtsText()
 
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError):
@@ -85,7 +85,7 @@ class TestProtoText(unittest.TestCase):
 
     def test_get_label(self):
         """ Test that getLabel function are not implemented but are consistent"""
-        a = CtsText()
+        a = PrototypeCtsText()
 
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError): 
@@ -93,7 +93,7 @@ class TestProtoText(unittest.TestCase):
 
     def test_urn(self):
         """ Test setters and getters for urn """
-        a = CtsText()
+        a = PrototypeCtsText()
         # Should work with string
         a.urn = "urn:cts:latinLit:tg.wk.v" 
         self.assertEqual(isinstance(a.urn, MyCapytain.common.reference._capitains_cts.URN), True)
@@ -109,12 +109,12 @@ class TestProtoText(unittest.TestCase):
             a.urn = 2
 
         # Test original setting works out as well
-        b = CtsText(urn="urn:cts:latinLit:tg.wk.v")
+        b = PrototypeCtsText(urn="urn:cts:latinLit:tg.wk.v")
         self.assertEqual(str(b.urn), "urn:cts:latinLit:tg.wk.v")
 
     def test_reffs(self):
         """ Test property reff, should fail because it supposes validReff is implemented """
-        a = CtsText()
+        a = PrototypeCtsText()
 
         # It should fail because not implemented
         with self.assertRaises(NotImplementedError):
@@ -122,10 +122,10 @@ class TestProtoText(unittest.TestCase):
 
     def test_citation(self):
         """ Test citation property setter and getter """
-        a = CtsText()
+        a = PrototypeCtsText()
         a.citation = MyCapytain.common.reference._capitains_cts.Citation(name="label")
         self.assertIsInstance(a.citation, MyCapytain.common.reference._capitains_cts.Citation)
 
         #On init ?
-        b = CtsText(citation=MyCapytain.common.reference._capitains_cts.Citation(name="label"))
+        b = PrototypeCtsText(citation=MyCapytain.common.reference._capitains_cts.Citation(name="label"))
         self.assertEqual(b.citation.name, "label")

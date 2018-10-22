@@ -5,6 +5,7 @@ from MyCapytain.resources.collections.dts._resolver import PaginatedProxy
 
 class TestHttpDtsResolverCollection(unittest.TestCase):
     def setUp(self):
+        reset_graph()
         self.root_uri = "http://foobar.com/api/dts"
         self.resolver = HttpDtsResolver(self.root_uri)
 

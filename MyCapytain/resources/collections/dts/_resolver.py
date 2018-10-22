@@ -156,11 +156,11 @@ class HttpResolverDtsCollection(DtsCollection):
 
     @property
     def children(self):
-        return super(HttpResolverDtsCollection, self).children
+        return self._children
 
     @property
     def parents(self):
-        return super(HttpResolverDtsCollection, self).parents
+        return self._parents
 
     def retrieve(self):
         if not self._metadata_parsed:

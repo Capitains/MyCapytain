@@ -50,20 +50,13 @@ class Collection(Exportable):
 
     def __init__(self, identifier="", *args, **kwargs):
         super(Collection, self).__init__(identifier, *args, **kwargs)
-        self.__graph__ = get_graph()
+        self._graph = get_graph()
 
-        self.__node__ = URIRef(identifier)
-        self.__metadata__ = Metadata(node=self.asNode())
-        self.__capabilities__ = Metadata.getOr(self.asNode(), RDF_NAMESPACES.DTS.capabilities)
+        self._node = URIRef(identifier)
+        self._metadata = Metadata(node=self.asNode())
 
         self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
         self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.model, self.MODEL_URI))
-
-        self.graph.addN(
-            [
-                (self.asNode(), RDF_NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph)
-            ]
-        )
 
         self._parent = None
         self._children = {}
@@ -113,22 +106,18 @@ class Collection(Exportable):
 
         :rtype: Graph
         """
-        return self.__graph__
+        return self._graph
 
     @property
     def metadata(self):
-        return self.__metadata__
-
-    @property
-    def capabilities(self):
-        return self.__capabilities__
+        return self._metadata
 
     def asNode(self):
         """ Node representation of the collection in the graph
 
         :rtype: URIRef
         """
-        return self.__node__
+        return self._node
 
     @property
     def id(self):

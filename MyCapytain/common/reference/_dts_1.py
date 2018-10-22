@@ -38,7 +38,7 @@ class DtsReference(BaseReference):
             self.type == other.type
 
     def __repr__(self):
-        return "<DtsCitation <{}> [{}]>".format(
+        return "<DtsReference <{}> [{}]>".format(
             "><".join([str(x) for x in self if x]),
             self.type
         )

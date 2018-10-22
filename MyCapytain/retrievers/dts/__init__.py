@@ -19,6 +19,16 @@ __all__ = [
 ]
 
 
+def _parse_ref_parameters(parameters, ref):
+    if isinstance(ref, BaseReference):
+        if ref.is_range():
+            parameters["start"], parameters["end"] = ref
+        else:
+            parameters["ref"] = ref.start
+    elif ref:
+        parameters["ref"] = ref
+
+
 class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
     def __init__(self, endpoint):
         super(HttpDtsRetriever, self).__init__(endpoint)
@@ -138,13 +148,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
             "exclude": exclude,
             "page": page
         }
-        if isinstance(ref, BaseReference):
-            if ref.is_range():
-                parameters["start"], parameters["end"] = ref
-            else:
-                parameters["ref"] = ref.start
-        elif ref:
-            parameters["ref"] = ref
+        _parse_ref_parameters(parameters, ref)
 
         return self.call(
             "navigation",
@@ -165,10 +169,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         parameters = {
             "id": collection_id
         }
-        if isinstance(ref, tuple):
-            parameters["start"], parameters["end"] = ref
-        elif ref:
-            parameters["ref"] = ref
+        _parse_ref_parameters(parameters, ref)
 
         return self.call(
             "documents",

@@ -8,7 +8,7 @@
 
 """
 from typing import Union, List, Iterator
-from rdflib.namespace import DC
+from rdflib.namespace import DC, DCTERMS as DCT
 from rdflib import BNode, URIRef, Graph, Literal
 from rdflib.term import Identifier
 from MyCapytain.common.reference import Citation, NodeId, BaseReference, BaseReferenceSet
@@ -110,7 +110,8 @@ class TextualElement(Exportable):
         :return: Title string representation
         :rtype: Literal
         """
-        return self.metadata.get_single(key=DC.title, lang=lang)
+        return self.metadata.get_single(key=DC.title, lang=lang) or \
+            self.metadata.get_single(key=DCT.title, lang=lang)
 
     def set_title(self, value: Union[Literal, Identifier, str], lang: str= None):
         """ Set the DC Title literal value

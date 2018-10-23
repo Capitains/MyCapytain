@@ -1,0 +1,19 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#"
+    },
+    "@id": "/coll1_2_2",
+    "@type": "Collection",
+    "totalItems": 1,
+    "title": "Collection 1.2.2",
+    "member": [
+        {
+             "@id" : "/coll1_2_2_1",
+             "title" : "Collection 1.2.2.1",
+             "@type" : "Resource",
+             "totalItems" : 0
+        }
+    ]
+}

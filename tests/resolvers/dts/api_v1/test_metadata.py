@@ -223,3 +223,40 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
         )
 
         self.assertIsInstance(collection.parents, set, "Proxied object is replaced")
+
+    @requests_mock.mock()
+    def test_readable_descendants(self, mock_set):
+        mock_set.get(self.root_uri, text=_load_mock("root.json"))
+        mock_set.get(
+            self.root_uri+"/collections?",
+            text=_load_mock("collection", "readableDescendants/coll1.json"),
+            complete_qs=True
+        )
+
+        def add_mock(mocks, id_):
+            mocks.get(
+                self.root_uri+"/collections?id=%2Fcoll"+id_,
+                text=_load_mock("collection", "readableDescendants/coll"+id_+".json"),
+                complete_qs=True
+            )
+        add_mock(mock_set, "1_1")
+        add_mock(mock_set, "1_1_1")
+        add_mock(mock_set, "1_2")
+        add_mock(mock_set, "1_2_1")
+        add_mock(mock_set, "1_2_2")
+        add_mock(mock_set, "1_2_2_1")
+
+        root = self.resolver.getMetadata()
+
+        self.assertEqual(
+            ["/coll1_1_1", "/coll1_2_1", "/coll1_2_2_1"],
+            sorted([str(c.id) for c in root.readableDescendants]),
+            "Collections should be retrieved automatically"
+        )
+        history = [history.url for history in mock_set.request_history]
+        print(history)
+        self.assertNotIn(
+            self.root_uri+"/collections?id=%2Fcoll1_2_2_1",
+            history,
+            "Resource should not be parsed"
+        )

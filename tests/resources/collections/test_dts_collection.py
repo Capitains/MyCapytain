@@ -38,9 +38,8 @@ class TestDtsCollection(TestCase):
         coll = self.get_collection(1)
         parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
-
+        self.maxDiff = 1555555
         self.assertEqual(
-            exported,
             {
                 '@context': {
                     'dct': 'http://purl.org/dc/terms/',
@@ -52,7 +51,7 @@ class TestDtsCollection(TestCase):
                 'member': [
                     {'@id': '/cartulaires',
                      '@type': 'Collection',
-                     'totalItems': 1,
+                     'totalItems': 10,
                      'description': 'Collection de cartulaires '
                                           "d'Île-de-France et de ses "
                                           'environs',
@@ -67,7 +66,7 @@ class TestDtsCollection(TestCase):
                      'title': 'Lasciva Roma'},
                     {'@id': '/lettres_de_poilus',
                                  '@type': 'Collection',
-                                 'totalItems': 1,
+                                 'totalItems': 10000,
                                  'description': 'Collection de lettres de '
                                                       'poilus entre 1917 et 1918',
                                  'title': 'Correspondance des poilus'}],
@@ -81,7 +80,8 @@ class TestDtsCollection(TestCase):
                                                             'Nationale des Chartes'}]},
                 'dts:extensions': {'skos:prefLabel': "Collection Générale de l'École "
                                                       'Nationale des Chartes'}
-            }
+            },
+            exported
         )
 
     def test_collection_single_member_with_types(self):

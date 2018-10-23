@@ -62,7 +62,7 @@ class Collection(Exportable):
         self._children = {}
 
     def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__, self.id)
+        return "%s(%s)#%s" % (self.__class__.__name__, self.id, id(self))
 
     @property
     def version(self):
@@ -213,7 +213,12 @@ class Collection(Exportable):
         :param key: Key of the object to delete
         :return: Collection identified by the item
         """
-        for obj in self.descendants + [self]:
+        if key == self.id:
+            return self
+        for obj in self.members:
+            if key == obj.id:
+                return obj
+        for obj in self.descendants:
             if obj.id == key:
                 return obj
         raise UnknownCollection("%s is not part of this object" % key)

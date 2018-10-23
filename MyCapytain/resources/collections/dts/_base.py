@@ -41,7 +41,8 @@ class DtsCollection(Collection):
 
     @property
     def size(self):
-        for value in self.metadata.get_single(RDF_NAMESPACES.HYDRA.totalItems):
+        value = self.metadata.get_single(RDF_NAMESPACES.HYDRA.totalItems)
+        if value:
             return int(value)
         return 0
 
@@ -130,7 +131,7 @@ class DtsCollection(Collection):
             self.citation.depth = data[_cite_depth_term][0]["@value"]
 
         for val_dict in data[str(_hyd.totalItems)]:
-            self.metadata.add(_hyd.totalItems, val_dict["@value"], 0)
+            self.metadata.add(_hyd.totalItems, val_dict["@value"])
 
         for val_dict in data.get(str(_hyd.description), []):
             self.metadata.add(_hyd.description, val_dict["@value"], None)

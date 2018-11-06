@@ -9,8 +9,7 @@
 
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.errors import UnknownCollection
-from MyCapytain.common.utils import literal_to_dict
-from MyCapytain.common.utils import Subgraph
+from MyCapytain.common.utils import literal_to_dict, Subgraph
 from MyCapytain.common.constants import RDF_NAMESPACES, RDFLIB_MAPPING, Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from MyCapytain.common.reference import BaseCitationSet

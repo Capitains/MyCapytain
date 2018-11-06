@@ -1,8 +1,9 @@
-from MyCapytain.common.constants import RDF_NAMESPACES
-from pyld.jsonld import expand
 import re
+from pyld.jsonld import expand
 from typing import Optional
 
+from MyCapytain.common.constants import RDF_NAMESPACES
+from MyCapytain.errors import UnknownCollection
 from ._base import DtsCollection
 
 
@@ -176,7 +177,9 @@ class HttpResolverDtsCollection(DtsCollection):
             query = self._resolver.endpoint.get_collection(self.id)
             data = query.json()
             if not len(data):
-                raise Exception("We'll see this one later")  # toDo: What error should it be ?
+                raise UnknownCollection(
+                    "The contacted endpoint seems to not have any data about collection %s " % self.id
+                )
             self._parse_metadata(expand(data)[0])
         return True
 

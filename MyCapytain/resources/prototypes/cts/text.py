@@ -62,7 +62,7 @@ class PrototypeCtsNode(InteractiveTextualNode):
         if isinstance(value, str):
             value = URN(value)
         elif not isinstance(value, URN):
-            raise TypeError()
+            raise TypeError("New urn must be string or {} instead of {}".format(type(URN), type(value)))
         self._urn = value
 
     def get_cts_metadata(self, key: str, lang: str = None) -> Literal:

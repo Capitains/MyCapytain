@@ -10,6 +10,7 @@
 
 from typing import Union, Optional, Any, Dict
 import re
+from pyld.jsonld import expand
 
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet, \
@@ -17,9 +18,8 @@ from MyCapytain.common.reference import BaseReference, BaseReferenceSet, \
 from MyCapytain.retrievers.dts import HttpDtsRetriever
 from MyCapytain.common.utils.dts import parse_metadata
 from MyCapytain.resources.collections.dts import HttpResolverDtsCollection
-from pyld.jsonld import expand
 from MyCapytain.resources.texts.remote.dts import DtsResolverDocument
-
+from MyCapytain.errors import EmptyReference, PaginationBrowsingError
 
 __all__ = [
     "HttpDtsResolver"
@@ -39,7 +39,7 @@ def _parse_ref(ref_dict, default_type: str=None):
             ref_dict["https://w3id.org/dts/api#end"][0]["@value"]
         )
     else:
-        return None  # Maybe Raise ?
+        raise EmptyReference("A reference is either empty or malformed")
     type_ = default_type
     if "https://w3id.org/dts/api#citeType" in ref_dict:
         type_ = ref_dict["https://w3id.org/dts/api#citeType"][0]["@value"]
@@ -110,7 +110,9 @@ class HttpDtsResolver(Resolver):
             data = response.json()
             data = expand(data)
             if not len(data):
-                raise Exception("We'll see this one later")  # toDo: What error should it be ?
+                raise PaginationBrowsingError(
+                    "The contacted endpoint seems to not have any data about collection %s " % self.id
+                )
             data = data[0]
 
             level_ = data.get("https://w3id.org/dts/api#level", _empty)[0]["@value"]

@@ -66,8 +66,9 @@ class UnknownCollection(KeyError, MyCapytainException):
     """ A collection is unknown to its ancestor
     """
 
+
 class EmptyReference(SyntaxWarning, MyCapytainException):
-    """ Error generated when a duplicate is found in CtsReference
+    """ Error generated when a CtsReference is wrong
     """
 
     
@@ -78,6 +79,11 @@ class CitationDepthError(UnknownObjectError, MyCapytainException):
 
 class MissingRefsDecl(Exception, MyCapytainException):
     """ A text has no properly encoded refsDecl
+    """
+
+
+class PaginationBrowsingError(MyCapytainException):
+    """ When contacting a remote service and some part of the pages where not reachable or parsable
     """
 
 

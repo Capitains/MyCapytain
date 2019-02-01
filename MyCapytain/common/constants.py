@@ -2,6 +2,17 @@ from rdflib import Namespace, Graph
 from rdflib.namespace import SKOS
 
 
+__all__ = [
+    "XPATH_NAMESPACES",
+    "RDF_NAMESPACES",
+    "Mimetypes",
+    "GRAPH_BINDINGS",
+    "bind_graph",
+    "get_graph",
+    "set_graph",
+    "RDFLIB_MAPPING"
+]
+
 #: List of XPath Namespaces used in guidelines
 XPATH_NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
@@ -93,7 +104,7 @@ class Mimetypes:
         class MyCapytain:
             """ MyCapytain Objects
 
-            :cvar ReadableText: MyCapytain.resources.prototypes.text.CitableText
+            :cvar ReadableText: MyCapytain.resources.prototypes.text.CtsText
             """
             TextualElement = "Capitains/TextualElement"
 

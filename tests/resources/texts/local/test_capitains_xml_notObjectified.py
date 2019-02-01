@@ -12,7 +12,7 @@ import MyCapytain.common.reference._capitains_cts
 import MyCapytain.errors
 import MyCapytain.resources.texts.base.tei
 import MyCapytain.resources.texts.local.capitains.cts
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils.xml import xmlparser
 from tests.resources.texts.local.commonTests import CapitainsXmlTextTest, CapitainsXmlPassageTests, CapitainsXMLRangePassageTests
 
 

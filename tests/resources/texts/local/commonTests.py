@@ -122,52 +122,53 @@ class CapitainsXmlTextTest(TestCase):
 
         # Test with reference and level
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=3)[1]),
-            "2.1.2"
+            "2.1.2",
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=3)[1])
         )
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=3)[-1]),
-            "2.1.12"
+            "2.1.12",
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=3)[-1])
+
         )
         self.assertEqual(
-            self.TEI.getValidReff(reference=CtsReference("2.38-2.39"), level=3),
-            (CtsReference("2.38.1"), CtsReference("2.38.2"), CtsReference("2.39.1"), CtsReference("2.39.2"))
+            (CtsReference("2.38.1"), CtsReference("2.38.2"), CtsReference("2.39.1"), CtsReference("2.39.2")),
+            self.TEI.getValidReff(reference=CtsReference("2.38-2.39"), level=3)
         )
 
         # Test with reference and level autocorrected because too small
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=0)[-1]),
             "2.1.12",
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=0)[-1]),
             "Level should be autocorrected to len(citation) + 1"
         )
         self.assertEqual(
-            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=2)[-1]),
             "2.1.12",
+            str(self.TEI.getValidReff(reference=CtsReference("2.1"), level=2)[-1]),
             "Level should be autocorrected to len(citation) + 1 even if level == len(citation)"
         )
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=CtsReference("2.1-2.2")),
-            CtsReferenceSet(CtsReference(ref) for ref in[
+            CtsReferenceSet(*[CtsReference(ref) for ref in [
                 '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9', '2.1.10', '2.1.11',
                 '2.1.12', '2.2.1', '2.2.2', '2.2.3', '2.2.4', '2.2.5', '2.2.6'
-            ]),
+            ]], level=3, citation=[c for c in self.TEI.citation][-1]),
+            self.TEI.getValidReff(reference=CtsReference("2.1-2.2")),
             "It could be possible to ask for range reffs children")
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=CtsReference("2.1-2.2"), level=2),
             CtsReferenceSet(CtsReference('2.1'), CtsReference('2.2')),
+            self.TEI.getValidReff(reference=CtsReference("2.1-2.2"), level=2),
             "It could be possible to ask for range References reference at the same level in between milestone")
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=CtsReference("1.38-2.2"), level=2),
             CtsReferenceSet(CtsReference(ref) for ref in ['1.38', '1.39', '2.pr', '2.1', '2.2']),
+            self.TEI.getValidReff(reference=CtsReference("1.38-2.2"), level=2),
             "It could be possible to ask for range References reference at the same level in between milestone "
             "across higher levels")
 
         self.assertEqual(
-            self.TEI.getValidReff(reference=CtsReference("1.1.1-1.1.4"), level=3),
             CtsReferenceSet(CtsReference(ref) for ref in ['1.1.1', '1.1.2', '1.1.3', '1.1.4']),
+            self.TEI.getValidReff(reference=CtsReference("1.1.1-1.1.4"), level=3),
             "It could be possible to ask for range reffs in between at the same level cross higher level")
 
         # Test level too deep
@@ -750,104 +751,105 @@ class CapitainsXMLRangePassageTests(TestCase):
     def test_prevnext_on_first_passage(self):
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.1-1.2.1"))
         self.assertEqual(
-            str(passage.nextId), "1.2.2-1.5.2",
+            "1.2.2-1.5.2", str(passage.nextId),
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            passage.prevId, None,
+            None, passage.prevId,
             "Prev reff should be none if we are on the first passage of the text"
         )
 
     def test_prevnext_on_close_to_first_passage(self):
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.10-1.2.1"))
         self.assertEqual(
-            str(passage.nextId), "1.2.2-1.4.1",
+            "1.2.2-1.4.1", str(passage.nextId),
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            str(passage.prevId), "1.pr.1-1.pr.9",
+            "1.pr.1-1.pr.9", str(passage.prevId),
             "Prev reff should start at the beginning of the text, no matter the length of the reference"
         )
 
     def test_prevnext_on_last_passage(self):
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39.2-2.40.8"))
         self.assertEqual(
-            passage.nextId, None,
+            None, passage.nextId,
             "Next reff should be none if we are on the last passage of the text"
         )
         self.assertEqual(
-            str(passage.prevId), "2.37.6-2.39.1",
+            "2.37.6-2.39.1", str(passage.prevId),
             "Prev reff should be the same length as sibling"
         )
 
     def test_prevnext_on_close_to_last_passage(self):
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39.2-2.40.5"))
         self.assertEqual(
-            str(passage.nextId), "2.40.6-2.40.8",
+            "2.40.6-2.40.8", str(passage.nextId),
             "Next reff should finish at the end of the text, no matter the length of the reference"
         )
         self.assertEqual(
-            str(passage.prevId), "2.37.9-2.39.1",
+            "2.37.9-2.39.1", str(passage.prevId),
             "Prev reff should be the same length as sibling"
         )
 
     def test_prevnext(self):
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.5-1.pr.6"))
         self.assertEqual(
-            str(passage.nextId), "1.pr.7-1.pr.8",
+            "1.pr.7-1.pr.8", str(passage.nextId),
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            str(passage.prevId), "1.pr.3-1.pr.4",
+            "1.pr.3-1.pr.4", str(passage.prevId),
             "Prev reff should be the same length as sibling"
         )
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr.5"))
         self.assertEqual(
-            str(passage.nextId), "1.pr.6",
+            "1.pr.6", str(passage.nextId),
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            str(passage.prevId), "1.pr.4",
+            "1.pr.4", str(passage.prevId),
             "Prev reff should be the same length as sibling"
         )
 
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("1.pr"))
         self.assertEqual(
-            str(passage.nextId), "1.1",
+            "1.1", str(passage.nextId),
             "Next reff should be the same length as sibling"
         )
         self.assertEqual(
-            passage.prevId, None,
+            None, passage.prevId,
             "Prev reff should be None when at the start"
         )
 
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.40"))
         self.assertEqual(
-            str(passage.prevId), "2.39",
+            "2.39", str(passage.prevId),
             "Prev reff should be the same length as sibling"
         )
         self.assertEqual(
-            passage.nextId, None,
+            None, passage.nextId,
             "Next reff should be None when at the start"
         )
 
     def test_first_list(self):
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39"))
+        print(list(passage.children), str(passage.firstId))
         self.assertEqual(
-            str(passage.firstId), "2.39.1",
+            "2.39.1", str(passage.firstId),
             "First reff should be the first"
         )
         self.assertEqual(
-            str(passage.lastId), "2.39.2",
+            "2.39.2", str(passage.lastId),
             "Last reff should be the last"
         )
 
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39-2.40"))
         self.assertEqual(
-            str(passage.firstId), "2.39.1",
+            "2.39.1", str(passage.firstId),
             "First reff should be the first"
         )
         self.assertEqual(
-            str(passage.lastId), "2.40.8",
+            "2.40.8", str(passage.lastId),
             "Last reff should be the last"
         )

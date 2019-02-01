@@ -1,0 +1,28 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#"
+    },
+    "@id" : "document_id",
+    "@type": "Resource",
+    "title" : "A title",
+    "description": "A description",
+    "totalItems": 0,
+    "dts:dublincore": {
+        "dc:title": [{"@language": "la", "@value": "Titulus"}],
+        "dc:description": [{
+           "@language": "fr",
+           "@value": "Une description"
+        }],
+        "dc:dateCopyrighted": 2018,
+        "dc:creator": [
+            {"@language": "en", "@value": "Anonymous"}
+        ],
+        "dc:contributor": ["Aemilius Baehrens"],
+        "dc:language": ["la", "en"]
+    },
+    "dts:passage": "/api/dts/documents?id=document_id",
+    "dts:references": "/api/dts/navigation?id=document_id",
+    "dts:citeDepth": 1
+}

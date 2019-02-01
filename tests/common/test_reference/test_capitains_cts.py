@@ -1,7 +1,7 @@
 import unittest
 
 from six import text_type as str
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.reference import CtsReference, URN, Citation
 
 

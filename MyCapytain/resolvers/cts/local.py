@@ -8,7 +8,7 @@ from glob import glob
 from math import ceil
 
 from MyCapytain.common.reference._capitains_cts import CtsReference, URN
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
@@ -19,6 +19,11 @@ from MyCapytain.resources.prototypes.cts.inventory import CtsEditionMetadata, Ct
     CtsCommentaryMetadata, CtsTextInventoryCollection, CtsTranslationMetadata, CtsTextInventoryMetadata
 from MyCapytain.resources.prototypes.cts.inventory import CtsTextInventoryCollection
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
+
+
+__all__ = [
+    "CtsCapitainsLocalResolver"
+]
 
 
 class CtsCapitainsLocalResolver(Resolver):

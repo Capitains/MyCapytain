@@ -1,0 +1,56 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#",
+        "foo": "http://foo.bar/ontology#"
+    },
+    "@id":"/api/dts/navigation/?id=http://data.bnf.fr/ark:/12148/cb11936111v",
+    "dts:citeDepth" : 1,
+    "dts:level": 1,
+    "member": [
+      {
+        "dts:ref": "Av",
+        "dts:dublincore": {
+        "dc:title": "Avertissement de l'Éditeur"
+        }
+      },
+      {
+        "dts:ref": "Pr",
+        "dts:dublincore": {
+          "dc:title": "Préface"
+        }
+      },
+      {
+        "dts:ref": "1",
+        "dts:dublincore": {
+          "dc:title": "Lettre 1"
+        },
+        "dts:extensions": {
+          "foo:fictionalSender": "Cécile Volanges",
+          "foo:fictionalRecipient": "Sophie Carnay"
+        }
+      },
+      {
+        "dts:ref": "2",
+        "dts:dublincore": {
+          "dc:title": "Lettre 2"
+        },
+        "dts:extensions": {
+          "foo:fictionalSender": "La Marquise de Merteuil",
+          "foo:fictionalRecipient": "Vicomte de Valmont"
+        }
+      },
+      {
+        "dts:ref": "3",
+        "dts:dublincore": {
+          "dc:title": "Lettre 3"
+        },
+        "dts:extensions": {
+          "foo:fictionalSender": "Cécile Volanges",
+          "foo:fictionalRecipient": "Sophie Carnay"
+        }
+      }
+    ],
+    "dts:passage": "/dts/api/document/?id=http://data.bnf.fr/ark:/12148/cb11936111v{&ref}{&start}{&end}"
+}

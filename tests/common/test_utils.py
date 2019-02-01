@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from six import text_type as str
 
 import unittest
-from MyCapytain.common.utils import *
-from copy import copy as deepcopy
+
+from MyCapytain.common.utils.xml import normalizeXpath
 
 
 class TestUtils(unittest.TestCase):

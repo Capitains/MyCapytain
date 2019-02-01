@@ -12,6 +12,11 @@ from MyCapytain.common.reference._capitains_cts import CtsReference
 import requests
 
 
+__all__ = [
+    "HttpCtsRetriever"
+]
+
+
 class HttpCtsRetriever(MyCapytain.retrievers.prototypes.CtsRetriever):
     """ Basic integration of the MyCapytain.retrievers.proto.CTS abstraction
     """

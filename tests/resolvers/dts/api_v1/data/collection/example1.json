@@ -1,0 +1,40 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#"
+    },
+    "@id": "general",
+    "@type": "Collection",
+    "totalItems": 3,
+    "title": "Collection Générale de l'École Nationale des Chartes",
+    "dts:dublincore": {
+        "dc:publisher": ["École Nationale des Chartes", "https://viaf.org/viaf/167874585"],
+        "dc:title": [
+            {"@language": "fr", "@value": "Collection Générale de l'École Nationale des Chartes"}
+        ]
+    },
+    "member": [
+        {
+             "@id" : "cartulaires",
+             "title" : "Cartulaires",
+             "description": "Collection de cartulaires d'Île-de-France et de ses environs",
+             "@type" : "Collection",
+             "totalItems" : 10
+        },
+        {
+             "@id" : "lasciva_roma",
+             "title" : "Lasciva Roma",
+             "description": "Collection of primary sources of interest in the studies of Ancient World's sexuality",
+             "@type" : "Collection",
+             "totalItems" : 1
+        },
+        {
+             "@id" : "lettres_de_poilus",
+             "title" : "Correspondance des poilus",
+             "description": "Collection de lettres de poilus entre 1917 et 1918",
+             "@type" : "Collection",
+             "totalItems" : 10000
+        }
+    ]
+}

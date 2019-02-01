@@ -2,6 +2,7 @@ from MyCapytain.common.base import Exportable
 from MyCapytain.common.constants import get_graph, Mimetypes, RDF_NAMESPACES
 from MyCapytain.errors import CitationDepthError
 from copy import copy
+from typing import Tuple
 from abc import abstractmethod
 
 
@@ -319,6 +320,7 @@ class BaseReference(tuple):
     def __new__(cls, *refs):
         if len(refs) == 1 and not isinstance(refs[0], tuple):
             refs = refs[0], None
+
         obj = tuple.__new__(cls, refs)
 
         return obj
@@ -358,7 +360,7 @@ class BaseReferenceSet(tuple):
         obj._citation = None
         obj._level = level
 
-        if citation:
+        if citation is not None:
             obj._citation = citation
         return obj
 
@@ -369,6 +371,14 @@ class BaseReferenceSet(tuple):
     @property
     def level(self) -> int:
         return self._level
+
+    def __repr__(self):
+        return "<{typ} ({repr}) level:{level}, citation:{citation}>".format(
+            typ=type(self).__name__,
+            repr=", ".join([str(s) for s in self]),
+            level=self.level,
+            citation=str(self.citation)
+        )
 
 
 class NodeId(object):
@@ -386,79 +396,63 @@ class NodeId(object):
     :type depth: int
     """
     def __init__(self, identifier=None, children=None, parent=None, siblings=(None, None), depth=None):
-        self.__children__ = children or []
-        self.__parent__ = parent
-        self.__prev__, self.__nextId__ = siblings
-        self.__identifier__ = identifier
-        self.__depth__ = depth
+        self._children = children or []
+        self._parent = parent
+        self._prev_id, self._next_id = siblings
+        self._identifier = identifier
+        self._depth = depth
 
     @property
-    def depth(self):
+    def depth(self) -> int:
         """ Depth of the node in the global hierarchy of the text tree
-
-        :rtype: int
         """
-        return self.__depth__
+        return self._depth
 
     @property
-    def childIds(self):
-        """ Children Node
-
-        :rtype: [str]
+    def childIds(self) -> BaseReferenceSet:
+        """ Children Ids
         """
-        return self.__children__
+        return self._children
 
     @property
-    def firstId(self):
-        """ First child Node
-
-        :rtype: str
+    def firstId(self) -> BaseReference:
+        """ First child Id
         """
-        if len(self.__children__) == 0:
+        if len(self._children) == 0:
             return None
-        return self.__children__[0]
+        return self._children[0]
 
     @property
-    def lastId(self):
-        """ Last child Node
-
-        :rtype: str
+    def lastId(self) -> BaseReference:
+        """ Last child id
         """
-        if len(self.__children__) == 0:
+        if len(self._children) == 0:
             return None
-        return self.__children__[-1]
+        return self._children[-1]
 
     @property
-    def parentId(self):
-        """ Parent Node
-
-        :rtype: str
+    def parentId(self) -> BaseReference:
+        """ Parent Id
         """
-        return self.__parent__
+        return self._parent
 
     @property
-    def siblingsId(self):
-        """ Siblings Node
-
-        :rtype: (str, str)
+    def siblingsId(self) -> Tuple[BaseReference, BaseReference]:
+        """ Siblings Id
         """
-        return self.__prev__, self.__nextId__
+        return self.prevId, self.nextId
 
     @property
-    def prevId(self):
-        """ Previous Node (Sibling)
-
-        :rtype: str
+    def prevId(self) -> BaseReference:
+        """ Previous Id (Sibling)
         """
-        return self.__prev__
+        return self._prev_id
 
     @property
-    def nextId(self):
-        """ Next Node (Sibling)
-
-        :rtype: str
+    def nextId(self) -> BaseReference:
+        """ Next Id
         """
-        return self.__nextId__
+        return self._next_id
 
     @property
     def id(self):
@@ -466,4 +460,4 @@ class NodeId(object):
 
         :rtype: str
         """
-        return self.__identifier__
+        return self._identifier

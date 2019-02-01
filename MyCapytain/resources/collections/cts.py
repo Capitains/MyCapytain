@@ -15,9 +15,21 @@ from lxml.objectify import IntElement, FloatElement
 
 from MyCapytain.resources.prototypes.cts import inventory as cts
 from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
-from MyCapytain.common.utils import xmlparser, expand_namespace
+from MyCapytain.common.utils import expand_namespace
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 
+
+__all__ = [
+    "XmlCtsCitation",
+    "XmlCtsWorkMetadata",
+    "XmlCtsCommentaryMetadata",
+    "XmlCtsTranslationMetadata",
+    "XmlCtsEditionMetadata",
+    "XmlCtsTextgroupMetadata",
+    "XmlCtsTextInventoryMetadata",
+    "XmlCtsTextMetadata"
+]
 
 _CLASSES_DICT = {}
 
@@ -64,7 +76,7 @@ class XmlCtsCitation(CitationPrototype):
         return None
 
 
-def xpathDict(xml, xpath, cls, parent, **kwargs):
+def _xpathDict(xml, xpath, cls, parent, **kwargs):
     """ Returns a default Dict given certain information
 
     :param xml: An xml tree
@@ -88,7 +100,7 @@ def xpathDict(xml, xpath, cls, parent, **kwargs):
     return children
 
 
-def __parse_structured_metadata__(obj, xml):
+def _parse_structured_metadata(obj, xml):
     """ Parse an XML object for structured metadata
 
     :param obj: Object whose metadata are parsed
@@ -166,7 +178,7 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
         for child in xml.xpath("ti:about", namespaces=XPATH_NAMESPACES):
             obj.set_link(RDF_NAMESPACES.CTS.term("about"), child.get('urn'))
 
-        __parse_structured_metadata__(obj, xml)
+        _parse_structured_metadata(obj, xml)
 
         """
         online = xml.xpath("ti:online", namespaces=NS)
@@ -264,20 +276,20 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
 
         # Parse children
         children = []
-        children.extend(xpathDict(
+        children.extend(_xpathDict(
             xml=xml, xpath='ti:edition',
             cls=cls.CLASS_EDITION, parent=o
         ))
-        children.extend(xpathDict(
+        children.extend(_xpathDict(
             xml=xml, xpath='ti:translation',
             cls=cls.CLASS_TRANSLATION, parent=o
         ))
-        children.extend(xpathDict(
+        children.extend(_xpathDict(
             xml=xml, xpath='ti:commentary',
             cls=cls.CLASS_COMMENTARY, parent=o
         ))
 
-        __parse_structured_metadata__(o, xml)
+        _parse_structured_metadata(o, xml)
 
         if _with_children:
             return o, children
@@ -306,9 +318,9 @@ class XmlCtsTextgroupMetadata(cts.CtsTextgroupMetadata):
                 o.set_cts_property("groupname", child.text, lg)
 
         # Parse Works
-        xpathDict(xml=xml, xpath='ti:work', cls=cls.CLASS_WORK, parent=o)
+        _xpathDict(xml=xml, xpath='ti:work', cls=cls.CLASS_WORK, parent=o)
 
-        __parse_structured_metadata__(o, xml)
+        _parse_structured_metadata(o, xml)
         return o
 
 
@@ -327,5 +339,5 @@ class XmlCtsTextInventoryMetadata(cts.CtsTextInventoryMetadata):
         xml = xmlparser(resource)
         o = cls(name=xml.xpath("//ti:TextInventory", namespaces=XPATH_NAMESPACES)[0].get("tiid") or "")
         # Parse textgroups
-        xpathDict(xml=xml, xpath='//ti:textgroup', cls=cls.CLASS_TEXTGROUP, parent=o)
+        _xpathDict(xml=xml, xpath='//ti:textgroup', cls=cls.CLASS_TEXTGROUP, parent=o)
         return o

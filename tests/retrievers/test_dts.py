@@ -3,9 +3,8 @@ import unittest
 import responses
 
 from MyCapytain.retrievers.dts import HttpDtsRetriever
-from MyCapytain.common.utils import _Navigation
+from MyCapytain.common.utils._http import _Navigation, parse_pagination
 from urllib.parse import parse_qs, urlparse, urljoin
-from MyCapytain.common.utils import parse_pagination
 
 _SERVER_URI = "http://domainname.com/api/dts/"
 patch_args = ("MyCapytain.retrievers.dts.requests.get", )
@@ -141,7 +140,7 @@ class TestDtsParsing(unittest.TestCase):
             _Navigation("18", "20", "500", None, "1")
         )
 
-        self.assertInCalls(_SERVER_URI+"collections/", {"nav": ["children"]}, )
+        self.assertInCalls(_SERVER_URI+"collections/", {})
 
     @responses.activate
     def test_querystring_type_of_route(self):

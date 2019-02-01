@@ -1,4 +1,4 @@
-from MyCapytain.resources.collections.dts import DTSCollection
+from MyCapytain.resources.collections.dts import DtsCollection
 from MyCapytain.common.constants import Mimetypes, set_graph, bind_graph
 from unittest import TestCase
 import json
@@ -36,11 +36,10 @@ class TestDtsCollection(TestCase):
 
     def test_simple_collection(self):
         coll = self.get_collection(1)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
-
+        self.maxDiff = 1555555
         self.assertEqual(
-            exported,
             {
                 '@context': {
                     'dct': 'http://purl.org/dc/terms/',
@@ -52,7 +51,7 @@ class TestDtsCollection(TestCase):
                 'member': [
                     {'@id': '/cartulaires',
                      '@type': 'Collection',
-                     'totalItems': 1,
+                     'totalItems': 10,
                      'description': 'Collection de cartulaires '
                                           "d'Île-de-France et de ses "
                                           'environs',
@@ -67,7 +66,7 @@ class TestDtsCollection(TestCase):
                      'title': 'Lasciva Roma'},
                     {'@id': '/lettres_de_poilus',
                                  '@type': 'Collection',
-                                 'totalItems': 1,
+                                 'totalItems': 10000,
                                  'description': 'Collection de lettres de '
                                                       'poilus entre 1917 et 1918',
                                  'title': 'Correspondance des poilus'}],
@@ -81,12 +80,13 @@ class TestDtsCollection(TestCase):
                                                             'Nationale des Chartes'}]},
                 'dts:extensions': {'skos:prefLabel': "Collection Générale de l'École "
                                                       'Nationale des Chartes'}
-            }
+            },
+            exported
         )
 
     def test_collection_single_member_with_types(self):
         coll = self.get_collection(2)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
         self.assertEqual(
             exported,
@@ -131,7 +131,7 @@ class TestDtsCollection(TestCase):
 
     def test_collection_with_complex_child(self):
         coll = self.get_collection(3)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
         self.assertEqual(
             exported,
@@ -193,7 +193,7 @@ class TestDtsCollection(TestCase):
 
     def test_collection_with_cite_depth_but_no_structure(self):
         coll = self.get_collection(5)
-        parsed = DTSCollection.parse(coll)
+        parsed = DtsCollection.parse(coll)
         exported = self.reorder_orderable(parsed.export(Mimetypes.JSON.DTS.Std))
         self.assertEqual(exported["dts:citeDepth"], 7, "There should be a cite depth property")
         self.assertNotIn("dts:citeStructure", exported, "CiteStructure was not defined")

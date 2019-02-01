@@ -9,8 +9,24 @@
 """
 import MyCapytain.retrievers.prototypes
 from MyCapytain import __version__
+from MyCapytain.common.reference import BaseReference
 import requests
 from MyCapytain.common.utils import parse_uri
+
+
+__all__ = [
+    "HttpDtsRetriever"
+]
+
+
+def _parse_ref_parameters(parameters, ref):
+    if isinstance(ref, BaseReference):
+        if ref.is_range():
+            parameters["start"], parameters["end"] = ref
+        else:
+            parameters["ref"] = ref.start
+    elif ref:
+        parameters["ref"] = ref
 
 
 class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
@@ -18,7 +34,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         super(HttpDtsRetriever, self).__init__(endpoint)
         self._routes = None
 
-    def call(self, route, parameters, mimetype="application/ld+json"):
+    def call(self, route, parameters, mimetype="application/ld+json", defaults=None):
         """ Call an endpoint given the parameters
 
         :param route: Named of the route which is called
@@ -29,9 +45,13 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         :type mimetype: str
         :rtype: text
         """
-
+        if not defaults:
+            defaults = {}
         parameters = {
-            key: str(parameters[key]) for key in parameters if parameters[key] is not None
+            key: str(parameters[key])
+            for key in parameters
+            if parameters[key] is not None and
+               parameters[key] != defaults.get(key, None)
         }
         parameters.update(self.routes[route].query_dict)
 
@@ -97,19 +117,23 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
                 "id": collection_id,
                 "nav": nav,
                 "page": page
+            },
+            defaults={
+                "id": None,
+                "nav": "children",
+                "page": 1
             }
         )
 
     def get_navigation(
-            self, collection_id,
-            level=None, ref=None, group_size=None, max_=None, exclude=None,
-            page=None):
+            self, collection_id, level=None, ref=None,
+            group_by=None, max_=None, exclude=None, page=None):
         """ Make a navigation request on the DTS API
 
         :param collection_id: Id of the collection
         :param level: Lever at which the references should be listed
         :param ref: If ref is a tuple, it is treated as a range. String or int are treated as single ref
-        :param group_size: Size of the ranges the server should produce
+        :param group_by: Size of the ranges the server should produce
         :param max_: Maximum number of results
         :param exclude: Exclude specific metadata.
         :param page: Page
@@ -119,15 +143,12 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         parameters = {
             "id": collection_id,
             "level": level,
-            "groupSize": group_size,
+            "groupBy": group_by,
             "max": max_,
             "exclude": exclude,
             "page": page
         }
-        if isinstance(ref, tuple):
-            parameters["start"], parameters["end"] = ref
-        elif ref:
-            parameters["ref"] = ref
+        _parse_ref_parameters(parameters, ref)
 
         return self.call(
             "navigation",
@@ -148,13 +169,10 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
         parameters = {
             "id": collection_id
         }
-        if isinstance(ref, tuple):
-            parameters["start"], parameters["end"] = ref
-        elif ref:
-            parameters["ref"] = ref
+        _parse_ref_parameters(parameters, ref)
 
         return self.call(
-            "document",
+            "documents",
             parameters,
             mimetype=mimetype
         )

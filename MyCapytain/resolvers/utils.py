@@ -1,6 +1,11 @@
 from MyCapytain.errors import UndispatchedTextError
 
 
+__all__ = [
+    "CollectionDispatcher"
+]
+
+
 class CollectionDispatcher:
     """ Collection Dispatcher provides a utility to divide automatically texts and collections \
     into different collections

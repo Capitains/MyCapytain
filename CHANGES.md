@@ -1,3 +1,7 @@
+### 2019-04-10 2.1.1dev0 @sonofmun
+
+- Corrected JSON.Std export for metadata to include all objects for a predicate
+
 ### 2018-06-25 2.0.8 @sonofmun
 
 - Corrected error on the empty references exception from 2.0.7

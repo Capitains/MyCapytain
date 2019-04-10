@@ -1,3 +1,7 @@
+### 2019-04-10 2.0.10 @sonofmun
+
+- Corrected JSON.Std export for metadata to include all objects for a predicate
+
 ### 2018-07-27 2.0.9 @sonofmun
 
  - Removed a random print statement that had been used for debugging empty references

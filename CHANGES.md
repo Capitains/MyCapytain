@@ -1,3 +1,38 @@
+### 2019-07-01 3.0.0 @ponteineptique
+
+- Added DTS !
+- New Generic / Prototype CitationSetObject
+    - New .match(passageId) function
+- New Generic / Prototype Citation Object
+    - New .children Property
+    - New .depth property (Not ported to CTS Citation object yet)
+    - New meaning of .__len__() magic method
+- New .root and is_root properties to link back to the citation set (for match implementations)
+- Guidelines / CTS Citation Object
+    - Implementation of the .match(passageId) method
+- CitationSet.is_root -> CitationSet.is_root() # Keep in check with other practices
+- BaseCitation.is_empty() now checks if the object has children
+- BaseCitation.is_set() checks if objects have their properties set
+- cts.Citation.isEmpty() old behaviour is now in .is_set() and has been reversed in meaning
+    - Old system would check if the CTS Citation was not set, old code such as
+    - if citation.isEmpty() should be moved to if citation.is_set()
+- Guidelines / CTS Citation Object
+- New Generic / Prototype Citation Object
+    - RetroPorted .start and .end Properties (see below for breaking change)
+    - New .is_range property
+
+From MyCapytain.resources.prototypes.text to MyCapytain.resources.prototypes.cts.text :
+
+- `CtsNode` now `PrototypeCtsNode`
+- `CtsPassage` now `PrototypeCtsPassage`
+- `CtsText` now `PrototypeCtsText`
+
+Texts class:
+- `self.__attr__` to `self._attr`
+
+CTS Citation:
+- `CTSCitation.isEmpty()` to `CTSCitation.is_empty()`
+
 ### 2019-04-10 2.0.10 @sonofmun
 
 - Corrected JSON.Std export for metadata to include all objects for a predicate

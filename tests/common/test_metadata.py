@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from rdflib.namespace import DC
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes
 from unittest import TestCase
@@ -134,4 +135,17 @@ class TestMetadata(TestCase):
             {
                 'https://w3id.org/dts/api#description': {'fre': 'Subtitle', 'eng': 'Subtitle'}
             }
+        )
+
+    def test_export_multiple_values_JSON(self):
+        m = Metadata()
+        m.add(DC.contributor, "Me", lang="eng")
+        m.add(DC.contributor, "You", lang="eng")
+        m.add(DC.contributor, "Ich", lang="deu")
+        m.add(DC.contributor, "Du", lang="deu")
+
+        self.assertCountEqual(
+            m.export(Mimetypes.JSON.Std),
+            {'http://purl.org/dc/elements/1.1/contributor': {'deu': ['Du', 'Ich'],
+                                                             'eng': ['Me', 'You']}}
         )

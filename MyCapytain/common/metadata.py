@@ -205,7 +205,12 @@ class Metadata(Exportable):
                 if predicate not in out:
                     out[predicate] = {}
                 if isinstance(object, Literal):
-                    out[predicate][object.language] = object.title()
+                    if object.language in out[predicate]:
+                        if isinstance(out[predicate][object.language], str):
+                            out[predicate][object.language] = [out[predicate][object.language]]
+                        out[predicate][object.language].append(object.title())
+                    else:
+                        out[predicate][object.language] = object.title()
             del graph
             return out
 

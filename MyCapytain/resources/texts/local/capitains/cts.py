@@ -264,7 +264,13 @@ class _SharedMethods(TeiResource):
         passages = [".".join(passage) for passage in passages]
 
         if _debug:
-            duplicates = set([n for n in passages if passages.count(n) > 1])
+            duplicates = set()
+            seen = set()
+            for n in passages:
+                if n in seen:
+                    duplicates.add(n)
+                else:
+                    seen.add(n)
             if len(duplicates) > 0:
                 message = ", ".join(duplicates)
                 warnings.warn(message, DuplicateReference)

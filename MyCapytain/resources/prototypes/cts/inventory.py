@@ -80,7 +80,7 @@ class PrototypeCtsCollection(Collection):
         if lang is not None:
             if lang in x:
                 return x[lang]
-            return next(x.values())
+            return next(iter(x.values()))
         return x
 
     def set_cts_property(self, prop, value, lang=None):

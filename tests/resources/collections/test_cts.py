@@ -367,14 +367,23 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "lat")), "Martialis")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "eng")), "Epigrammata")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "fre")), "Epigrammes")
+        self.assertRegex(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "per")),
+                         "Epigrammata|Epigrammes",
+                         "Requesting a CTS title with a language that does not exist should return one of the existing properties.")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "eng")),
                          "Epigrammata Label")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "fre")),
                          "Epigrammes Label")
+        self.assertRegex(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "per")),
+                         "Epigrammes Label|Epigrammata Label",
+                         "Requesting a CTS label with a language that does not exist should return one of the existing properties.")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "fre")),
                          "G. Heraeus")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "eng")),
                          "W. Heraeus")
+        self.assertRegex(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "per")),
+                         "W. Heraeus|G. Heraeus",
+                         "Requesting a CTS description with a language that does not exist should return one of the existing properties.")
         self.assertCountEqual(
             list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.RDF_NAMESPACES.CTS.term("about"))]),
                          ["urn:cts:latinLit:phi1294.phi002.perseus-eng2", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"])

@@ -90,7 +90,9 @@ class BaseCitationSet(Exportable):
 
     @property
     def depth(self):
-        """ Depth of the citation scheme
+        """ Depth of the citation scheme: if multiple scheme are available,
+        the deepest one from the current node is chosen (if there is two possibilities,
+        a->((b->c)(d->e->f)) 4 is the depth
 
         .. example:: If we have a Book, Poem, Line system,
          and the citation we are looking at is Poem, depth is 2

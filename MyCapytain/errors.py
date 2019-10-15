@@ -71,7 +71,7 @@ class UnknownCollection(KeyError, MyCapytainException):
 
 
 class EmptyReference(SyntaxWarning, MyCapytainException):
-    """ Error generated when a CtsReference is wrong
+    """ Error generated when a CtsReference does not exist or is invalid
     """
 
     

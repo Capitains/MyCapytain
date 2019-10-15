@@ -112,14 +112,14 @@ class TestDtsCitation(TestCase):
         cite = DtsCitationSet.ingest(_context(_ex_2))
         children = {c.name: c for c in cite}
 
-        self.assertEqual(2, cite.depth, "There should be 3 levels of citation")
-        self.assertEqual(2, len(cite), "There should be 5 children")
+        self.assertEqual(2, cite.depth, "There should be 2 levels of citation")
+        self.assertEqual(2, len(cite), "There should be 2 children")
 
         self.assertEqual(list(cite[-1]), [children["line"]], "Last level should contain line only")
         self.assertEqual(list(cite[-1]), list(cite[1]), "-1 level == level 1")
 
         self.assertCountEqual(list(cite[-2]), [children["poem"]], "-2 level  == level 0")
-        self.assertCountEqual(list(cite[-2]), list(cite[0]), "-32 level  == level 0")
+        self.assertCountEqual(list(cite[-2]), list(cite[0]), "-2 level  == level 0")
 
         self.assertIsInstance(cite, DtsCitationSet, "Root should be a DtsCitationSet")
         self.assertEqual([type(child) for child in cite.children], [DtsCitation], "Children should be DtsCitation")

@@ -100,7 +100,8 @@ class DtsCitation(BaseCitation):
 
 
 class DtsCitationSet(BaseCitationSet):
-    """ Set of citation that are supposed
+    """ Set of citations following the DTS model (Unlike CTS, one citation
+    can have two or more children)
 
     """
 

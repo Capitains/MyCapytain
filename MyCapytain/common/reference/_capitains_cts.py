@@ -786,7 +786,7 @@ class Citation(BaseCitation):
         return REFSDECL_REPLACER.sub("?", "".join(matches[0:-1])), REFSDECL_REPLACER.sub("?", matches[-1])
 
     def _fromScopeXpathToRefsDecl(self, scope, xpath):
-        """ Update xpath and scope property when refsDecl is updated
+        """ Update the refsDecl value if xpath and scope property are to be updated
 
         """
         if scope is not None and xpath is not None:

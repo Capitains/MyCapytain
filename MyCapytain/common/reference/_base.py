@@ -372,6 +372,10 @@ class BaseReferenceSet(tuple):
 
     @property
     def level(self) -> int:
+        """ Level represents the depth at which lies the reference.
+
+        eg. depth is the number of floors, level is the actual floor number.
+        """
         return self._level
 
     def __repr__(self):

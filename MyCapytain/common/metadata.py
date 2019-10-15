@@ -7,11 +7,16 @@
 
 
 """
-from __future__ import unicode_literals
-from MyCapytain.common.utils import make_xml_node
+from MyCapytain.common.utils.xml import make_xml_node
 from MyCapytain.common.constants import Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from rdflib import BNode, Literal, Graph, URIRef, term
+from typing import Union, Optional
+
+
+__all__ = [
+    "Metadata"
+]
 
 
 class Metadata(Exportable):
@@ -24,7 +29,8 @@ class Metadata(Exportable):
     :cvar DEFAULT_EXPORT: Default export (CTS XML Inventory)
     :cvar STORE: RDF Store
     """
-    EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.XML.RDFa, Mimetypes.JSON.LD, Mimetypes.XML.CapiTainS.CTS]
+    EXPORT_TO = [Mimetypes.JSON.Std, Mimetypes.XML.RDF, Mimetypes.XML.RDFa, Mimetypes.JSON.LD,
+                 Mimetypes.XML.CapiTainS.CTS]
     DEFAULT_EXPORT = Mimetypes.JSON.Std
     
     def __init__(self, node=None, *args, **kwargs):
@@ -45,6 +51,23 @@ class Metadata(Exportable):
         :rtype: Graph
         """
         return self.__graph__
+
+    def set(self, key: URIRef, value: Union[Literal, BNode, URIRef, str, int], lang: Optional[str]=None):
+        """ Set the VALUE for KEY predicate in the Metadata Graph
+
+        :param key: Predicate to be set (eg. DCT.creator)
+        :param value: Value to be stored (eg. "Cicero")
+        :param lang: [Optional] Language of the value (eg. "la")
+        """
+        if not isinstance(value, Literal) and lang is not None:
+            value = Literal(value, lang=lang)
+        elif not isinstance(value, (BNode, URIRef)):
+            value, _type = term._castPythonToLiteral(value)
+            if _type is None:
+                value = Literal(value)
+            else:
+                value = Literal(value, datatype=_type)
+        self.graph.set((self.asNode(), key, value))
 
     def add(self, key, value, lang=None):
         """ Add a triple to the graph related to this node
@@ -85,6 +108,9 @@ class Metadata(Exportable):
         :param lang: Language of the triple if applicable
         :rtype: Literal or BNode or URIRef
         """
+        if not isinstance(key, URIRef):
+            key = URIRef(key)
+
         if lang is not None:
             default = None
             for o in self.graph.objects(self.asNode(), key):

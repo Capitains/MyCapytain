@@ -14,9 +14,24 @@ from rdflib.namespace import XSD
 from lxml.objectify import IntElement, FloatElement
 
 from MyCapytain.resources.prototypes.cts import inventory as cts
-from MyCapytain.common.reference import Citation as CitationPrototype
-from MyCapytain.common.utils import xmlparser, expand_namespace
+from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
+from MyCapytain.common.utils import expand_namespace
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
+
+
+__all__ = [
+    "XmlCtsCitation",
+    "XmlCtsWorkMetadata",
+    "XmlCtsCommentaryMetadata",
+    "XmlCtsTranslationMetadata",
+    "XmlCtsEditionMetadata",
+    "XmlCtsTextgroupMetadata",
+    "XmlCtsTextInventoryMetadata",
+    "XmlCtsTextMetadata"
+]
+
+_CLASSES_DICT = {}
 
 
 class XmlCtsCitation(CitationPrototype):
@@ -24,8 +39,8 @@ class XmlCtsCitation(CitationPrototype):
 
     """
 
-    @staticmethod
-    def ingest(resource, element=None, xpath="ti:citation"):
+    @classmethod
+    def ingest(cls, resource, element=None, xpath="ti:citation"):
         """ Ingest xml to create a citation
 
         :param resource: XML on which to do xpath
@@ -37,21 +52,21 @@ class XmlCtsCitation(CitationPrototype):
         # Reuse of of find citation
         results = resource.xpath(xpath, namespaces=XPATH_NAMESPACES)
         if len(results) > 0:
-            citation = XmlCtsCitation(
+            citation = cls(
                 name=results[0].get("label"),
                 xpath=results[0].get("xpath"),
                 scope=results[0].get("scope")
             )
 
-            if isinstance(element, XmlCtsCitation):
+            if isinstance(element, cls):
                 element.child = citation
-                XmlCtsCitation.ingest(
+                cls.ingest(
                     resource=results[0],
                     element=element.child
                 )
             else:
                 element = citation
-                XmlCtsCitation.ingest(
+                cls.ingest(
                     resource=results[0],
                     element=element
                 )
@@ -61,7 +76,7 @@ class XmlCtsCitation(CitationPrototype):
         return None
 
 
-def xpathDict(xml, xpath, cls, parent, **kwargs):
+def _xpathDict(xml, xpath, cls, parent, **kwargs):
     """ Returns a default Dict given certain information
 
     :param xml: An xml tree
@@ -75,15 +90,17 @@ def xpathDict(xml, xpath, cls, parent, **kwargs):
     :rtype: collections.defaultdict.<basestring, inventory.Resource>
     :returns: Dictionary of children
     """
+    children = []
     for child in xml.xpath(xpath, namespaces=XPATH_NAMESPACES):
-        cls.parse(
+        children.append(cls.parse(
             resource=child,
             parent=parent,
             **kwargs
-        )
+        ))
+    return children
 
 
-def __parse_structured_metadata__(obj, xml):
+def _parse_structured_metadata(obj, xml):
     """ Parse an XML object for structured metadata
 
     :param obj: Object whose metadata are parsed
@@ -125,6 +142,7 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
 
     """
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
+    CLASS_CITATION = XmlCtsCitation
 
     @staticmethod
     def __findCitations(obj, xml, xpath="ti:citation"):
@@ -134,8 +152,8 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
         :param xpath: Xpath to use to retrieve the xml node
         """
 
-    @staticmethod
-    def parse_metadata(obj, xml):
+    @classmethod
+    def parse_metadata(cls, obj, xml):
         """ Parse a resource to feed the object
 
         :param obj: Obj to set metadata of
@@ -154,13 +172,13 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
             if lg is not None:
                 obj.set_cts_property("label", child.text, lg)
 
-        obj.citation = XmlCtsCitation.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
+        obj.citation = cls.CLASS_CITATION.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
 
         # Added for commentary
         for child in xml.xpath("ti:about", namespaces=XPATH_NAMESPACES):
             obj.set_link(RDF_NAMESPACES.CTS.term("about"), child.get('urn'))
 
-        __parse_structured_metadata__(obj, xml)
+        _parse_structured_metadata(obj, xml)
 
         """
         online = xml.xpath("ti:online", namespaces=NS)
@@ -173,64 +191,77 @@ class XmlCtsTextMetadata(cts.CtsTextMetadata):
                 obj.metadata["namespaceMapping"][namespaceMapping.get("abbreviation")] = namespaceMapping.get("nsURI")
         """
 
+    def __init__(self, *args, **kwargs):
+        super(XmlCtsTextMetadata, self).__init__(*args, **kwargs)
+        self._path = None
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        self._path = value
+
 
 class XmlCtsEditionMetadata(cts.CtsEditionMetadata, XmlCtsTextMetadata):
     """ Create an edition subtyped CtsTextMetadata object
     """
-    @staticmethod
-    def parse(resource, parent=None):
+    @classmethod
+    def parse(cls, resource, parent=None):
         xml = xmlparser(resource)
-        o = XmlCtsEditionMetadata(urn=xml.get("urn"), parent=parent)
-        XmlCtsEditionMetadata.parse_metadata(o, xml)
-
+        o = cls(urn=xml.get("urn"), parent=parent)
+        cls.parse_metadata(o, xml)
         return o
 
 
 class XmlCtsTranslationMetadata(cts.CtsTranslationMetadata, XmlCtsTextMetadata):
     """ Create a translation subtyped CtsTextMetadata object
     """
-    @staticmethod
-    def parse(resource, parent=None):
+    @classmethod
+    def parse(cls, resource, parent=None):
         xml = xmlparser(resource)
         lang = xml.get("{http://www.w3.org/XML/1998/namespace}lang")
 
-        o = XmlCtsTranslationMetadata(urn=xml.get("urn"), parent=parent)
+        o = cls(urn=xml.get("urn"), parent=parent)
         if lang is not None:
             o.lang = lang
-        XmlCtsTranslationMetadata.parse_metadata(o, xml)
+        cls.parse_metadata(o, xml)
         return o
 
 
 class XmlCtsCommentaryMetadata(cts.CtsCommentaryMetadata, XmlCtsTextMetadata):
     """ Create a commentary subtyped PrototypeText object
     """
-    @staticmethod
-    def parse(resource, parent=None):
+    @classmethod
+    def parse(cls, resource, parent=None):
         xml = xmlparser(resource)
         lang = xml.get("{http://www.w3.org/XML/1998/namespace}lang")
 
-        o = XmlCtsCommentaryMetadata(urn=xml.get("urn"), parent=parent)
+        o = cls(urn=xml.get("urn"), parent=parent)
         if lang is not None:
             o.lang = lang
-        XmlCtsCommentaryMetadata.parse_metadata(o, xml)
+        cls.parse_metadata(o, xml)
         return o
 
 
 class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
     """ Represents a CTS Textgroup in XML
     """
+    CLASS_EDITION = XmlCtsEditionMetadata
+    CLASS_TRANSLATION = XmlCtsTranslationMetadata
+    CLASS_COMMENTARY = XmlCtsCommentaryMetadata
 
-    @staticmethod
-    def parse(resource, parent=None):
+    @classmethod
+    def parse(cls, resource, parent=None, _with_children=False):
         """ Parse a resource
 
         :param resource: Element rerpresenting a work
-        :param type: basestring, etree._Element
         :param parent: Parent of the object
         :type parent: XmlCtsTextgroupMetadata
         """
         xml = xmlparser(resource)
-        o = XmlCtsWorkMetadata(urn=xml.get("urn"), parent=parent)
+        o = cls(urn=xml.get("urn"), parent=parent)
 
         lang = xml.get("{http://www.w3.org/XML/1998/namespace}lang")
         if lang is not None:
@@ -242,29 +273,41 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
                 o.set_cts_property("title", child.text, lg)
 
         # Parse children
-        xpathDict(xml=xml, xpath='ti:edition', cls=XmlCtsEditionMetadata, parent=o)
-        xpathDict(xml=xml, xpath='ti:translation', cls=XmlCtsTranslationMetadata, parent=o)
-        # Added for commentary
-        xpathDict(xml=xml, xpath='ti:commentary', cls=XmlCtsCommentaryMetadata, parent=o)
+        children = []
+        children.extend(_xpathDict(
+            xml=xml, xpath='ti:edition',
+            cls=cls.CLASS_EDITION, parent=o
+        ))
+        children.extend(_xpathDict(
+            xml=xml, xpath='ti:translation',
+            cls=cls.CLASS_TRANSLATION, parent=o
+        ))
+        children.extend(_xpathDict(
+            xml=xml, xpath='ti:commentary',
+            cls=cls.CLASS_COMMENTARY, parent=o
+        ))
 
-        __parse_structured_metadata__(o, xml)
+        _parse_structured_metadata(o, xml)
 
+        if _with_children:
+            return o, children
         return o
 
 
 class XmlCtsTextgroupMetadata(cts.CtsTextgroupMetadata):
     """ Represents a CTS Textgroup in XML
     """
+    CLASS_WORK = XmlCtsWorkMetadata
 
-    @staticmethod
-    def parse(resource, parent=None):
+    @classmethod
+    def parse(cls, resource, parent=None):
         """ Parse a textgroup resource
 
         :param resource: Element representing the textgroup
         :param parent: Parent of the textgroup
         """
         xml = xmlparser(resource)
-        o = XmlCtsTextgroupMetadata(urn=xml.get("urn"), parent=parent)
+        o = cls(urn=xml.get("urn"), parent=parent)
 
         for child in xml.xpath("ti:groupname", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
@@ -272,25 +315,25 @@ class XmlCtsTextgroupMetadata(cts.CtsTextgroupMetadata):
                 o.set_cts_property("groupname", child.text, lg)
 
         # Parse Works
-        xpathDict(xml=xml, xpath='ti:work', cls=XmlCtsWorkMetadata, parent=o)
+        _xpathDict(xml=xml, xpath='ti:work', cls=cls.CLASS_WORK, parent=o)
 
-        __parse_structured_metadata__(o, xml)
+        _parse_structured_metadata(o, xml)
         return o
 
 
 class XmlCtsTextInventoryMetadata(cts.CtsTextInventoryMetadata):
     """ Represents a CTS Inventory file
     """
+    CLASS_TEXTGROUP = XmlCtsTextgroupMetadata
 
-    @staticmethod
-    def parse(resource):
-        """ Parse a resource 
+    @classmethod
+    def parse(cls, resource):
+        """ Parse a resource
 
         :param resource: Element representing the text inventory
-        :param type: basestring, etree._Element
         """
         xml = xmlparser(resource)
-        o = XmlCtsTextInventoryMetadata(name=xml.xpath("//ti:TextInventory", namespaces=XPATH_NAMESPACES)[0].get("tiid") or "")
+        o = cls(name=xml.xpath("//ti:TextInventory", namespaces=XPATH_NAMESPACES)[0].get("tiid") or "")
         # Parse textgroups
-        xpathDict(xml=xml, xpath='//ti:textgroup', cls=XmlCtsTextgroupMetadata, parent=o)
+        _xpathDict(xml=xml, xpath='//ti:textgroup', cls=cls.CLASS_TEXTGROUP, parent=o)
         return o

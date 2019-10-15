@@ -126,14 +126,14 @@ class TestMetadata(TestCase):
         self.assertEqual(
             m.export(Mimetypes.JSON.Std, exclude=[RDF_NAMESPACES.CTS.title]),
             {
-                'http://w3id.org/dts-ontology/description': {'fre': 'Subtitle', 'eng': 'Subtitle'},
+                'https://w3id.org/dts/api#description': {'fre': 'Subtitle', 'eng': 'Subtitle'},
              'http://chs.harvard.edu/xmlns/cts/description': {'fre': 'Subtitle', 'eng': 'Subtitle'}
             }
         )
         self.assertEqual(
             m.export(Mimetypes.JSON.Std, exclude=[RDF_NAMESPACES.CTS]),
             {
-                'http://w3id.org/dts-ontology/description': {'fre': 'Subtitle', 'eng': 'Subtitle'}
+                'https://w3id.org/dts/api#description': {'fre': 'Subtitle', 'eng': 'Subtitle'}
             }
         )
 

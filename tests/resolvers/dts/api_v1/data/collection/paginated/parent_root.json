@@ -1,0 +1,17 @@
+{
+    "@context": {
+        "@vocab": "https://www.w3.org/ns/hydra/core#",
+        "dc": "http://purl.org/dc/terms/",
+        "dts": "https://w3id.org/dts/api#"
+    },
+    "@id" : "urn:enc",
+    "@type" : "Collection",
+    "title": "Collection Générale de l'École Nationale des Chartes",
+    "dts:dublincore": {
+        "dc:publisher": ["École Nationale des Chartes", "https://viaf.org/viaf/167874585"],
+        "dc:title": [
+            {"@language": "fr", "@value" : "Collection Générale de l'École Nationale des Chartes"}
+        ]
+    },
+    "totalItems" : 0
+}

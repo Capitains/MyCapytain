@@ -5,14 +5,15 @@ import unittest
 from io import open, StringIO
 from operator import attrgetter
 
-from rdflib import Literal, URIRef
-
 import lxml.etree as etree
 import xmlunittest
 
-from MyCapytain.resources.collections.cts import *
-from MyCapytain.resources.prototypes.text import CtsNode
 from MyCapytain.common import constants
+from MyCapytain.resources.collections.cts import *
+from MyCapytain.resources.prototypes.cts.text import PrototypeCtsNode
+from MyCapytain.common.utils.xml import xmlparser
+from MyCapytain.common.constants import Mimetypes, RDF_NAMESPACES, XPATH_NAMESPACES
+from rdflib import URIRef, Literal, XSD
 
 
 class XML_Compare(object):
@@ -366,14 +367,23 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294"].get_cts_property("groupname", "lat")), "Martialis")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "eng")), "Epigrammata")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "fre")), "Epigrammes")
+        self.assertRegex(str(TI["urn:cts:latinLit:phi1294.phi002"].get_cts_property("title", "per")),
+                         "Epigrammata|Epigrammes",
+                         "Requesting a CTS title with a language that does not exist should return one of the existing properties.")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "eng")),
                          "Epigrammata Label")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "fre")),
                          "Epigrammes Label")
+        self.assertRegex(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("label", "per")),
+                         "Epigrammes Label|Epigrammata Label",
+                         "Requesting a CTS label with a language that does not exist should return one of the existing properties.")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "fre")),
                          "G. Heraeus")
         self.assertEqual(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "eng")),
                          "W. Heraeus")
+        self.assertRegex(str(TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].get_cts_property("description", "per")),
+                         "W. Heraeus|G. Heraeus",
+                         "Requesting a CTS description with a language that does not exist should return one of the existing properties.")
         self.assertCountEqual(
             list([str(o) for o in TI["urn:cts:latinLit:phi1294.phi002.perseus-eng3"].get_link(constants.RDF_NAMESPACES.CTS.term("about"))]),
                          ["urn:cts:latinLit:phi1294.phi002.perseus-eng2", "urn:cts:latinLit:phi1294.phi002.perseus-lat2"])
@@ -450,7 +460,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         ti_text = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
 
-        txt_text = CtsNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
+        txt_text = PrototypeCtsNode("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:latinLit:phi1294.phi002.perseus-lat2")
         self.assertEqual(
@@ -662,3 +672,39 @@ class TestCitation(unittest.TestCase):
     def test_empty(self):
         a = XmlCtsCitation(name="none")
         self.assertEqual(a.export(), "")
+
+    def test_ingest_and_match(self):
+        """ Ensure matching and parsing XML works correctly """
+        xml = xmlparser("""<ns0:edition urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2' workUrn='urn:cts:latinLit:phi1294.phi002' xml:lang="lat" xmlns:ns0='http://chs.harvard.edu/xmlns/cts'>
+    <ns0:label xml:lang='eng'>Epigrammata Label</ns0:label>
+    <ns0:label xml:lang='fre'>Epigrammes Label</ns0:label>
+    <ns0:description xml:lang='eng'>W. Heraeus</ns0:description>
+    <ns0:description xml:lang='fre'>G. Heraeus</ns0:description>
+    <ns0:online>
+    <ns0:citationMapping>
+    <ns0:citation label='book' xpath="/tei:div[@n='?']" scope='/tei:TEI/tei:text/tei:body/tei:div'>
+    <ns0:citation label='poem' xpath="/tei:div[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']">
+    <ns0:citation label='line' xpath="/tei:l[@n='?']"  scope="/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='?']/tei:div[@n='?']"></ns0:citation>
+    </ns0:citation>
+    </ns0:citation>
+    </ns0:citationMapping>
+    </ns0:online>
+    </ns0:edition>""".replace("\n", ""))
+        citation = (XmlCtsEditionMetadata.parse(xml)).citation
+        # The citation that should be returned is the root
+        self.assertEqual(citation.name, "book", "Name should have been parsed")
+        self.assertEqual(citation.child.name, "poem", "Name of child should have been parsed")
+        self.assertEqual(citation.child.child.name, "line", "Name of descendants should have been parsed")
+        self.assertEqual(citation.is_root(), True, "Root should be true on root")
+        self.assertEqual(citation.match("1.2"), citation.child, "Matching should make use of root matching")
+        self.assertEqual(citation.match("1.2.4"), citation.child.child, "Matching should make use of root matching")
+        self.assertEqual(citation.match("1"), citation, "Matching should make use of root matching")
+
+        self.assertEqual(citation.child.match("1.2").name, "poem", "Matching should retrieve poem at 2nd level")
+        self.assertEqual(citation.child.match("1.2.4").name, "line", "Matching should retrieve line at 3rd level")
+        self.assertEqual(citation.child.match("1").name, "book", "Matching retrieve book at 1st level")
+
+        citation = citation.child
+        self.assertEqual(citation.child.match("1.2").name, "poem", "Matching should retrieve poem at 2nd level")
+        self.assertEqual(citation.child.match("1.2.4").name, "line", "Matching should retrieve line at 3rd level")
+        self.assertEqual(citation.child.match("1").name, "book", "Matching retrieve book at 1st level")

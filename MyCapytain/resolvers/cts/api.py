@@ -14,6 +14,10 @@ from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
 
 
+__all__ = [
+    "HttpCtsResolver"
+]
+
 class HttpCtsResolver(Resolver):
     """ HttpCtsResolver provide a resolver for CTS API http endpoint.
 

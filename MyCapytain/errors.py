@@ -14,8 +14,16 @@ class MyCapytainException(BaseException):
     """
 
 
+class JsonLdCollectionMissing(MyCapytainException):
+    """ Error thrown when a JSON LD contains no principle collection
+
+    Raised when a json supposed to contain collection is parsed
+    but nothing is found
+    """
+
+
 class DuplicateReference(SyntaxWarning, MyCapytainException):
-    """ Error generated when a duplicate is found in Reference
+    """ Error generated when a duplicate is found in CtsReference
     """
 
 
@@ -63,7 +71,7 @@ class UnknownCollection(KeyError, MyCapytainException):
 
 
 class EmptyReference(SyntaxWarning, MyCapytainException):
-    """ Error generated when a duplicate is found in Reference
+    """ Error generated when a CtsReference does not exist or is invalid
     """
 
     
@@ -75,3 +83,17 @@ class CitationDepthError(UnknownObjectError, MyCapytainException):
 class MissingRefsDecl(Exception, MyCapytainException):
     """ A text has no properly encoded refsDecl
     """
+
+
+class PaginationBrowsingError(MyCapytainException):
+    """ When contacting a remote service and some part of the pages where not reachable or parsable
+    """
+
+
+class CapitainsXPathError(Exception):
+    def __init__(self, message):
+        super(CapitainsXPathError, self).__init__()
+        self.message = message
+
+    def __repr__(self):
+        return "CapitainsXPathError("+self.message+")"

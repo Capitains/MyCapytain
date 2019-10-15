@@ -2,6 +2,17 @@ from rdflib import Namespace, Graph
 from rdflib.namespace import SKOS
 
 
+__all__ = [
+    "XPATH_NAMESPACES",
+    "RDF_NAMESPACES",
+    "Mimetypes",
+    "GRAPH_BINDINGS",
+    "bind_graph",
+    "get_graph",
+    "set_graph",
+    "RDFLIB_MAPPING"
+]
+
 #: List of XPath Namespaces used in guidelines
 XPATH_NAMESPACES = {
     "tei": "http://www.tei-c.org/ns/1.0",
@@ -26,9 +37,10 @@ class RDF_NAMESPACES:
     :type CAPITAINS: Namespace
     """
     CTS = Namespace("http://chs.harvard.edu/xmlns/cts/")
-    DTS = Namespace("http://w3id.org/dts-ontology/")
+    DTS = Namespace("https://w3id.org/dts/api#")
     TEI = Namespace("http://www.tei-c.org/ns/1.0/")
     CAPITAINS = Namespace("http://purl.org/capitains/ns/1.0#")
+    HYDRA = Namespace("https://www.w3.org/ns/hydra/core#")
 
 
 class Mimetypes:
@@ -92,20 +104,37 @@ class Mimetypes:
         class MyCapytain:
             """ MyCapytain Objects
 
-            :cvar ReadableText: MyCapytain.resources.prototypes.text.CitableText
+            :cvar ReadableText: MyCapytain.resources.prototypes.text.CtsText
             """
             TextualElement = "Capitains/TextualElement"
 
     PLAINTEXT = "text/plain"
 
 
+GRAPH_BINDINGS = {
+    "": RDF_NAMESPACES.CTS,
+    "dts": RDF_NAMESPACES.DTS,
+    "tei": RDF_NAMESPACES.TEI,
+    "skos": SKOS,
+    "cpt": RDF_NAMESPACES.CAPITAINS
+}
+
+
+def bind_graph(graph=None):
+    """ Bind a graph with generic MyCapytain prefixes
+
+    :param graph: Graph (Optional)
+    :return: Bound graph
+    """
+    if graph is None:
+        graph = Graph()
+    for prefix, ns in GRAPH_BINDINGS.items():
+        graph.bind(prefix, ns, True)
+    return graph
+
+
 global __MYCAPYTAIN_TRIPLE_GRAPH__
-__MYCAPYTAIN_TRIPLE_GRAPH__ = Graph()
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("", RDF_NAMESPACES.CTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("dts", RDF_NAMESPACES.DTS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("tei", RDF_NAMESPACES.TEI)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("skos", SKOS)
-__MYCAPYTAIN_TRIPLE_GRAPH__.bind("cpt", RDF_NAMESPACES.CAPITAINS)
+__MYCAPYTAIN_TRIPLE_GRAPH__ = bind_graph()
 
 
 def set_graph(graph):

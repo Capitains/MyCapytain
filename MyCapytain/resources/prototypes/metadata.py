@@ -9,11 +9,28 @@
 
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.errors import UnknownCollection
-from MyCapytain.common.utils import Subgraph, LiteralToDict
+from MyCapytain.common.utils import literal_to_dict, Subgraph
 from MyCapytain.common.constants import RDF_NAMESPACES, RDFLIB_MAPPING, Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
+from MyCapytain.common.reference import BaseCitationSet
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
-from rdflib.namespace import SKOS, DC
+from rdflib.namespace import SKOS, DC, DCTERMS
+from typing import List
+
+
+__all__ = [
+    "Collection",
+    "ResourceCollection"
+]
+
+
+_ns_hydra_str = str(RDF_NAMESPACES.HYDRA)
+_ns_cts_str = str(RDF_NAMESPACES.CTS)
+_ns_dts_str = str(RDF_NAMESPACES.DTS)
+_ns_dct_str = str(DCTERMS)
+_ns_cap_str = str(RDF_NAMESPACES.CAPITAINS)
+_ns_rdf_str = str(RDF)
+_ns_rdfs_str = str(RDFS)
 
 
 class Collection(Exportable):
@@ -32,26 +49,19 @@ class Collection(Exportable):
 
     def __init__(self, identifier="", *args, **kwargs):
         super(Collection, self).__init__(identifier, *args, **kwargs)
-        self.__graph__ = get_graph()
+        self._graph = get_graph()
 
-        self.__node__ = URIRef(identifier)
-        self.__metadata__ = Metadata(node=self.asNode())
-        self.__capabilities__ = Metadata.getOr(self.asNode(), RDF_NAMESPACES.DTS.capabilities)
+        self._node = URIRef(identifier)
+        self._metadata = Metadata(node=self.asNode())
 
         self.graph.set((self.asNode(), RDF.type, self.TYPE_URI))
         self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.model, self.MODEL_URI))
 
-        self.graph.addN(
-            [
-                (self.asNode(), RDF_NAMESPACES.DTS.capabilities, self.capabilities.asNode(), self.graph)
-            ]
-        )
-
-        self.__parent__ = None
-        self.__children__ = {}
+        self._parent = None
+        self._children = {}
 
     def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__, self.id)
+        return "%s(%s)#%s" % (self.__class__.__name__, self.id, id(self))
 
     @property
     def version(self):
@@ -95,22 +105,18 @@ class Collection(Exportable):
 
         :rtype: Graph
         """
-        return self.__graph__
+        return self._graph
 
     @property
     def metadata(self):
-        return self.__metadata__
-
-    @property
-    def capabilities(self):
-        return self.__capabilities__
+        return self._metadata
 
     def asNode(self):
         """ Node representation of the collection in the graph
 
         :rtype: URIRef
         """
-        return self.__node__
+        return self._node
 
     @property
     def id(self):
@@ -145,15 +151,15 @@ class Collection(Exportable):
         ])
 
     @property
-    def children(self):
+    def children(self) -> dict:
         """ Dictionary of childrens {Identifier: Collection}
 
         :rtype: dict
         """
-        return self.__children__
+        return self._children
 
     @property
-    def parents(self):
+    def parents(self) -> List["Collection"]:
         """ Iterator to find parents of current collection, from closest to furthest
 
         :rtype: Generator[:class:`Collection`]
@@ -171,7 +177,7 @@ class Collection(Exportable):
 
         :rtype: Collection
         """
-        return self.__parent__
+        return self._parent
 
     @parent.setter
     def parent(self, parent):
@@ -181,13 +187,13 @@ class Collection(Exportable):
         :type parent: Collection
         :return:
         """
-        self.__parent__ = parent
-        self.graph.set(
-            (self.asNode(), RDF_NAMESPACES.DTS.parent, parent.asNode())
+        self._parent = parent
+        self.graph.add(
+            (self.asNode(), RDF_NAMESPACES.CAPITAINS.parent, parent.asNode())
         )
-        parent.__add_member__(self)
+        parent._add_member(self)
 
-    def __add_member__(self, member):
+    def _add_member(self, member):
         """ Does not add member if it already knows it.
 
         .. warning:: It should not be called !
@@ -206,7 +212,12 @@ class Collection(Exportable):
         :param key: Key of the object to delete
         :return: Collection identified by the item
         """
-        for obj in self.descendants + [self]:
+        if key == self.id:
+            return self
+        for obj in self.members:
+            if key == obj.id:
+                return obj
+        for obj in self.descendants:
             if obj.id == key:
                 return obj
         raise UnknownCollection("%s is not part of this object" % key)
@@ -291,70 +302,130 @@ class Collection(Exportable):
 
         return bindings
 
-    def __export__(self, output=None, domain=""):
+    @classmethod
+    def export_base_dts(cls, graph, obj, nsm):
+        """ Export the base DTS information in a simple reusable way
+
+        :param graph: Current graph where the information lie
+        :param obj: Object for which we build info
+        :param nsm: Namespace manager
+        :return: Dict
+        """
+
+        o = {
+            "@id": str(obj.asNode()),
+            "@type": nsm.qname(obj.type),
+            nsm.qname(RDF_NAMESPACES.HYDRA.title): str(obj.get_label()),
+            nsm.qname(RDF_NAMESPACES.HYDRA.totalItems): obj.size
+        }
+
+        for desc in graph.objects(obj.asNode(), RDF_NAMESPACES.HYDRA.description):
+            o[nsm.qname(RDF_NAMESPACES.HYDRA.description)] = str(desc)
+
+        return o
+
+    def __export__(self, output=None, namespace_manager=None):
         """ Export the collection item in the Mimetype required.
 
         ..note:: If current implementation does not have special mimetypes, reuses default_export method
 
         :param output: Mimetype to export to (Uses MyCapytain.common.utils.Mimetypes)
         :type output: str
-        :param domain: Domain (Necessary sometime to express some IDs)
-        :type domain: str
         :return: Object using a different representation
         """
 
         if output == Mimetypes.JSON.DTS.Std:
-            nm = self.graph.namespace_manager
-            bindings = {}
-            for predicate in set(self.graph.predicates()):
-                prefix, namespace, name = nm.compute_qname(predicate)
-                bindings[prefix] = str(URIRef(namespace))
 
-            RDFSLabel = self.graph.qname(RDFS.label)
-            RDFType = self.graph.qname(RDF.type)
-            store = Subgraph(get_graph().namespace_manager)
-            store.graphiter(self.graph, self.metadata, ascendants=0, descendants=1)
-            metadata = {}
+            # Set-up a derived Namespace Manager
+            if not namespace_manager:
+                nsm = {
+                    prefix: ns
+                    for prefix, ns in self.graph.namespace_manager.namespaces()
+                    if str(ns) not in [_ns_cap_str, _ns_cts_str, _ns_dts_str, _ns_dct_str, _ns_hydra_str]
+                }
+                nsm[""] = RDF_NAMESPACES.HYDRA
+                nsm["cts"] = RDF_NAMESPACES.CTS
+                nsm["dts"] = RDF_NAMESPACES.DTS
+                nsm["dct"] = DCTERMS
+
+            else:
+                nsm = namespace_manager.namespaces()
+
+            # Set-up a derived graph
+            store = Subgraph(nsm)
+            store.graphiter(self.graph, self.asNode(), ascendants=0, descendants=1)
+            graph = store.graph
+            nsm = store.graph.namespace_manager
+
+            # Build the JSON-LD @context
+
+            ignore_ns_for_bindings = [_ns_cap_str, _ns_hydra_str, _ns_rdf_str, _ns_rdfs_str]
+            bindings = {}
+            for predicate in set(graph.predicates()):
+                prefix, namespace, name = nsm.compute_qname(predicate)
+                if prefix not in bindings and str(namespace) not in ignore_ns_for_bindings:
+                    bindings[prefix] = str(URIRef(namespace))
+
+            # Builds the specific Store data
+            extensions = {}
+            dublincore = {}
+            ignore_ns = [_ns_cap_str, _ns_hydra_str, _ns_rdf_str, _ns_rdfs_str, _ns_dts_str]
+
+            # Builds the .dublincore and .extensions graphs
             for _, predicate, obj in store.graph:
-                k = self.graph.qname(predicate)
+                k = graph.qname(predicate)
+                prefix, namespace, name = nsm.compute_qname(predicate)
+                namespace = str(namespace)
+
+                # Ignore namespaces that are part of the root DTS object
+                if namespace in ignore_ns:
+                    continue
+
+                # Switch to the correct container depending on namespaces
+                if namespace == str(DCTERMS):
+                    metadata = dublincore
+                else:
+                    metadata = extensions
+
                 if k in metadata:
                     if isinstance(metadata[k], list):
-                        metadata[k].append(LiteralToDict(obj))
+                        metadata[k].append(literal_to_dict(obj))
                     else:
-                        metadata[k] = [metadata[k], LiteralToDict(obj)]
+                        metadata[k] = [metadata[k], literal_to_dict(obj)]
                 else:
-                    metadata[k] = LiteralToDict(obj)
-            o = {
-                "@context": bindings,
-                "@graph": {
-                    "@id": self.id,
-                    RDFType: str(self.type),
-                    RDFSLabel: LiteralToDict(self.get_label()) or self.id,
-                    self.graph.qname(RDF_NAMESPACES.DTS.size): len(self.members),
-                    self.graph.qname(RDF_NAMESPACES.DTS.metadata): metadata
-                }
-            }
-            version = self.version
-            if version is not None:
-                o["@graph"]["version"] = str(version)
-            if len(self.members):
-                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.members)] = [
-                    {
-                        "@id": member.id,
-                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
-                        self.graph.qname(RDF_NAMESPACES.DTS.url): domain + member.id
-                    }
+                    metadata[k] = literal_to_dict(obj)
+                    if isinstance(metadata[k], dict):
+                        metadata[k] = [metadata[k]]
+
+            o = {"@context": bindings}
+            o.update(self.export_base_dts(graph, self, nsm))
+            o["@context"]["@vocab"] = _ns_hydra_str
+
+            if extensions:
+                o[graph.qname(RDF_NAMESPACES.DTS.extensions)] = extensions
+
+            if dublincore:
+                o[graph.qname(RDF_NAMESPACES.DTS.dublincore)] = dublincore
+
+            if self.size:
+                o[graph.qname(RDF_NAMESPACES.HYDRA.member)] = [
+                    self.export_base_dts(self.graph, member, nsm)
                     for member in self.members
                 ]
-            if self.parent:
-                o["@graph"][self.graph.qname(RDF_NAMESPACES.DTS.parents)] = [
-                    {
-                        "@id": member.id,
-                        RDFSLabel: LiteralToDict(member.get_label()) or member.id,
-                        self.graph.qname(RDF_NAMESPACES.DTS.url): domain + member.id
-                    }
-                    for member in self.parents
-                ]
+
+            # If the system handles citation structure
+            if hasattr(self, "citation") and \
+                    isinstance(self.citation, BaseCitationSet):
+                if self.citation.depth:
+                    o[graph.qname(RDF_NAMESPACES.DTS.term("citeDepth"))] = self.citation.depth
+
+                if not self.citation.is_empty():
+                    o[graph.qname(RDF_NAMESPACES.DTS.term("citeStructure"))] = self.citation.export(
+                        Mimetypes.JSON.DTS.Std,
+                        context=False,
+                        namespace_manager=nsm
+                    )
+
             del store
             return o
         elif output == Mimetypes.JSON.LD\

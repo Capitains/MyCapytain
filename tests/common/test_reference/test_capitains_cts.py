@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from past.builtins import basestring
-from six import text_type as str
 import unittest
-from MyCapytain.common.reference import URN, Reference, Citation, NodeId
+
+from six import text_type as str
+from MyCapytain.common.utils.xml import xmlparser
+from MyCapytain.common.reference import CtsReference, URN, Citation
 
 
 class TestReferenceImplementation(unittest.TestCase):
@@ -11,78 +10,79 @@ class TestReferenceImplementation(unittest.TestCase):
     """ Test how reference reacts """
 
     def test_str_function(self):
-        a = Reference("1-1")
+        a = CtsReference("1-1")
         self.assertEqual(str(a), "1-1")
 
-    def test_len_ref(self):
-        a = Reference("1.1@Achilles[0]-1.10@Atreus[3]")
-        self.assertEqual(len(a), 2)
-        a = Reference("1.1.1")
-        self.assertEqual(len(a), 3)
+    def test_depth_ref(self):
+        a = CtsReference("1.1@Achilles[0]-1.10@Atreus[3]")
+        self.assertEqual(a.depth, 2)
+        a = CtsReference("1.1.1")
+        self.assertEqual(a.depth, 3)
 
     def test_highest(self):
         self.assertEqual(
-            str((Reference("1.1-1.2.8")).highest), "1.1",
+            str((CtsReference("1.1-1.2.8")).highest), "1.1",
             "1.1 is higher"
         )
         self.assertEqual(
-            str((Reference("1.1-2")).highest), "2",
+            str((CtsReference("1.1-2")).highest), "2",
             "2 is higher"
         )
 
     def test_properties(self):
-        a = Reference("1.1@Achilles-1.10@Atreus[3]")
-        self.assertEqual(str(a.start), "1.1@Achilles")
+        a = CtsReference("1.1@Achilles-1.10@Atreus[3]")
+        self.assertEqual(a.start, "1.1@Achilles")
         self.assertEqual(a.start.list, ["1", "1"])
-        self.assertEqual(a.start.subreference[0], "Achilles")
-        self.assertEqual(str(a.end), "1.10@Atreus[3]")
+        self.assertEqual(a.start.subreference.word, "Achilles")
+        self.assertEqual(a.end, "1.10@Atreus[3]")
         self.assertEqual(a.end.list, ["1", "10"])
-        self.assertEqual(a.end.subreference[1], 3)
-        self.assertEqual(a.end.subreference, ("Atreus", 3))
+        self.assertEqual(a.end.subreference.counter, 3)
+        self.assertEqual(a.end.subreference.tuple(), ("Atreus", 3))
 
     def test_Unicode_Support(self):
-        a = Reference("1.1@καὶ[0]-1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(str(a.start), "1.1@καὶ[0]")
+        a = CtsReference("1.1@καὶ[0]-1.10@Ἀλκιβιάδου[3]")
+        self.assertEqual(a.start, "1.1@καὶ[0]")
         self.assertEqual(a.start.list, ["1", "1"])
-        self.assertEqual(a.start.subreference[0], "καὶ")
-        self.assertEqual(str(a.end), "1.10@Ἀλκιβιάδου[3]")
+        self.assertEqual(a.start.subreference.word, "καὶ")
+        self.assertEqual(a.end, "1.10@Ἀλκιβιάδου[3]")
         self.assertEqual(a.end.list, ["1", "10"])
-        self.assertEqual(a.end.subreference[1], 3)
-        self.assertEqual(a.end.subreference, ("Ἀλκιβιάδου", 3))
+        self.assertEqual(a.end.subreference.counter, 3)
+        self.assertEqual(a.end.subreference.tuple(), ("Ἀλκιβιάδου", 3))
 
     def test_NoWord_Support(self):
-        a = Reference("1.1@[0]-1.10@Ἀλκιβιάδου[3]")
-        self.assertEqual(str(a.start), "1.1@[0]")
-        self.assertEqual(a.start.subreference[0], "")
-        self.assertEqual(a.start.subreference[1], 0)
+        a = CtsReference("1.1@[0]-1.10@Ἀλκιβιάδου[3]")
+        self.assertEqual(a.start, "1.1@[0]")
+        self.assertEqual(a.start.subreference.word, "")
+        self.assertEqual(a.start.subreference.counter, 0)
 
     def test_No_End_Support(self):
-        a = Reference("1.1@[0]")
+        a = CtsReference("1.1@[0]")
         self.assertEqual(a.end, None)
-        self.assertEqual(str(a.start), "1.1@[0]")
-        self.assertEqual(a.start.subreference[0], "")
-        self.assertEqual(a.start.subreference[1], 0)
+        self.assertEqual(a.start, "1.1@[0]")
+        self.assertEqual(a.start.subreference.word, "")
+        self.assertEqual(a.start.subreference.counter, 0)
 
     def test_equality(self):
-        a = Reference("1.1@[0]")
-        b = Reference("1.1@[0]")
-        c = Reference("1.1@[1]")
+        a = CtsReference("1.1@[0]")
+        b = CtsReference("1.1@[0]")
+        c = CtsReference("1.1@[1]")
         d = "1.1@[0]"
         self.assertEqual(a, b)
         self.assertNotEqual(a, c)
         self.assertNotEqual(a, d)
 
     def test_get_parent(self):
-        a = Reference("1.1")
-        b = Reference("1")
-        c = Reference("1.1-2.3")
-        d = Reference("1.1-1.2")
-        e = Reference("1.1@Something[0]-1.2@SomethingElse[2]")
-        f = Reference("1-2")
+        a = CtsReference("1.1")
+        b = CtsReference("1")
+        c = CtsReference("1.1-2.3")
+        d = CtsReference("1.1-1.2")
+        e = CtsReference("1.1@Something[0]-1.2@SomethingElse[2]")
+        f = CtsReference("1-2")
 
-        self.assertEqual(str(a.parent), "1")
+        self.assertEqual(a.parent, CtsReference("1"))
         self.assertEqual(b.parent, None)
         self.assertEqual(str(c.parent), "1-2")
+        self.assertEqual(c.parent, CtsReference("1-2"), "Output should also be CtsReference")
         self.assertEqual(str(d.parent), "1")
         self.assertEqual(str(e.parent), "1@Something[0]-1@SomethingElse[2]")
         self.assertEqual(f.parent, None)
@@ -105,7 +105,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.textgroup, "tlg0012")
         self.assertEqual(a.work, "tlg001")
         self.assertEqual(a.version, "mth-01")
-        self.assertEqual(a.reference, Reference("1.1@Achilles-1.10@the[2]"))
+        self.assertEqual(a.reference, CtsReference("1.1@Achilles-1.10@the[2]"))
 
     def test_upTo(self):
         a = URN("urn:cts:greekLit:tlg0012.tlg001.mth-01:1.1@Achilles-1.10@the[2]")
@@ -159,7 +159,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.work, "wk")
         self.assertEqual(str(a), "urn:cts:ns:tg.wk")
         a.reference = "1-2"
-        self.assertEqual(a.reference, Reference("1-2"))
+        self.assertEqual(a.reference, CtsReference("1-2"))
         self.assertEqual(str(a), "urn:cts:ns:tg.wk:1-2")
         a.version = "vs"
         self.assertEqual(a.version, "vs")
@@ -195,7 +195,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.upTo(URN.VERSION), "urn:cts:greekLit:textgroup.work.text")
         self.assertEqual(a.upTo(URN.PASSAGE), "urn:cts:greekLit:textgroup.work.text:1")
         self.assertEqual(a.upTo(URN.NO_PASSAGE), "urn:cts:greekLit:textgroup.work.text")
-        self.assertEqual(a.reference, Reference("1"))
+        self.assertEqual(a.reference, CtsReference("1"))
         self.assertIsNone(a.reference.end)
 
     def test_missing_text_in_passage_emptiness(self):
@@ -209,9 +209,9 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(a.upTo(URN.PASSAGE), "urn:cts:greekLit:textgroup.work:1-2")
         self.assertEqual(a.upTo(URN.PASSAGE_START), "urn:cts:greekLit:textgroup.work:1")
         self.assertEqual(a.upTo(URN.PASSAGE_END), "urn:cts:greekLit:textgroup.work:2")
-        self.assertEqual(a.reference, Reference("1-2"))
-        self.assertEqual(a.reference.start, Reference("1"))
-        self.assertEqual(a.reference.end, Reference("2"))
+        self.assertEqual(a.reference, CtsReference("1-2"))
+        self.assertEqual(a.reference.start, "1")
+        self.assertEqual(a.reference.end, "2")
         self.assertIsNone(a.version)
 
     def test_warning_on_empty(self):
@@ -237,7 +237,7 @@ class TestURNImplementation(unittest.TestCase):
 
     def test_set(self):
         a = URN("urn:cts:latinLit:phi1294.phi002.perseus-lat2")
-        a.reference = Reference("1.1")
+        a.reference = CtsReference("1.1")
         self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1")
         a.reference = "2.2"
         self.assertEqual(str(a), "urn:cts:latinLit:phi1294.phi002.perseus-lat2:2.2")
@@ -249,6 +249,7 @@ class TestURNImplementation(unittest.TestCase):
         self.assertEqual(str(a), "urn:cts:latinLit:phi1293.phi001.perseus-eng2:2.2")
         a.namespace = "greekLit"
         self.assertEqual(str(a), "urn:cts:greekLit:phi1293.phi001.perseus-eng2:2.2")
+
 
 class TestCitation(unittest.TestCase):
     """ Test the citation object """
@@ -369,8 +370,8 @@ class TestCitation(unittest.TestCase):
             scope="/TEI/text/body/div/div[@n=\"?\"]",
             xpath="//l[@n=\"?\"]"
         )
-        self.assertEqual(c.fill(Reference("1.2")), "/TEI/text/body/div/div[@n='1']//l[@n='2']")
-        self.assertEqual(c.fill(Reference("1.1")), "/TEI/text/body/div/div[@n='1']//l[@n='1']")
+        self.assertEqual(c.fill(CtsReference("1.2")), "/TEI/text/body/div/div[@n='1']//l[@n='2']")
+        self.assertEqual(c.fill(CtsReference("1.1")), "/TEI/text/body/div/div[@n='1']//l[@n='1']")
         self.assertEqual(c.fill(None), "/TEI/text/body/div/div[@n]//l[@n]")
         self.assertEqual(c.fill("1", xpath=True), "//l[@n='1']")
         self.assertEqual(c.fill("2", xpath=True), "//l[@n='2']")
@@ -378,30 +379,43 @@ class TestCitation(unittest.TestCase):
         self.assertEqual(c.fill([None, None]), "/TEI/text/body/div/div[@n]//l[@n]")
         self.assertEqual(c.fill(["1", None]), "/TEI/text/body/div/div[@n='1']//l[@n]")
 
+    def test_ingest_and_match(self):
+        """ Ensure matching and parsing XML works correctly """
+        xml = xmlparser("""<TEI xmlns="http://www.tei-c.org/ns/1.0">
+         <refsDecl n="CTS">
+            <cRefPattern n="line"
+                         matchPattern="(\w+).(\w+).(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:l[@n='$3'])">
+                <p>This pointer pattern extracts book and poem and line</p>
+            </cRefPattern>
+            <cRefPattern n="poem"
+                         matchPattern="(\w+).(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
+                <p>This pointer pattern extracts book and poem</p>
+            </cRefPattern>
+            <cRefPattern n="book"
+                         matchPattern="(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                <p>This pointer pattern extracts book</p>
+            </cRefPattern>
+        </refsDecl>
+        </TEI>""")
+        citation = Citation.ingest(xml)
+        # The citation that should be returned is the root
+        self.assertEqual(citation.name, "book", "Name should have been parsed")
+        self.assertEqual(citation.child.name, "poem", "Name of child should have been parsed")
+        self.assertEqual(citation.child.child.name, "line", "Name of descendants should have been parsed")
 
-class TestNodeId(unittest.TestCase):
-    def test_setup(self):
-        """ Ensure basic properties works """
-        n = NodeId(children=["1", "b", "d"])
-        self.assertEqual(n.childIds, ["1", "b", "d"])
-        self.assertEqual(n.lastId, "d")
-        self.assertEqual(n.firstId, "1")
-        self.assertEqual(n.depth, None)
-        self.assertEqual(n.parentId, None)
-        self.assertEqual(n.id, None)
-        self.assertEqual(n.prevId, None)
-        self.assertEqual(n.nextId, None)
-        self.assertEqual(n.siblingsId, (None, None))
+        self.assertEqual(citation.is_root(), True, "Root should be true on root")
+        self.assertEqual(citation.match("1.2"), citation.child, "Matching should make use of root matching")
+        self.assertEqual(citation.match("1.2.4"), citation.child.child, "Matching should make use of root matching")
+        self.assertEqual(citation.match("1"), citation, "Matching should make use of root matching")
 
-        n = NodeId(parent="1", identifier="1.1")
-        self.assertEqual(n.parentId, "1")
-        self.assertEqual(n.id, "1.1")
+        self.assertEqual(citation.child.match("1.2").name, "poem", "Matching should retrieve poem at 2nd level")
+        self.assertEqual(citation.child.match("1.2.4").name, "line", "Matching should retrieve line at 3rd level")
+        self.assertEqual(citation.child.match("1").name, "book", "Matching retrieve book at 1st level")
 
-        n = NodeId(siblings=("1", "1.1"), depth=5)
-        self.assertEqual(n.prevId, "1")
-        self.assertEqual(n.nextId, "1.1")
-        self.assertEqual(n.childIds, [])
-        self.assertEqual(n.firstId, None)
-        self.assertEqual(n.lastId, None)
-        self.assertEqual(n.siblingsId, ("1", "1.1"))
-        self.assertEqual(n.depth, 5)
+        citation = citation.child
+        self.assertEqual(citation.child.match("1.2").name, "poem", "Matching should retrieve poem at 2nd level")
+        self.assertEqual(citation.child.match("1.2.4").name, "line", "Matching should retrieve line at 3rd level")
+        self.assertEqual(citation.child.match("1").name, "book", "Matching retrieve book at 1st level")

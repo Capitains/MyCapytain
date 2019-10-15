@@ -1,8 +1,8 @@
 from MyCapytain.resolvers.cts.api import HttpCtsResolver
 from MyCapytain.retrievers.cts5 import HttpCtsRetriever
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes
-from MyCapytain.resources.prototypes.text import Passage
+from MyCapytain.resources.prototypes.cts.text import PrototypeCtsPassage
 from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata, XmlCtsTextgroupMetadata, XmlCtsWorkMetadata, XmlCtsTextMetadata
 from MyCapytain.resources.prototypes.metadata import Collection
 
@@ -50,7 +50,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, PrototypeCtsPassage,
             "GetPassage should always return passages objects"
         )
 
@@ -86,7 +86,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, PrototypeCtsPassage,
             "GetPassage should always return passages objects"
         )
 
@@ -122,7 +122,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, PrototypeCtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
@@ -183,7 +183,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, PrototypeCtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
@@ -235,7 +235,7 @@ class TestHttpCtsResolver(TestCase):
             urn="urn:cts:latinLit:phi1294.phi002.perseus-lat2:1.1"
         )
         self.assertIsInstance(
-            passage, Passage,
+            passage, PrototypeCtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
@@ -327,7 +327,7 @@ class TestHttpCtsResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["member"]],
             ["urn:cts:latinLit:phi1294", "urn:cts:latinLit:phi0959", "urn:cts:greekLit:tlg0003", "urn:cts:latinLit:phi1276"],
             "There should be 4 Members in DTS JSON"
         )
@@ -362,7 +362,7 @@ class TestHttpCtsResolver(TestCase):
             "There should be one node in exported format corresponding to lat2"
         )
         self.assertCountEqual(
-            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["@graph"]["dts:members"]],
+            [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["member"]],
             ["urn:cts:latinLit:phi1294.phi002.perseus-lat2", "urn:cts:latinLit:phi1294.phi002.perseus-eng2"],
             "There should be one member in DTS JSON"
         )

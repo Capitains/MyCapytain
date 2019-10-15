@@ -10,8 +10,8 @@ from __future__ import unicode_literals
 from six import text_type
 
 from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
-from MyCapytain.common.reference import URN
-from MyCapytain.common.utils import make_xml_node, xmlparser
+from MyCapytain.common.reference._capitains_cts import URN
+from MyCapytain.common.utils.xml import make_xml_node, xmlparser
 from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
@@ -19,6 +19,18 @@ from copy import deepcopy
 
 from rdflib import RDF, Literal, URIRef
 from rdflib.namespace import DC
+
+__all__ = [
+    "PrototypeCtsCollection",
+    "CtsTextInventoryCollection",
+    "CtsEditionMetadata",
+    "CtsWorkMetadata",
+    "CtsCommentaryMetadata",
+    "CtsTextgroupMetadata",
+    "CtsTextInventoryMetadata",
+    "CtsTextMetadata",
+    "CtsTranslationMetadata"
+]
 
 
 class PrototypeCtsCollection(Collection):
@@ -28,7 +40,6 @@ class PrototypeCtsCollection(Collection):
     :type identifier: str,URN
     :cvar CTS_MODEL: String Representation of the type of collection
     """
-    CTS_MODEL = "CtsCollection"
     DC_TITLE_KEY = None
     CTS_PROPERTIES = []
     CTS_LINKS = []
@@ -38,10 +49,6 @@ class PrototypeCtsCollection(Collection):
 
     def __init__(self, identifier=""):
         super(PrototypeCtsCollection, self).__init__(identifier)
-
-        if hasattr(type(self), "CTS_MODEL"):
-            self.graph.set((self.asNode(), RDF.type, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
-            self.graph.set((self.asNode(), RDF_NAMESPACES.DTS.isA, RDF_NAMESPACES.CTS.term(self.CTS_MODEL)))
 
         self.__urn__ = ""
 
@@ -73,7 +80,7 @@ class PrototypeCtsCollection(Collection):
         if lang is not None:
             if lang in x:
                 return x[lang]
-            return next(x.values())
+            return next(iter(x.values()))
         return x
 
     def set_cts_property(self, prop, value, lang=None):
@@ -135,14 +142,12 @@ class PrototypeCtsCollection(Collection):
         :param lines: New Line Character (Can be empty)
         :return: String representation of XML Nodes
         """
-        if namespaces is True:
-            attrs.update(self.__namespaces_header__(cpt=(output == Mimetypes.XML.CapiTainS.CTS)))
 
         TYPE_URI = self.TYPE_URI
         if TYPE_URI == RDF_NAMESPACES.CTS.term("CtsTextInventoryCollection"):
             TYPE_URI = RDF_NAMESPACES.CTS.term("TextInventory")
 
-        strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)]
+        strings = []
         for pred in self.CTS_PROPERTIES:
             for obj in self.metadata.get(pred):
                 strings.append(
@@ -166,6 +171,11 @@ class PrototypeCtsCollection(Collection):
             strings.append(obj.export(output, namespaces=False))
 
         strings.append(make_xml_node(self.graph, TYPE_URI, close=True))
+
+        if namespaces is True:
+            attrs.update(self.__namespaces_header__(cpt=(output == Mimetypes.XML.CapiTainS.CTS)))
+
+        strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)] + strings
 
         return lines.join(strings)
 
@@ -445,7 +455,7 @@ class CtsWorkMetadata(PrototypeCtsCollection):
         :return: Dictionary of texts
         :rtype: defaultdict(:class:`PrototypeTexts`)
         """
-        return self.__children__
+        return self.children
 
     @property
     def lang(self):
@@ -480,7 +490,7 @@ class CtsWorkMetadata(PrototypeCtsCollection):
         elif self.urn != other.urn:
             raise InvalidURN("Cannot add CtsWorkMetadata %s to CtsWorkMetadata %s " % (self.urn, other.urn))
 
-        for urn, text in other.texts.items():
+        for urn, text in other.children.items():
             self.texts[urn] = text
             self.texts[urn].parent = self
             self.texts[urn].resource = None
@@ -566,7 +576,7 @@ class CtsTextgroupMetadata(PrototypeCtsCollection):
         :return: Dictionary of works
         :rtype: defaultdict(:class:`PrototypeWorks`)
         """
-        return self.__children__
+        return self.children
 
     def update(self, other):
         """ Merge two Textgroup Objects.
@@ -646,7 +656,7 @@ class CtsTextInventoryMetadata(PrototypeCtsCollection):
         :return: Dictionary of textgroups
         :rtype: defaultdict(:class:`CtsTextgroupMetadata`)
         """
-        return self.__children__
+        return self.children
 
     def __len__(self):
         """ Get the number of text in the Inventory
@@ -733,6 +743,6 @@ class CtsTextInventoryCollection(PrototypeCtsCollection):
             )
         elif output == Mimetypes.JSON.DTS.Std:
             if len(self.members) > 1:
-                return Collection.__export__(self, output=output, domain=domain)
+                return Collection.__export__(self, output=output)
             else:
-                return self.members[0].export(output=output, domain=domain)
+                return self.members[0].export(output=output)

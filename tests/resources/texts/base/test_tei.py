@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 import unittest
 
-from MyCapytain.common.reference import Reference, Citation
-from MyCapytain.resources.texts.base.tei import TEIResource
+from MyCapytain.common.reference._capitains_cts import CtsReference, Citation
+from MyCapytain.resources.texts.base.tei import TeiResource
 from MyCapytain.common.constants import Mimetypes
-from MyCapytain.common.utils import xmlparser
+from MyCapytain.common.utils.xml import xmlparser
 
 
 class TestTEICitation(unittest.TestCase):
@@ -65,7 +65,7 @@ class TestTEICitation(unittest.TestCase):
             """<tei:cRefPattern n="line" matchPattern="(\\w+)\.(\\w+)\.(\\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'$1\' and @type=\'section\']/tei:div[@n=\'$2\']/tei:l[@n=\'$3\'])"><tei:p>This pointer pattern extracts line</tei:p></tei:cRefPattern>"""
         )
         self.assertEqual(
-            a.child.child.fill(Reference("1.2.3")),
+            a.child.child.fill(CtsReference("1.2.3")),
             "/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n=\'1\' and @type=\'section\']/tei:div[@n=\'2\']/tei:l[@n=\'3\']"
         )
 
@@ -106,7 +106,7 @@ class TestTEICitation(unittest.TestCase):
 class TestTEIPassage(unittest.TestCase):
     def test_text(self):
         """ Test text attribute """
-        P = TEIResource(
+        P = TeiResource(
             identifier="dummy",
             resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
         )
@@ -117,7 +117,7 @@ class TestTEIPassage(unittest.TestCase):
 
     def test_str(self):
         """ Test STR conversion of xml """
-        P = TEIResource(
+        P = TeiResource(
             identifier="dummy",
             resource=xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
         )
@@ -125,7 +125,7 @@ class TestTEIPassage(unittest.TestCase):
 
     def test_xml(self):
         X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
-        P = TEIResource(
+        P = TeiResource(
             identifier="dummy",
             resource=X
         )
@@ -133,7 +133,7 @@ class TestTEIPassage(unittest.TestCase):
 
     def test_exportable_capacities(self):
         X = xmlparser('<l n="8">Ibis <note>hello<a>b</a></note> ab excusso missus in astra <hi>sago.</hi> </l>')
-        P = TEIResource(
+        P = TeiResource(
             identifier="dummy",
             resource=X
         )
@@ -147,7 +147,7 @@ class TestTEIPassage(unittest.TestCase):
         """ Test when user change default value of export joining char """
         X = xmlparser("""<root>in- genium<note place="unspecified">ingenium <hi rend="italic">ll.v</hi>(<hi rend="italic">G</hi>). -nio
 <hi rend="italic">B.</hi> in ganea <hi rend="italic">J</hi></note><add>n</add>a<add>t</add>us</root>""")
-        P = TEIResource(
+        P = TeiResource(
             identifier="dummy",
             resource=X
         )

@@ -254,7 +254,7 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
             "Collections should be retrieved automatically"
         )
         history = [history.url for history in mock_set.request_history]
-        print(history)
+
         self.assertNotIn(
             self.root_uri+"/collections?id=%2Fcoll1_2_2_1",
             history,

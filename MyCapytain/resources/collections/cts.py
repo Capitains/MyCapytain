@@ -257,10 +257,8 @@ class XmlCtsWorkMetadata(cts.CtsWorkMetadata):
         """ Parse a resource
 
         :param resource: Element rerpresenting a work
-        :param type: basestring, etree._Element
         :param parent: Parent of the object
         :type parent: XmlCtsTextgroupMetadata
-        :param _cls_dict: Dictionary of classes to generate subclasses
         """
         xml = xmlparser(resource)
         o = cls(urn=xml.get("urn"), parent=parent)
@@ -307,7 +305,6 @@ class XmlCtsTextgroupMetadata(cts.CtsTextgroupMetadata):
 
         :param resource: Element representing the textgroup
         :param parent: Parent of the textgroup
-        :param _cls_dict: Dictionary of classes to generate subclasses
         """
         xml = xmlparser(resource)
         o = cls(urn=xml.get("urn"), parent=parent)
@@ -334,7 +331,6 @@ class XmlCtsTextInventoryMetadata(cts.CtsTextInventoryMetadata):
         """ Parse a resource
 
         :param resource: Element representing the text inventory
-        :param _cls_dict: Dictionary of classes to generate subclasses
         """
         xml = xmlparser(resource)
         o = cls(name=xml.xpath("//ti:TextInventory", namespaces=XPATH_NAMESPACES)[0].get("tiid") or "")

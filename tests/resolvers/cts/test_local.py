@@ -544,11 +544,11 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             previous, CtsReference("1.pr"),
-            "Previous should be well computed"
+            "Previous reference should be well computed"
         )
         self.assertEqual(
             nextious, CtsReference("1.2"),
-            "Previous should be well computed"
+            "Next reference should be well computed"
         )
 
     def test_getSiblings_nextOnly(self):
@@ -558,11 +558,11 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             previous, None,
-            "Previous Should not exist"
+            "Previous reference should not exist"
         )
         self.assertEqual(
             nextious, CtsReference("1.1"),
-            "Next should be well computed"
+            "Next reference should be well computed"
         )
 
     def test_getSiblings_prevOnly(self):
@@ -572,11 +572,11 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             previous, CtsReference("14.222"),
-            "Previous should be well computed"
+            "Previous reference should be well computed"
         )
         self.assertEqual(
             nextious, None,
-            "Next should not exist"
+            "Next reference should not exist"
         )
 
     def test_getReffs_full(self):

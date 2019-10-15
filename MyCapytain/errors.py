@@ -15,7 +15,10 @@ class MyCapytainException(BaseException):
 
 
 class JsonLdCollectionMissing(MyCapytainException):
-    """ Error thrown when a JSON LD has now first ressource
+    """ Error thrown when a JSON LD contains no principle collection
+
+    Raised when a json supposed to contain collection is parsed
+    but nothing is found
     """
 
 
@@ -68,7 +71,7 @@ class UnknownCollection(KeyError, MyCapytainException):
 
 
 class EmptyReference(SyntaxWarning, MyCapytainException):
-    """ Error generated when a CtsReference is wrong
+    """ Error generated when a CtsReference does not exist or is invalid
     """
 
     

@@ -70,6 +70,7 @@ class HttpDtsResolver(Resolver):
         return self._endpoint
 
     def getMetadata(self, objectId: str=None, **filters) -> HttpResolverDtsCollection:
+        """ Retrieves metadata calling the Collections Endpoint """
         req = self.endpoint.get_collection(objectId)
         req.raise_for_status()
 
@@ -87,6 +88,7 @@ class HttpDtsResolver(Resolver):
             include_descendants: bool=False,
             additional_parameters: Optional[Dict[str, Any]]=None
     ) -> DtsReferenceSet:
+        """ Retrieve references by calling the Navigation API """
         if not additional_parameters:
             additional_parameters = {}
 
@@ -151,7 +153,7 @@ class HttpDtsResolver(Resolver):
             prevnext: bool=False,
             metadata: bool=False
     ) -> DtsResolverDocument:
-        """ Retrieve a text node from the API
+        """ Retrieve a text node from the API via the Document Endpoint
 
         :param textId: CtsTextMetadata Identifier
         :type textId: str

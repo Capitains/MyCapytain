@@ -95,7 +95,7 @@ class PrototypeCtsNode(InteractiveTextualNode):
         """ Set the object metadata using its collections recursively
 
         :param text_metadata: Object representing the current text as a collection
-        :type text_metadata: CtsEditionMetadata or CtsTranslationMetadata
+        :type text_metadata: CtsTextMetadata
         """
         edition, work, textgroup = tuple(([text_metadata] + text_metadata.parents)[:3])
 

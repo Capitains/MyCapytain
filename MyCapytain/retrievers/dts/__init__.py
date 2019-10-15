@@ -158,7 +158,7 @@ class HttpDtsRetriever(MyCapytain.retrievers.prototypes.API):
     def get_document(
             self,
             collection_id, ref=None, mimetype="application/tei+xml, application/xml"):
-        """ Make a navigation request on the DTS API
+        """ Make a document request on the DTS API
 
         :param collection_id: Id of the collection
         :param ref: If ref is a tuple, it is treated as a range. String or int are treated as single ref

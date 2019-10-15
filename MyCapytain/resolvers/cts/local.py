@@ -286,14 +286,14 @@ class CtsCapitainsLocalResolver(Resolver):
         for folder in resource:
             cts_files = glob("{base_folder}/data/*/__cts__.xml".format(base_folder=folder))
             for cts_file in cts_files:
-                textgroup, cts_file = self._parse_textgroup(cts_file)
+                textgroup, cts_file = self._parse_textgroup_wrapper(cts_file)
                 textgroups.append((textgroup, cts_file))
 
         for textgroup, cts_textgroup_file in textgroups:
             cts_work_files = glob("{parent}/*/__cts__.xml".format(parent=os.path.dirname(cts_textgroup_file)))
 
             for cts_work_file in cts_work_files:
-                _, parsed_texts, directory = self._parse_work(cts_work_file, textgroup)
+                _, parsed_texts, directory = self._parse_work_wrapper(cts_work_file, textgroup)
                 texts.extend([(text, directory) for text in parsed_texts])
 
         for text, directory in texts:

@@ -871,10 +871,10 @@ class Citation(BaseCitation):
                 self.refsDecl
             )
 
-    def is_set(self):
-        """ Check if the citation has not been set
+    def is_set(self) -> bool:
+        """ Check if the citation has been set
 
-        :return: True if nothing was setup
+        :return: True if set up, False if not
         :rtype: bool
         """
         return self.refsDecl is not None

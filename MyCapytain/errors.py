@@ -15,7 +15,10 @@ class MyCapytainException(BaseException):
 
 
 class JsonLdCollectionMissing(MyCapytainException):
-    """ Error thrown when a JSON LD has now first ressource
+    """ Error thrown when a JSON LD has now first resource
+
+    Raised when a json supposed to contain collection is parsed
+    but nothing is found
     """
 
 

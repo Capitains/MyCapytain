@@ -1,11 +1,35 @@
 from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
-from MyCapytain.resources.collections.cts import _parse_structured_metadata, _xpathDict
+from MyCapytain.resources.collections.cts import _parse_structured_metadata
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
-from MyCapytain.resources.prototypes.cts import inventory as cts
+from MyCapytain.resources.prototypes.capitains import collection as capitains
 
 XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/", 'cpt': 'http://purl.org/ns/capitains'})
+
+
+def _xpathDict(xml, xpath, cls, parent, **kwargs):
+    """ Returns a default Dict given certain information
+
+    :param xml: An xml tree
+    :type xml: etree
+    :param xpath: XPath to find children
+    :type xpath: str
+    :param cls: Class identifying children
+    :type cls: inventory.Resource
+    :param parent: Parent of object
+    :type parent: CtsCollection
+    :rtype: collections.defaultdict.<basestring, inventory.Resource>
+    :returns: Dictionary of children
+    """
+    children = []
+    for child in xml.xpath(xpath, namespaces=XPATH_NAMESPACES):
+        children.append(cls.parse(
+            resource=child,
+            parent=parent,
+            **kwargs
+        ))
+    return children
 
 
 class XmlCapitainsCitation(CitationPrototype):
@@ -50,7 +74,7 @@ class XmlCapitainsCitation(CitationPrototype):
         return None
 
 
-class XmlCapitainsReadableMetadata(cts.CtsTextMetadata):
+class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
     """ Represents a general Capitains CtsTextMetadata
 
     """
@@ -78,12 +102,12 @@ class XmlCapitainsReadableMetadata(cts.CtsTextMetadata):
         for child in xml.xpath("dc:description", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
-                obj.set_cts_property("description", child.text, lg)
+                obj.set_capitains_property("description", child.text, lg)
 
         for child in xml.xpath("dc:title", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
-                obj.set_cts_property("title", child.text, lg)
+                obj.set_capitains_property("title", child.text, lg)
 
         obj.citation = cls.CLASS_CITATION.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
 
@@ -111,6 +135,10 @@ class XmlCapitainsReadableMetadata(cts.CtsTextMetadata):
         lang = xml.xpath("dc:language", namespaces=XPATH_NAMESPACES)[0].text
         if lang is not None:
             o.lang = lang
+        o.path = xml.get('path')
+        o.subtype = xml.xpath("dc:type", namespaces=XPATH_NAMESPACES)[0].text
+        if parent is not None:
+            o.parent = parent
         cls.parse_metadata(o, xml)
         return o
 
@@ -127,7 +155,7 @@ class XmlCapitainsReadableMetadata(cts.CtsTextMetadata):
         self._path = value
 
 
-class XmlCapitainsCollectionMetadata(cts.CtsWorkMetadata):
+class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
     """ Represents a CTS Textgroup in XML
     """
     CLASS_READABLE = XmlCapitainsReadableMetadata
@@ -146,12 +174,16 @@ class XmlCapitainsCollectionMetadata(cts.CtsWorkMetadata):
         # This is for a local collection
         if identifier is None:
             identifier = xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text
-        o = cls(urn=identifier, parent=parent)
+        o = cls(urn=identifier)
+        o.path = xml.get('path')
+        o.subtype = [t.text for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES)]
+        if parent is not None:
+            o.parent = parent
 
         for child in xml.xpath("dc:title", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
-                o.set_cts_property("title", child.text, lg)
+                o.set_label(child.text, lg)
 
         # Parse children
         children = []
@@ -169,3 +201,15 @@ class XmlCapitainsCollectionMetadata(cts.CtsWorkMetadata):
         if _with_children:
             return o, children
         return o
+
+    def __init__(self, *args, **kwargs):
+        super(XmlCapitainsCollectionMetadata, self).__init__(*args, **kwargs)
+        self._path = None
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        self._path = value

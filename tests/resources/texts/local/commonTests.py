@@ -716,6 +716,10 @@ class CapitainsXmlPassageTests(TestCase):
             self.assertEqual(("1-4", "9-12"), (str(p), str(n)), "Middle node should have right siblings")
             p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("5-10"), simple=simple).siblingsId
             self.assertEqual(("1-4", "11-14"), (str(p), str(n)), "Middle node should have right siblings")
+            # This test makes sure that siblingsId functions when end + range_length == len(document_references)
+            # Previously when this was the case siblingsId would throw an IndexError
+            p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("2-8"), simple=simple).siblingsId
+            self.assertEqual(("1-1", "9-14"), (str(p), str(n)), "Middle node should have right siblings")
             # NONE !
             p, n = self.FULL_EPIGRAMMATA.getTextualNode(CtsReference("1-14"), simple=simple).siblingsId
             self.assertEqual((None, None), (p, n), "If whole range, nothing !")

@@ -43,7 +43,7 @@ class PrototypeCapitainsCollection(Collection):
 
     EXPORT_TO = [Mimetypes.PYTHON.ETREE]
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
-    SUBTYPE = ["unknown"]
+    SUBTYPE = "unknown"
 
     def __init__(self, identifier=""):
         super(PrototypeCapitainsCollection, self).__init__(identifier)
@@ -61,18 +61,18 @@ class PrototypeCapitainsCollection(Collection):
 
         :return: string representation of subtype
         """
-        return ', '.join(self.__subtype__)
+        return self.__subtype__
 
     @subtype.setter
     def subtype(self, val):
         """ Set the subtype of the object
 
-        :param val: the objects subtype
+        :param val: the object's subtype
         """
-        if type(val) == list:
+        if isinstance(val, str):
             self.__subtype__ = val
         else:
-            self.__subtype__ = list(val)
+            self.__subtype__ = str(val)
 
     def __eq__(self, other):
         if self is other:
@@ -418,7 +418,7 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
     def texts(self):
         """ Texts
 
-        :return: List of readable descendants
+        :return: Readable descendants
         :rtype: {str: CapitainsReadableMetadata}
         """
         return {item.id: item for item in self.readableDescendants}
@@ -523,6 +523,9 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
                 attrs["groupUrn"] = self.parent.id
             return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)
 
+
+# The following classes are currently not being used by the resolver.
+# If this remains the case, they should be deleted before these changes go into production.
 
 class CapitainsTextgroupMetadata(PrototypeCapitainsCollection):
     """ Represents a CTS Textgroup

@@ -7,17 +7,14 @@ import os.path
 from glob import glob
 from math import ceil
 
-from MyCapytain.common.reference._capitains_cts import CtsReference, URN
+from MyCapytain.common.reference._capitains_cts import CtsReference
 from MyCapytain.common.utils.xml import xmlparser
-from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
+from MyCapytain.errors import UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
 from MyCapytain.resources.collections.capitains import XmlCapitainsCitation, XmlCapitainsCollectionMetadata, \
     XmlCapitainsReadableMetadata
-from MyCapytain.resources.collections.cts import XmlCtsTextInventoryMetadata
-from MyCapytain.resources.prototypes.cts.inventory import CtsEditionMetadata, CtsTextgroupMetadata, CtsWorkMetadata, \
-    CtsCommentaryMetadata, CtsTextInventoryCollection, CtsTranslationMetadata, CtsTextInventoryMetadata
-from MyCapytain.resources.prototypes.cts.inventory import CtsTextInventoryCollection
+from MyCapytain.resources.prototypes.capitains.collection import CapitainsCollectionMetadata
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
 
@@ -27,16 +24,16 @@ __all__ = [
 
 
 class XmlCapitainsLocalResolver(Resolver):
-    """ XML Folder Based resolver. CtsTextMetadata and metadata resolver based on local directories
+    """ XML Folder Based resolver. CapitainsReadableMetadata and metadata resolver based on local directories
 
-    :param resource: Resource should be a list of folders retaining data as Capitains Guidelines Repositories
+    :param resource: Resource should be a list of folders retaining data as Capitains 3.0 Guidelines Repositories
     :type resource: [str]
     :param name: Key used to differentiate Repository and thus enabling different repo to be used
     :type name: str
     :param logger: Logging object
     :type logger: logging
 
-    :cvar TEXT_CLASS: CtsTextMetadata Class [not instantiated] to be used to parse Texts. Can be changed to support Cache for example
+    :cvar TEXT_CLASS: CapitainsReadableMetadata Class [not instantiated] to be used to parse Texts. Can be changed to support Cache for example
     :type TEXT_CLASS: class
     :cvar DEFAULT_PAGE: Default Page to show
     :cvar PER_PAGE: Tuple representing the minimal number of texts returned, the default number and the maximum number of texts returned
@@ -70,7 +67,13 @@ class XmlCapitainsLocalResolver(Resolver):
 
     @property
     def texts(self):
-        return self.inventory.readableDescendants
+        """ returns all readable texts
+
+        :return: Readable descendants
+        :rtype: {str: CapitainsReadableMetadata}
+        """
+        # Changed to a dictionary to match with the return type for XmlCapitainsCollectionMetadata.texts
+        return {text.id: text for text in self.inventory.readableDescendants}
 
     def __init__(self, resource, name=None, logger=None, dispatcher=None, autoparse=True):
         """ Initiate the XMLResolver
@@ -122,63 +125,35 @@ class XmlCapitainsLocalResolver(Resolver):
             o = self.classes["text"](urn=identifier, resource=self.xmlparse(f))
         return o
 
-    def _parse_textgroup_wrapper(self, metadata_file):
-        """ Wraps with a Try/Except the textgroup parsing from a cts file
-
-        :param metadata_file: Path to the CTS File
-        :type metadata_file: str
-        :return: CtsTextgroupMetadata
-        """
-        try:
-            return self._parse_textgroup(metadata_file)
-        except Exception as E:
-            self.logger.error("Error parsing %s ", metadata_file)
-            if self.RAISE_ON_GENERIC_PARSING_ERROR:
-                raise E
-
-    def _parse_textgroup(self, metadata_file):
-        """ Parses a textgroup from a cts file
-
-        :param metadata_file: Path to the CTS File
-        :type metadata_file: str
-        :return: CtsTextgroupMetadata and Current file
-        """
-        with io.open(metadata_file) as __xml__:
-            group, children =  self.classes["textgroup"].parse(
-                resource=__xml__, _with_children=True
-            )
-
-        return group, children, os.path.dirname(metadata_file)
-
-    def _parse_work_wrapper(self, metadata_file, textgroup=None):
+    def _parse_collection_wrapper(self, metadata_file, collection=None):
         """ Wraps with a Try/Except the Work parsing from a cts file
 
-        :param metadata_file: Path to the CTS File
+        :param metadata_file: Path to the metadata File
         :type metadata_file: str
-        :param textgroup: Textgroup to which the Work is a part of
-        :type textgroup: CtsTextgroupMetadata
-        :return: Parsed Work and the Texts, as well as the current file directory
+        :param collection: Collection to which the collection belongs
+        :type collection: CapitainsCollectionMetadata
+        :return: Parsed Collection and the Texts, as well as the current file directory
         """
         try:
-            return self._parse_work(metadata_file, textgroup)
+            return self._parse_collection(metadata_file, collection)
         except Exception as E:
             self.logger.error("Error parsing %s ", metadata_file)
             if self.RAISE_ON_GENERIC_PARSING_ERROR:
                 raise E
 
-    def _parse_work(self, metadata_file, textgroup=None):
+    def _parse_collection(self, metadata_file, collection=None):
         """ Parses a work from a cts file
 
         :param metadata_file: Path to the CTS File
         :type metadata_file: str
-        :param textgroup: Textgroup to which the Work is a part of
-        :type textgroup: CtsTextgroupMetadata
-        :return: Parsed Work and the Texts, as well as the current file directory
+        :param collection: Collection to which the Work is a part of
+        :type collection: CapitainsCollectionMetadata
+        :return: Parsed Collection and the Texts, as well as the current file directory
         """
         with io.open(metadata_file) as __xml__:
             work, children = self.classes["work"].parse(
                 resource=__xml__,
-                parent=textgroup,
+                parent=collection,
                 _with_children=True
             )
 
@@ -188,7 +163,7 @@ class XmlCapitainsLocalResolver(Resolver):
         """ Complete the TextMetadata object with its citation scheme by parsing the original text
 
         :param text: Text Metadata collection
-        :type text: XmlCtsTextMetadata
+        :type text: XmlCapitainsReadableMetadata
         :returns: True if all went well
         :rtype: bool
         """
@@ -228,32 +203,32 @@ class XmlCapitainsLocalResolver(Resolver):
             self.logger.error("%s is not present", text_metadata.path)
             return False
 
-    def _dispatch(self, textgroup, directory):
+    def _dispatch(self, collection, directory):
         """ Run the dispatcher over a textgroup.
 
-        :param textgroup: Textgroup object that needs to be dispatched
-        :param directory: Directory in which the textgroup was found
+        :param collection: Collection object that needs to be dispatched
+        :param directory: Directory in which the Collection was found
         """
-        if textgroup.id in self.dispatcher.collection:
-            self.dispatcher.collection[textgroup.id].update(textgroup)
+        if collection.id in self.dispatcher.collection:
+            self.dispatcher.collection[collection.id].update(collection)
         else:
-            self.dispatcher.dispatch(textgroup, path=directory)
+            self.dispatcher.dispatch(collection, path=directory)
 
-        for sub_coll_id, sub_coll in textgroup.collections.items():
-            if sub_coll_id in self.dispatcher.collection[textgroup.id].collections:
+        for sub_coll_id, sub_coll in collection.collections.items():
+            if sub_coll_id in self.dispatcher.collection[collection.id].collections:
                 self.dispatcher.collection[sub_coll_id].update(sub_coll)
 
-    def _dispatch_container(self, textgroup, directory):
-        """ Run the dispatcher over a textgroup within a try/except block
+    def _dispatch_container(self, collection, directory):
+        """ Run the dispatcher over a collection within a try/except block
 
         .. note:: This extraction allows to change the dispatch routine \
             without having to care for the error dispatching
 
-        :param textgroup: Textgroup object that needs to be dispatched
-        :param directory: Directory in which the textgroup was found
+        :param collection: Collection object that needs to be dispatched
+        :param directory: Directory in which the Collection was found
         """
         try:
-            self._dispatch(textgroup, directory)
+            self._dispatch(collection, directory)
         except UndispatchedTextError as E:
             self.logger.error("Error dispatching %s ", directory)
             if self.RAISE_ON_UNDISPATCHED is True:
@@ -263,7 +238,7 @@ class XmlCapitainsLocalResolver(Resolver):
         """ Optionally remove texts that were found to be invalid
 
         :param invalids: List of text identifiers
-        :type invalids: [CtsTextMetadata]
+        :type invalids: [CapitainsReadableMetadata]
         """
         pass
 
@@ -271,7 +246,7 @@ class XmlCapitainsLocalResolver(Resolver):
         """ Parse a list of directories and reads it into a collection
 
         :param resource: List of folders
-        :return: An inventory resource and a list of CtsTextMetadata metadata-objects
+        :return: An inventory resource and a list of CapitainsReadableMetadata metadata-objects
         """
         collections = []
         readables = []
@@ -281,9 +256,9 @@ class XmlCapitainsLocalResolver(Resolver):
         for folder in resource:
             metadata_files = glob("{base_folder}/data/*/__capitains__.xml".format(base_folder=folder))
             for metadata_file in metadata_files:
-                textgroup, children, rel_dir = self._parse_work_wrapper(metadata_file)
-                textgroup.path = os.path.normpath(metadata_file)
-                collections.append(textgroup)
+                collection, children, rel_dir = self._parse_collection_wrapper(metadata_file)
+                collection.path = os.path.normpath(metadata_file)
+                collections.append(collection)
                 for child in children:
                     if child.readable is True:
                         child.path = os.path.normpath(os.path.join(rel_dir, child.path))
@@ -294,10 +269,10 @@ class XmlCapitainsLocalResolver(Resolver):
 
         # Follow all the collections to their readable leaves
         while len(tempcolls) > 0:
-            collection = tempcolls.pop(0)
-            textgroup, children, rel_dir = self._parse_work_wrapper(collection.path)
-            textgroup.path = collection.path
-            collections.append(textgroup)
+            temp_collection = tempcolls.pop(0)
+            collection, children, rel_dir = self._parse_collection_wrapper(temp_collection.path)
+            collection.path = temp_collection.path
+            collections.append(collection)
             for child in children:
                 if child.readable is True:
                     child.path = os.path.normpath(os.path.join(rel_dir, child.path))
@@ -312,8 +287,8 @@ class XmlCapitainsLocalResolver(Resolver):
                 invalids.append(text)
 
         # Dispatching routine
-        for textgroup in collections:
-            self._dispatch_container(textgroup, os.path.dirname(textgroup.path))
+        for collection in collections:
+            self._dispatch_container(collection, os.path.dirname(collection.path))
 
         # Clean invalids if there was a need
         self._clean_invalids(invalids)
@@ -321,38 +296,29 @@ class XmlCapitainsLocalResolver(Resolver):
         self.inventory = self.dispatcher.collection
         return self.inventory
 
-    def __getText__(self, urn):
-        """ Returns a CtsTextMetadata object
-        :param urn: URN of a text to retrieve
-        :type urn: str, URN
+    def __getText__(self, identifier):
+        """ Returns a XmlCapitainsReadableMetadata object
+        :param identifier: URN of a text to retrieve
+        :type identifier: str, URN
         :return: Textual resource and metadata
-        :rtype: (CapitainsCtsText, InventoryText)
+        :rtype: (CapitainsCtsText, XmlCapitainsReadableMetadata)
         """
-        if not isinstance(urn, URN):
-            urn = URN(urn)
-        if len(urn) != 5:
-            if len(urn) == 4:
-                urn, reference = urn.upTo(URN.WORK), str(urn.reference)
-                urn = [
-                    t.id
-                    for t in self.texts
-                    if t.id.startswith(str(urn)) and isinstance(t, CtsEditionMetadata)
-                ]
-                if len(urn) > 0:
-                    urn = URN(urn[0])
-                else:
-                    raise UnknownObjectError
-            else:
-                raise InvalidURN
-
-        text = self.inventory[str(urn)]
+        # This will raise an UnknownCollection error if the identifier does not exist in the collection
+        # I assume that this is the desired outcome. If not, we can do a try/except here.
+        temp_text = self.inventory[str(identifier)]
+        if temp_text.readable:
+            text = temp_text
+        else:
+            # Perhaps there is a better exception to raise here?
+            raise(UnknownObjectError('{} is not a readable object'.format(str(identifier))))
 
         if os.path.isfile(text.path):
             with io.open(text.path) as __xml__:
-                resource = self.classes["text"](urn=urn, resource=self.xmlparse(__xml__))
+                resource = self.classes["text"](urn=identifier, resource=self.xmlparse(__xml__))
         else:
-            resource = None
-            self.logger.warning('The file {} is mentioned in the metadata but does not exist'.format(text.path))
+            # Passing None to the functions that call __getText__ results in a not very helpful AttributeError
+            # A more informative error should be raised here.
+            raise(UnknownObjectError('The file {} is mentioned in the metadata but does not exist'.format(text.path)))
 
         return resource, text
 
@@ -378,24 +344,22 @@ class XmlCapitainsLocalResolver(Resolver):
         :return: ([Matches], Page, Count)
         :rtype: ([CtsTextMetadata], int, int)
         """
-        __PART = None
-        if urn is not None:
-            if isinstance(urn, URN):
-                _urn = urn
-            else:
-                _urn = URN(urn)
-            __PART = [None, None, URN.NAMESPACE, URN.TEXTGROUP, URN.WORK, URN.VERSION, URN.COMPLETE][len(_urn)]
+        collection = self.inventory[urn].texts
 
         matches = [
             text
-            for text in self.texts
+            for text in collection.values()
             if
             (lang is None or (lang is not None and lang == text.lang)) and
-            (urn is None or (urn is not None and text.urn.upTo(__PART) == urn)) and
             (text.citation is not None) and
+            # I am not sure that this categorization is useful since the type is not longer a strictly controlled
+            # vocabulary.
+            # It might be possible if the resolver built a list of the types as it was ingesting the texts and then
+            # checked to see if the category parameter is a member of this list.
             (
-                category not in ["edition", "translation", "commentary"] or
-                (category in ["edition", "translation", "commentary"] and category.lower() == text.subtype.lower())
+                category not in ["cts:edition", "cts:translation", "cts:commentary"] or
+                (category in ["cts:edition", "cts:translation", "cts:commentary"]
+                 and category.lower() == text.subtype.lower())
             )
         ]
         if pagination:
@@ -466,7 +430,7 @@ class XmlCapitainsLocalResolver(Resolver):
                     self.classes["work"](urn=coll_urn, parent=parent)
                 parent = parent.collections[coll_urn]
 
-            x = self.classes["edition"](urn=str(text.urn), parent=parent)
+            x = self.classes["edition"](urn=str(text.urn), parent=parent, lang=text.lang)
             x.citation = text.citation
 
         return inventory[objectId]

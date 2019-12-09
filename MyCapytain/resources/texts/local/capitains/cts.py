@@ -659,7 +659,7 @@ class CapitainsCtsPassage(_SharedMethods, PrototypeCtsPassage):
         if start + 1 == len(document_references) or end + 1 == len(document_references):
             # If the passage is already at the end
             _next = None
-        elif end + range_length > len(document_references):
+        elif end + range_length >= len(document_references):
             if start == end:
                 _next = document_references[-1]
             else:

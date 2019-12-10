@@ -185,20 +185,19 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
             if lg is not None:
                 o.set_label(child.text, lg)
 
-        # Parse children
-        children = []
-        children.extend(_xpathDict(
-            xml=xml, xpath='cpt:members/cpt:collection[@readable="true"]',
-            cls=cls.CLASS_READABLE, parent=o
-        ))
-        children.extend(_xpathDict(
-            xml=xml, xpath='cpt:members/cpt:collection[not(@readable="true")]',
-            cls=cls, parent=o
-        ))
-
         _parse_structured_metadata(o, xml)
 
         if _with_children:
+            # Parse children
+            children = []
+            children.extend(_xpathDict(
+                xml=xml, xpath='cpt:members/cpt:collection[@readable="true"]',
+                cls=cls.CLASS_READABLE, parent=None
+            ))
+            children.extend(_xpathDict(
+                xml=xml, xpath='cpt:members/cpt:collection[not(@readable="true")]',
+                cls=cls, parent=None
+            ))
             return o, children
         return o
 

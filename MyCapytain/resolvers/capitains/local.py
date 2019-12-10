@@ -6,6 +6,7 @@ import logging
 import os.path
 from glob import glob
 from math import ceil
+from collections import defaultdict
 
 from MyCapytain.common.reference._capitains_cts import CtsReference
 from MyCapytain.common.utils.xml import xmlparser
@@ -248,47 +249,34 @@ class XmlCapitainsLocalResolver(Resolver):
         :param resource: List of folders
         :return: An inventory resource and a list of CapitainsReadableMetadata metadata-objects
         """
-        collections = []
-        readables = []
+        parents = dict()
+        members = dict()
         invalids = []
-        tempcolls = []
 
         for folder in resource:
-            metadata_files = glob("{base_folder}/data/*/__capitains__.xml".format(base_folder=folder))
+            metadata_files = glob("{base_folder}/data/**/__capitains__.xml".format(base_folder=folder), recursive=True)
             for metadata_file in metadata_files:
                 collection, children, rel_dir = self._parse_collection_wrapper(metadata_file)
                 collection.path = os.path.normpath(metadata_file)
-                collections.append(collection)
+                parents[collection.id] = collection
+                members[collection.id] = [child.id for child in children]
                 for child in children:
                     if child.readable is True:
                         child.path = os.path.normpath(os.path.join(rel_dir, child.path))
-                        readables.append(child)
-                    else:
-                        child.path = os.path.normpath(os.path.join(rel_dir, child.path))
-                        tempcolls.append(child)
+                        parents[child.id] = child
 
-        # Follow all the collections to their readable leaves
-        while len(tempcolls) > 0:
-            temp_collection = tempcolls.pop(0)
-            collection, children, rel_dir = self._parse_collection_wrapper(temp_collection.path)
-            collection.path = temp_collection.path
-            collections.append(collection)
-            for child in children:
-                if child.readable is True:
-                    child.path = os.path.normpath(os.path.join(rel_dir, child.path))
-                    readables.append(child)
-                else:
-                    child.path = os.path.normpath(os.path.join(rel_dir, child.path))
-                    tempcolls.append(child)
-
-        for text in readables:
-            # If text_id is not none, the text parsing errored
-            if not self._parse_text(text):
-                invalids.append(text)
+        for k, v in parents.items():
+            if v.readable is False:
+                v.children.update({ident: parents[ident] for ident in members[k]})
+            else:
+                # If text_id is not none, the text parsing errored
+                if not self._parse_text(v):
+                    invalids.append(v)
 
         # Dispatching routine
-        for collection in collections:
-            self._dispatch_container(collection, os.path.dirname(collection.path))
+        for collection in parents:
+            if parents[collection].readable is False:
+                self._dispatch_container(parents[collection], os.path.dirname(parents[collection].path))
 
         # Clean invalids if there was a need
         self._clean_invalids(invalids)

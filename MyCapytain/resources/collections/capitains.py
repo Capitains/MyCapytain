@@ -192,11 +192,11 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
             children = []
             children.extend(_xpathDict(
                 xml=xml, xpath='cpt:members/cpt:collection[@readable="true"]',
-                cls=cls.CLASS_READABLE, parent=None
+                cls=cls.CLASS_READABLE, parent=o
             ))
             children.extend(_xpathDict(
                 xml=xml, xpath='cpt:members/cpt:collection[not(@readable="true")]',
-                cls=cls, parent=None
+                cls=cls, parent=o
             ))
             return o, children
         return o

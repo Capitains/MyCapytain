@@ -249,7 +249,7 @@ class XmlCapitainsLocalResolver(Resolver):
         :param resource: List of folders
         :return: An inventory resource and a list of CapitainsReadableMetadata metadata-objects
         """
-        parents = dict()
+        id_to_coll = dict()
         members = dict()
         invalids = []
 
@@ -258,25 +258,25 @@ class XmlCapitainsLocalResolver(Resolver):
             for metadata_file in metadata_files:
                 collection, children, rel_dir = self._parse_collection_wrapper(metadata_file)
                 collection.path = os.path.normpath(metadata_file)
-                parents[collection.id] = collection
+                id_to_coll[collection.id] = collection
                 members[collection.id] = [child.id for child in children]
                 for child in children:
                     if child.readable is True:
                         child.path = os.path.normpath(os.path.join(rel_dir, child.path))
-                        parents[child.id] = child
+                        id_to_coll[child.id] = child
 
-        for k, v in parents.items():
+        for k, v in id_to_coll.items():
             if v.readable is False:
-                v.children.update({ident: parents[ident] for ident in members[k]})
+                v.children.update({ident: id_to_coll[ident] for ident in members[k]})
             else:
                 # If text_id is not none, the text parsing errored
                 if not self._parse_text(v):
                     invalids.append(v)
 
         # Dispatching routine
-        for collection in parents:
-            if parents[collection].readable is False:
-                self._dispatch_container(parents[collection], os.path.dirname(parents[collection].path))
+        for collection in id_to_coll:
+            if id_to_coll[collection].readable is False:
+                self._dispatch_container(id_to_coll[collection], os.path.dirname(id_to_coll[collection].path))
 
         # Clean invalids if there was a need
         self._clean_invalids(invalids)

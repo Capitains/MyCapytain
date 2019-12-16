@@ -9,7 +9,7 @@
             xmlns:cts="http://chs.harvard.edu/xmlns/cts"
             xmlns:foaf="http://xmlns.com/foaf/0.1/">
    <identifier>a:different.identifier</identifier>
-   <dc:title xml:lang="deu">This is a collected collection</dc:title>
+   <dc:title xml:lang="eng">This is a collected collection</dc:title>
    <dc:type>cts:textgroup</dc:type>
    <structured-metadata>
       <bib:AbbreviatedTitle>Collected</bib:AbbreviatedTitle>

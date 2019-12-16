@@ -1,0 +1,100 @@
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100</title>
+            <editor>Hauthaler, Willibald Abt (O.S.B)</editor>
+            <editor>Martin, Franz</editor>
+         </titleStmt>
+         <editionStmt>
+            <edition>
+               Digitale Transkription des Salzburger Urkundenbuchs
+            </edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Magdalena Hermann-Kowalczyk (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML/TEI</resp>
+               <persName>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+            <sponsor>Akademie der Wissenschaften in Hamburg</sponsor>
+            <sponsor>Universität Hamburg</sponsor>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2018"/>
+            <availability>
+                <licence corresp="urn:cts:formulae:salzburg.hauthaler-a0100.lat001" target="https://creativecommons.org/licenses/by/4.0/">Distributed under a Creative Commons Attribution 4.0 International License.</licence>
+               <licence corresp="#salzburg.hauthaler-a0100/front">All Rights Reserved.</licence>
+            </availability>
+         </publicationStmt>
+		       <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <idno type="OCLC">312728555</idno>
+                  <title level="m" type="main">Salzburger Urkundenbuch</title>
+                  <editor>Hauthaler, Willibald</editor>
+                  <imprint>
+                     <publisher>Gesellschaft für Salzburger Landeskunde</publisher>
+                     <pubPlace>Salzburg</pubPlace>
+                     <date when="1910" n="originalAusgabe">1910</date>
+                     <biblScope unit="volume">2</biblScope>
+                     <biblScope unit="pp">
+                  162-163
+               </biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription des Salzburger Urkundenbuchs, welches 1920 von Abt Willibald Hauthaler O.S.B. herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+).(.+)" n="paragraph" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:p[@n='$2'])"/>
+            <cRefPattern matchPattern="(.+)" n="charta" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="salzburg.hauthaler-a0100">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+                  <p corresp="urn:cts:formulae:salzburg.hauthaler-a0100.lat001:1">a) Der Edle Vodalhard (Odalhard) übergibt dem Erzbischof 7 Huben am Ergoltsbach (Zufluss der kleinen Laber n. Landshut) mit Vorbehalt von 3 Joch in jeder Zelch und einer Hofstatt auf der Westseite als Hantgemâl (Stammgut), wofür er zu ewigem Eigenthum für sich und seine Nachkommen erhält, was er bisher zu Weidenbach (w. Ampfing) als Eigen innegehabt hat, nur ausgenommen die Kirche, den Kirchhof und eine Baustätte.</p>
+                  <p corresp="urn:cts:formulae:salzburg.hauthaler-a0100.lat001:2">b) Altorf übergibt dem Erzbischof am gleichen Tage 5 Hubcn zu Ergoltsbach und erhält dafür Volagangesperch (seit 13. Jahrh. Neumarkt a/Rott), wieder ausgenommen die Kirche, den Kirchhof und eine Baustätte.</p>
+               </div>
+         <dateline>(c. 925 07 30)<date when="0925-07-30"/></dateline></front>
+      <body>
+               <div type="edition" xml:lang="lat" n="urn:cts:formulae:salzburg.hauthaler-a0100.lat001">
+                  <div type="textpart" subtype="charta" n="1">
+                     <head xml:space="preserve"><w>COMMUTACIO</w> <w>INTER</w> <w>ÔDALHARDUM</w> <w>ET</w> <w>ÔDALBERTUM</w> <w>ARCHIEPISCOPUM</w>.</head>
+                     <p xml:space="preserve" n="1"><w>a</w>) <w>Noverint</w> <w>igitur</w> <w>omnes</w> <w>Christi</w> <w>fideles</w>, <w>quoniam</w> <w>Odalbertus</w> <w>venerabilis</w> <w>archiepiscopus</w> <w>quandam</w> <w>commutacionem</w> <w>cum</w> <w>Ôdalhardo</w> <w>quodam</w> <w>nobili</w> <w>viro</w> <w>cum</w> <w>consilio</w> <w>fidelium</w> <w>suorum</w> <w>clericorum</w> <w>scilicet</w> <w>et</w> <w>laicorum</w> <w>decrevit</w> <w>faciendum</w>. <w>Tradidit</w> <w>namque</w> <w>praenominatus</w> <w>Vôdalhardus</w> <w>ad</w> <w>Ergeltespach</w> <w>hobas</w> <w>VII</w> <w>in</w> <w>reconpensacionem</w> <w>et</w> <w>omne</w> <w>videlicet</w> <w>territorium</w>, <w>quod</w> <w>ibidem</w> <w>visus</w> <w>est</w> <w>habere</w>, <w>exceptis</w> <w>in</w> <w>una</w> <w>quaque</w> <w>parte</w>, <w>quam</w> <w>celga</w> <w>vocamus</w>, <w>iugeribus</w> <w>tribus</w> <w>et</w> <w>uno</w> <w>curtili</w> <w>loco</w> <w>ad</w> <w>occidenlalem</w> <w>partem</w>, <w>quod</w> <w>vulgo</w> <w>hantkimahili</w> <w>vocamus</w>, <w>caetera</w> <w>omnia</w> <w>tradidit</w> <w>in</w> <w>manus</w> <w>Ôdalberti</w> <w>venerabilis</w> <w>archiepiscopi</w> <w>et</w> <w>advocati</w> <w>sui</w> <w>Adalfredi</w> <w>ad</w> <w>sanctum</w> <w>Petrum</w> <w>sanctumque</w> <w>Rodbertum</w> <w>ad</w> <w>sanctam</w> <w>Iuuanensem</w> <w>sedem</w> <w>absque</w> <w>ullius</w> <w>contradictione</w> <w>personae</w> <w>perpetualiter</w> <w>in</w> <w>proprietatem</w> <w>possidendum</w>. <w>Econtra</w> <w>vero</w> <w>Ôdalbertus</w> <w>archiepiscopus</w> <w>cum</w> <w>manu</w> <w>advocati</w> <w>sui</w> <w>Adalfredi</w> <w>tradidit</w> <w>prenominato</w> <w>Ôdalhardo</w> <w>quicquid</w> <w>ad</w> <w>Uuidinapach</w> <w>visus</w> <w>est</w> <w>habere</w>, <w>except</w> <w>aecclesiae</w> <w>loco</w> <w>et</w> <w>atrio</w> <w>et</w> <w>uno</w> <w>curtili</w> <w>loco</w>, <w>caetera</w> <w>omnia</w> <w>ad</w> <w>eundem</w> <w>locum</w> <w>pertinentia</w> <w>sibi</w> <w>suisque</w> <w>posteris</w> <w>perpetualiter</w> <w>in</w> <w>proprietatem</w> <w>possidendum</w>.</p>
+                     <p xml:space="preserve" n="2"><w>Et</w> <w>isti</w> <w>sunt</w> <w>testes</w> <w>exinde</w> <w>per</w> <w>aures</w> <w>attracti</w>: <w>Engilpreht</w> <w>comes</w>, <w>Chadalhoh</w> <w>comes</w>, <w>Adalfrid</w>, <w>Diotrih</w>, <w>Ludolf</w>, <w>Râtpot</w>, <w>Heitfolch</w>, <w>Uuolfperht</w>, <w>Uuelisinch</w>, <w>Diotto</w>, <w>Eparhart</w>, <w>Pirihtilo</w>, <w>Tyso</w>, <w>Iôdung</w>, <w>Volhart</w>, <w>Masso</w>, <w>item</w> <w>Eparhart</w>, <w>Fridaperht</w>, <w>Rôdolt</w>, <w>Selpker</w>, <w>Muotuni</w>, <w>Liutker</w>, <w>Mathfrid</w>, <w>Otker</w>, <w>Pêrnhart</w>, <w>Uuillihelm</w>, <w>Heimo</w>, <w>Rafolt</w>, <w>Dultinch</w>, <w>Aza1nan</w>, <w>Imizi</w>, <w>Heidfolch</w>, <w>Gotahelm</w>.</p>
+                  </div>
+                  <div type="textpart" subtype="charta" n="2">
+                     <p xml:space="preserve" n="1"><w>b</w>) <w>Eodem</w> <w>die</w>, <w>quo</w> <w>haec</w> <w>tradicio</w> <w>peracta</w> <w>est</w>, <w>tradidit</w> <w>Altorf</w> <w>ad</w> <w>Erkeltespach</w> <w>hobas</w> <w>V</w> <w>in</w> <w>manus</w> <w>Ôdalberti</w> <w>archiepiscopi</w> <w>et</w> <w>advocati</w> <w>sui</w> <w>Adalfredi</w> <w>ad</w> <w>sanctum</w> <w>Petrum</w> <w>sanctumqne</w> <w>Rodbertum</w> <w>perenniter</w> <w>in</w> <w>proprietatem</w>. <w>Econtra</w> <w>vero</w> <w>praedictus</w> <w>episcopus</w> <w>cum</w> <w>manu</w> <w>praenominati</w> <w>advocate</w> <w>tradidit</w> <w>Altolfo</w> <w>Vôlagangesperch</w> <w>excepto</w> <w>aecclesiae</w> <w>loco</w> <w>et</w> <w>atrio</w> <w>et</w> <w>uno</w> <w>curtili</w> <w>loco</w> <w>perenniter</w> <w>in</w> <w>proprietatem</w>.</p>
+                     <p xml:space="preserve" n="2"><w>Et</w> <w>isti</w> <w>sunt</w> <w>testes</w>, <w>ut</w> <w>supra</w> <w>nominati</w> <w>sunt</w>.</p>
+                  </div>
+               </div>
+            </body>
+   </text>
+</TEI>

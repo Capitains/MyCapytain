@@ -364,7 +364,7 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         :return: Title string representation
         :rtype: Literal
         """
-        return self.parent.get_label(lang=lang)
+        return self.get_label(lang=lang)
 
     def get_description(self, lang=None):
         """ Get the DC description of the object

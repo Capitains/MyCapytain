@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 124</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>Codex diplomaticus Fuldensis (Ed. Dronke)</edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Your Name (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Dr. Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML</resp>
+               <persName xml:lang="mul">Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2019"/>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0/">
+                  Distributed under a Creative Commons Attribution 4.0 International License.
+               </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Codex diplomaticus Fuldensis</title>
+                  <editor>Ernst Friedrich Johann Dronke</editor>
+                  <imprint>
+                     <pubPlace>Kassel</pubPlace>
+                     <date when="1850" n="originalAusgabe">1850</date>
+                     <biblScope unit="pp">73</biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription von Codex diplomaticus Fuldensis, welches 1850 von Ernst Friedrich Johann Dronke herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)"
+                         n="charta"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="fulda_dronke.dronke0124">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p/>
+         </div>
+         <dateline>
+            <date/>
+         </dateline>
+      </front>
+      <body>
+         <div type="edition"
+              xml:lang="lat"
+              n="urn:cts:formulae:fulda_dronke.dronke0124.lat001">
+            <div type="textpart" subtype="charta" n="1">
+               <head xml:space="preserve"><w>Kartula</w> <w>traditionis</w> <w>Egilolfi</w>.</head>
+               <p xml:space="preserve"><w>Ego</w> <w>itaque</w> <w>in</w> <w>dei</w> <w>nomine</w> <w>Egilolf</w> <w>in</w> <w>elimosinam</w> <w>meam</w> <w>et</w> <w>filii</w> <w>mei</w> <w>Helpfolfes</w> <w>sancto</w> <w>Bonifatio</w> <w>martyri</w> <w>trado</w> <w>hanc</w> <w>partem</w> <w>et</w> <w>ex</w> <w>iure</w> <w>proprietatis</w> <w>meae</w>, <w>sicut</w> <w>mihi</w> <w>pater</w> <w>meus</w> <w>Huntolf</w> <w>in</w> <w>hereditatem</w> <w>reliquit</w>, <w>id</w> <w>est</w> <w>in</w> <w>istis</w> <w>locis</w>: <w>in</w> <w>pago</w> <w>Tollifeldum</w> <w>in</w> <w>villa</w> <w>Nordheim</w> <w>tertiam</w> <w>partem</w>, <w>similiter</w> <w>in</w> <w>Hoitine</w> <w>tertiam</w> <w>partem</w> <w>et</w> <w>pago</w> <w>Grapfeldun</w> <w>in</w> <w>villa</w> <w>Herifatorphe</w> <w>tertiam</w> <w>partem</w> <w>et</w> <w>in</w> <w>Sulzifelde</w> <w>et</w> <w>in</w> <w>Swallungom</w> <w>tertiam</w> <w>partem</w>, <w>in</w> <w>Chunithorpfe</w> <w>et</w> <w>Pargthorfum</w>, <w>in</w> <w>Potoluessteti</w> <w>et</w> <w>in</w> <w>Weterungom</w> <w>similiter</w> <w>tertiam</w> <w>partem</w>, <w>in</w> <w>Sclauis</w> <w>in</w> <w>Heidu</w> <w>et</w> <w>in</w> <w>Truosnasteti</w> <w>tertiam</w> <w>partem</w>, <w>in</w> <w>pago</w> <w>Gozfeld</w> <w>in</w> <w>villa</w> <w>Swanafeldum</w> <w>tertiam</w>, <w>in</w> <w>pago</w> <w>Egewi</w> <w>in</w> <w>Scegifeldum</w> <w>tertiam</w> <w>partem</w>, <w>in</w> <w>pago</w> <w>Rinahgeweg</w> <w>in</w> <w>villa</w> <w>Gisenheim</w> <w>tertiam</w> <w>partem</w>. <w>In</w> <w>his</w> <w>supradictis</w> <w>locis</w>, <w>sicut</w> <w>hic</w> <w>scriptum</w> <w>est</w>, <w>sic</w> <w>volo</w> <w>esse</w> <w>traditum</w> <w>ad</w> <w>supradictum</w> <w>sanctum</w> <w>tertiam</w> <w>partem</w> <w>in</w> <w>terris</w>, <w>silvis</w>, <w>campis</w>, <w>pratis</w>, <w>pascuis</w>, <w>aquis</w> <w>aquarumve</w> <w>decursibus</w>, <w>domibus</w>, <w>aedificiis</w> <w>vobis</w> <w>et</w> <w>posteris</w> <w>vestris</w> <w>absque</w> <w>ullius</w> <w>personae</w> <w>contradictione</w>. <w>Vos</w> <w>et</w> <w>successores</w> <w>vestri</w> <w>ad</w> <w>possidendum</w> <w>et</w> <w>ad</w> <w>fruendum</w> <w>in</w> <w>elimosinam</w> <w>meam</w> <w>ulterius</w> <w>prenniter</w> <w>firmissimam</w> <w>habeatis</w> <w>potestatem</w>, <w>stipula</w> <w>confixum</w> <w>vobis</w> <w>ad</w> <w>roborandum</w> <w>et</w> <w>ad</w> <w>induendum</w>. <w>Actum</w> <w>in</w> <w>monasterio</w> <w>Fulda</w> <w>die</w> <w>VI</w>. <w>mensis</w> <w>februarii</w>. <w>Ego</w> <w>Asger</w> <w>scripsi</w>. <w>Ecce</w> <w>hic</w> <w>testes</w> <w>illius</w> <w>vestitionis</w>, <w>qualiter</w> <w>Egilolf</w> <w>tradiderat</w> <w>sancto</w> <w>Bonifatio</w> <w>in</w> <w>Swanafeldum</w>: <w>†</w> <w>Ato</w>. <w>†</w> <w>Liuto</w>. <w>†</w> <w>Ato</w>. <w>†</w> <w>Alaholf</w>. <w>†</w> <w>Weringer</w>. <w>†</w> <w>Erolt</w>. <w>†</w> <w>Thilo</w>. <w>†</w> <w>Ferting</w>. <w>†</w> <w>Rihhelm</w>. <w>†</w> <w>Hahger</w>. <w>†</w> <w>Einhart</w>. <w>Ecce</w> <w>isti</w> <w>testes</w> <w>sunt</w> <w>supra</w> <w>in</w> <w>Uuangheim</w> <w>†</w> <w>Othelm</w> <w>†</w> <w>Germo</w> <w>†</w> <w>Ludmar</w> <w>†</w> <w>Rabau</w> <w>†</w> <w>Pero†</w> <w>Erpf</w> <w>†</w> <w>Gundmar</w> <w>†</w> <w>Ortleib</w> <w>†</w> <w>Hunperaht</w> <w>†</w> <w>Uuolfleih</w> <w>†</w> <w>Fridumar</w> <w>†</w> <w>Orentil</w> <w>†</w> <w>Lud</w>. <w>Ecce</w> <w>testes</w> <w>in</w> <w>Heriffu</w> <w>†</w> <w>Starcfried</w> <w>†</w> <w>Thancrat</w> <w>†</w> <w>Uuigfrid</w> <w>†</w> <w>Tenihart</w> <w>†</w> <w>Adalrih</w> <w>†</w> <w>Heripraht</w> <w>†</w> <w>Vodalhari</w> <w>†</w> <w>Thruadland</w> <w>†</w> <w>Flampraht</w>.</p>
+            </div>
+         </div>
+      </body>
+   </text>
+</TEI>

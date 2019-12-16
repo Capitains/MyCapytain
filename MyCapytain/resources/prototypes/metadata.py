@@ -268,8 +268,9 @@ class Collection(Exportable):
 
         :rtype: [Collection]
         """
-        return self.members + \
-            [submember for member in self.members for submember in member.descendants]
+        member_dict = {member.id: member for member in self.members}
+        member_dict.update({submember.id: submember for member in self.members for submember in member.descendants})
+        return list(member_dict.values())
 
     @property
     def readableDescendants(self):
@@ -277,7 +278,7 @@ class Collection(Exportable):
 
         :rtype: [Collection]
         """
-        return [member for member in self.descendants if member.readable]
+        return list({member.id: member for member in self.descendants if member.readable}.values())
 
     def __namespaces_header__(self, cpt=None):
         """ Generates Namespaces Header given the graph

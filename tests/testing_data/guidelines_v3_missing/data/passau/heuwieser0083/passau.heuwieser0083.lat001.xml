@@ -1,0 +1,101 @@
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>
+               Digitale Transkription der Traditionen des Hochstifts Passau
+            </edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML/TEI</resp>
+               <persName>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+            <sponsor>Akademie der Wissenschaften in Hamburg</sponsor>
+            <sponsor>Universität Hamburg</sponsor>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2018"/>
+            <availability>
+                <licence target="https://creativecommons.org/licenses/by/4.0/">
+                    Distributed under a Creative Commons Attribution 4.0 International License.
+                </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <idno type="URI">http://d-nb.info/458436127</idno>
+                  <title>Die Traditionen des Hochstifts Passau</title>
+                  <editor>Heuwieser, Max</editor>
+                  <imprint>
+                     <publisher>Komission für bayerische Landgeschichte bei der Bayerischen Akademie der Wissenschaften</publisher>
+                     <pubPlace>München</pubPlace>
+                     <date when="1930" n="originalAusgabe">1930</date>
+                     <date when="1969" n="neudruck">1969</date>
+                     <biblScope unit="pp">69-70</biblScope>
+                  </imprint>
+               </monogr>
+               <series>
+                  <title level="s">Quellen und Erörterungen zur bayerischen Geschichte</title>
+                  <title level="s">Neue Folge</title>
+                  <biblScope unit="volume">6</biblScope>
+               </series>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription der Traditionen des Hochstifts Passau, welche 1930 von Max Heuwieser herausgegeben worden ist.Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)" n="charta" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="passau.heuwieser0083">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p>EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</p>
+         </div>
+         <dateline>866-874<date notBefore="0866" notAfter="0874"/></dateline></front>
+      <body>
+                     <div type="edition" xml:lang="lat" n="urn:cts:formulae:passau.heuwieser0083.lat001">
+                        <div type="textpart" subtype="charta" n="1">
+                           <p xml:space="preserve">
+                              <w>a</w>) <w>In</w> <w>nomine</w> <w>omnipotentis</w> <w>dei</w>. 
+                              <w>Sit</w> <w>omnibus</w> <w>in</w> <w>Christo</w> <w>fidelibus</w> <w>notum</w>, <w>quomodo</w> <w>vero</w> <w>Einheri</w> <w>una</w> <w>cum</w> <w>coniuge</w> <w>mea</w> <w>nomine</w> <w>Irminsuuinda</w> <w>talem</w> <w>hereditatem</w> <w>qualem</w> <w>ad</w> <w>Euuisteti</w> <w>habuimus</w> <w>tradidimus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>et</w> <w>mancipia</w> <w>ista</w> <w>Deotolf</w> <w>et</w> <w>Ratni</w> <w>uxor</w> <w>eius</w> <w>tamen</w> <w>in</w> <w>ea</w> <w>ratione</w>, <w>ut</w> <w>nos</w> <w>haec</w> <w>teneamus</w> <w>ad</w> <w>minuuitatem</w> <w>nostrorum</w> <w>macula</w> <w>delictorum</w> <w>et</w> <w>ad</w> <w>prosperitatem</w> <w>vitae</w> <w>nostrae</w> <w>et</w> <w>insuper</w> <w>illam</w> <w>terram</w> <w>a</w> <w>supradicto</w> <w>loco</w> <w>quam</w> <w>Gaganhardus</w> <w>presbiter</w> <w>frater</w> <w>meus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>tradidit</w>, <w>ut</w> <w>simul</w> <w>habeamus</w> <w>ad</w> <w>beneficium</w> <w>vitae</w> <w>nostrae</w> <w>ab</w> <w>Ermenrico</w> <w>episcopo</w> <w>Patauiae</w> <w>civitatis</w> <w>vel</w> <w>successore</w> <w>eius</w> <w>et</w> <w>post</w> <w>obitum</w> <w>meum</w> <w>seu</w> <w>coniugis</w> <w>meae</w> <w>ad</w> 
+                              <w>sanctum</w> <w>Stephanum</w> <w>omnia</w> <w>redeant</w> <w>et</w> <w>quaecumque</w> <w>tradidimus</w> <w>in</w> <w>domibus</w> <w>in</w> <w>aedificiis</w> <w>in</w> <w>silvis</w> <w>cultis</w> <w>et</w> <w>incultis</w> <w>in</w> <w>viis</w> <w>vel</w> <w>in</w> <w>inviis</w> <w>in</w> <w>agris</w> <w>in</w> <w>pascuis</w> <w>in</w> <w>campis</w> <w>in</w> <w>finibus</w> <w>omnia</w> <w>pertineant</w> <w>ad</w> <w>nostram</w> <w>memoriam</w> <w>et</w> <w>parentum</w> <w>nostrorum</w> <w>ad</w> <w>domum</w> <w>dei</w> <w>sancti</w> <w>prefati</w> <w>pertineant</w> <w>aut</w> <w>absque</w> <w>ullam</w> <w>contradiccionem</w>.
+                           </p>
+                           <p xml:space="preserve">
+                              <w>Et</w> <w>hii</w> <w>sunt</w> <w>testes</w> <w>per</w> <w>aurem</w> <w>ad</w> <w>tracti</w>: <w>Rihguuo</w>. <w>Gutascalhc</w>. <w>Rumolt</w>. <w>Engildeo</w>. <w>Engilpern</w>. <w>Atto</w>. <w>Suuidger</w>.
+                           </p>
+                        </div>
+                     </div>
+                  </body>
+   </text>
+</TEI>

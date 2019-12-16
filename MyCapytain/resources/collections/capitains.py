@@ -5,7 +5,7 @@ from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPA
 from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
 from MyCapytain.resources.prototypes.capitains import collection as capitains
 
-XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/", 'cpt': 'http://purl.org/ns/capitains'})
+XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/"})
 
 
 def _xpathDict(xml, xpath, cls, parent, **kwargs):
@@ -166,11 +166,11 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
 
         :param resource: Element rerpresenting a work
         :param parent: Parent of the object
-        :type parent: XmlCtsTextgroupMetadata
+        :type parent: XmlCapitainsCollectionMetadata
         """
         xml = xmlparser(resource)
         # This is for a remote collection
-        identifier = xml.get('identifier')
+        identifier = xml.get('identifier') or xml.get('urn')
         # This is for a local collection
         if identifier is None:
             identifier = xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text

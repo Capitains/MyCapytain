@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../capitains.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<collection xmlns:ti="http://chs.harvard.edu/xmlns/cts"
+            xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns="http://purl.org/capitains/ns/1.0#"
+            xmlns:owl="http://www.w3.org/2002/07/owl#"
+            xmlns:bib="http://bibliotek-o.org/1.0/ontology/">
+   <identifier>urn:cts:formulae:passau.heuwieser0073</identifier>
+   <parent>urn:cts:formulae:passau</parent>
+   <dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+   <dc:type>cts:work</dc:type>
+   <members>
+      <collection readable="true" path="./passau.heuwieser0073.lat002.xml">
+         <parent>urn:cts:formulae:passau.heuwieser0073</parent>
+         <dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+         <dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+         <dc:language>lat</dc:language>
+         <dc:type>cts:edition</dc:type>
+         <dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+         <dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+         <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+         <dc:format>application/tei+xml</dc:format>
+         <dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+         <structured-metadata>
+            <dct:abstract xml:lang="deu"/>
+            <bib:editor>Heuwieser, Max</bib:editor>
+            <dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+            <dct:created/>
+            <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+         </structured-metadata>
+      </collection>
+      <collection readable="true" path="./passau.heuwieser0073.lat004.xml">
+         <identifier>urn:cts:formulae:passau.heuwieser0073.lat004</identifier>
+         <parent>urn:cts:formulae:passau.heuwieser0073</parent>
+         <dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+         <dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+         <dc:language>lat</dc:language>
+         <dc:type>cts:edition</dc:type>
+         <dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+         <dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+         <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+         <dc:format>application/tei+xml</dc:format>
+         <dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+         <structured-metadata>
+            <dct:abstract xml:lang="deu"/>
+            <bib:editor>Heuwieser, Max</bib:editor>
+            <dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+            <dct:created/>
+            <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+         </structured-metadata>
+      </collection>
+      <collection readable="true" path="./passau.heuwieser0073.lat003.xml">
+         <identifier>urn:cts:formulae:passau.heuwieser0073.lat003</identifier>
+         <parent>urn:cts:formulae:passau.heuwieser0073</parent>
+         <dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+         <dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+         <dc:language>lat</dc:language>
+         <dc:type>cts:edition</dc:type>
+         <dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+         <dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+         <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+         <dc:format>application/tei+xml</dc:format>
+         <dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+         <structured-metadata>
+            <dct:abstract xml:lang="deu"/>
+            <bib:editor>Heuwieser, Max</bib:editor>
+            <dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+            <dct:created/>
+            <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+         </structured-metadata>
+      </collection>
+      <collection readable="true" path="./passau.heuwieser0073.lat001.xml">
+         <identifier>urn:cts:formulae:passau.heuwieser0073.lat001</identifier>
+         <parent>urn:cts:formulae:passau.heuwieser0073</parent>
+         <dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+         <dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+         <dc:language>lat</dc:language>
+         <dc:type>cts:edition</dc:type>
+         <dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+         <dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+         <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+         <dc:format>application/tei+xml</dc:format>
+         <dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+         <structured-metadata>
+            <dct:abstract xml:lang="deu"/>
+            <bib:editor>Heuwieser, Max</bib:editor>
+            <dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+            <dct:created/>
+            <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+         </structured-metadata>
+      </collection>
+      <collection readable="true" path="./some/strange/path">
+         <identifier>urn:cts:formulae:passau.heuwieser0073.lat005</identifier>
+         <parent>urn:cts:formulae:passau.heuwieser0073</parent>
+         <dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+         <dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+         <dc:language>lat</dc:language>
+         <dc:type>cts:edition</dc:type>
+         <dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+         <dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+         <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+         <dc:format>application/tei+xml</dc:format>
+         <dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+         <structured-metadata>
+            <dct:abstract xml:lang="deu"/>
+            <bib:editor>Heuwieser, Max</bib:editor>
+            <dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+            <dct:created/>
+            <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+         </structured-metadata>
+      </collection>
+   </members>
+</collection>

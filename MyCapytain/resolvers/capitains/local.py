@@ -251,6 +251,7 @@ class XmlCapitainsLocalResolver(Resolver):
         """
         id_to_coll = dict()
         members = dict()
+        parents = dict()
         invalids = []
 
         for folder in resource:
@@ -260,12 +261,15 @@ class XmlCapitainsLocalResolver(Resolver):
                 collection.path = os.path.normpath(metadata_file)
                 id_to_coll[collection.id] = collection
                 members[collection.id] = [child.id for child in children]
+                parents.update({child.id: collection for child in children})
                 for child in children:
                     if child.readable is True:
                         child.path = os.path.normpath(os.path.join(rel_dir, child.path))
                         id_to_coll[child.id] = child
 
         for k, v in id_to_coll.items():
+            if k in parents:
+                v.parent = parents[k]
             if v.readable is False:
                 v.children.update({ident: id_to_coll[ident] for ident in members[k]})
             else:
@@ -306,7 +310,8 @@ class XmlCapitainsLocalResolver(Resolver):
         else:
             # Passing None to the functions that call __getText__ results in a not very helpful AttributeError
             # A more informative error should be raised here.
-            raise(UnknownObjectError('The file {} is mentioned in the metadata but does not exist'.format(text.path)))
+            resource = None
+            self.logger.warning('The file {} is mentioned in the metadata but does not exist'.format(text.path))
 
         return resource, text
 
@@ -332,11 +337,14 @@ class XmlCapitainsLocalResolver(Resolver):
         :return: ([Matches], Page, Count)
         :rtype: ([CtsTextMetadata], int, int)
         """
-        collection = self.inventory[urn].texts
+        if urn is not None:
+            collection = self.inventory[urn].readableDescendants or [self.inventory[urn]]
+        else:
+            collection = self.inventory.readableDescendants
 
         matches = [
             text
-            for text in collection.values()
+            for text in collection
             if
             (lang is None or (lang is not None and lang == text.lang)) and
             (text.citation is not None) and
@@ -442,7 +450,7 @@ class XmlCapitainsLocalResolver(Resolver):
             subreference = CtsReference(subreference)
         passage = text.getTextualNode(subreference)
         if metadata:
-            passage.set_metadata_from_collection(text_metadata)
+            passage._metadata = text_metadata.metadata
         return passage
 
     def getSiblings(self, textId, subreference: CtsReference):

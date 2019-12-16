@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns:ti="http://chs.harvard.edu/xmlns/cts"
+            xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns="http://purl.org/capitains/ns/1.0#"
+            xmlns:owl="http://www.w3.org/2002/07/owl#"
+            xmlns:bib="http://bibliotek-o.org/1.0/ontology/"
+            xmlns:cts="http://chs.harvard.edu/xmlns/cts"
+            xmlns:foaf="http://xmlns.com/foaf/0.1/">
+   <identifier>urn:cts:formulae:fulda_dronke</identifier>
+   <dc:title xml:lang="deu">Codex diplomaticus &lt;span class="collection-origin"&gt;Fuldensis&lt;/span&gt;</dc:title>
+   <dc:type>cts:textgroup</dc:type>
+   <structured-metadata>
+      <bib:AbbreviatedTitle>Cod. dipl. Fuldensis</bib:AbbreviatedTitle>
+   </structured-metadata>
+   <members>
+      <collection path="./dronke0004a/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0004a"/>
+      <collection path="./dronke0041/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0041"/>
+      <collection path="./dronke0064/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0064"/>
+      <collection path="./dronke0124/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0124"/>
+      <collection path="./dronke0126/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0126"/>
+      <collection path="./dronke0192/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0192"/>
+      <collection path="./dronke0323/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0323"/>
+      <collection path="./dronke0616/__capitains__.xml"
+                  identifier="urn:cts:formulae:fulda_dronke.dronke0616"/>
+   </members>
+</collection>

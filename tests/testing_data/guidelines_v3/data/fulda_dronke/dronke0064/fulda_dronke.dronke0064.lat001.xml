@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 64</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>Codex diplomaticus Fuldensis (Ed. Dronke)</edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Your Name (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Dr. Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML</resp>
+               <persName xml:lang="mul">Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2019"/>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0/">
+                  Distributed under a Creative Commons Attribution 4.0 International License.
+               </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Codex diplomaticus Fuldensis</title>
+                  <editor>Ernst Friedrich Johann Dronke</editor>
+                  <imprint>
+                     <pubPlace>Kassel</pubPlace>
+                     <date when="1850" n="originalAusgabe">1850</date>
+                     <biblScope unit="pp">40-41</biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription von Codex diplomaticus Fuldensis, welches 1850 von Ernst Friedrich Johann Dronke herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)"
+                         n="charta"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="fulda_dronke.dronke0064">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p/>
+         </div>
+         <dateline>
+            <date/>
+         </dateline>
+      </front>
+      <body>
+         <div type="edition"
+              xml:lang="lat"
+              n="urn:cts:formulae:fulda_dronke.dronke0064.lat001">
+            <div type="textpart" subtype="charta" n="1">
+               <head xml:space="preserve"><w>Kartula</w> <w>Geilrata</w> <w>et</w> <w>Elisabeth</w> <w>de</w> <w>Mogontia</w>.</head>
+               <p xml:space="preserve"><w>In</w> <w>nomine</w> <w>patris</w> <w>et</w> <w>filii</w> <w>et</w> <w>Spiritus</w> <w>sancti</w>. <w>licet</w> <w>parua</w> <w>et</w> <w>exigua</w> <w>sunt</w> <w>quae</w> <w>pro</w> <w>inmensis</w> <w>peccatis</w> <w>et</w> <w>debitis</w> <w>offerimus</w> <w>tamen</w> <w>pius</w> <w>dominus</w> <w>noster</w> <w>Ihesus</w> <w>Christus</w> <w>non</w> <w>quantitatem</w> <w>muneris</w> <w>sed</w> <w>devotionem</w> <w>animi</w> <w>perspicit</w> <w>offerentis</w>. <w>ideoque</w> <w>ego</w> <w>Geilrat</w> <w>et</w> <w>Elisabeth</w> <w>sana</w> <w>mente</w> <w>sanoque</w> <w>consilio</w> <w>pro</w> <w>malis</w> <w>peccatis</w> <w>nostris</w> <w>ut</w> <w>in</w> <w>futuro</w> <w>veniam</w> <w>aliquam</w> <w>promerire</w> <w>mereamur</w>. <w>donamus</w> <w>ad</w> <w>ecclesiam</w> <w>sancti</w> <w>Bonifatii</w> <w>ubi</w> <w>ipse</w> <w>requiescit</w> <w>corpore</w> <w>sacro</w> <w>in</w> <w>Mogontiarum</w> <w>marcu</w> <w>areas</w> <w>tres</w> <w>de</w> <w>duobus</w> <w>areis</w> <w>ab</w> <w>uno</w> <w>latere</w> <w>habet</w> <w>Lantswind</w> <w>ab</w> <w>alio</w> <w>latere</w> <w>sancti</w> <w>Bonifatii</w> <w>tertio</w> <w>et</w> <w>llll</w>. <w>vis</w> <w>communis</w>. <w>de</w> <w>lertis</w> <w>area</w> <w>ab</w> <w>uno</w> <w>latere</w> <w>habet</w> <w>Ata</w> <w>ab</w> <w>alio</w> <w>Lantswind</w> <w>tertio</w> <w>latere</w> <w>strata</w>. <w>et</w> <w>in</w> <w>Mogontia</w> <w>vineam</w> .<w>I</w>. <w>ab</w> <w>uno</w> <w>latere</w> <w>habet</w> <w>Geila</w> <w>ab</w> <w>alio</w> <w>latere</w> <w>sancti</w> <w>Albani</w> <w>tertio</w> <w>latere</w> <w>antiqua</w> <w>mura</w> <w>quarto</w> <w>latere</w> <w>via</w> <w>communis</w>. <w>et</w> <w>aliam</w> <w>vineam</w> <w>foris</w> <w>murum</w> <w>ab</w> <w>uno</w> <w>latere</w> <w>habet</w> <w>Geila</w> <w>ab</w> <w>alio</w> <w>latere</w> <w>Lantswind</w> <w>latere</w> <w>tertio</w> <w>sancti</w> <w>Albani</w> <w>quarto</w> <w>latere</w> <w>atrats</w>. <w>et</w> <w>in</w> <w>Brezzenheim</w> <w>vineam</w> <w>tertiani</w> <w>ab</w> <w>uno</w> <w>latere</w> <w>habet</w> <w>Geila</w> <w>ab</w> <w>alio</w> <w>latere</w> <w>meum</w> <w>ipaius</w> <w>tertio</w> <w>latere</w> <w>Lantswind</w> <w>IIII</w>. <w>parte</w> <w>atrata</w>. <w>et</w> <w>dono</w> <w>in</w> .<w>Magontiorum</w> <w>marcu</w> <w>iugera</w> <w>LX</w>. <w>et</w> <w>mancipia</w> <w>XII</w>. <w>Wigheri</w> <w>Reginbald</w> <w>Willibeid</w> <w>Doda</w> <w>Gerlind</w> <w>Hun</w> <w>Hruodolf</w> <w>Lingolf</w> <w>Liobheri</w> <w>Gebarat</w> <w>Guntlind</w> <w>Bilihild</w> <w>ita</w> <w>tamen</w> <w>ut</w> <w>dum</w> <w>advixerimus</w> <w>ego</w> <w>Geilrat</w> <w>et</w> <w>Elisabebt</w> <w>et</w> <w>Landswind</w> <w>habeamus</w> <w>et</w> <w>post</w> <w>obitum</w> <w>nostrum</w> <w>habendi</w> <w>donandi</w> <w>vendendi</w> <w>vel</w> <w>quicquid</w> <w>exinde</w> <w>facere</w> <w>voluerint</w> <w>liberam</w> <w>in</w> <w>omnibus</w> <w>habeant</w> <w>potstestam</w>. <w>si</w> <w>quis</w> <w>vero</w> <w>quod</w> <w>fieri</w> <w>non</w> <w>credo</w> <w>si</w> <w>ego</w> <w>ipse</w> <w>ant</w> <w>aliquis</w> <w>de</w> <w>heredibus</w> <w>meis</w> <w>qui</w> <w>contra</w> <w>hanc</w> <w>donationem</w> <w>venire</w> <w>temptaverit</w> <w>iram</w> <w>dei</w> <w>incurrat</w> <w>et</w> <w>insuper</w> <w>inferat</w> <w>fisci</w> <w>dicionibus</w> <w>auri</w> <w>uncias</w> <w>duas</w> <w>argenti</w> <w>pondera</w> <w>llll</w>. <w>coaotus</w> <w>exsoluat</w> <w>et</w> <w>nec</w> <w>sic</w> <w>quod</w> <w>repetit</w> <w>evindicare</w> <w>non</w> <w>valeat</w> <w>sed</w> <w>presens</w> <w>donatio</w> <w>hec</w> <w>omni</w> <w>tempore</w> <w>firma</w> <w>et</w> <w>stabilis</w> <w>permaneat</w> <w>stipulatione</w> <w>subnixa</w>. <w>facta</w> <w>donatio</w> <w>hec</w> <w>sub</w> <w>die</w> <w>III</w>. <w>kalendas</w> <w>iulias</w> <w>anno</w> <w>XI</w>. <w>regnante</w> <w>domino</w> <w>nostro</w> <w>Karlo</w> <w>glorioso</w> <w>rege</w>, <w>ego</w> <w>Welimannus</w> <w>scripsi</w> <w>et</w> <w>notavi</w> <w>diem</w> <w>et</w> <w>tempus</w> <w>quo</w> <w>supra</w>. <w>ꝉ</w> <w>sign</w>. <w>Geilrata</w> <w>qui</w> <w>hanc</w> <w>donationem</w> <w>fieri</w> <w>rogavit</w>. <w>ꝉ</w> <w>Elisabeht</w> <w>ꝉ</w> <w>Lantswind</w> <w>ꝉ</w> <w>Otacar</w> <w>ꝉ</w> <w>Waluram</w> <w>ꝉ</w> <w>llribald</w> <w>ꝉ</w> .<w>Adalpraht</w> <w>ꝉ</w> <w>Erchanpraht</w> <w>ꝉ</w> <w>Waning</w> <w>ꝉ</w> <w>Sigiman</w> <w>ꝉ</w> <w>Adalfrid</w> <w>ꝉ</w>.</p>
+            </div>
+         </div>
+      </body>
+   </text>
+</TEI>

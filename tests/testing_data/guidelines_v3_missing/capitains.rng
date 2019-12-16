@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" ns="http://purl.org/capitains/ns/1.0#"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+  xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
+  xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <!-- je restructurerais bien le schéma en listant les patterns par NS, puis regroupement par ref dans le pattern collection -->
+  <!-- idem, il faut mieux documenter et inscrire dans le schéma les 2 choix de structuration: élément capitains:collection renseigné OU lien vers fichier de méta -->
+  <start>
+    <ref name="collection"/>
+  </start>
+  <define name="collection">
+    <element name="collection">
+      <choice>
+        <ref name="local"/>
+        <ref name="remote"/>
+      </choice>
+    </element>
+  </define>
+  <define name="local">
+    <group>
+      <a:documentation xml:lang="eng">This group is required for completely described collections,
+        for example root collection of the document.</a:documentation>
+      <interleave>
+        <optional>
+          <ref name="readable"/>
+        </optional>
+        <ref name="identifier.el"/>
+        <oneOrMore>
+          <ref name="dc.title"/>
+        </oneOrMore>
+        <oneOrMore>
+          <ref name="dc.type"/>
+        </oneOrMore>
+        <optional>
+          <ref name="parent"/>
+        </optional>
+        <zeroOrMore>
+          <ref name="dc.description"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.contributor"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.coverage"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.creator"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.date"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.format"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.identifier"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.publisher"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.relation"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.rights"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.source"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dc.subject"/>
+        </zeroOrMore>
+        <optional>
+          <ref name="members"/>
+        </optional>
+        <optional>
+          <ref name="structured-metadata"/>
+        </optional>
+      </interleave>
+    </group>
+  </define>
+  <define name="remote">
+    <group>
+      <ref name="identifier.att"/>
+      <optional>
+        <ref name="path"></ref>
+      </optional>
+      <empty/>
+    </group>
+  </define>
+
+  <!-- Capitains -->
+  <!-- factoriser les 2 définitions (el, att) ? -->
+  <define name="identifier.el">
+    <element name="identifier">
+      <a:documentation xml:lang="eng">Identifier of the collection required in the API (CTS URN,
+        HTTP Address, DOI, ARK, etc.)</a:documentation>
+      <data type="anyURI"/>
+    </element>
+  </define>
+  <define name="identifier.att">
+    <attribute name="identifier">
+      <a:documentation xml:lang="eng">Identifier of the collection if required in an API (CTS URN,
+        HTTP Address, DOI, ARK, etc.)</a:documentation>
+      <data type="anyURI"/>
+    </attribute>
+  </define>
+  <define name="parent">
+    <element name="parent">
+      <a:documentation xml:lang="eng">Identifier of the parent if required by a parent
+        collection</a:documentation>
+      <data type="anyURI"/>
+    </element>
+  </define>
+  <define name="readable">
+    <a:documentation>Boolean. Optional, false by default. When set to true, the described-document's
+      content (ie transcription) is readable.</a:documentation>
+    <choice>
+      <group>
+        <attribute name="readable">
+          <a:documentation>The collection IS readable: the text language(s) MUST be
+            specified.</a:documentation>
+          <value type="boolean">true</value>
+        </attribute>
+        <ref name="path" />
+        <oneOrMore>
+          <ref name="dc.language"/>
+        </oneOrMore>
+      </group>
+      <group>
+        <attribute name="readable">
+          <a:documentation>The collection IS NOT readable: the text language(s) can be
+            specified.</a:documentation>
+          <choice>
+            <empty/>
+            <value type="boolean">false</value>
+          </choice>
+        </attribute>
+        <zeroOrMore>
+          <ref name="dc.language"/>
+        </zeroOrMore>
+      </group>
+    </choice>
+  </define>
+  <define name="members">
+    <element name="members">
+      <oneOrMore>
+        <ref name="collection"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="path">
+    <attribute name="path">
+      <a:documentation xml:lang="eng">Relative address pointing to the metadata or the text
+        containing xml file.</a:documentation>
+      <data type="string"/>
+    </attribute>
+  </define>
+
+  <!-- Dublin Core -->
+  <define name="dc.title">
+    <element name="dc:title">
+      <a:documentation xml:lang="eng">Title of the collection (can be the author name, the work
+        title, a corpus name, etc.)</a:documentation>
+      <ref name="lang-att"/>
+      <data type="string"/>
+    </element>
+  </define>
+  <define name="dc.type">
+    <element name="dc:type">
+      <a:documentation xml:lang="eng">Type of the resource. Describes the type of concept this
+        collection [title?] embodies. </a:documentation>
+      <data type="anyURI"/>
+    </element>
+  </define>
+  <define name="dc.language">
+    <element name="dc:language">
+      <a:documentation xml:lang="eng">Language in which the document is written</a:documentation>
+      <data type="language"/>
+    </element>
+  </define>
+  <define name="dc.description">
+    <element name="dc:description">
+      <a:documentation xml:lang="eng">Description of the collection</a:documentation>
+      <ref name="lang-att"/>
+      <text/>
+    </element>
+  </define>
+  <define name="dc.contributor">
+    <element name="dc:contributor">
+      <a:documentation xml:lang="eng"> This holds contributor information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.coverage">
+    <element name="dc:coverage">
+      <a:documentation xml:lang="eng"> This holds coverage information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.creator">
+    <element name="dc:creator">
+      <a:documentation xml:lang="eng"> This holds creator information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.date">
+    <element name="dc:date">
+      <a:documentation xml:lang="eng"> This holds date information according to the Dublin
+        Core Elements ontology </a:documentation>
+      <choice>
+        <data type="date"/>
+        <data type="dateTime"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.format">
+    <element name="dc:format">
+      <a:documentation xml:lang="eng"> This holds format information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.identifier">
+    <element name="dc:identifier">
+      <a:documentation xml:lang="eng"> This holds identifier information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.publisher">
+    <element name="dc:publisher">
+      <a:documentation xml:lang="eng"> This holds publisher information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <optional>
+        <ref name="lang-att"/>
+      </optional>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.relation">
+    <element name="dc:relation">
+      <a:documentation xml:lang="eng"> This holds relation information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.rights">
+    <element name="dc:rights">
+      <a:documentation xml:lang="eng"> This holds rights information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <optional>
+        <ref name="lang-att"/>
+      </optional>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.source">
+    <element name="dc:source">
+      <a:documentation xml:lang="eng"> This holds hold source information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="dc.subject">
+    <element name="dc:subject">
+      <a:documentation xml:lang="eng"> This holds hold subject information according to the
+        Dublin Core Elements ontology </a:documentation>
+      <optional>
+        <ref name="lang-att"/>
+      </optional>
+      <choice>
+        <data type="anyURI"/>
+        <text/>
+      </choice>
+    </element>
+  </define>
+  <define name="lang-att">
+    <attribute>
+      <a:documentation xml:lang="eng">Language in which the current node is
+        expressed</a:documentation>
+      <name ns="http://www.w3.org/XML/1998/namespace">lang</name>
+      <data type="language"/>
+    </attribute>
+  </define>
+  <!-- idée: pattern très générique: ns et datatype, sauf dc et ctp -->
+  <define name="structured-metadata">
+    <element>
+      <a:documentation>Structured metadata contains any other optional metadata that are not part of
+        DublinCore Elements and CapiTainS namespaces</a:documentation>
+      <name>structured-metadata</name>
+
+      <zeroOrMore>
+        <element>
+          <anyName>
+            <except>
+              <nsName ns="http://purl.org/dc/elements/1.1/"/>
+              <nsName ns="http://purl.org/ns/capitains"/>
+            </except>
+          </anyName>
+          <optional>
+            <ref name="lang-att"/>
+          </optional>
+          <text/>
+        </element>
+      </zeroOrMore>
+    </element>
+  </define>
+  <!--  -->
+</grammar>

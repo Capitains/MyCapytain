@@ -425,6 +425,10 @@ class TextXMLFolderResolver(TestCase):
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
+            len(metadata.members[0].members), 4,
+            "There should be four grandchildren to top-level Collection."
+        )
+        self.assertEqual(
             len(metadata.descendants), 34,
             "There should be as many descendants as there is readables plus collections + 1 "
             "for default inventory"
@@ -440,7 +444,7 @@ class TextXMLFolderResolver(TestCase):
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
                 "//cpt:readable[@urn='urn:cts:formulae:passau.heuwieser0073.lat002']",
-                namespaces={"cpt": "http://purl.org/capitains/ns/1.0#"})), 1,
+                namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to Passau 73, version 2"
         )
         self.assertCountEqual(

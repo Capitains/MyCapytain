@@ -278,7 +278,8 @@ class XmlCapitainsLocalResolver(Resolver):
                     invalids.append(v)
 
         # Dispatching routine
-        for collection in id_to_coll:
+        # The sorting is required to make sure that the top-level collections are dispatched first.
+        for collection in sorted(id_to_coll, key=lambda x: x in parents.keys()):
             if id_to_coll[collection].readable is False:
                 self._dispatch_container(id_to_coll[collection], os.path.dirname(id_to_coll[collection].path))
 

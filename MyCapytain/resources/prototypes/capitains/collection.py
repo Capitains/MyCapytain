@@ -22,10 +22,7 @@ from rdflib.namespace import DC
 
 __all__ = [
     "PrototypeCapitainsCollection",
-    "CapitainsTextInventoryCollection",
     "CapitainsCollectionMetadata",
-    "CapitainsTextgroupMetadata",
-    "CapitainsTextInventoryMetadata",
     "CapitainsReadableMetadata",
 ]
 
@@ -165,6 +162,8 @@ class PrototypeCapitainsCollection(Collection):
 
         strings = []
         for pred in self.CAPITAINS_PROPERTIES:
+            print(pred)
+            print(self.metadata.export())
             for obj in self.metadata.get(pred):
                 strings.append(
                     make_xml_node(
@@ -404,7 +403,7 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
     TYPE_URI = RDF_NAMESPACES.CAPITAINS.term("collection")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
-    CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.term("title")]
+    CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.title]
 
     def __init__(self, urn=None, parent=None):
         super(CapitainsCollectionMetadata, self).__init__(identifier=str(urn))
@@ -522,213 +521,3 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
             if self.parent is not None and self.parent.id:
                 attrs["groupUrn"] = self.parent.id
             return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)
-
-
-# The following classes are currently not being used by the resolver.
-# If this remains the case, they should be deleted before these changes go into production.
-
-class CapitainsTextgroupMetadata(PrototypeCapitainsCollection):
-    """ Represents a CTS Textgroup
-
-    CTS CtsTextgroupMetadata can be added to each other which would most likely happen if you take your data from multiple API or \
-    Textual repository. This works close to dictionary update in Python. See update
-
-    :param urn: Identifier of the CtsTextgroupMetadata
-    :type urn: str
-    :param parent: Parent of the current object
-    :type parent: CapitainsTextInventoryMetadata
-
-    :ivar urn: URN Identifier
-    :type urn: URN
-    """
-    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("groupname")
-    TYPE_URI = RDF_NAMESPACES.CTS.term("textgroup")
-    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
-    CTS_PROPERTIES = [RDF_NAMESPACES.CTS.groupname]
-
-    def __init__(self, urn="", parent=None):
-        super(CapitainsTextgroupMetadata, self).__init__(identifier=str(urn))
-        self.__urn__ = URN(urn)
-        self.__children__ = defaultdict(CapitainsCollectionMetadata)
-
-        if parent is not None:
-            self.parent = parent
-
-    @property
-    def works(self):
-        """ Works
-
-        :return: Dictionary of works
-        :rtype: defaultdict(:class:`PrototypeWorks`)
-        """
-        return self.children
-
-    def update(self, other):
-        """ Merge two Textgroup Objects.
-
-        - Original (left Object) keeps his parent.
-        - Added document merges with work if it already exists
-
-        :param other: Textgroup object
-        :type other: CapitainsTextgroupMetadata
-        :return: Textgroup Object
-        :rtype: CapitainsTextgroupMetadata
-        """
-        if not isinstance(other, CapitainsTextgroupMetadata):
-            raise TypeError("Cannot add %s to CtsTextgroupMetadata" % type(other))
-        elif str(self.urn) != str(other.urn):
-            raise InvalidURN("Cannot add CtsTextgroupMetadata %s to CtsTextgroupMetadata %s " % (self.urn, other.urn))
-
-        for urn, work in other.works.items():
-            if urn in self.works:
-                self.works[urn].update(deepcopy(work))
-            else:
-                self.works[urn] = deepcopy(work)
-            self.works[urn].parent = self
-            self.works[urn].resource = None
-
-        return self
-
-    def __len__(self):
-        """ Get the number of text in the Textgroup
-
-        :return: Number of texts available in the inventory
-        """
-        return len([
-            text
-            for work in self.works.values()
-            for text in work.texts.values()
-        ])
-
-    def __export__(self, output=None, domain="", namespaces=True):
-        """ Create a {output} version of the XmlCtsTextgroupMetadata
-
-        :param output: Format to be chosen
-        :type output: basestring
-        :param domain: Domain to prefix IDs when necessary
-        :type domain: str
-        :returns: Desired output formated resource
-        """
-        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
-            attrs = {"urn": self.id}
-            return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)
-
-
-class CapitainsTextInventoryMetadata(PrototypeCapitainsCollection):
-    """ Initiate a CtsTextInventoryMetadata resource
-
-    :param resource: Resource representing the CtsTextInventoryMetadata
-    :type resource: Any
-    :param name: Identifier of the CtsTextInventoryMetadata
-    :type name: str
-    """
-    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("name")
-    TYPE_URI = RDF_NAMESPACES.CTS.term("TextInventory")
-    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
-
-    def __init__(self, name="defaultInventory", parent=None):
-        super(CapitainsTextInventoryMetadata, self).__init__(identifier=name)
-        self.__children__ = defaultdict(CapitainsTextgroupMetadata)
-
-        if parent is not None:
-            self.parent = parent
-
-    @property
-    def textgroups(self):
-        """ Textgroups
-
-        :return: Dictionary of textgroups
-        :rtype: defaultdict(:class:`CtsTextgroupMetadata`)
-        """
-        return self.children
-
-    def __len__(self):
-        """ Get the number of text in the Inventory
-
-        :return: Number of texts available in the inventory
-        """
-        return len([
-            text
-            for tg in self.textgroups.values()
-            for work in tg.works.values()
-            for text in work.texts.values()
-        ])
-
-    def __export__(self, output=None, domain="", namespaces=True):
-        """ Create a {output} version of the CtsTextInventoryMetadata
-
-        :param output: Format to be chosen
-        :type output: basestring
-        :param domain: Domain to prefix IDs when necessary
-        :type domain: str
-        :param namespaces: List namespaces in main node
-        :returns: Desired output formated resource
-        """
-        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
-            attrs = {}
-            if self.id:
-                attrs["tiid"] = self.id
-
-            return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)
-
-
-class CapitainsTextInventoryCollection(PrototypeCapitainsCollection):
-    """ Initiate a CtsTextInventoryMetadata resource
-
-    :param resource: Resource representing the CtsTextInventoryMetadata
-    :type resource: Any
-    :param name: Identifier of the CtsTextInventoryMetadata
-    :type name: str
-    """
-    DC_TITLE_KEY = RDF_NAMESPACES.CTS.term("name")
-    TYPE_URI = RDF_NAMESPACES.CTS.term("CtsTextInventoryCollection")
-    MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.JSON.DTS.Std, Mimetypes.XML.CapiTainS.CTS]
-
-    def __init__(self, identifier="default"):
-        super(CapitainsTextInventoryCollection, self).__init__(identifier=identifier)
-        self.__children__ = dict()
-
-    def __len__(self):
-        """ Get the number of text in the Inventory
-
-        :return: Number of texts available in the inventory
-        """
-        return len([
-            text
-            for inv in self.members
-            for tg in inv.textgroups.values()
-            for work in tg.works.values()
-            for text in work.texts.values()
-        ])
-
-    def __export__(self, output=None, domain="", namespaces=True):
-        """ Create a {output} version of the CtsTextInventoryMetadata
-
-        :param output: Format to be chosen
-        :type output: basestring
-        :param domain: Domain to prefix IDs when necessary
-        :type domain: str
-        :param namespaces: List namespaces in main node
-        :returns: Desired output formated resource
-        """
-        if output == Mimetypes.XML.CTS:
-            attrs = {}
-            if self.id:
-                attrs["tiid"] = self.id
-
-            return self.__xml_export_generic__(
-                attrs,
-                namespaces=namespaces,
-                members=[
-                    m for inv in self.members for m in inv.members
-                ],
-                output=Mimetypes.XML.CTS
-            )
-        elif output == Mimetypes.JSON.DTS.Std:
-            if len(self.members) > 1:
-                return Collection.__export__(self, output=output)
-            else:
-                return self.members[0].export(output=output)

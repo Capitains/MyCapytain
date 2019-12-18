@@ -90,11 +90,11 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
         """ Check Get Capabilities """
         Repository = XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3"])
         self.assertEqual(
-            len(Repository.__getTextMetadata__()[0]), 18,
+            len(Repository.__getTextMetadata__()[0]), 19,
             "General no filter works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(category="cts:edition")[0]), 16,
+            len(Repository.__getTextMetadata__(category="cts:edition")[0]), 17,
             "Type filter works"
         )
         self.assertEqual(
@@ -102,11 +102,11 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "Type filter works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(lang="deu")[0]), 1,
+            len(Repository.__getTextMetadata__(lang="deu")[0]), 2,
             "Filtering on language works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(category="cts:edition", lang="ger")[0]), 0,
+            len(Repository.__getTextMetadata__(category="cts:edition", lang="deu")[0]), 1,
             "Type filter + lang works"
         )
         self.assertEqual(
@@ -153,7 +153,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "We should find Passau 73, version 1"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__()[0]), 18,
+            len(Repository.__getTextMetadata__()[0]), 19,
             "Texts repeated in the two repos should not be repeated in the resolver."
         )
 
@@ -425,20 +425,20 @@ class TextXMLFolderResolver(TestCase):
             "Members of Inventory should be TextGroups"
         )
         self.assertEqual(
-            len(metadata.members[0].members), 4,
+            len(metadata.members[0].members), 5,
             "There should be four grandchildren to top-level Collection."
         )
         self.assertEqual(
-            len(metadata.descendants), 34,
+            len(metadata.descendants), 37,
             "There should be as many descendants as there is readables plus collections + 1 "
             "for default inventory"
         )
         self.assertEqual(
-            len(metadata.readableDescendants), 18,
+            len(metadata.readableDescendants), 19,
             "There should be as many readable descendants as there is readables"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, CapitainsReadableMetadata)]), 18,
+            len([x for x in metadata.readableDescendants if isinstance(x, CapitainsReadableMetadata)]), 19,
             "There should be 18 readable descendants"
         )
         self.assertEqual(
@@ -605,6 +605,8 @@ class TextXMLFolderResolverDispatcher(TestCase):
         collected.set_label("Eine Sammelsammlung", "deu")
         collected = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
         collected.set_label("Salzburger Urkunden", "deu")
+        collected = CapitainsCollectionMetadata("urn:cts:formulae:elexicon", parent=tic)
+        collected.set_label("E-Lexikon Einträge", "deu")
 
         dispatcher = CollectionDispatcher(tic)
 
@@ -632,6 +634,12 @@ class TextXMLFolderResolverDispatcher(TestCase):
                 return True
             return False
 
+        @dispatcher.inventory("urn:cts:formulae:elexicon")
+        def dispatchPassau(collection, path=None, **kwargs):
+            if collection.id.startswith("urn:cts:formulae:elexicon"):
+                return True
+            return False
+
         resolver = XmlCapitainsLocalResolver(
             ["./tests/testing_data/guidelines_v3"],
             dispatcher=dispatcher
@@ -639,6 +647,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
         fulda_stuff = resolver.getMetadata("urn:cts:formulae:fulda_dronke")
         collected_stuff = resolver.getMetadata("a:different.identifier")
         passau_stuff = resolver.getMetadata("urn:cts:formulae:passau")
+        elexicon_stuff = resolver.getMetadata("urn:cts:formulae:elexicon")
         self.assertEqual(
             len(fulda_stuff.readableDescendants), 8,
             "There should be 8 readable descendants in Fulda"

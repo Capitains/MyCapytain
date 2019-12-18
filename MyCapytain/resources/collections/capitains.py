@@ -1,11 +1,12 @@
 from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
-from MyCapytain.resources.collections.cts import _parse_structured_metadata
+from MyCapytain.resources.collections.cts import _parse_structured_metadata, XmlCtsCitation
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
 from MyCapytain.resources.prototypes.capitains import collection as capitains
+from rdflib.namespace import DCTERMS
 
-XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/"})
+XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/", 'dct': 'http://purl.org/dc/terms/'})
 
 
 def _xpathDict(xml, xpath, cls, parent, **kwargs):
@@ -32,54 +33,13 @@ def _xpathDict(xml, xpath, cls, parent, **kwargs):
     return children
 
 
-class XmlCapitainsCitation(CitationPrototype):
-    """ XmlCtsCitation XML implementation for CtsTextInventoryMetadata
-
-    """
-
-    @classmethod
-    def ingest(cls, resource, element=None, xpath="ti:citation"):
-        """ Ingest xml to create a citation
-
-        :param resource: XML on which to do xpath
-        :param element: Element where the citation should be stored
-        :param xpath: XPath to use to retrieve citation
-
-        :return: XmlCapitainsCitation
-        """
-        # Reuse of of find citation
-        results = resource.xpath(xpath, namespaces=XPATH_NAMESPACES)
-        if len(results) > 0:
-            citation = cls(
-                name=results[0].get("label"),
-                xpath=results[0].get("xpath"),
-                scope=results[0].get("scope")
-            )
-
-            if isinstance(element, cls):
-                element.child = citation
-                cls.ingest(
-                    resource=results[0],
-                    element=element.child
-                )
-            else:
-                element = citation
-                cls.ingest(
-                    resource=results[0],
-                    element=element
-                )
-
-            return citation
-
-        return None
-
-
 class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
     """ Represents a general Capitains CtsTextMetadata
 
     """
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
-    CLASS_CITATION = XmlCapitainsCitation
+    # We may want to update this at some point to XmlCapitainsCitation.
+    CLASS_CITATION = XmlCtsCitation
 
     @staticmethod
     def __findCitations(obj, xml, xpath="ti:citation"):
@@ -111,9 +71,12 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
 
         obj.citation = cls.CLASS_CITATION.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
 
-        # Added for commentary
-        for child in xml.xpath("ti:about", namespaces=XPATH_NAMESPACES):
-            obj.set_link(RDF_NAMESPACES.CTS.term("about"), child.get('urn'))
+        # Added for links to other documents
+        for child in xml.xpath("dct:references|dct:isReferencedBy", namespaces=XPATH_NAMESPACES):
+            if 'Referenced' in child.tag:
+                obj.set_link(DCTERMS.term("isReferencedBy"), child.get('urn'))
+            else:
+                obj.set_link(DCTERMS.term("references"), child.get('urn'))
 
         _parse_structured_metadata(obj, xml)
 
@@ -183,7 +146,7 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
         for child in xml.xpath("dc:title", namespaces=XPATH_NAMESPACES):
             lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
             if lg is not None:
-                o.set_label(child.text, lg)
+                o.set_capitains_property('title', child.text, lg)
 
         _parse_structured_metadata(o, xml)
 

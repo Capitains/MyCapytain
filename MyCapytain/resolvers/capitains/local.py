@@ -13,8 +13,9 @@ from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.errors import UnknownObjectError, UndispatchedTextError
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
-from MyCapytain.resources.collections.capitains import XmlCapitainsCitation, XmlCapitainsCollectionMetadata, \
+from MyCapytain.resources.collections.capitains import XmlCapitainsCollectionMetadata, \
     XmlCapitainsReadableMetadata
+from MyCapytain.resources.collections.cts import XmlCtsCitation
 from MyCapytain.resources.prototypes.capitains.collection import CapitainsCollectionMetadata
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
 
@@ -50,7 +51,7 @@ class XmlCapitainsLocalResolver(Resolver):
         "textgroup": XmlCapitainsCollectionMetadata,
         "inventory": XmlCapitainsCollectionMetadata,
         "inventory_collection": XmlCapitainsCollectionMetadata,
-        "citation": XmlCapitainsCitation
+        "citation": XmlCtsCitation
     }
 
     DEFAULT_PAGE = 1

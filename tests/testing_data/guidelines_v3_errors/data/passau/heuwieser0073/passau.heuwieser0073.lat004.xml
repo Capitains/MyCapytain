@@ -4,7 +4,7 @@
    <teiHeader xml:lang="deu">
       <fileDesc>
          <titleStmt>
-            <title>Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</title>
+            <title>Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</title>
          </titleStmt>
          <editionStmt>
             <edition>
@@ -59,7 +59,7 @@
                      <pubPlace>München</pubPlace>
                      <date when="1930" n="originalAusgabe">1930</date>
                      <date when="1969" n="neudruck">1969</date>
-                     <biblScope unit="pp">69-70</biblScope>
+                     <biblScope unit="pp">61-62</biblScope>
                   </imprint>
                </monogr>
                <series>
@@ -72,26 +72,25 @@
       </fileDesc>
       <encodingDesc>
          <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription der Traditionen des Hochstifts Passau, welche 1930 von Max Heuwieser herausgegeben worden ist.Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt</p>
-         <!--<refsDecl n="CTS">
+         <refsDecl n="CTS">
             <cRefPattern matchPattern="(.+)" n="charta" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
-         </refsDecl>-->
+         </refsDecl>
       </encodingDesc>
    </teiHeader>
-   <text type="charta" xml:id="passau.heuwieser0083">
+   <text type="charta" xml:id="passau.heuwieser0073">
       <front xml:lang="deu">
          <div type="section" subtype="regest">
-            <p>EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</p>
+            <p>ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH). </p>
          </div>
-         <dateline>866-874<date notBefore="0866" notAfter="0874"/></dateline></front>
+         <div type="section" subtype="ausstellungsort">
+            <p>Triftern</p>
+         </div>
+         <dateline>818-838.<date notBefore="0818" notAfter="0838"/></dateline></front>
       <body>
-                     <div type="edition" xml:lang="lat" n="urn:cts:formulae:passau.heuwieser0083.lat002">
+                     <div type="edition" xml:lang="lat" n="urn:cts:formulae:passau.heuwieser0073.lat004">
                         <div type="textpart" subtype="charta" n="1">
                            <p xml:space="preserve">
-                              <w>b</w>) <w>In</w> <w>nomine</w> <w>domini</w>. <w>Sit</w> <w>omnibus</w> <w>notum</w>, <w>qualiter</w> <w>ego</w> <w>Einheri</w> <w>una</w> <w>cum</w> <w>coniuge</w> <w>mea</w> <w>nomine</w> <w>Irmsuind</w> <w>talem</w> <w>hereditatem</w> <w>qualem</w> <w>ad</w> <w>Euuisteti</w> <w>habuimus</w> <w>tradidimus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>et</w> <w>mancipia</w> <w>ista</w> <w>Teotol</w> <w>et</w> <w>Ratni</w> <w>uxor</w> <w>eius</w> <w>in</w> <w>ea</w> <w>tamen</w> <w>ratione</w>, <w>ut</w> <w>nos</w> <w>ad</w> <w>vitam</w> <w>nostram</w> <w>hec</w> <w>teneamus</w> <w>et</w> <w>insuper</w> <w>illam</w> <w>terram</w> <w>a</w> <w>supradicto</w> <w>loco</w>, <w>quam</w> <w>Gaganhard</w> <w>presbiter</w> <w>frater</w> <w>meus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>tradidit</w> <w>ad</w> <w>vitam</w> <w>nostram</w> <w>in</w> <w>beneficio</w> <w>habeamus</w> <w>ab</w> <w>episcopo</w> <w>Patauiae</w> <w>civitatis</w> <w>nomine</w> <w>Ermenrich</w> <w>vel</w> <w>successore</w> <w>eius</w> <w>et</w> <w>post</w> <w>obitum</w> <w>meum</w> <w>seu</w> <w>coniugis</w> <w>meae</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>omnia</w> <w>redeant</w> <w>et</w> <w>quecumque</w> <w>tradidimus</w> <w>in</w> <w>domibus</w> <w>in</w> <w>edificiis</w> <w>in</w> <w>silvis</w> 
-                              <w>cultis</w> <w>et</w> <w>incultis</w> <w>in</w> <w>viis</w> <w>et</w> <w>in</w> <w>inviis</w> <w>in</w> <w>agris</w> <w>in</w> <w>pascuis</w> <w>in</w> <w>campis</w> <w>in</w> <w>finibus</w> <w>omnia</w> <w>in</w> <w>memoria</w> <w>nostra</w> <w>et</w> <w>parentum</w> <w>nostrorum</w> <w>ad</w> <w>domum</w> <w>dei</w> <w>pertineant</w> <w>sine</w> <w>ullo</w> <w>contradictu</w>. </p>
-                           <p xml:space="preserve">
-                              <w>Et</w> <w>hi</w> <w>sunt</w> <w>testes</w> <w>per</w> <w>aurem</w> <w>attracti</w>: <w>Rihgouuo</w>. <w>Gotescalc</w>. <w>Rumolt</w>. <w>Engildeo</w>.
-                           </p>
+                              <w>c</w>) (<w>C</w>) <w>Ad</w> <w>Chalpaha</w> <w>qui</w> <w>vocatur</w> <w>Eotindorf</w> <w>habuit</w> <w>Ipurkc</w> <w>ibidem</w> <w>illa</w> <w>reddidit</w> <w>etconomus</w> <w>eius</w> <w>koram</w> <w>Kerolte</w> <w>comite</w> <w>atque</w> <w>misso</w> <w>dominico</w> <w>et</w> <w>in</w> <w>presentia</w> <w>nostra</w> <w>seu</w> <w>in</w> <w>manus</w> <w>vocati</w> <w>nostri</w> <w>non</w> <w>potuimus</w> <w>ad</w> <w>vestituram</w> <w>pervenire</w>.</p>
                         </div>
                      </div>
                   </body>

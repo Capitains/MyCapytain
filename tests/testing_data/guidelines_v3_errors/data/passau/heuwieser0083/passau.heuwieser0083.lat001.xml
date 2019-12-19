@@ -72,9 +72,9 @@
       </fileDesc>
       <encodingDesc>
          <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription der Traditionen des Hochstifts Passau, welche 1930 von Max Heuwieser herausgegeben worden ist.Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt</p>
-         <!--<refsDecl n="CTS">
+         <refsDecl n="CTS">
             <cRefPattern matchPattern="(.+)" n="charta" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
-         </refsDecl>-->
+         </refsDecl>
       </encodingDesc>
    </teiHeader>
    <text type="charta" xml:id="passau.heuwieser0083">
@@ -84,13 +84,15 @@
          </div>
          <dateline>866-874<date notBefore="0866" notAfter="0874"/></dateline></front>
       <body>
-                     <div type="edition" xml:lang="lat" n="urn:cts:formulae:passau.heuwieser0083.lat002">
+                     <div type="edition" xml:lang="lat" n="urn:cts:formulae:passau.heuwieser0083.lat001">
                         <div type="textpart" subtype="charta" n="1">
                            <p xml:space="preserve">
-                              <w>b</w>) <w>In</w> <w>nomine</w> <w>domini</w>. <w>Sit</w> <w>omnibus</w> <w>notum</w>, <w>qualiter</w> <w>ego</w> <w>Einheri</w> <w>una</w> <w>cum</w> <w>coniuge</w> <w>mea</w> <w>nomine</w> <w>Irmsuind</w> <w>talem</w> <w>hereditatem</w> <w>qualem</w> <w>ad</w> <w>Euuisteti</w> <w>habuimus</w> <w>tradidimus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>et</w> <w>mancipia</w> <w>ista</w> <w>Teotol</w> <w>et</w> <w>Ratni</w> <w>uxor</w> <w>eius</w> <w>in</w> <w>ea</w> <w>tamen</w> <w>ratione</w>, <w>ut</w> <w>nos</w> <w>ad</w> <w>vitam</w> <w>nostram</w> <w>hec</w> <w>teneamus</w> <w>et</w> <w>insuper</w> <w>illam</w> <w>terram</w> <w>a</w> <w>supradicto</w> <w>loco</w>, <w>quam</w> <w>Gaganhard</w> <w>presbiter</w> <w>frater</w> <w>meus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>tradidit</w> <w>ad</w> <w>vitam</w> <w>nostram</w> <w>in</w> <w>beneficio</w> <w>habeamus</w> <w>ab</w> <w>episcopo</w> <w>Patauiae</w> <w>civitatis</w> <w>nomine</w> <w>Ermenrich</w> <w>vel</w> <w>successore</w> <w>eius</w> <w>et</w> <w>post</w> <w>obitum</w> <w>meum</w> <w>seu</w> <w>coniugis</w> <w>meae</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>omnia</w> <w>redeant</w> <w>et</w> <w>quecumque</w> <w>tradidimus</w> <w>in</w> <w>domibus</w> <w>in</w> <w>edificiis</w> <w>in</w> <w>silvis</w> 
-                              <w>cultis</w> <w>et</w> <w>incultis</w> <w>in</w> <w>viis</w> <w>et</w> <w>in</w> <w>inviis</w> <w>in</w> <w>agris</w> <w>in</w> <w>pascuis</w> <w>in</w> <w>campis</w> <w>in</w> <w>finibus</w> <w>omnia</w> <w>in</w> <w>memoria</w> <w>nostra</w> <w>et</w> <w>parentum</w> <w>nostrorum</w> <w>ad</w> <w>domum</w> <w>dei</w> <w>pertineant</w> <w>sine</w> <w>ullo</w> <w>contradictu</w>. </p>
+                              <w>a</w>) <w>In</w> <w>nomine</w> <w>omnipotentis</w> <w>dei</w>. 
+                              <w>Sit</w> <w>omnibus</w> <w>in</w> <w>Christo</w> <w>fidelibus</w> <w>notum</w>, <w>quomodo</w> <w>vero</w> <w>Einheri</w> <w>una</w> <w>cum</w> <w>coniuge</w> <w>mea</w> <w>nomine</w> <w>Irminsuuinda</w> <w>talem</w> <w>hereditatem</w> <w>qualem</w> <w>ad</w> <w>Euuisteti</w> <w>habuimus</w> <w>tradidimus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>et</w> <w>mancipia</w> <w>ista</w> <w>Deotolf</w> <w>et</w> <w>Ratni</w> <w>uxor</w> <w>eius</w> <w>tamen</w> <w>in</w> <w>ea</w> <w>ratione</w>, <w>ut</w> <w>nos</w> <w>haec</w> <w>teneamus</w> <w>ad</w> <w>minuuitatem</w> <w>nostrorum</w> <w>macula</w> <w>delictorum</w> <w>et</w> <w>ad</w> <w>prosperitatem</w> <w>vitae</w> <w>nostrae</w> <w>et</w> <w>insuper</w> <w>illam</w> <w>terram</w> <w>a</w> <w>supradicto</w> <w>loco</w> <w>quam</w> <w>Gaganhardus</w> <w>presbiter</w> <w>frater</w> <w>meus</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>tradidit</w>, <w>ut</w> <w>simul</w> <w>habeamus</w> <w>ad</w> <w>beneficium</w> <w>vitae</w> <w>nostrae</w> <w>ab</w> <w>Ermenrico</w> <w>episcopo</w> <w>Patauiae</w> <w>civitatis</w> <w>vel</w> <w>successore</w> <w>eius</w> <w>et</w> <w>post</w> <w>obitum</w> <w>meum</w> <w>seu</w> <w>coniugis</w> <w>meae</w> <w>ad</w> 
+                              <w>sanctum</w> <w>Stephanum</w> <w>omnia</w> <w>redeant</w> <w>et</w> <w>quaecumque</w> <w>tradidimus</w> <w>in</w> <w>domibus</w> <w>in</w> <w>aedificiis</w> <w>in</w> <w>silvis</w> <w>cultis</w> <w>et</w> <w>incultis</w> <w>in</w> <w>viis</w> <w>vel</w> <w>in</w> <w>inviis</w> <w>in</w> <w>agris</w> <w>in</w> <w>pascuis</w> <w>in</w> <w>campis</w> <w>in</w> <w>finibus</w> <w>omnia</w> <w>pertineant</w> <w>ad</w> <w>nostram</w> <w>memoriam</w> <w>et</w> <w>parentum</w> <w>nostrorum</w> <w>ad</w> <w>domum</w> <w>dei</w> <w>sancti</w> <w>prefati</w> <w>pertineant</w> <w>aut</w> <w>absque</w> <w>ullam</w> <w>contradiccionem</w>.
+                           </p>
                            <p xml:space="preserve">
-                              <w>Et</w> <w>hi</w> <w>sunt</w> <w>testes</w> <w>per</w> <w>aurem</w> <w>attracti</w>: <w>Rihgouuo</w>. <w>Gotescalc</w>. <w>Rumolt</w>. <w>Engildeo</w>.
+                              <w>Et</w> <w>hii</w> <w>sunt</w> <w>testes</w> <w>per</w> <w>aurem</w> <w>ad</w> <w>tracti</w>: <w>Rihguuo</w>. <w>Gutascalhc</w>. <w>Rumolt</w>. <w>Engildeo</w>. <w>Engilpern</w>. <w>Atto</w>. <w>Suuidger</w>.
                            </p>
                         </div>
                      </div>

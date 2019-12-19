@@ -162,8 +162,6 @@ class PrototypeCapitainsCollection(Collection):
 
         strings = []
         for pred in self.CAPITAINS_PROPERTIES:
-            print(pred)
-            print(self.metadata.export())
             for obj in self.metadata.get(pred):
                 strings.append(
                     make_xml_node(
@@ -215,7 +213,7 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
     TYPE_URI = RDF_NAMESPACES.CAPITAINS.term("readable")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.resource)
     EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
-    CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.label, RDF_NAMESPACES.CAPITAINS.description]
+    CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.title, RDF_NAMESPACES.CAPITAINS.description]
     CAPITAINS_LINKS = [RDF_NAMESPACES.CAPITAINS.about]
 
     def __init__(self, urn="", parent=None, lang=None):

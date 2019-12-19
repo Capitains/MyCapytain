@@ -54,8 +54,8 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "The collected collection is found."
         )
         self.assertEqual(
-            len(collected_collection.texts), 4,
-            "The collected collection has 4 readable versions."
+            len(collected_collection.texts), 5,
+            "The collected collection has 5 readable versions."
         )
 
     def test_text_resource(self):
@@ -130,8 +130,8 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "URN Filtering works. 7 texts should be found in Passau."
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(urn="a:different.identifier")[0]), 4,
-            "URN Filtering works. 4 texts should be found in a:different.identifier"
+            len(Repository.__getTextMetadata__(urn="a:different.identifier")[0]), 5,
+            "URN Filtering works. 5 texts should be found in a:different.identifier"
         )
         self.assertEqual(
             len(Repository.__getTextMetadata__(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 1,
@@ -164,6 +164,11 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             len(Repository.__getTextMetadata__(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 0,
             "Texts without citations were ignored"
         )
+
+    def test_get_capabilities_errors(self):
+        """ Check Get Capabilities latinLit data"""
+        with self.assertRaises(IndexError):
+            XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3_errors"])
 
     def test_pagination(self):
         self.assertEqual(
@@ -438,6 +443,10 @@ class TextXMLFolderResolver(TestCase):
             "There should be as many readable descendants as there is readables"
         )
         self.assertEqual(
+            len(metadata.readableDescendants), len(metadata.texts),
+            "There should be as many readable descendants as there is texts"
+        )
+        self.assertEqual(
             len([x for x in metadata.readableDescendants if isinstance(x, CapitainsReadableMetadata)]), 19,
             "There should be 18 readable descendants"
         )
@@ -656,8 +665,8 @@ class TextXMLFolderResolverDispatcher(TestCase):
             fulda_stuff, CapitainsCollectionMetadata, "should be collection"
         )
         self.assertEqual(
-            len(collected_stuff.readableDescendants), 4,
-            "There should be 4 readable descendants in the collected collection"
+            len(collected_stuff.readableDescendants), 5,
+            "There should be 5 readable descendants in the collected collection"
         )
         self.assertEqual(
             len(passau_stuff.descendants), 9,

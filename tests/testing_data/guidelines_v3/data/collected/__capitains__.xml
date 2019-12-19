@@ -15,6 +15,7 @@
       <bib:AbbreviatedTitle>Collected</bib:AbbreviatedTitle>
    </structured-metadata>
    <members>
+      <collection path="../fulda_dronke/dronke0004a/__capitains__.xml" identifier="urn:cts:formulae:fulda_dronke.dronke0004a"/>
       <collection path="../passau/heuwieser0083/__capitains__.xml" identifier="urn:cts:formulae:passau.heuwieser0083"/>
       <collection readable="true" path="../passau/heuwieser0073/passau.heuwieser0073.lat001.xml">
          <identifier>urn:cts:formulae:passau.heuwieser0073.lat001_as_com</identifier>

@@ -298,9 +298,13 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertIsInstance(TI["default"], XmlCapitainsCollectionMetadata)
         self.assertIsInstance(TI["urn:cts:formulae:fulda_dronke"], XmlCapitainsCollectionMetadata)
         self.assertEqual(TI["urn:cts:formulae:fulda_dronke.dronke0041"].urn, "urn:cts:formulae:fulda_dronke.dronke0041")
-        self.assertEqual(TI["urn:cts:formulae:fulda_dronke.dronke0041"].lang, 'None', "Non-readable should not have a language")
+        self.assertEqual(TI["urn:cts:formulae:fulda_dronke.dronke0041"].lang, None, "Non-readable should not have a language")
         self.assertEqual(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].lang, 'lat', "Readable should have a language")
         self.assertIsInstance(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"], XmlCapitainsReadableMetadata)
+        self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_label()),
+                         'Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41')
+        self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_subject()),
+                         'Medieval Charter')
 
     def test_xml_Textgroup_GetItem(self):
         """ Test access through getItem obj[urn] """
@@ -369,6 +373,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         </cpt:collection>""".replace("\n", "")
         W, children = XmlCapitainsCollectionMetadata.parse(resource=xml, _with_children=True)
         self.assertEqual(len(W.get_translation_in()), 3)
+        self.assertEqual(len(W.readableDescendants[0].translations()), 3)
+        self.assertEqual([str(x) for x in W.readableDescendants[0].get_root_collection()], ['Abbas, abbatissa'])
         self.assertEqual(len(W.get_translation_in("eng")), 2)
         self.assertEqual(
             W.metadata.export(
@@ -616,7 +622,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(
             len(TG2), 2,
-            "There is one edition in TG1"
+            "There are 2 editions in TG2"
         )
         TG3 = TG1.update(TG2)
         self.assertEqual(
@@ -825,6 +831,7 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
         TI2, children = XmlCapitainsCollectionMetadata.parse(resource=wrapper.format(tg=coll2),
                                                              _with_children=True, recursive=True)
         TI3 = TI1.update(TI2)
+        self.assertEqual(TI1, TI1, "Make sure that the same collection is equal to itself.")
         self.assertEqual(
             len(TI3), 1,
             "There is only one text in merged objects"
@@ -833,6 +840,11 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             [x.id for x in TI3["urn:cts:formulae:salzburg"].parent],
             ['default', 'default2'],
             "The single textgroup should have both collections as parents."
+        )
+        self.assertCountEqual(
+            [x.id for x in TI3["urn:cts:formulae:salzburg"].parents][:2],
+            ['default', 'default2'],
+            "Make sure that the first two elements of parents are the direct parents."
         )
         self.assertListEqual(
             sorted(TI3["defaultTic"].members, key=lambda x: str(x.urn)),

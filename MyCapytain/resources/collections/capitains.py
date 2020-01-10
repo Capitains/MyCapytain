@@ -67,13 +67,6 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
 
         obj.citation = cls.CLASS_CITATION.ingest(xml, obj.citation, "cpt:structured-metadata/ti:online/ti:citationMapping/ti:citation")
 
-        # Added for links to other documents
-        for child in xml.xpath("dct:references|dct:isReferencedBy", namespaces=XPATH_NAMESPACES):
-            if 'Referenced' in child.tag:
-                obj.set_link(DCTERMS.term("isReferencedBy"), child.get('urn'))
-            else:
-                obj.set_link(DCTERMS.term("references"), child.get('urn'))
-
         _parse_structured_metadata(obj, xml)
 
         """

@@ -696,6 +696,8 @@ class TextXMLFolderResolverDispatcher(TestCase):
             str(collected_stuff.get_label(lang="deu")), "Eine Sammelsammlung",
             "Label should be correct"
         )
+        self.assertEqual(len(collected_stuff['urn:cts:formulae:passau.heuwieser0083.lat001'].get_root_collection()), 2,
+                         'Passau 83 should belong to two root collections.')
 
         with self.assertRaises(KeyError):
             _ = fulda_stuff["urn:cts:formulae:salzburg.hauthaler-a0100"]

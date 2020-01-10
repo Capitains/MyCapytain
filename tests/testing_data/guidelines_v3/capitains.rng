@@ -307,30 +307,6 @@
       </choice>
     </element>
   </define>
-  <define name="dct.isReferencedBy">
-    <element name="dct:isReferencedBy">
-      <a:documentation xml:lang="eng"> A related resource that references, cites, or otherwise points to the described resource. </a:documentation>
-      <ref name="identifier.att"></ref>
-      <optional>
-        <ref name="lang-att"/>
-      </optional>
-      <choice>
-        <text/>
-      </choice>
-    </element>
-  </define>
-  <define name="dct.references">
-    <element name="dct:references">
-      <a:documentation xml:lang="eng"> A related resource that is referenced, cited, or otherwise pointed to by the described resource. </a:documentation>
-      <ref name="identifier.att"></ref>
-      <optional>
-        <ref name="lang-att"/>
-      </optional>
-      <choice>
-        <text/>
-      </choice>
-    </element>
-  </define>
   <define name="lang-att">
     <attribute>
       <a:documentation xml:lang="eng">Language in which the current node is
@@ -352,8 +328,6 @@
             <except>
               <nsName ns="http://purl.org/dc/elements/1.1/"/>
               <nsName ns="http://purl.org/ns/capitains"/>
-              <name ns="http://purl.org/dc/terms/">isReferencedBy</name>
-              <name ns="http://purl.org/dc/terms/">references</name>
             </except>
           </anyName>
           <optional>
@@ -361,12 +335,6 @@
           </optional>
           <text/>
         </element>
-      </zeroOrMore>
-      <zeroOrMore>
-        <ref name="dct.isReferencedBy"/>
-      </zeroOrMore>
-      <zeroOrMore>
-        <ref name="dct.references"/>
       </zeroOrMore>
     </element>
   </define>

@@ -162,100 +162,6 @@ class PrototypeCapitainsCollection(Collection):
             return next(iter(x.values()))
         return x
 
-    def set_capitains_property(self, prop, value, lang=None):
-        """ Set given property in CAPITAINS Namespace
-
-        .. example::
-            collection.set_capitains_property("groupname", "MyCapytain", "eng")
-
-        :param prop: Property to set (Without namespace)
-        :param value: Value to set for given property
-        :param lang: Language to set for given value
-        """
-        if not isinstance(value, Literal):
-            value = Literal(value, lang=lang)
-        prop = RDF_NAMESPACES.CAPITAINS.term(prop)
-
-        if prop == self.DC_TITLE_KEY:
-            self.set_label(value, lang)
-
-        self.metadata.add(prop, value)
-
-    # new for commentary
-    def get_link(self, prop):
-        """ Get given link in CAPITAINS Namespace
-
-        .. example::
-            collection.get_link("about")
-
-        :param prop: Property to get (Without namespace)
-        :return: whole set of values
-        :rtype: list
-        """
-        return list(self.metadata.get(prop))
-
-    def set_link(self, prop, value):
-        """ Set given link in CAPITAINS Namespace
-
-        .. example::
-            collection.set_link(NAMESPACES.CAPITAINS.about, "urn:cts:latinLit:phi1294.phi002")
-
-        :param prop: Property to set (Without namespace)
-        :param value: Value to set for given property
-        """
-        # https://rdflib.readthedocs.io/en/stable/
-        # URIRef == identifiers (urn, http, URI in general)
-        # Literal == String or Number (can have a language)
-        # BNode == Anonymous nodes (So no specific identifier)
-        #		eg. BNode : Edition(MartialEpigrams:URIRef) ---has_metadata--> Metadata(BNode)
-        if not isinstance(value, URIRef):
-            value = URIRef(value)
-
-        self.metadata.add(prop, value)
-
-    def __xml_export_generic__(self, attrs, namespaces=False, lines="\n", members=None, output=None):
-        """ Shared method for Mimetypes.XML.CTS Export
-
-        :param attrs: Dictionary of attributes for the node
-        :param namespaces: Add namespaces to the node
-        :param lines: New Line Character (Can be empty)
-        :return: String representation of XML Nodes
-        """
-
-        TYPE_URI = self.TYPE_URI
-
-        strings = []
-        for pred in self.CAPITAINS_PROPERTIES:
-            for obj in self.metadata.get(pred):
-                strings.append(
-                    make_xml_node(
-                        self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
-                    )
-                )
-
-        if output == Mimetypes.XML.CapiTainS.CTS:
-            strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata")))
-            strings.append(
-                self.metadata.export(
-                    Mimetypes.XML.CapiTainS.CTS,
-                    exclude=[RDF_NAMESPACES.CTS, RDF_NAMESPACES.DTS, RDF])
-            )
-            strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata"), close=True))
-
-        if members is None:
-            members = self.members
-        for obj in members:
-            strings.append(obj.export(output, namespaces=False))
-
-        strings.append(make_xml_node(self.graph, TYPE_URI, close=True))
-
-        if namespaces is True:
-            attrs.update(self.__namespaces_header__(cpt=(output == Mimetypes.XML.CapiTainS.CTS)))
-
-        strings = [make_xml_node(self.graph, TYPE_URI, close=False, attributes=attrs)] + strings
-
-        return lines.join(strings)
-
     def __export__(self, output=None, domain="", namespaces=True, lines="\n", recursion_depth=0):
         """
 
@@ -393,7 +299,10 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         :param key: Language ISO Code to filter on
         :return:
         """
-        return self.parent.get_translation_in(key)
+        translations = []
+        for parent in self.parent:
+            translations.extend(parent.get_translation_in(key))
+        return translations
 
     @property
     def readable_siblings(self):
@@ -413,12 +322,14 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
 
         :param lang: Language to retrieve
         :return: Creator string representation
-        :rtype: Literal
+        :rtype: [Literal]
         """
-        ancestor = self.parent
-        while ancestor.parent:
-            ancestor = ancestor.parent
-        return ancestor.get_label(lang=lang)
+        root_colls = []
+        for parent in self.parents:
+            if len(parent.parents) == 1 and parent.parents[0].parents == []:
+                root_colls.append(parent.get_label(lang=lang))
+
+        return root_colls
 
     def get_title(self, lang=None):
         """ Get the DC Title of the object
@@ -500,16 +411,7 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
 
         :return: List of available languages
         """
-        return str(self.graph.value(self.asNode(), DC.language))
-
-    @lang.setter
-    def lang(self, lang):
-        """ Language this text is available in
-
-        :param lang: Language to add
-        :type lang: str
-        """
-        self.graph.set((self.asNode(), DC.language, Literal(lang)))
+        return None
 
     def update(self, other):
         """ Merge two CapitainsCollectionMetadata Objects.

@@ -374,7 +374,6 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         W, children = XmlCapitainsCollectionMetadata.parse(resource=xml, _with_children=True)
         self.assertEqual(len(W.get_translation_in()), 3)
         self.assertEqual(len(W.readableDescendants[0].translations()), 3)
-        self.assertEqual([str(x) for x in W.readableDescendants[0].get_root_collection()], ['Abbas, abbatissa'])
         self.assertEqual(len(W.get_translation_in("eng")), 2)
         self.assertEqual(
             W.metadata.export(

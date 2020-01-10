@@ -109,7 +109,8 @@
 <bib:editor>Heuwieser, Max</bib:editor>
 <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
 <dct:created></dct:created>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<dct:dateCopyrighted>1930</dct:dateCopyrighted>
+<dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:abstract xml:lang="deu"></dct:abstract>
 </cpt:structured-metadata>
 </cpt:collection>
@@ -131,8 +132,9 @@
 <cpt:structured-metadata>
 <bib:editor>Heuwieser, Max</bib:editor>
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
-<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:created></dct:created>
 <dct:abstract xml:lang="deu"></dct:abstract>
 </cpt:structured-metadata>
@@ -157,8 +159,9 @@
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
 <dct:created></dct:created>
 <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
-<dct:abstract xml:lang="deu"></dct:abstract>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <dct:abstract xml:lang="deu"></dct:abstract>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 </cpt:structured-metadata>
 </cpt:collection>
 <cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat005.xml" readable="true">
@@ -180,8 +183,9 @@
 <dct:created></dct:created>
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
 <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
-<bib:editor>Heuwieser, Max</bib:editor>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <bib:editor>Heuwieser, Max</bib:editor>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:abstract xml:lang="deu"></dct:abstract>
 </cpt:structured-metadata>
 </cpt:collection>
@@ -213,8 +217,9 @@
 <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
 <dc:description xml:lang="deu">EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</dc:description>
 <cpt:structured-metadata>
-<bib:editor>Heuwieser, Max</bib:editor>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <bib:editor>Heuwieser, Max</bib:editor>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
 <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
 <dct:abstract xml:lang="deu"></dct:abstract>
@@ -238,9 +243,10 @@
 <dc:source>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dc:source>
 <cpt:structured-metadata>
 <bib:editor>Heuwieser, Max</bib:editor>
-<dct:abstract xml:lang="deu"></dct:abstract>
-<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <dct:abstract xml:lang="deu">A great charter!</dct:abstract>
+    <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:created></dct:created>
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
 </cpt:structured-metadata>
@@ -622,8 +628,9 @@
 <cpt:structured-metadata>
 <dct:created></dct:created>
 <dct:abstract xml:lang="deu"></dct:abstract>
-<bib:editor>Heuwieser, Max</bib:editor>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <bib:editor>Heuwieser, Max</bib:editor>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
 <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
 </cpt:structured-metadata>
@@ -648,8 +655,9 @@
 <dct:abstract xml:lang="deu"></dct:abstract>
 <bib:editor>Heuwieser, Max</bib:editor>
 <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
-<dct:created></dct:created>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <dct:created></dct:created>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 </cpt:structured-metadata>
 </cpt:collection>
 <cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0004a/__capitains__.xml">
@@ -711,8 +719,9 @@
 <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
 <dc:description xml:lang="deu">EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</dc:description>
 <cpt:structured-metadata>
-<bib:editor>Heuwieser, Max</bib:editor>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <bib:editor>Heuwieser, Max</bib:editor>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
 <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
 <dct:abstract xml:lang="deu"></dct:abstract>
@@ -737,8 +746,9 @@
 <cpt:structured-metadata>
 <bib:editor>Heuwieser, Max</bib:editor>
 <dct:abstract xml:lang="deu"></dct:abstract>
-<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
-<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+    <rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
 <dct:created></dct:created>
 <dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
 </cpt:structured-metadata>

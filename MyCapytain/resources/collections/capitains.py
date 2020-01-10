@@ -4,7 +4,7 @@ from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
 from MyCapytain.resources.prototypes.capitains import collection as capitains
-from rdflib.namespace import DCTERMS
+from rdflib.namespace import DCTERMS, DC
 
 XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/", 'dct': 'http://purl.org/dc/terms/'})
 
@@ -59,17 +59,13 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
         :type xml: lxml.etree._Element
         """
 
-        for child in xml.xpath("dc:description", namespaces=XPATH_NAMESPACES):
-            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-            if lg is not None:
-                obj.set_capitains_property("description", child.text, lg)
+        for child in xml.getchildren():
+            if child.tag.startswith('{' + XPATH_NAMESPACES['dc']):
+                lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+                obj.metadata.add(DC.term(child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')),
+                                 child.text, lg)
 
-        for child in xml.xpath("dc:title", namespaces=XPATH_NAMESPACES):
-            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-            if lg is not None:
-                obj.set_capitains_property("title", child.text, lg)
-
-        obj.citation = cls.CLASS_CITATION.ingest(xml, obj.citation, "ti:online/ti:citationMapping/ti:citation")
+        obj.citation = cls.CLASS_CITATION.ingest(xml, obj.citation, "cpt:structured-metadata/ti:online/ti:citationMapping/ti:citation")
 
         # Added for links to other documents
         for child in xml.xpath("dct:references|dct:isReferencedBy", namespaces=XPATH_NAMESPACES):
@@ -95,6 +91,7 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
     def parse(cls, resource, parent=None):
         xml = xmlparser(resource)
         o = cls(urn=xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text, parent=parent)
+        o.metadata.set(RDF_NAMESPACES.CAPITAINS.identifier, o.id)
         lang = xml.xpath("dc:language", namespaces=XPATH_NAMESPACES)[0].text
         if lang is not None:
             o.lang = lang
@@ -124,12 +121,17 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
     CLASS_READABLE = XmlCapitainsReadableMetadata
 
     @classmethod
-    def parse(cls, resource, parent=None, _with_children=False):
+    def parse(cls, resource, parent=None, _with_children=False, recursive=False):
         """ Parse a resource
 
-        :param resource: Element rerpresenting a work
+        :param resource: Element rerpresenting a collection
         :param parent: Parent of the object
         :type parent: XmlCapitainsCollectionMetadata
+        :param _with_children: Whether to parse the children of the current collection
+        :type _with_children: bool
+        :param recursive: Whether to recurse all the way through the tree of the metadata file.
+            Note: recursive only recurses through the XML chunk currently being processed and does not seek other files.
+        :type recursive: bool
         """
         xml = xmlparser(resource)
         # This is for a remote collection
@@ -143,10 +145,12 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
         if parent is not None:
             o.parent = parent
 
-        for child in xml.xpath("dc:title", namespaces=XPATH_NAMESPACES):
-            lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-            if lg is not None:
-                o.set_capitains_property('title', child.text, lg)
+        o.metadata.set(RDF_NAMESPACES.CAPITAINS.identifier, o.id)
+        for child in xml.getchildren():
+            if child.tag.startswith('{' + XPATH_NAMESPACES['dc']):
+                lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
+                o.metadata.add(DC.term(child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')),
+                               child.text, lg)
 
         _parse_structured_metadata(o, xml)
 
@@ -159,7 +163,7 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
             ))
             children.extend(_xpathDict(
                 xml=xml, xpath='cpt:members/cpt:collection[not(@readable="true")]',
-                cls=cls, parent=o
+                cls=cls, parent=o, _with_children=recursive, recursive=recursive
             ))
             return o, children
         return o

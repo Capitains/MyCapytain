@@ -1,5 +1,5 @@
 from rdflib import Namespace, Graph
-from rdflib.namespace import SKOS
+from rdflib.namespace import SKOS, DC, DCTERMS, RDF, RDFS
 
 
 __all__ = [
@@ -20,7 +20,10 @@ XPATH_NAMESPACES = {
     "cpt": "http://purl.org/capitains/ns/1.0#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "xml": "http://www.w3.org/XML/1998/namespace",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "dct": "http://purl.org/dc/terms/",
+    "bib": "http://bibliotek-o.org/1.0/ontology/"
 }
 
 
@@ -85,6 +88,7 @@ class Mimetypes:
         RDFa = "application/rdfa+xml"
         CTS = "text/xml:CTS"
         TEI = "text/xml:tei"
+        GUIDELINES3 = "text/xml:CapiTainS_guidelinesv3"
 
         class CapiTainS:
             """ CapiTainS Guideline XML Structured metadata
@@ -116,7 +120,12 @@ GRAPH_BINDINGS = {
     "dts": RDF_NAMESPACES.DTS,
     "tei": RDF_NAMESPACES.TEI,
     "skos": SKOS,
-    "cpt": RDF_NAMESPACES.CAPITAINS
+    "cpt": RDF_NAMESPACES.CAPITAINS,
+    "dc": DC,
+    "dct": DCTERMS,
+    "bib": Namespace("http://bibliotek-o.org/1.0/ontology/"),
+    'rdf': RDF,
+    'rdfs': RDFS
 }
 
 

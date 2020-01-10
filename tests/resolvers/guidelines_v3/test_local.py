@@ -279,15 +279,18 @@ class TextXMLFolderResolver(TestCase):
         """ Test that we can get a full text with its metadata"""
         text_id = "urn:cts:formulae:salzburg.hauthaler-a0100.lat001"
         passage = self.resolver.getTextualNode(text_id, metadata=True)
-        self.assertEqual(passage.metadata.export(output=Mimetypes.JSON.LD),
-                         self.resolver.getMetadata(objectId=text_id).metadata.export(output=Mimetypes.JSON.LD))
+        # At this point, the text and passage classes do not export using the same methods as the metadata classes
+        # This will probably remain the case until the text and passage classes are updated to the new guidelines 3
+        # standards.
+        # self.assertEqual(passage.metadata.export(output=Mimetypes.JSON.LD),
+        #                  self.resolver.getMetadata(objectId=text_id).export(output=Mimetypes.JSON.LD))
 
         self.assertIsInstance(
             passage, PrototypeCtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_NAMESPACES.CAPITAINS.term('title'), 'deu']),
+            str(passage.metadata[DC.term('title'), 'deu']),
             "Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
@@ -297,7 +300,7 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertIn(
             "a) Der Edle Vodalhard (Odalhard) übergibt dem Erzbischof 7 Huben am Ergoltsbach",
-            str(passage.metadata[RDF_NAMESPACES.CAPITAINS.term("description"), "deu"]),
+            str(passage.metadata[DC.term("description"), "deu"]),
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
@@ -366,14 +369,17 @@ class TextXMLFolderResolver(TestCase):
         passage = self.resolver.getTextualNode(
             text_id, subreference="1.2", metadata=True, prevnext=True
         )
-        self.assertEqual(passage.metadata.export(output=Mimetypes.JSON.LD),
-                         self.resolver.getMetadata(objectId=text_id).metadata.export(output=Mimetypes.JSON.LD))
+        # At this point, the text and passage classes do not export using the same methods as the metadata classes
+        # This will probably remain the case until the text and passage classes are updated to the new guidelines 3
+        # standards.
+        # self.assertEqual(passage.metadata.export(output=Mimetypes.JSON.LD),
+        #                  self.resolver.getMetadata(objectId=text_id).metadata.export(output=Mimetypes.JSON.LD))
         self.assertIsInstance(
             passage, PrototypeCtsPassage,
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            str(passage.metadata[RDF_NAMESPACES.CAPITAINS.term('title'), 'deu']),
+            str(passage.metadata[DC.term('title'), 'deu']),
             "Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
@@ -383,7 +389,7 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertIn(
             "a) Der Edle Vodalhard (Odalhard) übergibt dem Erzbischof 7 Huben am Ergoltsbach",
-            str(passage.metadata[RDF_NAMESPACES.CAPITAINS.term("description"), "deu"]),
+            str(passage.metadata[DC.term("description"), "deu"]),
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
@@ -443,7 +449,7 @@ class TextXMLFolderResolver(TestCase):
             "There should be as many readable descendants as there is readables"
         )
         self.assertEqual(
-            len(metadata.readableDescendants), len(metadata.texts),
+            len(metadata.readableDescendants), len(self.resolver.texts),
             "There should be as many readable descendants as there is texts"
         )
         self.assertEqual(
@@ -451,8 +457,8 @@ class TextXMLFolderResolver(TestCase):
             "There should be 18 readable descendants"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
-                "//cpt:readable[@urn='urn:cts:formulae:passau.heuwieser0073.lat002']",
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE, recursion_depth=5).xpath(
+                "//cpt:collection/cpt:identifier[text()='urn:cts:formulae:passau.heuwieser0073.lat002']",
                 namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to Passau 73, version 2"
         )
@@ -466,7 +472,7 @@ class TextXMLFolderResolver(TestCase):
         """ Checks retrieval of Metadata information """
         metadata = self.resolver.getMetadata(objectId="urn:cts:formulae:passau.heuwieser0073")
         self.assertIsInstance(
-            metadata, Collection,
+            metadata, CapitainsCollectionMetadata,
             "Resolver should return a collection object"
         )
         self.assertIsInstance(
@@ -486,7 +492,7 @@ class TextXMLFolderResolver(TestCase):
             "All readable descendants should be CapitainsReadableMetadata"
         )
         self.assertIsInstance(
-            metadata.parent, CapitainsCollectionMetadata,
+            metadata.parent[0], CapitainsCollectionMetadata,
             "First parent should be CapitainsCollectionMetadata"
         )
         self.assertIsInstance(
@@ -494,9 +500,9 @@ class TextXMLFolderResolver(TestCase):
             "First parent should be CapitainsCollectionMetadata"
         )
         self.assertEqual(
-            len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
-                "//cpt:readable[@urn='urn:cts:formulae:passau.heuwieser0073.lat002']",
-                namespaces={"cpt": "http://purl.org/capitains/ns/1.0#"})), 1,
+            len(metadata.export(output=Mimetypes.PYTHON.ETREE, recursion_depth=1).xpath(
+                "//cpt:collection/cpt:identifier[text()='urn:cts:formulae:passau.heuwieser0073.lat002']",
+                namespaces=XPATH_NAMESPACES)), 1,
             "There should be one node in exported format corresponding to Passau 73, version 2"
         )
         self.assertCountEqual(
@@ -506,17 +512,31 @@ class TextXMLFolderResolver(TestCase):
              'urn:cts:formulae:passau.heuwieser0073.lat005'],
             "There should be five members in DTS JSON"
         )
+        self.assertCountEqual(
+            [x["@value"] for x in metadata.export(output=Mimetypes.JSON.LD)["cpt:children"]],
+            ['urn:cts:formulae:passau.heuwieser0073.lat001', 'urn:cts:formulae:passau.heuwieser0073.lat002',
+             'urn:cts:formulae:passau.heuwieser0073.lat003', 'urn:cts:formulae:passau.heuwieser0073.lat004',
+             'urn:cts:formulae:passau.heuwieser0073.lat005'],
+            "There should be five members in LD JSON"
+        )
+
+        corpus = self.resolver.getMetadata(objectId="urn:cts:formulae:passau")
+        self.assertIsInstance(
+            corpus, CapitainsCollectionMetadata,
+            "Resolver should return a collection object"
+        )
+        self.assertEqual(len(corpus.children), 2, 'Passau collection should have two children')
 
         readable = self.resolver.getMetadata(objectId="urn:cts:formulae:passau.heuwieser0073.lat001")
         self.assertIsInstance(
-            readable, CapitainsReadableMetadata, "Metadata should be commentary"
+            readable, CapitainsReadableMetadata, "Metadata should be CapitainsReadableMetadata"
         )
         self.assertEqual(
             readable.lang, "lat", "Language is Latin"
         )
         self.assertIn(
             "ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE",
-            readable.get_description("eng"),
+            readable.get_description("deu"),
             "Description should be the right one"
         )
 
@@ -606,16 +626,16 @@ class TextXMLFolderResolverDispatcher(TestCase):
     def test_dispatching_collections(self):
         tic = CapitainsCollectionMetadata()
         fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
-        fulda.set_label("Codex diplomaticus Fuldensis", "lat")
+        fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
         passau = CapitainsCollectionMetadata("urn:cts:formulae:passau", parent=tic)
-        passau.set_label("Passauer Urkunden", "deu")
+        passau.metadata.add(DC.title, "Passauer Urkunden", "deu")
         collected = CapitainsCollectionMetadata("a:different.identifier", parent=tic)
-        collected.set_label("A collected collection.", "eng")
-        collected.set_label("Eine Sammelsammlung", "deu")
+        collected.metadata.add(DC.title, "A collected collection.", "eng")
+        collected.metadata.add(DC.title, "Eine Sammelsammlung", "deu")
         collected = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
-        collected.set_label("Salzburger Urkunden", "deu")
+        collected.metadata.add(DC.title, "Salzburger Urkunden", "deu")
         collected = CapitainsCollectionMetadata("urn:cts:formulae:elexicon", parent=tic)
-        collected.set_label("E-Lexikon Einträge", "deu")
+        collected.metadata.add(DC.title, "E-Lexikon Einträge", "deu")
 
         dispatcher = CollectionDispatcher(tic)
 
@@ -670,7 +690,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
         )
         self.assertEqual(
             len(passau_stuff.descendants), 9,
-            "There should be 7 descendants in Passau"
+            "There should be 9 descendants in Passau"
         )
         self.assertEqual(
             str(collected_stuff.get_label(lang="deu")), "Eine Sammelsammlung",
@@ -683,7 +703,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
     def test_dispatching_error(self):
         tic = CapitainsCollectionMetadata()
         fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
-        fulda.set_label("Codex diplomaticus Fuldensis", "lat")
+        fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
         dispatcher = CollectionDispatcher(tic)
         # We remove default dispatcher
         dispatcher.__methods__ = []
@@ -715,14 +735,14 @@ class TextXMLFolderResolverDispatcher(TestCase):
     def test_dispatching_output(self):
         tic = CapitainsCollectionMetadata()
         fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
-        fulda.set_label("Codex diplomaticus Fuldensis", "lat")
+        fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
         passau = CapitainsCollectionMetadata("urn:cts:formulae:passau", parent=tic)
-        passau.set_label("Passauer Urkunden", "deu")
+        passau.metadata.add(DC.title, "Passauer Urkunden", "deu")
         collected = CapitainsCollectionMetadata("a:different.identifier", parent=tic)
-        collected.set_label("A collected collection.", "eng")
-        collected.set_label("Eine Sammelsammlung", "deu")
+        collected.metadata.add(DC.title, "A collected collection.", "eng")
+        collected.metadata.add(DC.title, "Eine Sammelsammlung", "deu")
         collected = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
-        collected.set_label("Salzburger Urkunden", "deu")
+        collected.metadata.add(DC.title, "Salzburger Urkunden", "deu")
 
         dispatcher = CollectionDispatcher(tic)
 
@@ -755,10 +775,13 @@ class TextXMLFolderResolverDispatcher(TestCase):
             dispatcher=dispatcher
         )
 
-        all = resolver.getMetadata().export(Mimetypes.XML.CTS)
-        fulda_stuff = resolver.getMetadata("urn:cts:formulae:fulda_dronke").export(Mimetypes.XML.CTS)
-        collected_stuff = resolver.getMetadata("a:different.identifier").export(Mimetypes.XML.CTS)
-        passau_stuff = resolver.getMetadata("urn:cts:formulae:passau").export(Mimetypes.XML.CTS)
+        all = resolver.getMetadata().export(Mimetypes.XML.GUIDELINES3, recursion_depth=5)
+        fulda_stuff = resolver.getMetadata("urn:cts:formulae:fulda_dronke").export(Mimetypes.XML.GUIDELINES3,
+                                                                                   recursion_depth=5)
+        collected_stuff = resolver.getMetadata("a:different.identifier").export(Mimetypes.XML.GUIDELINES3,
+                                                                                recursion_depth=5)
+        passau_stuff = resolver.getMetadata("urn:cts:formulae:passau").export(Mimetypes.XML.GUIDELINES3,
+                                                                              recursion_depth=5)
         get_graph().remove((None, None, None))
         fulda_stuff, collected_stuff, passau_stuff = XmlCapitainsCollectionMetadata.parse(fulda_stuff),\
                                                      XmlCapitainsCollectionMetadata.parse(collected_stuff), \

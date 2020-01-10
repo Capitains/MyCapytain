@@ -7,18 +7,17 @@
 
 """
 from __future__ import unicode_literals
-from six import text_type
 
 from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
 from MyCapytain.common.reference._capitains_cts import URN
 from MyCapytain.common.utils.xml import make_xml_node, xmlparser
-from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes
+from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes, GRAPH_BINDINGS
 from MyCapytain.errors import InvalidURN
 from collections import defaultdict
-from copy import deepcopy
 
 from rdflib import RDF, Literal, URIRef
 from rdflib.namespace import DC
+from typing import List
 
 __all__ = [
     "PrototypeCapitainsCollection",
@@ -38,15 +37,18 @@ class PrototypeCapitainsCollection(Collection):
     CAPITAINS_PROPERTIES = []
     CAPITAINS_LINKS = []
 
-    EXPORT_TO = [Mimetypes.PYTHON.ETREE]
+    EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.GUIDELINES3]
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
     SUBTYPE = "unknown"
+    TYPE_URI = RDF_NAMESPACES.CAPITAINS.term("collection")
+    COLLECTION_ATTRIBUTES = ['path', 'readable']
 
     def __init__(self, identifier=""):
         super(PrototypeCapitainsCollection, self).__init__(identifier)
 
         self.__urn__ = ""
         self.__subtype__ = self.SUBTYPE
+        self._parent = list()
 
     @property
     def urn(self):
@@ -71,6 +73,68 @@ class PrototypeCapitainsCollection(Collection):
         else:
             self.__subtype__ = str(val)
 
+    @property
+    def parents(self) -> List["Collection"]:
+        """ Iterator to find parents of current collection, from closest to furthest
+
+        :rtype: Generator[:class:`Collection`]
+        """
+        p = self.parent
+        parents = []
+        while p != []:
+            parents.extend(p)
+            new_p = []
+            for parent in p:
+                if isinstance(parent, list):
+                    new_p.extend([par.parent for par in parent])
+                else:
+                    new_p.extend(parent.parent)
+            p = new_p
+        return parents
+
+    @property
+    def parent(self):
+        """ Parent of current object
+
+        :rtype: [Collection]
+        """
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        """ Parents
+
+        :param parent: Parent to set for the object
+        :type parent: Collection
+        :return:
+        """
+        if parent not in self._parent:
+            self._parent.append(parent)
+            self.graph.add(
+                (self.asNode(), RDF_NAMESPACES.CAPITAINS.parent, parent.asNode())
+            )
+            parent._add_member(self)
+
+    def get_label(self, lang=None):
+        """ Return label for given lang or any default
+
+        :param lang: Language to request
+        :return: Label value
+        :rtype: Literal
+        """
+        x = None
+        if lang is None:
+            for obj in self.graph.objects(self.asNode(), DC.title):
+                return obj
+        for obj in self.graph.objects(self.asNode(), DC.title):
+            if obj.language == lang:
+                return obj
+        return x
+
+    def set_label(self, label, lang):
+        return NotImplementedError('Use obj.metadata.add(DC.title, {}, {}) to add a title to collection'.format(label,
+                                                                                                                lang))
+
     def __eq__(self, other):
         if self is other:
             return True
@@ -79,7 +143,7 @@ class PrototypeCapitainsCollection(Collection):
         return hasattr(self, "id") and hasattr(other, "id") and self.id == other.id
 
     def get_capitains_property(self, prop, lang=None):
-        """ Set given property in CAPITAINS Namespace
+        """ Get given property in CAPITAINS Namespace
 
         .. example::
             collection.get_capitains_property("groupname", "eng")
@@ -87,11 +151,11 @@ class PrototypeCapitainsCollection(Collection):
         :param prop: Property to get (Without namespace)
         :param lang: Language to get for given value
         :return: Value or default if lang is set, else whole set of values
-        :rtype: dict or Literal
+        :rtype: dict([Literal]) or [Literal]
         """
-        x = {
-            obj.language: obj for obj in self.metadata.get(RDF_NAMESPACES.CAPITAINS.term(prop))
-        }
+        x = defaultdict(list)
+        for obj in self.metadata.get(RDF_NAMESPACES.CAPITAINS.term(prop)):
+            x[getattr(obj, 'language', "")].append(obj)
         if lang is not None:
             if lang in x:
                 return x[lang]
@@ -192,9 +256,81 @@ class PrototypeCapitainsCollection(Collection):
 
         return lines.join(strings)
 
-    def __export__(self, output=None, domain=""):
-        if output == Mimetypes.PYTHON.ETREE:
-            return xmlparser(self.export(output=Mimetypes.XML.CTS))
+    def __export__(self, output=None, domain="", namespaces=True, lines="\n", recursion_depth=0):
+        """
+
+        :param output: output format
+        :type output: MyCapytain.common.constants.Mimetypes
+        :param domain: Domain to prefix IDs when necessary
+        :type domain: str
+        :param namespaces: Whether to include namespaces on the root node for XML output
+        :type namespaces: bool
+        :param lines: The character to use to separate the lines for the XML output
+        :type lines: str
+        :param recursion_depth: The depth to recurse from the base collection: 0: no children, 1: children, 2: children + grandchildren, etc.
+        :return:
+        """
+        if output == Mimetypes.XML.GUIDELINES3:
+            element_dict = self.export(output=Mimetypes.JSON.LD)
+            element_dict.pop('@context')
+            metadata_strings = []
+            structured_strings = []
+            child_strings = []
+            used_namespaces = {'dc', 'cpt'}
+            for k, v in element_dict.items():
+                ns_plus_tag = k.split(':')
+                if ns_plus_tag[0] in ['dc', 'cpt']:
+                    for member in v:
+                        attrs = None
+                        if member['@lang']:
+                            attrs = {'xml:lang': member['@lang']}
+                        if ns_plus_tag[1] == 'children':
+                            if recursion_depth > 0:
+                                child_strings.append(member['@object'].export(output=Mimetypes.XML.GUIDELINES3,
+                                                                              namespaces=False,
+                                                                              recursion_depth=recursion_depth - 1))
+                        else:
+                            metadata_strings.append(make_xml_node(self.graph,
+                                                                  GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
+                                                                  text=member['@value'],
+                                                                  complete=True,
+                                                                  attributes=attrs))
+                elif ns_plus_tag[0] not in ['dts']:
+                    for member in v:
+                        attrs = None
+                        if member['@lang']:
+                            attrs = {'xml:lang': member['@lang']}
+                        structured_strings.append(make_xml_node(self.graph,
+                                                                GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
+                                                                text=member['@value'],
+                                                                complete=True,
+                                                                attributes=attrs))
+                    used_namespaces.add(ns_plus_tag[0])
+
+            attrs = {x: getattr(self, x, None) for x in self.COLLECTION_ATTRIBUTES}
+            if attrs.get('readable', None):
+                attrs['readable'] = 'true'
+            else:
+                attrs.pop('readable', None)
+            if namespaces is True:
+                attrs.update(self.__namespaces_header__(cpt=False))
+
+            strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
+            strings += metadata_strings
+            if child_strings:
+                strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("members")))
+                strings += child_strings
+                strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("members"), close=True))
+            strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata")))
+            strings += structured_strings
+            strings.append(
+                    make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata"), close=True)
+                )
+            strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
+
+            return lines.join(strings)
+        elif output == Mimetypes.PYTHON.ETREE:
+            return xmlparser(self.export(output=Mimetypes.XML.GUIDELINES3, recursion_depth=recursion_depth))
 
 
 class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection):
@@ -210,26 +346,22 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
     """
 
     DC_TITLE_KEY = RDF_NAMESPACES.CAPITAINS.term("title")
-    TYPE_URI = RDF_NAMESPACES.CAPITAINS.term("readable")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.resource)
-    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
-    CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.title, RDF_NAMESPACES.CAPITAINS.description]
+    EXPORT_TO = [Mimetypes.XML.GUIDELINES3]
+    CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.identifier, RDF_NAMESPACES.CAPITAINS.parent]
     CAPITAINS_LINKS = [RDF_NAMESPACES.CAPITAINS.about]
 
     def __init__(self, urn="", parent=None, lang=None):
         super(CapitainsReadableMetadata, self).__init__(identifier=str(urn))
         self.resource = None
         self.citation = None
-        self.__urn__ = URN(urn)
+        self.__urn__ = str(urn)
         self.docname = None
         self.validate = None
-        if lang is not None:
-            self.lang = lang
+        self.lang = lang
 
         if parent is not None:
             self.parent = parent
-            if lang is None:
-                self.lang = self.parent.lang
 
     @property
     def readable(self):
@@ -270,77 +402,11 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         :return: List of readable siblings
         :rtype: [CapitainsTextMetadata]
         """
-        return [
-                item
-                for item in self.parent.readableDescendants
-        ]
-
-    def __export__(self, output=None, domain="", namespaces=True, lines="\n"):
-        """ Create a {output} version of the CapitainsCtsText
-
-        :param output: Format to be chosen
-        :type output: basestring
-        :param domain: Domain to prefix IDs when necessary
-        :type domain: str
-        :returns: Desired output formatted resource
-        """
-        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
-            attrs = {"urn": self.id, "xml:lang": self.lang}
-            if self.parent is not None and self.parent.id:
-                attrs["workUrn"] = self.parent.id
-            if namespaces is True:
-                attrs.update(self.__namespaces_header__(cpt=(output==Mimetypes.XML.CapiTainS.CTS)))
-
-            strings = [make_xml_node(self.graph, self.TYPE_URI, close=False, attributes=attrs)]
-
-            # additional = [make_xml_node(self.graph, RDF_NAMESPACES.CTS.extra)]
-            for pred in self.CAPITAINS_PROPERTIES:
-                for obj in self.metadata.get(pred):
-                    strings.append(
-                        make_xml_node(
-                            self.graph, pred, attributes={"xml:lang": obj.language}, text=str(obj), complete=True
-                        )
-                    )
-
-            for pred in self.CAPITAINS_LINKS:
-                # For each predicate in CAPITAINS_LINKS
-                for obj in self.metadata.get(pred):
-                    # For each item in the graph connected to the current item metadata as object through the predicate "pred"
-                    strings.append(
-                        make_xml_node(
-                            self.graph, pred, attributes={"urn": str(obj)}, complete=True
-                        )
-                        # <pref urn="obj.language"/>
-                    )
-
-            # Citation !
-            if self.citation is not None:
-                strings.append(
-                    # Online
-                    make_xml_node(
-                        self.graph, RDF_NAMESPACES.CAPITAINS.term("online"), complete=True,
-                        # XmlCtsCitation Mapping
-                        innerXML=make_xml_node(
-                            self.graph, RDF_NAMESPACES.CAPITAINS.term("citationMapping"), complete=True,
-                            innerXML=self.citation.export(Mimetypes.XML.CTS)
-                        )
-                    )
-                )
-
-            if output == Mimetypes.XML.CapiTainS.CTS:
-                strings.append(make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata")))
-                strings.append(
-                    self.metadata.export(
-                        Mimetypes.XML.CapiTainS.CTS,
-                        exclude=[RDF_NAMESPACES.CTS, RDF_NAMESPACES.DTS, RDF])
-                )
-                strings.append(
-                    make_xml_node(self.graph, RDF_NAMESPACES.CAPITAINS.term("structured-metadata"), close=True)
-                )
-
-            strings.append(make_xml_node(self.graph, self.TYPE_URI, close=True))
-
-            return lines.join(strings)
+        sibs = dict()
+        for parent in self.parent:
+            sibs.update({x.id: x for x in parent.readableDescendants})
+        sibs.pop(self.id, None)
+        return list(sibs.values())
 
     def get_root_collection(self, lang=None):
         """ Get the label of the root collection as a literal value
@@ -370,7 +436,7 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         :return: Description string representation
         :rtype: Literal
         """
-        return self.metadata.get_single(key=RDF_NAMESPACES.CAPITAINS.description, lang=lang)
+        return self.metadata.get_single(key=DC.description, lang=lang)
 
     def get_subject(self, lang=None):
         """ Get the DC subject of the object
@@ -379,7 +445,7 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         :return: Subject string representation
         :rtype: Literal
         """
-        return self.get_label(lang=lang)
+        return self.metadata.get_single(key=DC.subject, lang=lang)
 
 
 class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
@@ -398,9 +464,8 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
     """
 
     DC_TITLE_KEY = RDF_NAMESPACES.CAPITAINS.term("title")
-    TYPE_URI = RDF_NAMESPACES.CAPITAINS.term("collection")
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
-    EXPORT_TO = [Mimetypes.XML.CTS, Mimetypes.XML.CapiTainS.CTS]
+    EXPORT_TO = [Mimetypes.XML.GUIDELINES3]
     CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.title]
 
     def __init__(self, urn=None, parent=None):
@@ -463,17 +528,23 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
             raise InvalidURN("Cannot add CapitainsCollectionMetadata %s to CapitainsCollectionMetadata %s " % (self.urn, other.urn))
 
         # This is necessary because self.texts cannot just call self.children since not all children will be readable
-        if self.texts:
-            texts = self.texts
-        else:
-            texts = dict()
-
-        for id, text in other.texts.items():
-            texts[id] = text
-            texts[id].parent = self
-            texts[id].resource = None
-
-        self.texts.update(texts)
+        self_descendants = {x.id: x for x in self.descendants}
+        for other_descendant in other.descendants:
+            if other_descendant.id in self_descendants.keys():
+                if other_descendant.readable is False:
+                    self[other_descendant.id].update(other_descendant)
+                for parent in other_descendant.parent + self_descendants[other_descendant.id].parent:
+                    self[other_descendant.id].parent = parent
+            else:
+                new_parents = []
+                for parent in other_descendant.parent:
+                    if parent.id in self_descendants.keys() or parent.id == self.id:
+                        new_parents.append(self[parent.id])
+                    else:
+                        new_parents.append(parent)
+                other_descendant._parent = []
+                for parent in new_parents:
+                    other_descendant.parent = parent
 
         return self
 
@@ -488,13 +559,13 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
         if key is not None:
             return [
                 item
-                for item in self.texts
+                for item in self.readableDescendants
                 if item.lang == key
                 ]
         else:
             return [
                 item
-                for item in self.texts
+                for item in self.readableDescendants
                 if item.subtype == 'cts:translation'
             ]
 
@@ -504,18 +575,3 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
         :return: Number of texts available in the inventory
         """
         return len(self.texts)
-
-    def __export__(self, output=None, domain="", namespaces=True):
-        """ Create a {output} version of the XmlCtsWorkMetadata
-
-        :param output: Format to be chosen
-        :type output: basestring
-        :param domain: Domain to prefix IDs when necessary
-        :type domain: str
-        :returns: Desired output formated resource
-        """
-        if output == Mimetypes.XML.CTS or output == Mimetypes.XML.CapiTainS.CTS:
-            attrs = {"urn": self.id, "xml:lang": self.lang}
-            if self.parent is not None and self.parent.id:
-                attrs["groupUrn"] = self.parent.id
-            return self.__xml_export_generic__(attrs, namespaces=namespaces, output=output)

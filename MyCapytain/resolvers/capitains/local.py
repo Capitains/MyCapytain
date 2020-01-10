@@ -262,15 +262,20 @@ class XmlCapitainsLocalResolver(Resolver):
                 collection.path = os.path.normpath(metadata_file)
                 id_to_coll[collection.id] = collection
                 members[collection.id] = [child.id for child in children]
-                parents.update({child.id: collection for child in children})
+
                 for child in children:
+                    if child.id not in parents:
+                        parents.update({child.id: [collection]})
+                    else:
+                        parents[child.id].append(collection)
                     if child.readable is True:
                         child.path = os.path.normpath(os.path.join(rel_dir, child.path))
                         id_to_coll[child.id] = child
 
         for k, v in id_to_coll.items():
             if k in parents:
-                v.parent = parents[k]
+                for parent in parents[k]:
+                    v.parent = parent
             if v.readable is False:
                 v.children.update({ident: id_to_coll[ident] for ident in members[k]})
             else:
@@ -422,14 +427,17 @@ class XmlCapitainsLocalResolver(Resolver):
             # Generate any ancestor collections for the text
             reversed_parents = text.parents[::-1][2:]
             parent = inventory
-            for i, ancestor in enumerate(reversed_parents):
+            for ancestor in reversed_parents:
                 coll_urn = str(ancestor.urn)
                 if coll_urn not in parent.collections:
                     self.classes["work"](urn=coll_urn, parent=parent)
                 parent = parent.collections[coll_urn]
+                parent.path = ancestor.path
+                parent.children.update(ancestor.children)
 
             x = self.classes["edition"](urn=str(text.urn), parent=parent, lang=text.lang)
             x.citation = text.citation
+            x.path = text.path
 
         return inventory[objectId]
 

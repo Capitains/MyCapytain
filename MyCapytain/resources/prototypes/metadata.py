@@ -16,6 +16,7 @@ from MyCapytain.common.reference import BaseCitationSet
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
 from rdflib.namespace import SKOS, DC, DCTERMS
 from typing import List
+from collections import defaultdict
 
 
 __all__ = [
@@ -350,7 +351,7 @@ class Collection(Exportable):
                 nsm["dct"] = DCTERMS
 
             else:
-                nsm = namespace_manager.namespaces()
+                nsm = {prefix: ns for prefix, ns in namespace_manager.namespaces()}
 
             # Set-up a derived graph
             store = Subgraph(nsm)
@@ -432,11 +433,38 @@ class Collection(Exportable):
         elif output == Mimetypes.JSON.LD\
                 or output == Mimetypes.XML.RDF:
 
+            namespaces = {prefix: ns for prefix, ns in get_graph().namespace_manager.namespaces()}
             # We create a temp graph
-            store = Subgraph(get_graph().namespace_manager)
+            store = Subgraph(namespaces)
             store.graphiter(self.graph, self.asNode(), ascendants=1, descendants=-1)
+            nsm = store.graph.namespace_manager
 
-            o = store.serialize(format=RDFLIB_MAPPING[output], auto_compact=True, indent="")
+            if output == Mimetypes.XML.RDF:
+                o = store.serialize(format=RDFLIB_MAPPING[output], auto_compact=True, indent="")
+            else:
+                o = {"@context": namespaces}
+                o.update({'cpt:identifier': [{'@value': self.id, '@lang': self.lang}]})
+                data = defaultdict(list)
+                for graph_pred, graph_obj in self.graph.predicate_objects(self.asNode()):
+                    data[nsm.qname(graph_pred)].append({'@value': str(graph_obj),
+                                                        '@lang': getattr(graph_obj, 'language', None)})
+                o.update(data)
+                children = [{'@value': k, '@lang': v.lang, '@object': v} for k, v in self.children.items()]
+                o.update({'cpt:children': children})
+                o["@context"]["@vocab"] = _ns_hydra_str
+
+                # If the system handles citation structure
+                if hasattr(self, "citation") and \
+                        isinstance(self.citation, BaseCitationSet):
+                    if self.citation.depth:
+                        o[store.graph.qname(RDF_NAMESPACES.DTS.term("citeDepth"))] = self.citation.depth
+
+                    if not self.citation.is_empty():
+                        o[store.graph.qname(RDF_NAMESPACES.DTS.term("citeStructure"))] = self.citation.export(
+                            Mimetypes.JSON.DTS.Std,
+                            context=False,
+                            namespace_manager=nsm
+                        )
             del store
             return o
 

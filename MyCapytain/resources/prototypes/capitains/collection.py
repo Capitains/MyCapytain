@@ -529,7 +529,9 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
 
         # This is necessary because self.texts cannot just call self.children since not all children will be readable
         self_descendants = {x.id: x for x in self.descendants}
-        for other_descendant in other.descendants:
+        # The sorting here is to make sure that the new descendants that are added to self will be processed first.
+        # This is so that a descendant in other that is also in self but has a different parent in other will have its parent attribute correctly expanded.
+        for other_descendant in sorted(other.descendants, key=lambda x: x.id in self_descendants.keys()):
             if other_descendant.id in self_descendants.keys():
                 if other_descendant.readable is False:
                     self[other_descendant.id].update(other_descendant)

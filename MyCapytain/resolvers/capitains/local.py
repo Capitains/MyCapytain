@@ -250,7 +250,7 @@ class XmlCapitainsLocalResolver(Resolver):
         :param resource: List of folders
         :return: An inventory resource and a list of CapitainsReadableMetadata metadata-objects
         """
-        id_to_coll = OrderedDict()
+        id_to_coll = dict()
         members = dict()
         parents = dict()
         invalids = []

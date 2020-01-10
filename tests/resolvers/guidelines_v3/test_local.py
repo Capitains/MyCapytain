@@ -525,7 +525,6 @@ class TextXMLFolderResolver(TestCase):
             corpus, CapitainsCollectionMetadata,
             "Resolver should return a collection object"
         )
-        print(list(corpus.children))
         self.assertEqual(len(corpus.children), 2, 'Passau collection should have two children')
 
         readable = self.resolver.getMetadata(objectId="urn:cts:formulae:passau.heuwieser0073.lat001")

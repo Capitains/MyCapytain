@@ -6,7 +6,7 @@ import logging
 import os.path
 from glob import glob
 from math import ceil
-from collections import defaultdict
+from collections import OrderedDict
 
 from MyCapytain.common.reference._capitains_cts import CtsReference
 from MyCapytain.common.utils.xml import xmlparser
@@ -250,7 +250,7 @@ class XmlCapitainsLocalResolver(Resolver):
         :param resource: List of folders
         :return: An inventory resource and a list of CapitainsReadableMetadata metadata-objects
         """
-        id_to_coll = dict()
+        id_to_coll = OrderedDict()
         members = dict()
         parents = dict()
         invalids = []

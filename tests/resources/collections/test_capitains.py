@@ -487,6 +487,12 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertEqual('Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73',
                          str(list(txt_text.metadata.get(DC.term("title"), 'deu'))[0]),
                          "Check get with language.")
+        self.assertEqual({'': [URIRef('urn:cts:formulae:passau.heuwieser0073')]}, txt_text.get_capitains_metadata('parent'),
+                         "get_capitatins_metadata should work with no language given")
+        self.assertEqual([URIRef('urn:cts:formulae:passau.heuwieser0073')], txt_text.get_capitains_metadata('parent', lang=''),
+                         "get_capitatins_metadata should work with empty string for language")
+        self.assertEqual([URIRef('urn:cts:formulae:passau.heuwieser0073')], txt_text.get_capitains_metadata('parent', lang='lat'),
+                         "get_capitatins_metadata should work a language that does not exist")
 
     def test_addition_work(self):
         """ Test merging two Works together

@@ -110,9 +110,6 @@ class PrototypeCapitainsPassage(PrototypeCapitainsNode):
     :cvar default_exclude: Default exclude for exports
     """
 
-    def __init__(self, **kwargs):
-        super(PrototypeCapitainsPassage, self).__init__(**kwargs)
-
     @property
     def reference(self) -> BaseReference:
         """ Can we make any assumptions about where the citation reference portion of a passage ID can be found?"""

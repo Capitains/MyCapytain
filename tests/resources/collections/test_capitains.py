@@ -305,6 +305,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                          'Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41')
         self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_subject()),
                          'Medieval Charter')
+        self.assertEqual(len(TI['urn:cts:formulae:passau.heuwieser0073'].parents), 3)
 
     def test_xml_Textgroup_GetItem(self):
         """ Test access through getItem obj[urn] """
@@ -316,6 +317,9 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertTrue(tg['urn:cts:formulae:passau.heuwieser0073.lat001'].readable)
         self.assertIsInstance(tg["urn:cts:formulae:passau.heuwieser0073.lat001"], XmlCapitainsReadableMetadata)
         self.assertEqual(tg["urn:cts:formulae:passau.heuwieser0073.lat001"].lang, 'lat', "Readable should have a language")
+        self.assertEqual(str(tg["urn:cts:formulae:passau.heuwieser0073.lat001"].get_title('deu')),
+                         'Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73',
+                         "Readable should have a title")
 
     def test_xml_Work_GetItem(self):
         """ Test access through getItem obj[urn] """

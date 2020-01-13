@@ -74,10 +74,10 @@ class PrototypeCapitainsCollection(Collection):
             self.__subtype__ = str(val)
 
     @property
-    def parents(self) -> List["Collection"]:
+    def parents(self) -> List[Collection]:
         """ Iterator to find parents of current collection, from closest to furthest
 
-        :rtype: Generator[:class:`Collection`]
+        :rtype: [Collection]
         """
         p = self.parent
         parents = []
@@ -85,10 +85,7 @@ class PrototypeCapitainsCollection(Collection):
             parents.extend(p)
             new_p = []
             for parent in p:
-                if isinstance(parent, list):
-                    new_p.extend([par.parent for par in parent])
-                else:
-                    new_p.extend(parent.parent)
+                new_p.extend(parent.parent)
             p = new_p
         return parents
 

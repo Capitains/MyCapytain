@@ -698,6 +698,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
         )
         self.assertEqual(len(collected_stuff['urn:cts:formulae:passau.heuwieser0083.lat001'].get_root_collection()), 2,
                          'Passau 83 should belong to two root collections.')
+        self.assertEqual(tic.get_label(), None, 'A collection without a label should return None.')
 
         with self.assertRaises(KeyError):
             _ = fulda_stuff["urn:cts:formulae:salzburg.hauthaler-a0100"]
@@ -803,8 +804,9 @@ class TextXMLFolderResolverDispatcher(TestCase):
             len(passau_stuff.descendants), 0,
             "Descendants should only be available through the resolver"
         )
-        self.assertEqual(
-            collected_stuff.get_label("fre"), None,  # CapitainsCtsText inventory have no label in CTS
+        self.assertIn(
+            str(collected_stuff.get_label("fre")),
+            ['Eine Sammelsammlung', 'A collected collection.', 'This is a collected collection'],
             "Label should be correct"
         )
         get_graph().remove((None, None, None))

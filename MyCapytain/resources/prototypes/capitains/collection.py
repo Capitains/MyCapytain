@@ -120,12 +120,11 @@ class PrototypeCapitainsCollection(Collection):
         :rtype: Literal
         """
         x = None
-        if lang is None:
-            for obj in self.graph.objects(self.asNode(), DC.title):
-                return obj
         for obj in self.graph.objects(self.asNode(), DC.title):
             if obj.language == lang:
                 return obj
+        for obj in self.graph.objects(self.asNode(), DC.title):
+            return obj
         return x
 
     def set_label(self, label, lang):

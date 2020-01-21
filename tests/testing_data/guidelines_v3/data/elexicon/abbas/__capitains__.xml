@@ -17,13 +17,13 @@
          <structured-metadata>
             <dct:bibliographicCitation>Lößlein, Horst, "Abbas, abbatissa", in: Formulae-Litterae-Chartae. Neuedition der frühmittelalterlichen Formulae, Hamburg (2019-05-07), [URL: https://werkstatt.formulae.uni-hamburg.de/texts/urn:cts:formulae:elexicon.abbas.deu001/passage/all]</dct:bibliographicCitation>
             <dct:created>2019-05-07</dct:created>
-            <dct:isReferencedBy>urn:cts:formulae:andecavensis.form007.lat001%patri illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel omnis</dct:isReferencedBy>
-            <dct:isReferencedBy>urn:cts:formulae:andecavensis.form010.lat001%uir illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel reliquis%fuit ipsius &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel quibus</dct:isReferencedBy>
-            <dct:isReferencedBy>urn:cts:formulae:andecavensis.form027.lat001%patri illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; ego illi</dct:isReferencedBy>
-            <dct:isReferencedBy>urn:cts:formulae:andecavensis.form029.lat001%uir illi &lt;span class='elex-word'&gt;abbate&lt;/span&gt; interpellauerunt hominem%ab ipso &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel qui</dct:isReferencedBy>
-            <dct:isReferencedBy>urn:cts:formulae:andecavensis.form030.lat001%ante illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel reliquis,%fuit ipsius &lt;span class='elex-word'&gt;abbate&lt;/span&gt;, ut dum</dct:isReferencedBy>
-            <dct:isReferencedBy>urn:cts:formulae:andecavensis.form046.lat001%uir illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt;, propria pecunia</dct:isReferencedBy>
-            <dct:isReferencedBy>urn:cts:formulae:andecavensis.form047.lat001%uir illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel reliquis</dct:isReferencedBy>
+            <dct:isReferencedBy>%urn:cts:formulae:andecavensis.form007.lat001%patri illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel omnis</dct:isReferencedBy>
+            <dct:isReferencedBy>%urn:cts:formulae:andecavensis.form010.lat001%uir illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel reliquis%fuit ipsius &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel quibus</dct:isReferencedBy>
+            <dct:isReferencedBy>%urn:cts:formulae:andecavensis.form027.lat001%patri illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; ego illi</dct:isReferencedBy>
+            <dct:isReferencedBy>%urn:cts:formulae:andecavensis.form029.lat001%uir illi &lt;span class='elex-word'&gt;abbate&lt;/span&gt; interpellauerunt hominem%ab ipso &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel qui</dct:isReferencedBy>
+            <dct:isReferencedBy>%urn:cts:formulae:andecavensis.form030.lat001%ante illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel reliquis,%fuit ipsius &lt;span class='elex-word'&gt;abbate&lt;/span&gt;, ut dum</dct:isReferencedBy>
+            <dct:isReferencedBy>%urn:cts:formulae:andecavensis.form046.lat001%uir illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt;, propria pecunia</dct:isReferencedBy>
+            <dct:isReferencedBy>%urn:cts:formulae:andecavensis.form047.lat001%uir illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel reliquis</dct:isReferencedBy>
             <dct:references>urn:cts:formulae:passau.heuwieser0073.lat001</dct:references>
          </structured-metadata>
       </collection>

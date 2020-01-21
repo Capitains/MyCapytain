@@ -216,10 +216,6 @@ class XmlCapitainsLocalResolver(Resolver):
         else:
             self.dispatcher.dispatch(collection, path=directory)
 
-        for sub_coll_id, sub_coll in collection.collections.items():
-            if sub_coll_id in self.dispatcher.collection[collection.id].collections:
-                self.dispatcher.collection[sub_coll_id].update(sub_coll)
-
     def _dispatch_container(self, collection, directory):
         """ Run the dispatcher over a collection within a try/except block
 

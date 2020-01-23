@@ -497,7 +497,7 @@ class TextXMLFolderResolver(TestCase):
             "First parent should be CtsTextgroupMetadata"
         )
         self.assertIsInstance(
-            metadata.parents[0], CtsTextgroupMetadata,
+            metadata.ancestors[0], CtsTextgroupMetadata,
             "First parent should be CtsTextgroupMetadata"
         )
         self.assertEqual(

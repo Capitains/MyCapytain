@@ -160,7 +160,7 @@ class Collection(Exportable):
         return self._children
 
     @property
-    def parents(self) -> List["Collection"]:
+    def ancestors(self) -> List["Collection"]:
         """ Iterator to find parents of current collection, from closest to furthest
 
         :rtype: Generator[:class:`Collection`]
@@ -235,8 +235,8 @@ class Collection(Exportable):
         self.metadata.remove()
         self.metadata.unlink()
         # Delete the Python item
-        if len(item.parents) > 0:
-            del item.parents[0].children[item.id]
+        if len(item.ancestors) > 0:
+            del item.ancestors[0].children[item.id]
 
     def __contains__(self, item):
         """ Retrieve an item by its ID in the tree of a collection

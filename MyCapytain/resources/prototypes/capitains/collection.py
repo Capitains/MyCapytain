@@ -78,7 +78,7 @@ class PrototypeCapitainsCollection(Collection):
             self.__subtype__ = str(val)
 
     @property
-    def parents(self) -> List[Collection]:
+    def ancestors(self) -> List[Collection]:
         """ Iterator to find parents of current collection, from closest to furthest
 
         :rtype: [Collection]
@@ -325,8 +325,8 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         :rtype: [Literal]
         """
         root_colls = []
-        for parent in self.parents:
-            if len(parent.parents) == 1 and parent.parents[0].parents == []:
+        for parent in self.ancestors:
+            if len(parent.ancestors) == 1 and parent.ancestors[0].ancestors == []:
                 root_colls.append(parent.get_label(lang=lang))
 
         return root_colls

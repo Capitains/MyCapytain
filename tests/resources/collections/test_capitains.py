@@ -305,7 +305,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
                          'Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41')
         self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_subject()),
                          'Medieval Charter')
-        self.assertEqual(len(TI['urn:cts:formulae:passau.heuwieser0073'].parents), 3)
+        self.assertEqual(len(TI['urn:cts:formulae:passau.heuwieser0073'].ancestors), 3)
 
     def test_xml_Textgroup_GetItem(self):
         """ Test access through getItem obj[urn] """
@@ -559,8 +559,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(str(TG3), str(TG1), "Addition in equal or incremental should have same result")
         self.assertEqual(
-            list(TG3["urn:cts:formulae:elexicon.abbas.fre001"].parents),
-            list(TG1["urn:cts:formulae:elexicon.abbas.deu001"].parents),
+            list(TG3["urn:cts:formulae:elexicon.abbas.fre001"].ancestors),
+            list(TG1["urn:cts:formulae:elexicon.abbas.deu001"].ancestors),
             "XmlCapitainsReadableMetadata OPP should be added to textgroup and original kept"
         )
         self.assertListEqual(
@@ -640,8 +640,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(str(TG3), str(TG1), "Addition in equal or incremental should have same result")
         self.assertEqual(
-            list(TG3["urn:cts:formulae:elexicon.abbas"].parents),
-            list(TG3["urn:cts:formulae:elexicon.regnum"].parents),
+            list(TG3["urn:cts:formulae:elexicon.abbas"].ancestors),
+            list(TG3["urn:cts:formulae:elexicon.regnum"].ancestors),
             "XmlCapitainsCollectionMetadata OPP should be added to textgroup and original kept"
         )
         self.assertListEqual(
@@ -735,8 +735,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(str(TI3), str(TI1), "Addition in equal or incremental should have same result")
         self.assertEqual(
-            list(TI3["urn:cts:formulae:elexicon"].parents),
-            list(TI3["urn:cts:formulae:salzburg"].parents),
+            list(TI3["urn:cts:formulae:elexicon"].ancestors),
+            list(TI3["urn:cts:formulae:salzburg"].ancestors),
             "XmlCapitainsCollectionMetadata OPP should be added to inventory and original kept"
         )
         self.assertListEqual(
@@ -851,7 +851,7 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             "The single textgroup should have both collections as parents."
         )
         self.assertCountEqual(
-            [x.id for x in TI3["urn:cts:formulae:salzburg"].parents][:2],
+            [x.id for x in TI3["urn:cts:formulae:salzburg"].ancestors][:2],
             ['default', 'default2'],
             "Make sure that the first two elements of parents are the direct parents."
         )

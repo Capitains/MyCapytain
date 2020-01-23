@@ -496,7 +496,7 @@ class TextXMLFolderResolver(TestCase):
             "First parent should be CapitainsCollectionMetadata"
         )
         self.assertIsInstance(
-            metadata.parents[0], CapitainsCollectionMetadata,
+            metadata.ancestors[0], CapitainsCollectionMetadata,
             "First parent should be CapitainsCollectionMetadata"
         )
         self.assertEqual(
@@ -653,7 +653,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
 
         @dispatcher.inventory("a:different.identifier")
         def dispatchCollected(collection, path=None, **kwargs):
-            if collected in collection.parents:
+            if collected in collection.ancestors:
                 return True
             return False
 
@@ -763,7 +763,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
 
         @dispatcher.inventory("a:different.identifier")
         def dispatchCollected(collection, path=None, **kwargs):
-            if collected in collection.parents:
+            if collected in collection.ancestors:
                 return True
             return False
 

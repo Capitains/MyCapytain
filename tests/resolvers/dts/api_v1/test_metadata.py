@@ -113,7 +113,7 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
         )
 
         self.assertEqual(
-            {collection_parent}, collection.parents,
+            {collection_parent}, collection.ancestors,
             "The collection parents should be pre-defined"
         )
 
@@ -214,15 +214,15 @@ class TestHttpDtsResolverCollection(unittest.TestCase):
             0, collection.size,
             "There should be no children collections"
         )
-        self.assertIsInstance(collection.parents, PaginatedProxy, "Proxied object is in place")
+        self.assertIsInstance(collection.ancestors, PaginatedProxy, "Proxied object is in place")
         # Then we test the children
         self.assertEqual(
             ["urn:enc:membre1", "urn:enc:membre2", "urn:enc:membre3"],
-            sorted([x.id for x in collection.parents]),
+            sorted([x.id for x in collection.ancestors]),
             "Each page should be reached when iterating over parents"
         )
 
-        self.assertIsInstance(collection.parents, set, "Proxied object is replaced")
+        self.assertIsInstance(collection.ancestors, set, "Proxied object is replaced")
 
     @requests_mock.mock()
     def test_readable_descendants(self, mock_set):

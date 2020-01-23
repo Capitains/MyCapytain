@@ -406,7 +406,7 @@ class XmlCapitainsLocalResolver(Resolver):
         texts, _, _ = self._get_text_metadata(urn=objectId)
 
         # We store inventory names and if there is only one we recreate the inventory
-        inv_names = [text.parents[-2].id for text in texts]
+        inv_names = [text.ancestors[-2].id for text in texts]
         if len(set(inv_names)) == 1:
             inventory = self.classes["Collection"](urn=inv_names[0])
         else:
@@ -415,7 +415,7 @@ class XmlCapitainsLocalResolver(Resolver):
         # For each text we found using the filter
         for text in texts:
             # Generate any ancestor collections for the text
-            reversed_parents = text.parents[::-1][2:]
+            reversed_parents = text.ancestors[::-1][2:]
             parent = inventory
             for ancestor in reversed_parents:
                 coll_urn = str(ancestor.urn)

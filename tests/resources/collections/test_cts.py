@@ -286,12 +286,12 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         tg = TI["urn:cts:latinLit:phi1294"]
         wk = TI["urn:cts:latinLit:phi1294.phi002"]
         tx = TI["urn:cts:latinLit:phi1294.phi002.perseus-lat2"]
-        self.assertEqual(tg.parents[0], TI)
-        self.assertEqual(wk.parents[0], tg)
-        self.assertEqual(wk.parents[1], TI)
-        self.assertEqual(tx.parents[0], wk)
-        self.assertEqual(tx.parents[1], tg)
-        self.assertEqual(tx.parents[2], TI)
+        self.assertEqual(tg.ancestors[0], TI)
+        self.assertEqual(wk.ancestors[0], tg)
+        self.assertEqual(wk.ancestors[1], TI)
+        self.assertEqual(tx.ancestors[0], wk)
+        self.assertEqual(tx.ancestors[1], tg)
+        self.assertEqual(tx.ancestors[2], TI)
 
     def test_translation(self):
         TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
@@ -526,8 +526,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(str(TG3), str(TG1), "Addition in equal or incremental should have same result")
         self.assertEqual(
-            list(TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].parents),
-            list(TG1["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].parents),
+            list(TG3["urn:cts:latinLit:phi1294.phi002.opp-lat2"].ancestors),
+            list(TG1["urn:cts:latinLit:phi1294.phi002.perseus-lat2"].ancestors),
             "XmlCtsEditionMetadata OPP should be added to textgroup and original kept"
         )
         self.assertListEqual(

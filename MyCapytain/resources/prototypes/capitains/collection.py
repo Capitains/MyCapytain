@@ -142,19 +142,19 @@ class PrototypeCapitainsCollection(Collection):
             return False
         return hasattr(self, "id") and hasattr(other, "id") and self.id == other.id
 
-    def get_capitains_property(self, prop, lang=None):
+    def get_property(self, namespace, name, lang=None):
         """ Get given property in CAPITAINS Namespace
 
         .. example::
             collection.get_capitains_property("groupname", "eng")
 
-        :param prop: Property to get (Without namespace)
+        :param name: Property to get (Without namespace)
         :param lang: Language to get for given value
         :return: Value or default if lang is set, else whole set of values
         :rtype: dict([Literal]) or [Literal]
         """
         x = defaultdict(list)
-        for obj in self.metadata.get(RDF_NAMESPACES.CAPITAINS.term(prop)):
+        for obj in self.metadata.get(namespace.term(name)):
             x[getattr(obj, 'language', "")].append(obj)
         if lang is not None:
             if lang in x:
@@ -293,17 +293,6 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         """
         return list()
 
-    def translations(self, key=None):
-        """ Get translations in given language
-
-        :param key: Language ISO Code to filter on
-        :return:
-        """
-        translations = []
-        for parent in self.parent:
-            translations.extend(parent.get_translation_in(key))
-        return translations
-
     @property
     def readable_siblings(self):
         """ Get all readable siblings of the text
@@ -317,20 +306,6 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         sibs.pop(self.id, None)
         return list(sibs.values())
 
-    def get_root_collection(self, lang=None):
-        """ Get the label of the root collection as a literal value
-
-        :param lang: Language to retrieve
-        :return: Creator string representation
-        :rtype: [Literal]
-        """
-        root_colls = []
-        for parent in self.ancestors:
-            if len(parent.ancestors) == 1 and parent.ancestors[0].ancestors == []:
-                root_colls.append(parent.get_label(lang=lang))
-
-        return root_colls
-
     def get_title(self, lang=None):
         """ Get the DC Title of the object
 
@@ -339,24 +314,6 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         :rtype: Literal
         """
         return self.get_label(lang=lang)
-
-    def get_description(self, lang=None):
-        """ Get the DC description of the object
-
-        :param lang: Lang to retrieve
-        :return: Description string representation
-        :rtype: Literal
-        """
-        return self.metadata.get_single(key=DC.description, lang=lang)
-
-    def get_subject(self, lang=None):
-        """ Get the DC subject of the object
-
-        :param lang: Lang to retrieve
-        :return: Subject string representation
-        :rtype: Literal
-        """
-        return self.metadata.get_single(key=DC.subject, lang=lang)
 
 
 class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
@@ -451,27 +408,6 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
                     other_descendant.parent = parent
 
         return self
-
-    def get_translation_in(self, key=None):
-        """ Find a translation with given language
-
-        :param key: Language to find
-        :type key: text_type
-        :rtype: [CapitainsReadableMetadata]
-        :returns: List of available translations
-        """
-        if key is not None:
-            return [
-                item
-                for item in self.readableDescendants
-                if item.lang == key
-                ]
-        else:
-            return [
-                item
-                for item in self.readableDescendants
-                if item.subtype == 'cts:translation'
-            ]
 
     def __len__(self):
         """ Get the number of text in the CtsWorkMetadata

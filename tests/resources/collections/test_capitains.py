@@ -303,7 +303,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertIsInstance(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"], XmlCapitainsReadableMetadata)
         self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_label()),
                          'Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41')
-        self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_subject()),
+        self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_property(DC, 'subject')[None][0]),
                          'Medieval Charter')
         self.assertEqual(len(TI['urn:cts:formulae:passau.heuwieser0073'].ancestors), 3)
 
@@ -317,9 +317,9 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertTrue(tg['urn:cts:formulae:passau.heuwieser0073.lat001'].readable)
         self.assertIsInstance(tg["urn:cts:formulae:passau.heuwieser0073.lat001"], XmlCapitainsReadableMetadata)
         self.assertEqual(tg["urn:cts:formulae:passau.heuwieser0073.lat001"].lang, 'lat', "Readable should have a language")
-        self.assertEqual(str(tg["urn:cts:formulae:passau.heuwieser0073.lat001"].get_title('deu')),
-                         'Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73',
-                         "Readable should have a title")
+        self.assertIn('Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73',
+                      [str(x) for x in tg["urn:cts:formulae:passau.heuwieser0073.lat001"].get_property(DC, 'title', 'deu')],
+                      "Readable should have a title")
 
     def test_xml_Work_GetItem(self):
         """ Test access through getItem obj[urn] """
@@ -376,9 +376,6 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             </cpt:structured-metadata>
         </cpt:collection>""".replace("\n", "")
         W, children = XmlCapitainsCollectionMetadata.parse(resource=xml, _with_children=True)
-        self.assertEqual(len(W.get_translation_in()), 3)
-        self.assertEqual(len(W.readableDescendants[0].translations()), 3)
-        self.assertEqual(len(W.get_translation_in("eng")), 2)
         self.assertEqual(
             W.metadata.export(
                 output=Mimetypes.JSON.Std,
@@ -430,21 +427,21 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
     def test_Inventory_metadata(self):
         """ Make sure that properties can be retrieved from the parsed collection """
         TI, children = XmlCapitainsCollectionMetadata.parse(resource=self.getCapabilities, _with_children=True, recursive=True)
-        self.assertIn("default", [str(x) for y in TI["urn:cts:formulae:passau"].get_capitains_property("parent").values() for x in y])
-        self.assertIn("default", [str(x) for x in TI["urn:cts:formulae:passau"].get_capitains_property("parent", 'lat')])
-        self.assertIn("default", [str(x) for x in TI["urn:cts:formulae:passau"].get_capitains_property("parent", '')])
+        self.assertIn("default", [str(x) for y in TI["urn:cts:formulae:passau"].get_property(RDF_NAMESPACES.CAPITAINS, "parent").values() for x in y])
+        self.assertIn("default", [str(x) for x in TI["urn:cts:formulae:passau"].get_property(RDF_NAMESPACES.CAPITAINS, "parent", 'lat')])
+        self.assertIn("default", [str(x) for x in TI["urn:cts:formulae:passau"].get_property(RDF_NAMESPACES.CAPITAINS, "parent", '')])
         self.assertIn("urn:cts:formulae:passau",
-                      [str(x) for x in TI["urn:cts:formulae:passau"].get_capitains_property("identifier", '')])
-        self.assertEqual(len(TI["urn:cts:formulae:passau.heuwieser0083"].get_capitains_property("parent", '')), 2,
+                      [str(x) for x in TI["urn:cts:formulae:passau"].get_property(RDF_NAMESPACES.CAPITAINS, "identifier", '')])
+        self.assertEqual(len(TI["urn:cts:formulae:passau.heuwieser0083"].get_property(RDF_NAMESPACES.CAPITAINS, "parent", '')), 2,
                          "Passau 83 should have 2 parents.")
         self.assertIn("a:different.identifier",
-                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083"].get_capitains_property("parent", '')])
+                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083"].get_property(RDF_NAMESPACES.CAPITAINS, "parent", '')])
         self.assertIn("urn:cts:formulae:passau.heuwieser0083",
-                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083"].get_capitains_property("identifier", '')])
+                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083"].get_property(RDF_NAMESPACES.CAPITAINS, "identifier", '')])
         self.assertIn('urn:cts:formulae:passau.heuwieser0083.lat001',
-                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083.lat001"].get_capitains_property("identifier", '')])
+                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083.lat001"].get_property(RDF_NAMESPACES.CAPITAINS, "identifier", '')])
         self.assertIn('urn:cts:formulae:passau.heuwieser0083',
-                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083.lat001"].get_capitains_property("parent", '')])
+                      [str(x) for x in TI["urn:cts:formulae:passau.heuwieser0083.lat001"].get_property(RDF_NAMESPACES.CAPITAINS, "parent", '')])
 
     def test_export(self):
         """ Test export round-tripping of collections to and from XML """

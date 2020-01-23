@@ -244,8 +244,6 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             </ti:work>
         """
         W = XmlCtsWorkMetadata.parse(resource=xml)
-        self.assertEqual(len(W.get_translation_in("eng")), 2)
-        self.assertEqual(len(W.get_translation_in()), 3)
         self.assertEqual(
             W.metadata.export(
                 output=Mimetypes.JSON.Std,

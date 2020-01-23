@@ -696,8 +696,6 @@ class TextXMLFolderResolverDispatcher(TestCase):
             str(collected_stuff.get_label(lang="deu")), "Eine Sammelsammlung",
             "Label should be correct"
         )
-        self.assertEqual(len(collected_stuff['urn:cts:formulae:passau.heuwieser0083.lat001'].get_root_collection()), 2,
-                         'Passau 83 should belong to two root collections.')
         self.assertEqual(tic.get_label(), None, 'A collection without a label should return None.')
 
         with self.assertRaises(KeyError):

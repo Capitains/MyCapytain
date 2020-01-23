@@ -85,9 +85,8 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
         xml = xmlparser(resource)
         o = cls(urn=xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text, parent=parent)
         o.metadata.set(RDF_NAMESPACES.CAPITAINS.identifier, o.id)
-        lang = xml.xpath("dc:language", namespaces=XPATH_NAMESPACES)[0].text
-        if lang is not None:
-            o.lang = lang
+        for lang in xml.xpath("dc:language", namespaces=XPATH_NAMESPACES):
+            o.lang = lang.text
         o.path = xml.get('path')
         o.subtype = xml.xpath("dc:type", namespaces=XPATH_NAMESPACES)[0].text
         if parent is not None:

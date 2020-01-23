@@ -43,14 +43,9 @@ class XmlCapitainsLocalResolver(Resolver):
 
     """
     CLASSES = {
-        "text": CapitainsCtsText,
-        "edition": XmlCapitainsReadableMetadata,
-        "translation": XmlCapitainsReadableMetadata,
-        "commentary": XmlCapitainsReadableMetadata,
-        "work": XmlCapitainsCollectionMetadata,
-        "textgroup": XmlCapitainsCollectionMetadata,
-        "inventory": XmlCapitainsCollectionMetadata,
-        "inventory_collection": XmlCapitainsCollectionMetadata,
+        "Text": CapitainsCtsText,
+        "ReadableCollection": XmlCapitainsReadableMetadata,
+        "Collection": XmlCapitainsCollectionMetadata,
         "citation": XmlCtsCitation
     }
 
@@ -61,11 +56,11 @@ class XmlCapitainsLocalResolver(Resolver):
 
     @property
     def inventory(self):
-        return self.__inventory__
+        return self._inventory
 
     @inventory.setter
     def inventory(self, value):
-        self.__inventory__ = value
+        self._inventory = value
 
     @property
     def texts(self):
@@ -84,14 +79,14 @@ class XmlCapitainsLocalResolver(Resolver):
         self.classes.update(type(self).CLASSES)
 
         if dispatcher is None:
-            inventory_collection = self.classes["inventory_collection"](urn="defaultTic")
-            ti = self.classes["inventory"]("default")
+            inventory_collection = self.classes["Collection"](urn="defaultTic")
+            ti = self.classes["Collection"]("default")
             ti.parent = inventory_collection
             ti.set_label("Default collection", "eng")
             self.dispatcher = CollectionDispatcher(inventory_collection)
         else:
             self.dispatcher = dispatcher
-        self.__inventory__ = self.dispatcher.collection
+        self._inventory = self.dispatcher.collection
         self.name = name
 
         self.logger = logger
@@ -100,8 +95,6 @@ class XmlCapitainsLocalResolver(Resolver):
 
         if not name:
             self.name = "repository"
-
-        self.works = []
 
         if autoparse:
             self.parse(resource)
@@ -124,7 +117,7 @@ class XmlCapitainsLocalResolver(Resolver):
         :rtype: CapitainsCtsText
         """
         with open(path) as f:
-            o = self.classes["text"](urn=identifier, resource=self.xmlparse(f))
+            o = self.classes["Text"](urn=identifier, resource=self.xmlparse(f))
         return o
 
     def _parse_collection_wrapper(self, metadata_file, collection=None):
@@ -152,9 +145,9 @@ class XmlCapitainsLocalResolver(Resolver):
         :type collection: CapitainsCollectionMetadata
         :return: Parsed Collection and the Texts, as well as the current file directory
         """
-        with io.open(metadata_file) as __xml__:
-            work, children = self.classes["work"].parse(
-                resource=__xml__,
+        with io.open(metadata_file) as _xml:
+            work, children = self.classes["Collection"].parse(
+                resource=_xml,
                 parent=collection,
                 _with_children=True
             )
@@ -163,6 +156,7 @@ class XmlCapitainsLocalResolver(Resolver):
 
     def _parse_text(self, text):
         """ Complete the TextMetadata object with its citation scheme by parsing the original text
+        Note that this still uses guidelines 2.0 (i.e., CTS) citation system
 
         :param text: Text Metadata collection
         :type text: XmlCapitainsReadableMetadata
@@ -291,7 +285,7 @@ class XmlCapitainsLocalResolver(Resolver):
         self.inventory = self.dispatcher.collection
         return self.inventory
 
-    def __getText__(self, identifier):
+    def _get_text(self, identifier):
         """ Returns a XmlCapitainsReadableMetadata object
         :param identifier: URN of a text to retrieve
         :type identifier: str, URN
@@ -308,8 +302,8 @@ class XmlCapitainsLocalResolver(Resolver):
             raise(UnknownObjectError('{} is not a readable object'.format(str(identifier))))
 
         if os.path.isfile(text.path):
-            with io.open(text.path) as __xml__:
-                resource = self.classes["text"](urn=identifier, resource=self.xmlparse(__xml__))
+            with io.open(text.path) as _xml:
+                resource = self.classes["Text"](urn=identifier, resource=self.xmlparse(_xml))
         else:
             # Passing None to the functions that call __getText__ results in a not very helpful AttributeError
             # A more informative error should be raised here.
@@ -318,10 +312,10 @@ class XmlCapitainsLocalResolver(Resolver):
 
         return resource, text
 
-    def __getTextMetadata__(self,
-                            urn=None, page=None, limit=None,
-                            lang=None, category=None, pagination=False
-                            ):
+    def _get_text_metadata(self,
+                           urn=None, page=None, limit=None,
+                           lang=None, category=None, pagination=False
+                           ):
         """ Retrieve a slice of the inventory filtered by given arguments
         :param urn: Partial URN to use to filter out resources
         :type urn: str
@@ -409,14 +403,14 @@ class XmlCapitainsLocalResolver(Resolver):
             return self.inventory
         elif objectId in self.inventory.children.keys():
             return self.inventory[objectId]
-        texts, _, _ = self.__getTextMetadata__(urn=objectId)
+        texts, _, _ = self._get_text_metadata(urn=objectId)
 
         # We store inventory names and if there is only one we recreate the inventory
         inv_names = [text.parents[-2].id for text in texts]
         if len(set(inv_names)) == 1:
-            inventory = self.classes["inventory"](urn=inv_names[0])
+            inventory = self.classes["Collection"](urn=inv_names[0])
         else:
-            inventory = self.classes["inventory"]()
+            inventory = self.classes["Collection"]()
 
         # For each text we found using the filter
         for text in texts:
@@ -426,12 +420,12 @@ class XmlCapitainsLocalResolver(Resolver):
             for ancestor in reversed_parents:
                 coll_urn = str(ancestor.urn)
                 if coll_urn not in parent.collections:
-                    self.classes["work"](urn=coll_urn, parent=parent)
+                    self.classes["Collection"](urn=coll_urn, parent=parent)
                 parent = parent.collections[coll_urn]
                 parent.path = ancestor.path
                 parent.children.update(ancestor.children)
 
-            x = self.classes["edition"](urn=str(text.urn), parent=parent, lang=text.lang)
+            x = self.classes["ReadableCollection"](urn=str(text.urn), parent=parent, lang=text.lang)
             x.citation = text.citation
             x.path = text.path
 
@@ -451,7 +445,7 @@ class XmlCapitainsLocalResolver(Resolver):
         :return: CapitainsCtsPassage
         :rtype: CapitainsCtsPassage
         """
-        text, text_metadata = self.__getText__(textId)
+        text, text_metadata = self._get_text(textId)
         if subreference is not None and not isinstance(subreference, CtsReference):
             subreference = CtsReference(subreference)
         passage = text.getTextualNode(subreference)
@@ -469,7 +463,7 @@ class XmlCapitainsLocalResolver(Resolver):
         :return: Tuple of references
         :rtype: (str, str)
         """
-        text, inventory = self.__getText__(textId)
+        text, inventory = self._get_text(textId)
         if not isinstance(subreference, CtsReference):
             subreference = CtsReference(subreference)
         passage = text.getTextualNode(subreference)
@@ -487,7 +481,7 @@ class XmlCapitainsLocalResolver(Resolver):
         :return: List of references
         :rtype: [str]
         """
-        passage, inventory = self.__getText__(textId)
+        passage, inventory = self._get_text(textId)
         if subreference:
             passage = passage.getTextualNode(subreference)
         return passage.getReffs(level=level, subreference=subreference)

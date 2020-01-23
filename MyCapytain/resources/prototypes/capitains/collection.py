@@ -46,13 +46,17 @@ class PrototypeCapitainsCollection(Collection):
     def __init__(self, identifier=""):
         super(PrototypeCapitainsCollection, self).__init__(identifier)
 
-        self.__urn__ = ""
+        self._id = str(identifier)
         self.__subtype__ = self.SUBTYPE
         self._parent = list()
 
     @property
     def urn(self):
-        return self.__urn__
+        return self._id
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def subtype(self):

@@ -61,7 +61,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
     def test_text_resource(self):
         """ Test to get the text resource to perform other queries """
         Repository = XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3"])
-        text, metadata = Repository.__getText__("urn:cts:formulae:passau.heuwieser0073.lat001")
+        text, metadata = Repository._get_text("urn:cts:formulae:passau.heuwieser0073.lat001")
         self.assertEqual(
             len(text.citation), 1,
             "Passau 73, version 1 has a single citation unit."
@@ -76,7 +76,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
         """ Test to make sure the correct warning is raised if a text is missing """
         with self.assertLogs(XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3_missing"]).logger) as cm:
             Repository = XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3_missing"])
-            text, metadata = Repository.__getText__("urn:cts:formulae:passau.heuwieser0073.lat005")
+            text, metadata = Repository._get_text("urn:cts:formulae:passau.heuwieser0073.lat005")
             self.assertIsNone(text)
         self.assertIn('WARNING:root:The file '
                       'tests/testing_data/guidelines_v3_missing/data/passau/heuwieser0073/passau.heuwieser0073.lat005.xml '
@@ -90,51 +90,51 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
         """ Check Get Capabilities """
         Repository = XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3"])
         self.assertEqual(
-            len(Repository.__getTextMetadata__()[0]), 19,
+            len(Repository._get_text_metadata()[0]), 19,
             "General no filter works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(category="cts:edition")[0]), 17,
+            len(Repository._get_text_metadata(category="cts:edition")[0]), 17,
             "Type filter works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(category="cts:commentary")[0]), 1,
+            len(Repository._get_text_metadata(category="cts:commentary")[0]), 1,
             "Type filter works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(lang="deu")[0]), 2,
+            len(Repository._get_text_metadata(lang="deu")[0]), 2,
             "Filtering on language works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(category="cts:edition", lang="deu")[0]), 1,
+            len(Repository._get_text_metadata(category="cts:edition", lang="deu")[0]), 1,
             "Type filter + lang works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(category="cts:translation", lang="deu")[0]), 1,
+            len(Repository._get_text_metadata(category="cts:translation", lang="deu")[0]), 1,
             "Type filter + lang works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(category="cts:commentary", lang="fre")[0]), 1,
+            len(Repository._get_text_metadata(category="cts:commentary", lang="fre")[0]), 1,
             "Type filter + lang works"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(page=1, limit=2, pagination=True)[0]), 2,
+            len(Repository._get_text_metadata(page=1, limit=2, pagination=True)[0]), 2,
             "Pagination works without other filters"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(page=2, limit=2, pagination=True)[0]), 2,
+            len(Repository._get_text_metadata(page=2, limit=2, pagination=True)[0]), 2,
             "Pagination works without other filters at list end"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(urn="urn:cts:formulae:passau")[0]), 7,
+            len(Repository._get_text_metadata(urn="urn:cts:formulae:passau")[0]), 7,
             "URN Filtering works. 7 texts should be found in Passau."
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(urn="a:different.identifier")[0]), 5,
+            len(Repository._get_text_metadata(urn="a:different.identifier")[0]), 5,
             "URN Filtering works. 5 texts should be found in a:different.identifier"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 1,
+            len(Repository._get_text_metadata(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 1,
             "Complete URN filtering works"
         )
 
@@ -145,15 +145,15 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
              "./tests/testing_data/guidelines_v3"]
         )
         self.assertIsNotNone(
-            Repository.__getText__("urn:cts:formulae:passau.heuwieser0073.lat005"),
+            Repository._get_text("urn:cts:formulae:passau.heuwieser0073.lat005"),
             "We should find Passau 73, version 5"
         )
         self.assertIsNotNone(
-            Repository.__getText__("urn:cts:formulae:passau.heuwieser0073.lat001"),
+            Repository._get_text("urn:cts:formulae:passau.heuwieser0073.lat001"),
             "We should find Passau 73, version 1"
         )
         self.assertEqual(
-            len(Repository.__getTextMetadata__()[0]), 19,
+            len(Repository._get_text_metadata()[0]), 19,
             "Texts repeated in the two repos should not be repeated in the resolver."
         )
 
@@ -161,7 +161,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
         """ Check Get Capabilities latinLit data"""
         Repository = XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3_missing"])
         self.assertEqual(
-            len(Repository.__getTextMetadata__(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 0,
+            len(Repository._get_text_metadata(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 0,
             "Texts without citations were ignored"
         )
 

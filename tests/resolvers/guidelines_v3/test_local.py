@@ -94,28 +94,8 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "General no filter works"
         )
         self.assertEqual(
-            len(Repository._get_text_metadata(category="cts:edition")[0]), 17,
-            "Type filter works"
-        )
-        self.assertEqual(
-            len(Repository._get_text_metadata(category="cts:commentary")[0]), 1,
-            "Type filter works"
-        )
-        self.assertEqual(
             len(Repository._get_text_metadata(lang="deu")[0]), 2,
             "Filtering on language works"
-        )
-        self.assertEqual(
-            len(Repository._get_text_metadata(category="cts:edition", lang="deu")[0]), 1,
-            "Type filter + lang works"
-        )
-        self.assertEqual(
-            len(Repository._get_text_metadata(category="cts:translation", lang="deu")[0]), 1,
-            "Type filter + lang works"
-        )
-        self.assertEqual(
-            len(Repository._get_text_metadata(category="cts:commentary", lang="fre")[0]), 1,
-            "Type filter + lang works"
         )
         self.assertEqual(
             len(Repository._get_text_metadata(page=1, limit=2, pagination=True)[0]), 2,
@@ -126,15 +106,15 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
             "Pagination works without other filters at list end"
         )
         self.assertEqual(
-            len(Repository._get_text_metadata(urn="urn:cts:formulae:passau")[0]), 7,
+            len(Repository._get_text_metadata(id="urn:cts:formulae:passau")[0]), 7,
             "URN Filtering works. 7 texts should be found in Passau."
         )
         self.assertEqual(
-            len(Repository._get_text_metadata(urn="a:different.identifier")[0]), 5,
+            len(Repository._get_text_metadata(id="a:different.identifier")[0]), 5,
             "URN Filtering works. 5 texts should be found in a:different.identifier"
         )
         self.assertEqual(
-            len(Repository._get_text_metadata(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 1,
+            len(Repository._get_text_metadata(id="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 1,
             "Complete URN filtering works"
         )
 
@@ -161,7 +141,7 @@ class TestXMLFolderResolverBehindTheScene(TestCase):
         """ Check Get Capabilities latinLit data"""
         Repository = XmlCapitainsLocalResolver(["./tests/testing_data/guidelines_v3_missing"])
         self.assertEqual(
-            len(Repository._get_text_metadata(urn="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 0,
+            len(Repository._get_text_metadata(id="urn:cts:formulae:passau.heuwieser0073.lat005")[0]), 0,
             "Texts without citations were ignored"
         )
 

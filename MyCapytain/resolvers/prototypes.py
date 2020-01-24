@@ -7,10 +7,11 @@
 
 """
 
-from typing import Tuple, Union, Optional, Dict, Any
+from typing import Tuple, Union, Optional, Dict, Any, Set
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.prototypes.text import TextualNode
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet
+from collections import defaultdict
 
 
 __all__ = [
@@ -24,6 +25,62 @@ class Resolver(object):
     Initiation of resolvers are dependent on the implementation of the prototype
 
     """
+    def __init__(self):
+        """
+        :ivar _id_to_coll: maps a collection id to that collection's object
+        :type _id_to_coll: {str: Collection}
+        :ivar _parents: maps a child id to the ids of its direct parents
+        :type _parents: {str: {str}}
+        :ivar _children: maps a parent id to the ids of its direct descendants, i.e., its children
+        :type _children: {str: {str}}
+
+        """
+        self._id_to_coll = dict()
+        self._parents = defaultdict(set)
+        self._children = defaultdict(set)
+
+    @property
+    def id_to_coll(self) -> Dict[str, Collection]:
+        """ Returns a mapping from collection's id to its Collection object"""
+        return self._id_to_coll
+
+    @id_to_coll.setter
+    def id_to_coll(self, id: str, collection: Collection):
+        """ Adds an id to coll mapping to self._id_to_coll"""
+        if not isinstance(id, str):
+            id = str(id)
+        if not isinstance(collection, Collection):
+            raise TypeError("'collection' must have be of type 'Collection'")
+        self._id_to_coll.update({id: collection})
+
+    @property
+    def parents(self) -> Dict[str, Set[str]]:
+        """ Returns a mapping from a collection's id to the ids of its direct parents"""
+        return self._parents
+
+    @parents.setter
+    def parents(self, collection_id: str, parent_id: str):
+        """ Adds a parent id to the set of a collection's parents"""
+        if not isinstance(collection_id, str):
+            collection_id = str(collection_id)
+        if not isinstance(parent_id, str):
+            parent_id = str(parent_id)
+        self._parents[collection_id].add(parent_id)
+
+    @property
+    def children(self) -> Dict[str, Set[str]]:
+        """ Returns a mapping from a collection's id to the ids of its direct children"""
+        return self._children
+
+    @children.setter
+    def children(self, collection_id: str, child_id: str):
+        """ Adds a child id to the set of a collection's children"""
+        if not isinstance(collection_id, str):
+            collection_id = str(collection_id)
+        if not isinstance(child_id, str):
+            child_id = str(child_id)
+        self._children[collection_id].add(child_id)
+
     def getMetadata(self, objectId: str=None, **filters) -> Collection:
         """ Request metadata about a text or a collection
 

@@ -16,8 +16,10 @@ from MyCapytain.resolvers.utils import CollectionDispatcher
 from MyCapytain.resources.collections.capitains import XmlCapitainsCollectionMetadata, \
     XmlCapitainsReadableMetadata
 from MyCapytain.resources.collections.cts import XmlCtsCitation
+from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.prototypes.capitains.collection import CapitainsCollectionMetadata
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
+from typing import Dict
 
 
 __all__ = [
@@ -63,18 +65,25 @@ class XmlCapitainsLocalResolver(Resolver):
         self._inventory = value
 
     @property
-    def texts(self):
+    def texts(self) -> Dict[str, Collection]:
         """ returns all readable texts
 
         :return: Readable descendants
         :rtype: {str: CapitainsReadableMetadata}
         """
         # Changed to a dictionary to match with the return type for XmlCapitainsCollectionMetadata.texts
-        return {text.id: text for text in self.inventory.readableDescendants}
+        texts = {}
+        for s in self.children.values():
+            for v in s:
+                c = self.id_to_coll[v]
+                if c.readable:
+                    texts[v] = c
+        return texts
 
     def __init__(self, resource, name=None, logger=None, dispatcher=None, autoparse=True):
         """ Initiate the XMLResolver
         """
+        super(XmlCapitainsLocalResolver, self).__init__()
         self.classes = {}
         self.classes.update(type(self).CLASSES)
 

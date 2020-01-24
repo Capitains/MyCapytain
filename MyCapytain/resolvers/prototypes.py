@@ -44,8 +44,7 @@ class Resolver(object):
         """ Returns a mapping from collection's id to its Collection object"""
         return self._id_to_coll
 
-    @id_to_coll.setter
-    def id_to_coll(self, id: str, collection: Collection):
+    def add_collection(self, id: str, collection: Collection):
         """ Adds an id to coll mapping to self._id_to_coll"""
         if not isinstance(id, str):
             id = str(id)
@@ -58,8 +57,7 @@ class Resolver(object):
         """ Returns a mapping from a collection's id to the ids of its direct parents"""
         return self._parents
 
-    @parents.setter
-    def parents(self, collection_id: str, parent_id: str):
+    def add_parent(self, collection_id: str, parent_id: str):
         """ Adds a parent id to the set of a collection's parents"""
         if not isinstance(collection_id, str):
             collection_id = str(collection_id)
@@ -72,8 +70,7 @@ class Resolver(object):
         """ Returns a mapping from a collection's id to the ids of its direct children"""
         return self._children
 
-    @children.setter
-    def children(self, collection_id: str, child_id: str):
+    def add_child(self, collection_id: str, child_id: str):
         """ Adds a child id to the set of a collection's children"""
         if not isinstance(collection_id, str):
             collection_id = str(collection_id)

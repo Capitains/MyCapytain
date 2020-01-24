@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 192</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>Codex diplomaticus Fuldensis (Ed. Dronke)</edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Your Name (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Dr. Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML</resp>
+               <persName xml:lang="mul">Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2019"/>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0/">
+                  Distributed under a Creative Commons Attribution 4.0 International License.
+               </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Codex diplomaticus Fuldensis</title>
+                  <editor>Ernst Friedrich Johann Dronke</editor>
+                  <imprint>
+                     <pubPlace>Kassel</pubPlace>
+                     <date when="1850" n="originalAusgabe">1850</date>
+                     <biblScope unit="pp">106</biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription von Codex diplomaticus Fuldensis, welches 1850 von Ernst Friedrich Johann Dronke herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)"
+                         n="charta"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="fulda_dronke.dronke0192">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p/>
+         </div>
+         <dateline>
+            <date/>
+         </dateline>
+      </front>
+      <body>
+         <div type="edition"
+              xml:lang="lat"
+              n="urn:cts:formulae:fulda_dronke.dronke0192.lat001">
+            <div type="textpart" subtype="charta" n="1">
+               <head xml:space="preserve"><w>Traditio</w> <w>Leidrati</w>.</head>
+               <p xml:space="preserve"><w>Ego</w> <w>Leidrat</w> <w>in</w> <w>supradicto</w> <w>pago</w> <w>[Salagewe]</w> <w>vel</w> <w>villa</w> <w>[Hnutilingi]</w> <w>totum</w> <w>trado</w>, <w>quicquid</w> <w>proprietatis</w> <w>habeo</w>, <w>et</w> <w>tria</w> <w>mancipia</w>: <w>Hartperaht</w>, <w>Helmswind</w>, <w>Hruadflat</w>, <w>et</w> <w>traditum</w> <w>sit</w> <w>post</w> <w>obitum</w> <w>meum</w> <w>ad</w> <w>sanctum</w> <w>Bonifatium</w> <w>elimosinam</w> <w>meam</w>.</p>
+            </div>
+         </div>
+      </body>
+   </text>
+</TEI>

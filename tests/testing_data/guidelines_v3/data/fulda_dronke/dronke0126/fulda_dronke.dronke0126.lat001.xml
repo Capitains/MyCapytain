@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 126</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>Codex diplomaticus Fuldensis (Ed. Dronke)</edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Your Name (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Dr. Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML</resp>
+               <persName xml:lang="mul">Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2019"/>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0/">
+                  Distributed under a Creative Commons Attribution 4.0 International License.
+               </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Codex diplomaticus Fuldensis</title>
+                  <editor>Ernst Friedrich Johann Dronke</editor>
+                  <imprint>
+                     <pubPlace>Kassel</pubPlace>
+                     <date when="1850" n="originalAusgabe">1850</date>
+                     <biblScope unit="pp">74</biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription von Codex diplomaticus Fuldensis, welches 1850 von Ernst Friedrich Johann Dronke herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)"
+                         n="charta"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="fulda_dronke.dronke0126">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p/>
+         </div>
+         <dateline>
+            <date/>
+         </dateline>
+      </front>
+      <body>
+         <div type="edition"
+              xml:lang="lat"
+              n="urn:cts:formulae:fulda_dronke.dronke0126.lat001">
+            <div type="textpart" subtype="charta" n="1">
+               <head xml:space="preserve"><w>Kartula</w> <w>traditionis</w> <w>Theotrici</w>.</head>
+               <p xml:space="preserve"><w>In</w> <w>dei</w> <w>nomine</w>. <w>Licet</w> <w>sint</w> <w>parva</w> <w>et</w> <w>exigus</w>, <w>quae</w> <w>pro</w> <w>meis</w> <w>inmensis</w> <w>offero</w> <w>sceleribus</w>, <w>tamen</w> <w>scio</w> <w>aequissimum</w> <w>iudicem</w> <w>plus</w> <w>devotionem</w> <w>mentis</w> <w>quam</w> <w>quantitatem</w> <w>perpendere</w> <w>muneris</w>. <w>Idcirco</w> <w>ego</w> <w>Theotricus</w> <w>inspirante</w> <w>dei</w> <w>gratia</w> <w>sana</w> <w>mente</w> <w>devotaque</w> <w>voluntate</w> <w>dono</w> <w>atque</w> <w>trado</w> <w>in</w> <w>elimosinam</w> <w>meam</w> <w>ad</w> <w>sanctum</w> <w>Bonifatium</w>, <w>qui</w> <w>corpore</w> <w>requiescit</w> <w>in</w> <w>pago</w> <w>Grapfelde</w> <w>in</w> <w>silva</w> <w>Bochonis</w> <w>prope</w> <w>ripam</w> <w>fluminis</w> <w>Fuldae</w>, <w>ubi</w> <w>vir</w> <w>venerabilis</w> <w>Paugolfus</w> <w>abbas</w> <w>turbae</w> <w>monachorum</w> <w>pius</w> <w>praeest</w> <w>pater</w>, <w>dimidiam</w> <w>meam</w> <w>paternalem</w> <w>hereditatem</w> <w>et</w> <w>duas</w> <w>partes</w> <w>de</w> <w>meo</w> <w>elaboratu</w> <w>in</w> <w>loco</w>, <w>qui</w> <w>dicitur</w> <w>Lantfrideshus</w>, <w>prope</w> <w>ripam</w> <w>fluminia</w> <w>Fuldae</w>, <w>id</w> <w>est</w> <w>terris</w>, <w>silvis</w>, <w>campis</w>, <w>pratis</w>, <w>pascuis</w>, <w>aquis</w> <w>aquarumque</w> <w>decursibus</w>, <w>domibus</w>, <w>aedificiis</w>, <w>mancipiis</w>, <w>quorum</w> <w>nomina</w> <w>haec</w> <w>sunt</w>: <w>Nandger</w>, <w>Theotunih</w>, <w>Prunhilt</w> <w>cum</w> <w>omni</w> <w>eorum</w> <w>supellectili</w> <w>et</w> <w>sumptu</w>, <w>ita</w> <w>ut</w> <w>a</w> <w>die</w> <w>praesente</w> <w>omnia</w> <w>illa</w> <w>in</w> <w>meam</w> <w>elimosinam</w> <w>in</w> <w>vestrum</w> <w>transeant</w> <w>dominium</w>, <w>ut</w> <w>firmissimam</w> <w>in</w> <w>omnibus</w> <w>habeatis</w> <w>potestatem</w> <w>facere</w> <w>de</w> <w>illa</w> <w>re</w>, <w>quicquid</w> <w>vobis</w> <w>placuerit</w>, <w>nullo</w> <w>quod</w> <w>absit</w> <w>contradicente</w>. <w>Actum</w> <w>in</w> <w>monasterio</w> <w>Fulda</w> <w>die</w> <w>VII</w>. <w>februarii</w>. <w>Ego</w> <w>Asger</w> <w>feci</w>.</p>
+            </div>
+         </div>
+      </body>
+   </text>
+</TEI>

@@ -1,0 +1,97 @@
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>
+               Digitale Transkription der Traditionen des Hochstifts Passau
+            </edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML/TEI</resp>
+               <persName>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+            <sponsor>Akademie der Wissenschaften in Hamburg</sponsor>
+            <sponsor>Universität Hamburg</sponsor>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2018"/>
+            <availability>
+                <licence target="https://creativecommons.org/licenses/by/4.0/">
+                    Distributed under a Creative Commons Attribution 4.0 International License.
+                </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <idno type="URI">http://d-nb.info/458436127</idno>
+                  <title>Die Traditionen des Hochstifts Passau</title>
+                  <editor>Heuwieser, Max</editor>
+                  <imprint>
+                     <publisher>Komission für bayerische Landgeschichte bei der Bayerischen Akademie der Wissenschaften</publisher>
+                     <pubPlace>München</pubPlace>
+                     <date when="1930" n="originalAusgabe">1930</date>
+                     <date when="1969" n="neudruck">1969</date>
+                     <biblScope unit="pp">61-62</biblScope>
+                  </imprint>
+               </monogr>
+               <series>
+                  <title level="s">Quellen und Erörterungen zur bayerischen Geschichte</title>
+                  <title level="s">Neue Folge</title>
+                  <biblScope unit="volume">6</biblScope>
+               </series>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription der Traditionen des Hochstifts Passau, welche 1930 von Max Heuwieser herausgegeben worden ist.Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)" n="charta" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="passau.heuwieser0073">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p>ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH). </p>
+         </div>
+         <div type="section" subtype="ausstellungsort">
+            <p>Triftern</p>
+         </div>
+         <dateline>818-838.<date notBefore="0818" notAfter="0838"/></dateline></front>
+      <body>
+                     <div type="edition" xml:lang="lat" n="urn:cts:formulae:passau.heuwieser0073.lat005">
+                        <div type="textpart" subtype="charta" n="1">
+                           <p xml:space="preserve"><w>d</w>) (<w>C</w>) <w>Ad</w> <w>Perinpah</w> <w>unam</w> <w>basilicam</w> <w>sine</w> <w>quisitione</w> <w>a</w> <w>sancto</w> <w>Stephano</w> <w>raptum</w> <w>est</w> <w>ad</w> <w>Filusa</w> <w>quod</w> <w>Onhart</w> <w>tradidit</w> <w>ad</w> <w>sanctum</w> <w>Stephanum</w> <w>et</w> <w>vestivit</w>.</p>
+                        </div>
+                     </div>
+                  </body>
+   </text>
+</TEI>

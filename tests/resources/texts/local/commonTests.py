@@ -838,7 +838,6 @@ class CapitainsXMLRangePassageTests(TestCase):
 
     def test_first_list(self):
         passage = self.text.getTextualNode(MyCapytain.common.reference.CtsReference("2.39"))
-        print(list(passage.children), str(passage.firstId))
         self.assertEqual(
             "2.39.1", str(passage.firstId),
             "First reff should be the first"

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../capitains.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<collection xmlns:ti="http://chs.harvard.edu/xmlns/cts"
+            xmlns:dct="http://purl.org/dc/terms/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns="http://purl.org/capitains/ns/1.0#"
+            xmlns:owl="http://www.w3.org/2002/07/owl#"
+            xmlns:bib="http://bibliotek-o.org/1.0/ontology/">
+   <identifier>urn:cts:formulae:salzburg.hauthaler-a0100</identifier>
+   <parent>urn:cts:formulae:salzburg</parent>
+   <dc:title xml:lang="deu">Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100</dc:title>
+   <dc:type>cts:work</dc:type>
+   <members>
+      <collection readable="true" path="./salzburg.hauthaler-a0100.lat001.xml">
+         <identifier>urn:cts:formulae:salzburg.hauthaler-a0100.lat001</identifier>
+         <parent>urn:cts:formulae:salzburg.hauthaler-a0100</parent>
+         <dc:title xml:lang="deu">Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100</dc:title>
+         <dc:description xml:lang="deu">a) Der Edle Vodalhard (Odalhard) übergibt dem Erzbischof 7 Huben am Ergoltsbach (Zufluss der kleinen Laber n. Landshut) mit Vorbehalt von 3 Joch in jeder Zelch und einer Hofstatt auf der Westseite als Hantgemâl (Stammgut), wofür er zu ewigem Eigenthum für sich und seine Nachkommen erhält, was er bisher zu Weidenbach (w. Ampfing) als Eigen innegehabt hat, nur ausgenommen die Kirche, den Kirchhof und eine Baustätte. b) Altorf übergibt dem Erzbischof am gleichen Tage 5 Hubcn zu Ergoltsbach und erhält dafür Volagangesperch (seit 13. Jahrh. Neumarkt a/Rott), wieder ausgenommen die Kirche, den Kirchhof und eine Baustätte.</dc:description>
+         <dc:language>lat</dc:language>
+         <dc:type>cts:edition</dc:type>
+         <dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Magdalena Hermann-Kowalczyk (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+         <dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+         <dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+         <dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+         <dc:format>application/tei+xml</dc:format>
+         <dc:source>Salzburger Urkundenbuch; Codex A Nummer 100, in: Willibald Hauthaler, Salzburger Urkundenbuch Bd. 2, Salzburg 1910, S. 162-163.</dc:source>
+         <structured-metadata>
+            <dct:abstract xml:lang="deu"/>
+            <bib:editor>Hauthaler, Willibald</bib:editor>
+            <dct:dateCopyrighted>1910</dct:dateCopyrighted>
+            <dct:created/>
+            <dct:bibliographicCitation>Salzburger Urkundenbuch; Codex A Nummer 100, in: Willibald Hauthaler, Salzburger Urkundenbuch Bd. 2, Salzburg 1910, S. 162-163.</dct:bibliographicCitation>
+         </structured-metadata>
+      </collection>
+   </members>
+</collection>

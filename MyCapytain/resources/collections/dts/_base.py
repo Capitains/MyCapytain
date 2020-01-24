@@ -53,10 +53,10 @@ class DtsCollection(Collection):
         return False
 
     @property
-    def parents(self):
+    def ancestors(self):
         return self._parents
 
-    @parents.setter
+    @ancestors.setter
     def parents(self, value):
         self._parents = value
 
@@ -111,7 +111,7 @@ class DtsCollection(Collection):
                 for coll in members
             })
         else:
-            self.parents.add(members)
+            self.ancestors.add(members)
 
     def _parse_metadata(self, data: dict):
 
@@ -165,7 +165,7 @@ class DtsCollection(Collection):
         for member in obj.get(str(_hyd.member), []):
             subcollection = cls.parse(member, **additional_parameters)
             if direction == "children":
-                subcollection.parents.update({collection})
+                subcollection.ancestors.update({collection})
             members.append(subcollection)
 
         return members

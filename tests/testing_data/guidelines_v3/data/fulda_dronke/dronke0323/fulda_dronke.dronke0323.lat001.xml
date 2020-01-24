@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 323</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>Codex diplomaticus Fuldensis (Ed. Dronke)</edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Your Name (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Dr. Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML</resp>
+               <persName xml:lang="mul">Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2019"/>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0/">
+                  Distributed under a Creative Commons Attribution 4.0 International License.
+               </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Codex diplomaticus Fuldensis</title>
+                  <editor>Ernst Friedrich Johann Dronke</editor>
+                  <imprint>
+                     <pubPlace>Kassel</pubPlace>
+                     <date when="1850" n="originalAusgabe">1850</date>
+                     <biblScope unit="pp">156-157</biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription von Codex diplomaticus Fuldensis, welches 1850 von Ernst Friedrich Johann Dronke herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)"
+                         n="charta"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="fulda_dronke.dronke0323">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p/>
+         </div>
+         <dateline>
+            <date/>
+         </dateline>
+      </front>
+      <body>
+         <div type="edition"
+              xml:lang="lat"
+              n="urn:cts:formulae:fulda_dronke.dronke0323.lat001">
+            <div type="textpart" subtype="charta" n="1">
+               <head xml:space="preserve"><w>Conventio</w> <w>inter</w> <w>Wolfgerum</w> <w>episcopum</w> <w>et</w> <w>Ratgarium</w> <w>abbatem</w> <w>confirmata</w> <w>a</w> <w>Ludowici</w> <w>imperatore</w>.</head>
+               <p xml:space="preserve"><w>Notum</w> <w>sit</w> <w>omnibus</w> <w>Christi</w> <w>fidelibus</w>. <w>Qualiter</w> <w>secundo</w> <w>Wolfger</w> <w>episcopus</w> <w>et</w> <w>Ratgarius</w> <w>abbas</w> <w>cum</w> <w>clericis</w> <w>cuis</w> <w>et</w> <w>populis</w> <w>conuentum</w> <w>fecerunt</w> <w>in</w> <w>loco</w> <w>qui</w> <w>dicitur</w>, <w>Rezzibach</w> <w>cum</w> <w>nuntiis</w> <w>gloriosissimi</w> <w>imperatoris</w> <w>Ludowici</w>. <w>Ut</w> <w>pristina</w> <w>discordia</w> <w>que</w> <w>suadente</w> <w>diabolo</w> <w>inter</w> <w>eos</w> <w>versabatur</w>. <w>Ad</w> <w>veram</w> <w>concordiam</w> <w>et</w> <w>caritatem</w> <w>converteretur</w>. <w>Quod</w> <w>ita</w> <w>deo</w> <w>propicio</w> <w>fecerunt</w>. <w>Dedit</w> <w>igitur</w> <w>Wolfgerus</w> <w>episcopus</w> <w>cum</w> <w>consilio</w> <w>fratrum</w> <w>suorum</w> <w>suprascripto</w> <w>abbati</w> <w>sicut</w> <w>ei</w> <w>uisum</w> <w>fuerat</w> <w>de</w> <w>decimatione</w> <w>sua</w>. <w>Sicut</w> <w>ipse</w> <w>abbas</w> <w>cum</w> <w>fratribus</w> <w>suis</w> <w>ab</w> <w>eo</w> <w>postulavit</w>. <w>In</w> <w>primis</w> <w>ad</w> <w>ecclesiam</w> <w>que</w> <w>est</w> <w>constructa</w> <w>in</w> <w>villa</w> <w>vocata</w> <w>Mechimunil</w>. <w>Ipsam</w> <w>villam</w> <w>et</w> <w>alias</w> <w>duas</w>. <w>Quarum</w> <w>vocabula</w> <w>sunt</w>. <w>Ruchesheim</w>. <w>Et</w> <w>Wargesowe</w>. <w>Ad</w> <w>Elrebach</w> <w>eandem</w> <w>villam</w> <w>ubi</w> <w>ecclesia</w> <w>est</w>. <w>Ad</w> <w>monasterium</w> <w>quo</w> <w>vocatur</w> <w>Holzkircha</w>. <w>Et</w> <w>villas</w> <w>quinque</w> <w>cum</w> <w>ipso</w> <w>monasterio</w>. <w>Et</w> <w>hec</w> <w>nomina</w> <w>earum</w>. <w>Nuwenbrunno</w>. <w>Helbingestat</w>. <w>Gundichenhusun</w>. <w>Et</w> <w>in</w> <w>Aldereheim</w>. <w>Ipsius</w> <w>abbatis</w> <w>servi</w>. <w>Similiter</w> <w>ad</w> <w>Stetin</w>. <w>Ipsius</w> <w>servi</w>. <w>In</w> <w>villa</w> <w>que</w> <w>dicitur</w> <w>Munrichestat</w>. <w>Quod</w> <w>constat</w> <w>ex</w> <w>suis</w> <w>propriis</w> <w>aratris</w>. <w>Acceptis</w> <w>servorum</w> <w>suorum</w> <w>bonis</w>. <w>Simili</w> <w>modo</w> <w>in</w> <w>villa</w> <w>vocata</w> <w>Romulde</w> <w>ad</w> <w>Bunaha</w> <w>ubi</w> <w>ecclesia</w> <w>edificata</w> <w>est</w>. <w>Similiter</w> <w>ad</w> <w>Tulba</w> <w>ubi</w> <w>nova</w> <w>ecclesia</w> <w>ordinata</w> <w>est</w>. <w>Ad</w> <w>monasterium</w> <w>quod</w> <w>dicitur</w> <w>Ratesdorf</w>. <w>Cum</w> <w>ipso</w> <w>monasterio</w>. <w>VII</w>. <w>villas</w>. <w>Et</w> <w>hec</w> <w>vocabula</w> <w>earum</w>. <w>Due</w> <w>Taftaha</w>. <w>Treisfelt</w>. <w>Grunzenbach</w>. <w>Geismare</w>. <w>Borsaha</w>. <w>In</w> <w>villa</w> <w>quae</w> <w>vocatur</w> <w>Soresdorf</w>. <w>Ipsius</w> <w>abbatis</w> <w>servi</w>. <w>Similiter</w> <w>ad</w> <w>Kincihe</w>. <w>Ipsius</w> <w>servi</w>. <w>Ad</w> <w>cella</w>, <w>que</w> <w>vocatur</w> <w>Hunifelt</w> <w>et</w> <w>cum</w> <w>eadem</w> <w>cella</w>. <w>VI</w>. <w>villas</w> <w>et</w> <w>hec</w> <w>vocabula</w> <w>earum</w>. <w>Rosbach</w> <w>tria</w> <w>Haselaha</w>. <w>Huniham</w>. <w>Ad</w> <w>Sundheim</w> <w>ubi</w> <w>ecclesia</w> <w>constructa</w> <w>est</w>. <w>Ad</w> <w>Fleidene</w>. <w>Servi</w> <w>eius</w>. <w>Similiter</w> <w>ad</w> <w>Kinciche</w> <w>servi</w> <w>eius</w>. <w>Lutra</w>. <w>Arnebrunno</w>. <w>Breitenbach</w>. <w>Ad</w> <w>Rore</w> <w>servi</w> <w>eius</w>. <w>Dietericheshusun</w>. <w>Frisenhusen</w>. <w>Hemmingeshusen</w> <w>et</w> <w>Treisbach</w>. <w>Necnon</w> <w>et</w> <w>in</w> <w>omnibus</w> <w>villis</w> <w>et</w> <w>biuangis</w> <w>et</w> <w>novalibus</w> <w>que</w> <w>capta</w> <w>et</w> <w>possessa</w> <w>sunt</w>. <w>Ex</w> <w>his</w> <w>duabus</w> <w>forestis</w> <w>quas</w> <w>Pippinus</w> <w>et</w> <w>Karolus</w> <w>sancto</w> <w>Bonifatio</w> <w>et</w> <w>Sturmi</w> <w>abbati</w> <w>ad</w> <w>manus</w> <w>tradiderunt</w>. <w>Hoc</w> <w>est</w> <w>Bramvirst</w>. <w>Salzvorst</w> <w>et</w> <w>per</w> <w>totam</w> <w>Bochoniam</w>. <w>Illud</w> <w>quoque</w> <w>conplacuit</w> <w>firmirterque</w> <w>sancitum</w> <w>est</w>. <w>Quatinus</w> <w>omnibus</w> <w>in</w> <w>locis</w> <w>ad</w> <w>sanctum</w> <w>Bonifacium</w> <w>intra</w> <w>parrochiam</w> <w>suam</w> <w>pertinentibus</w>. <w>De</w> <w>curtibus</w>. <w>De</w> <w>ecclesiis</w>. <w>De</w> <w>territoriis</w>. <w>De</w> <w>novalibus</w> <w>vel</w> <w>villis</w>. <w>De</w> <w>clericorum</w> <w>et</w> <w>ministrorum</w> <w>prediis</w> <w>et</w> <w>beneficiis</w>. <w>De</w> <w>lidis</w>. <w>Triduanis</w>. <w>Liberis</w>. <w>Colonis</w>. <w>Sclavis</w> <w>et</w> <w>quicquid</w> <w>huiusmodi</w> <w>est</w>. <w>Absque</w> <w>omni</w> <w>contradictione</w> <w>abbati</w> <w>decime</w> <w>ab</w> <w>apostolocis</w> <w>pontificibus</w> <w>concesse</w> <w>et</w> <w>ab</w> <w>imperatoribus</w> <w>et</w> <w>ab</w> <w>antiquis</w> <w>regibus</w> <w>confirmate</w> <w>permaneant</w>. <w>Nec</w> <w>episcopus</w> <w>vel</w> <w>ipsius</w> <w>clerici</w> <w>ullam</w> <w>in</w> <w>his</w> <w>exigendi</w> <w>exerceant</w> <w>ulterius</w> <w>potestatem</w>. <w>Preterea</w> <w>confirmatum</w> <w>est</w>. <w>Ut</w> <w>si</w> <w>a</w> <w>successoribus</w> <w>utriusque</w> <w>sopite</w> <w>discordie</w> <w>aliquid</w> <w>emerserit</w>. <w>ad</w> <w>audientiam</w> <w>imperatoris</w> <w>illo</w> <w>tempore</w> <w>monarchiam</w> <w>gubernantis</w> <w>deferatur</w>. <w>quo</w> <w>mediante</w> <w>terminetur</w>. <w>Predicte</w> <w>conventioni</w> <w>interfuerunt</w> <w>Meginboldus</w> <w>et</w> <w>Truandus</w> <w>legati</w> <w>Ludewici</w> <w>imperatoris</w> <w>gloriosissimi</w> <w>missi</w> <w>a</w> <w>latere</w> <w>ipsius</w>. <w>qui</w> <w>vicaria</w> <w>potestate</w> <w>eiusdem</w> <w>predictam</w> <w>conventionem</w> <w>tam</w> <w>ipsi</w> <w>quam</w> <w>predicti</w> <w>episcopus</w> <w>et</w> <w>abbas</w> <w>eaudem</w> <w>conventionem</w> <w>confirmaverunt</w> <w>et</w> <w>confirmatam</w> <w>ad</w> <w>presentiam</w> <w>eiusdem</w> <w>Ludewici</w> <w>piisimi</w> <w>imperatoris</w> <w>ipsis</w> <w>presentibus</w> <w>detulerunt</w>. <w>Ego</w> <w>vero</w> <w>Ludewicus</w> <w>Romanorum</w> <w>imperator</w> <w>et</w> <w>semper</w> <w>augustus</w> <w>petentibus</w> <w>utrisque</w> <w>predicto</w> <w>episcopo</w> <w>et</w> <w>abbate</w> <w>ex</w> <w>consensu</w> <w>et</w> <w>voluntate</w> <w>principum</w> <w>imperii</w> <w>hanc</w> <w>conventionem</w> <w>ratam</w> <w>haberi</w> <w>decrevi</w>. <w>et</w> <w>ut</w> <w>in</w> <w>posterum</w> <w>sine</w> <w>controversia</w> <w>permaneat</w>. <w>Sigillo</w> <w>anuli</w> <w>nostri</w> <w>confirmavi</w> <w>Signum</w> <w>domni</w> <w>Ludewici</w> (<w>M</w>) <w>pii</w> <w>et</w> <w>invictissimi</w> <w>imperatoris</w> <w>Romanorum</w>. <w>Signum</w> <w>Egilolfi</w>. <w>ꝉ</w>. <w>Signum</w> <w>Alberici</w>. <w>ꝉ</w>. <w>Signum</w> <w>Orentili</w>. <w>ꝉ</w>. <w>Signum</w> <w>Otperti</w>. <w>ꝉ</w>. <w>Signum</w> <w>Gerlahi</w>. <w>ꝉ</w>. <w>Signum</w> <w>Rutfridi</w>. <w>ꝉ</w>. <w>Signum</w> <w>Hunberti</w>. <w>ꝉ</w>. <w>Signum</w> <w>Alberici</w>. <w>ꝉ</w>. <w>Signum</w> <w>Meginboldi</w>. <w>ꝉ</w>. <w>Signum</w> <w>Truandi</w>. <w>ꝉ</w>. <w>Data</w> <w>VI</w>. <w>non</w>. <w>Mai</w>. <w>anno</w> <w>deo</w> <w>procipio</w>. <w>III°</w>. <w>imperii</w> <w>domini</w> <w>Ludewici</w> <w>imperatoris</w>. <w>Actum</w> <w>Aquisgrani</w> <w>in</w> <w>palatio</w> <w>regio</w>. (<w>S</w>.)</p>
+            </div>
+         </div>
+      </body>
+   </text>
+</TEI>

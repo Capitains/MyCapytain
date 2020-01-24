@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 4a</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>Codex diplomaticus Fuldensis (Ed. Dronke)</edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Your Name (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Dr. Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML</resp>
+               <persName xml:lang="mul">Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2019"/>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0/">
+                  Distributed under a Creative Commons Attribution 4.0 International License.
+               </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Codex diplomaticus Fuldensis</title>
+                  <editor>Ernst Friedrich Johann Dronke</editor>
+                  <imprint>
+                     <pubPlace>Kassel</pubPlace>
+                     <date when="1850" n="originalAusgabe">1850</date>
+                     <biblScope unit="pp">2-3.</biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription von Codex diplomaticus Fuldensis, welches 1850 von Ernst Friedrich Johann Dronke herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)"
+                         n="charta"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="fulda_dronke.dronke0004a">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p/>
+         </div>
+         <dateline>
+            <date/>
+         </dateline>
+      </front>
+      <body>
+         <div type="edition"
+              xml:lang="lat"
+              n="urn:cts:formulae:fulda_dronke.dronke0004a.lat001">
+            <div type="textpart" subtype="charta" n="1">
+               <head xml:space="preserve"><w>Privilegium</w> <w>Zachariae</w> <w>papae</w> <w>Bonifatio</w> <w>datum</w>.</head>
+               <p xml:space="preserve"><w>Zacharias</w> <w>papa</w> <w>Bonifatio</w> <w>episcopo</w> <w>et</w> <w>per</w> <w>eum</w> <w>in</w> <w>monasterio</w> <w>ab</w> <w>eo</w> <w>constructo</w> <w>successim</w> <w>abbatibus</w> <w>in</w> <w>perpetuum</w>. <w>Quoniam</w> <w>semper</w> <w>sunt</w> <w>concedenda</w> <w>quae</w> <w>rationalibus</w> <w>congruunt</w> <w>desideriis</w>. <w>oportet</w> <w>ut</w> <w>devotioni</w> <w>conditoris</w> <w>piae</w> <w>constructionis</w> <w>auctoritas</w> <w>in</w> <w>privilegiis</w> <w>prestandis</w> <w>minime</w> <w>denegetur</w>. <w>Igitur</w> <w>quia</w> <w>postulasti</w> <w>a</w> <w>nobis</w> <w>quatenus</w> <w>monasterium</w> <w>salvatoris</w> <w>a</w> <w>te</w> <w>constructum</w> <w>in</w> <w>loco</w> <w>qui</w> <w>vocatur</w> <w>Boconia</w> <w>erga</w> <w>ripam</w> <w>fluminis</w> <w>Uultaha</w> <w>privilegii</w> <w>sedis</w> <w>apostolicae</w> <w>infulis</w> <w>decoretur</w>. <w>ut</w> <w>sub</w> <w>iuris</w> <w>ditione</w> <w>sanctae</w> <w>nostrae</w> <w>cui</w> <w>domino</w> <w>auctore</w> <w>deservimus</w> <w>aecclesiae</w> <w>constitutum</w>. <w>nullius</w> <w>alterius</w> <w>aecclesiae</w> <w>iuris</w> <w>ditionibus</w> <w>submittatur</w>. <w>pro</w> <w>qua</w> <w>re</w> <w>piis</w> <w>desideriis</w> <w>faventes</w>. <w>hac</w> <w>nostra</w> <w>auctoritate</w> <w>id</w> <w>quod</w> <w>exposcitur</w> <w>effectui</w> <w>mancipamus</w>. <w>et</w> <w>ideo</w> <w>omnem</w> <w>cuiuslibet</w> <w>aecclesiae</w> <w>sacerdotem</w> <w>in</w> <w>prefato</w> <w>monasterio</w> <w>ditionem</w> <w>quamlibet</w> <w>habere</w> <w>aut</w> <w>auctoritatem</w> <w>preter</w> <w>sedem</w> <w>apostolicam</w> <w>prohibemus</w>. <w>ita</w> <w>ut</w> <w>nisi</w> <w>ab</w> <w>abbate</w> <w>monasterii</w> <w>fuerit</w> <w>invitatus</w>. <w>nec</w> <w>missarum</w> <w>ibidem</w> <w>sollemnitatem</w> <w>quispiam</w> <w>presumat</w> <w>omnimodo</w> <w>celebrare</w>. <w>ut</w> <w>profecto</w> <w>iuxta</w> <w>id</w> <w>quod</w> <w>subiectum</w> <w>apostolicae</w> <w>sedi</w> <w>firmitate</w> <w>privilegii</w> <w>consistit</w>. <w>inconcusse</w> <w>dotatum</w> <w>permaneat</w>. <w>locis</w> <w>et</w> <w>rebus</w>. <w>tam</w> <w>eis</w> <w>quas</w> <w>moderno</w> <w>tempore</w> <w>tenet</w> <w>vel</w> <w>possidet</w>. <w>quam</w> <w>que</w> <w>futuris</w> <w>temporibus</w> <w>in</w> <w>iure</w> <w>ipsius</w> <w>monasterii</w> <w>divina</w> <w>pietas</w> <w>voluerit</w> <w>augere</w> <w>ex</w> <w>donis</w> <w>et</w> <w>oblationibus</w> <w>decimisque</w> <w>fidelium</w> <w>absque</w> <w>ullius</w> <w>personae</w> <w>contradictione</w> <w>firmitate</w> <w>perpetua</w> <w>perfruatur</w>. <w>Constitvimus</w> <w>quoque</w> <w>per</w> <w>huius</w> <w>decreti</w> <w>nostri</w> <w>paginam</w>. <w>ut</w> <w>quicunque</w> <w>cuiuslibet</w> <w>aeccelesiae</w> <w>presul</w>. <w>vel</w> <w>quacunque</w> <w>dignitate</w> <w>predita</w> <w>persona</w> <w>hanc</w> <w>nostri</w> <w>privilegii</w> <w>cartam</w>. <w>quam</w> <w>auctoritate</w> <w>principis</w> <w>apostolorum</w> <w>firmamus</w> <w>temerare</w> <w>temptaverit</w>. <w>Anathema</w> <w>sit</w>. <w>et</w> <w>iram</w> <w>dei</w> <w>incurrens</w> <w>a</w> <w>cetu</w> <w>sanctorum</w> <w>omnium</w> <w>extorris</w> <w>existat</w>. <w>et</w> <w>nihilominus</w> <w>prefati</w> <w>monasterii</w> <w>dignitas</w> <w>a</w> <w>nobis</w> <w>indulta</w> <w>perpetualiter</w> <w>inviolata</w> <w>permaneat</w> <w>apostolica</w> <w>auctoritate</w> <w>subnixa</w>.</p>
+            </div>
+         </div>
+      </body>
+   </text>
+</TEI>

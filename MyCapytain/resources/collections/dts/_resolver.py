@@ -134,7 +134,7 @@ class HttpResolverDtsCollection(DtsCollection):
                     )
                 })
             else:
-                self.parents.update({
+                self.ancestors.update({
                     o
                     for o in type(self).parse_member(
                         obj=data, collection=self, direction=direction, resolver=self._resolver
@@ -167,7 +167,7 @@ class HttpResolverDtsCollection(DtsCollection):
         return self._children
 
     @property
-    def parents(self):
+    def ancestors(self):
         if self._parsed["parents"] and isinstance(self._parents, PaginatedProxy):
             self._parents = self._parents._proxied
         return self._parents
@@ -208,7 +208,7 @@ class HttpResolverDtsCollection(DtsCollection):
             for member in hydra_members:
                 subcollection = cls.parse(member, metadata_parsed=False, **additional_parameters)
                 if direction == "children":
-                    subcollection.parents.set({collection})
+                    subcollection.ancestors.set({collection})
                 members.append(subcollection)
 
             if "https://www.w3.org/ns/hydra/core#view" not in obj or \

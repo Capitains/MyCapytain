@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://digitallatin.github.io/guidelines/critical-editions.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="deu">
+      <fileDesc>
+         <titleStmt>
+            <title>Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 616</title>
+         </titleStmt>
+         <editionStmt>
+            <edition>Codex diplomaticus Fuldensis (Ed. Dronke)</edition>
+            <respStmt>
+               <resp>Projektleiter</resp>
+               <resp xml:lang="eng">Principal investigator</resp>
+               <persName>Prof. Dr. Philippe Depreux (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Korrektur</resp>
+               <resp xml:lang="eng">Proofreading</resp>
+               <persName>Franziska Quaas (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Dokument- und Urkundenbearbeitung</resp>
+               <resp xml:lang="eng">Initial charter processing</resp>
+               <persName>Your Name (Studentische Hilfskraft, Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Hauptentwickler</resp>
+               <resp xml:lang="eng">Lead developer</resp>
+               <persName>Dr. Matthew Munson (Universität Hamburg)</persName>
+            </respStmt>
+            <respStmt>
+               <resp>Umwandlung in XML/TEI</resp>
+               <resp xml:lang="eng">Conversion into XML</resp>
+               <persName xml:lang="mul">Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</persName>
+            </respStmt>
+         </editionStmt>
+         <publicationStmt>
+            <publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</publisher>
+            <pubPlace>Hamburg</pubPlace>
+            <date when="2019"/>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by/4.0/">
+                  Distributed under a Creative Commons Attribution 4.0 International License.
+               </licence>
+            </availability>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Codex diplomaticus Fuldensis</title>
+                  <editor>Ernst Friedrich Johann Dronke</editor>
+                  <imprint>
+                     <pubPlace>Kassel</pubPlace>
+                     <date when="1850" n="originalAusgabe">1850</date>
+                     <biblScope unit="pp">278</biblScope>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <p>Bei dieser Datei handelt es sich um eine OCR-bearbeitete Transkription von Codex diplomaticus Fuldensis, welches 1850 von Ernst Friedrich Johann Dronke herausgegeben worden ist. Die OCR-Texte wurden korrigiert und in gemäß TEI-P5-Vorgaben in einzelne XML-TEI-Dateien, umgewandelt. Auf dieser Grundlage und unter Einhaltung der CapiTainS-Vorgaben wurde die Formulae-Litterae-Chartae-Projektdatenbank erstellt.</p>
+         <refsDecl n="CTS">
+            <cRefPattern matchPattern="(.+)"
+                         n="charta"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+         </refsDecl>
+      </encodingDesc>
+   </teiHeader>
+   <text type="charta" xml:id="fulda_dronke.dronke0616">
+      <front xml:lang="deu">
+         <div type="section" subtype="regest">
+            <p/>
+         </div>
+         <dateline>
+            <date/>
+         </dateline>
+      </front>
+      <body>
+         <div type="edition"
+              xml:lang="lat"
+              n="urn:cts:formulae:fulda_dronke.dronke0616.lat001">
+            <div type="textpart" subtype="charta" n="1">
+               <head xml:space="preserve"><w>Praeceptum</w> <w>Ludowici</w> <w>imperatoris</w>.</head>
+               <p xml:space="preserve"><w>In</w> <w>nomine</w> <w>sancte</w> <w>individue</w> <w>trinitatis</w> <w>Ludewicus</w> <w>Romanorum</w> <w>imperator</w> <w>augustus</w>. <w>Quoniam</w> <w>ea</w> <w>que</w> <w>monasterii</w> <w>locis</w> <w>deo</w> <w>dicatis</w> <w>a</w> <w>fidelibus</w> <w>sancte</w> <w>dei</w> <w>ecclesie</w> <w>iure</w> <w>traduntur</w> <w>nostra</w> <w>auctoritate</w> <w>corroborari</w> <w>debentur</w>. <w>Idcirco</w> <w>notum</w> <w>esse</w> <w>volumus</w> <w>omnibus</w> <w>nostris</w> <w>Christique</w> <w>fidelibus</w> <w>tam</w> <w>futuris</w> <w>quam</w> <w>presentibus</w>. <w>Qualiter</w> <w>ob</w> <w>peticionem</w> <w>fidelis</w> <w>nostri</w> <w>Sigehardi</w> <w>fuldensis</w> <w>abbatis</w> <w>tradimus</w> <w>et</w> <w>confirmamus</w> <w>eidem</w> <w>fuldensi</w> <w>monasterio</w> <w>loca</w> <w>quedam</w> <w>a</w> <w>nostris</w> <w>parcutibus</w> <w>Pippino</w> <w>et</w> <w>Carlomanno</w> <w>contradita</w> <w>hoc</w> <w>est</w> <w>Cellingen</w>. <w>Recibah</w>. <w>Tetdelbach</w>. <w>Et</w> <w>Huntesfeld</w>. <w>Cum</w> <w>omnibus</w> <w>appendiciis</w> <w>et</w> <w>compertinentiis</w> <w>suis</w> <w>traitaque</w> <w>et</w> <w>confirmata</w> <w>ea</w> <w>in</w> <w>perpetuum</w> <w>esse</w> <w>decernimus</w>. <w>Iussimus</w> <w>ergo</w> <w>presentem</w> <w>eartam</w> <w>inde</w> <w>conscribi</w> <w>et</w> <w>nostre</w> <w>auctoritatis</w> <w>precepto</w> <w>eam</w> <w>confirmari</w> <w>per</w> <w>quod</w> <w>iubemus</w> <w>firmiterque</w> <w>mandamus</w> <w>ut</w> <w>predictus</w> <w>abbas</w> <w>de</w> <w>his</w> <w>locis</w> <w>firmam</w> <w>habeat</w> <w>potestatem</w> <w>quicquid</w> <w>utilitatis</w> <w>sue</w> <w>ecclesie</w> <w>exigit</w> <w>iude</w> <w>faciendi</w> <w>sine</w> <w>ullius</w> <w>contradictionis</w> <w>obstaculo</w>. <w>Et</w> <w>ut</w> <w>hec</w> <w>tradicio</w> <w>firmiorem</w> <w>in</w> <w>die</w> <w>nomine</w> <w>postmodum</w> <w>obtineat</w> <w>stabilitatem</w> <w>manu</w> <w>nostra</w> <w>subter</w> <w>firmavimus</w> <w>anuloque</w> <w>nostro</w> <w>signiri</w> <w>iussimus</w>. <w>Signum</w> <w>domni</w> <w>Ludowici</w> <w>gloriosissimi</w> <w>imperatoris</w> <w>augusti</w>.</p>
+            </div>
+         </div>
+      </body>
+   </text>
+</TEI>

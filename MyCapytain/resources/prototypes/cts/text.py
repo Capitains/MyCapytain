@@ -97,7 +97,7 @@ class PrototypeCtsNode(InteractiveTextualNode):
         :param text_metadata: Object representing the current text as a collection
         :type text_metadata: CtsTextMetadata
         """
-        edition, work, textgroup = tuple(([text_metadata] + text_metadata.parents)[:3])
+        edition, work, textgroup = tuple(([text_metadata] + text_metadata.ancestors)[:3])
 
         for node in textgroup.metadata.get(RDF_NAMESPACES.CTS.groupname):
             lang = node.language

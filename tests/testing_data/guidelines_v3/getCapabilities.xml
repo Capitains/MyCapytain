@@ -1,0 +1,768 @@
+<cpt:collection path="None" xmlns:dct="http://purl.org/dc/terms/" xmlns:cpt="http://purl.org/capitains/ns/1.0#" xmlns:dts="https://w3id.org/dts/api#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bib="http://bibliotek-o.org/1.0/ontology/">
+<cpt:identifier>defaultTic</cpt:identifier>
+<cpt:members>
+<cpt:collection path="None">
+<cpt:identifier>default</cpt:identifier>
+<cpt:parent>defaultTic</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/elexicon/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:elexicon</cpt:identifier>
+<dc:title xml:lang="fre">Lexique</dc:title>
+<dc:title xml:lang="deu">Lexikon</dc:title>
+<dc:title xml:lang="eng">Lexicon</dc:title>
+<cpt:parent>default</cpt:parent>
+<dc:type>cts:textgroup</dc:type>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/elexicon/abbas/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:elexicon.abbas</cpt:identifier>
+<dc:type>cts:work</dc:type>
+<dc:title xml:lang="lat">Abbas, abbatissa</dc:title>
+<cpt:parent>urn:cts:formulae:elexicon</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/elexicon/abbas/elexicon.abbas.deu001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:elexicon.abbas.deu001</cpt:identifier>
+<dc:format>application/tei+xml</dc:format>
+<dc:language>deu</dc:language>
+<cpt:parent>urn:cts:formulae:elexicon.abbas</cpt:parent>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae. Neuedition der frühmittelalterlichen Formulae, Hamburg</dc:publisher>
+<dc:title xml:lang="deu">Abbas, abbatissa (deu)</dc:title>
+<dc:type>cts:edition</dc:type>
+<dc:creator>Horst Lößlein</dc:creator>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:references>urn:cts:formulae:passau.heuwieser0073.lat001</dct:references>
+<dct:isReferencedBy>%urn:cts:formulae:andecavensis.form007.lat001%patri illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel omnis</dct:isReferencedBy>
+<dct:isReferencedBy>%urn:cts:formulae:andecavensis.form030.lat001%ante illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel reliquis,%fuit ipsius &lt;span class='elex-word'&gt;abbate&lt;/span&gt;, ut dum</dct:isReferencedBy>
+<dct:isReferencedBy>%urn:cts:formulae:andecavensis.form047.lat001%uir illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel reliquis</dct:isReferencedBy>
+<dct:isReferencedBy>%urn:cts:formulae:andecavensis.form027.lat001%patri illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; ego illi</dct:isReferencedBy>
+<dct:isReferencedBy>%urn:cts:formulae:andecavensis.form029.lat001%uir illi &lt;span class='elex-word'&gt;abbate&lt;/span&gt; interpellauerunt hominem%ab ipso &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel qui</dct:isReferencedBy>
+<dct:isReferencedBy>%urn:cts:formulae:andecavensis.form046.lat001%uir illo &lt;span class='elex-word'&gt;abbati&lt;/span&gt;, propria pecunia</dct:isReferencedBy>
+<dct:isReferencedBy>%urn:cts:formulae:andecavensis.form010.lat001%uir illo &lt;span class='elex-word'&gt;abbate&lt;/span&gt; uel reliquis%fuit ipsius &lt;span class='elex-word'&gt;abbati&lt;/span&gt; uel quibus</dct:isReferencedBy>
+<dct:bibliographicCitation>Lößlein, Horst, "Abbas, abbatissa", in: Formulae-Litterae-Chartae. Neuedition der frühmittelalterlichen Formulae, Hamburg (2019-05-07), [URL: https://werkstatt.formulae.uni-hamburg.de/texts/urn:cts:formulae:elexicon.abbas.deu001/passage/all]</dct:bibliographicCitation>
+<dct:created>2019-05-07</dct:created>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<bib:AbbreviatedTitle></bib:AbbreviatedTitle>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:passau</cpt:identifier>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts &lt;span class="collection-origin"&gt;Passau&lt;/span&gt;</dc:title>
+<cpt:parent>default</cpt:parent>
+<dc:type>cts:textgroup</dc:type>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073</cpt:identifier>
+<dc:type>cts:work</dc:type>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<cpt:parent>urn:cts:formulae:passau</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat002.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073.lat002</cpt:identifier>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+<dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<dc:language>lat</dc:language>
+<dc:type>cts:edition</dc:type>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0073</cpt:parent>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:format>application/tei+xml</dc:format>
+<cpt:structured-metadata>
+<dct:created></dct:created>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+<bib:editor>Heuwieser, Max</bib:editor>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat004.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073.lat004</cpt:identifier>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+<dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+<dc:format>application/tei+xml</dc:format>
+<dc:type>cts:edition</dc:type>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0073</cpt:parent>
+<dc:language>lat</dc:language>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<cpt:structured-metadata>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:created></dct:created>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat003.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073.lat003</cpt:identifier>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0073</cpt:parent>
+<dc:format>application/tei+xml</dc:format>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:type>cts:edition</dc:type>
+<dc:language>lat</dc:language>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:created></dct:created>
+<bib:editor>Heuwieser, Max</bib:editor>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073.lat001</cpt:identifier>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:type>cts:edition</dc:type>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0073</cpt:parent>
+<dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+<dc:format>application/tei+xml</dc:format>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+<dc:language>lat</dc:language>
+<cpt:structured-metadata>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:created></dct:created>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat005.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073.lat005</cpt:identifier>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0073</cpt:parent>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<dc:format>application/tei+xml</dc:format>
+<dc:type>cts:edition</dc:type>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+<dc:language>lat</dc:language>
+<dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+<cpt:structured-metadata>
+<dct:created></dct:created>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<bib:editor>Heuwieser, Max</bib:editor>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0083/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0083</cpt:identifier>
+<cpt:parent>a:different.identifier</cpt:parent>
+<cpt:parent>urn:cts:formulae:passau</cpt:parent>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</dc:title>
+<dc:type>cts:work</dc:type>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0083/passau.heuwieser0083.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0083.lat001</cpt:identifier>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0083</cpt:parent>
+<dc:language>lat</dc:language>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:type>cts:edition</dc:type>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</dc:title>
+<dc:description xml:lang="deu">EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</dc:description>
+<dc:format>application/tei+xml</dc:format>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dc:source>
+<cpt:structured-metadata>
+<dct:created></dct:created>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0083/passau.heuwieser0083.lat002.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0083.lat002</cpt:identifier>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</dc:title>
+<dc:format>application/tei+xml</dc:format>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0083</cpt:parent>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:language>lat</dc:language>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dc:source>
+<dc:type>cts:edition</dc:type>
+<dc:description xml:lang="deu">EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</dc:description>
+<cpt:structured-metadata>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:created></dct:created>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:abstract xml:lang="deu">A great charter!</dct:abstract>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<bib:AbbreviatedTitle>Traditionen Passau</bib:AbbreviatedTitle>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/salzburg/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:salzburg</cpt:identifier>
+<dc:title xml:lang="deu">&lt;span class="collection-origin"&gt;Salzburger&lt;/span&gt; Urkundenbuch</dc:title>
+<dc:type>cts:textgroup</dc:type>
+<cpt:parent>default</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/salzburg/hauthaler-a0100/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:salzburg.hauthaler-a0100</cpt:identifier>
+<dc:title xml:lang="deu">Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100</dc:title>
+<dc:type>cts:work</dc:type>
+<cpt:parent>urn:cts:formulae:salzburg</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/salzburg/hauthaler-a0100/salzburg.hauthaler-a0100.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:salzburg.hauthaler-a0100.lat001</cpt:identifier>
+<dc:language>lat</dc:language>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Magdalena Hermann-Kowalczyk (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:format>application/tei+xml</dc:format>
+<dc:title xml:lang="deu">Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100</dc:title>
+<dc:source>Salzburger Urkundenbuch; Codex A Nummer 100, in: Willibald Hauthaler, Salzburger Urkundenbuch Bd. 2, Salzburg 1910, S. 162-163.</dc:source>
+<dc:type>cts:edition</dc:type>
+<dc:description xml:lang="deu">a) Der Edle Vodalhard (Odalhard) übergibt dem Erzbischof 7 Huben am Ergoltsbach (Zufluss der kleinen Laber n. Landshut) mit Vorbehalt von 3 Joch in jeder Zelch und einer Hofstatt auf der Westseite als Hantgemâl (Stammgut), wofür er zu ewigem Eigenthum für sich und seine Nachkommen erhält, was er bisher zu Weidenbach (w. Ampfing) als Eigen innegehabt hat, nur ausgenommen die Kirche, den Kirchhof und eine Baustätte. b) Altorf übergibt dem Erzbischof am gleichen Tage 5 Hubcn zu Ergoltsbach und erhält dafür Volagangesperch (seit 13. Jahrh. Neumarkt a/Rott), wieder ausgenommen die Kirche, den Kirchhof und eine Baustätte.</dc:description>
+<cpt:parent>urn:cts:formulae:salzburg.hauthaler-a0100</cpt:parent>
+<cpt:structured-metadata>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:bibliographicCitation>Salzburger Urkundenbuch; Codex A Nummer 100, in: Willibald Hauthaler, Salzburger Urkundenbuch Bd. 2, Salzburg 1910, S. 162-163.</dct:bibliographicCitation>
+<dct:dateCopyrighted>1910</dct:dateCopyrighted>
+<bib:editor>Hauthaler, Willibald</bib:editor>
+<dct:created></dct:created>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<bib:AbbreviatedTitle>Salzburger Urkundenbuch</bib:AbbreviatedTitle>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke</cpt:identifier>
+<cpt:parent>default</cpt:parent>
+<dc:type>cts:textgroup</dc:type>
+<dc:title xml:lang="lat">Codex diplomaticus &lt;span class="collection-origin"&gt;Fuldensis&lt;/span&gt;</dc:title>
+<dc:title xml:lang="deu">Codex diplomaticus &lt;span class="collection-origin"&gt;Fuldensis&lt;/span&gt;</dc:title>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0004a/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0004a</cpt:identifier>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 4a</dc:title>
+<dc:type>cts:work</dc:type>
+<cpt:parent>a:different.identifier</cpt:parent>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0004a/fulda_dronke.dronke0004a.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0004a.lat001</cpt:identifier>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0004a</cpt:parent>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:format>application/tei+xml</dc:format>
+<dc:type>cts:edition</dc:type>
+<dc:source>Codex diplomaticus Fuldensis Nr. 4a, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 2-3..</dc:source>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:language>lat</dc:language>
+<dc:description xml:lang="deu">None</dc:description>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 4a</dc:title>
+<cpt:structured-metadata>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 4a, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 2-3..</dct:bibliographicCitation>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:created></dct:created>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0041/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0041</cpt:identifier>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41</dc:title>
+<dc:type>cts:work</dc:type>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0041/fulda_dronke.dronke0041.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0041.lat001</cpt:identifier>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:format>application/tei+xml</dc:format>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0041</cpt:parent>
+<dc:language>lat</dc:language>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41</dc:title>
+<dc:description xml:lang="deu">None</dc:description>
+<dc:type>cts:edition</dc:type>
+<dc:source>Codex diplomaticus Fuldensis Nr. 41, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 26-27.</dc:source>
+    <dc:subject>Medieval Charter</dc:subject>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 41, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 26-27.</dct:bibliographicCitation>
+<dct:created></dct:created>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0064/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0064</cpt:identifier>
+<dc:type>cts:work</dc:type>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 64</dc:title>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0064/fulda_dronke.dronke0064.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0064.lat001</cpt:identifier>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:description xml:lang="deu">None</dc:description>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0064</cpt:parent>
+<dc:format>application/tei+xml</dc:format>
+<dc:type>cts:edition</dc:type>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 64</dc:title>
+<dc:language>lat</dc:language>
+<dc:source>Codex diplomaticus Fuldensis Nr. 64, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 40-41.</dc:source>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 64, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 40-41.</dct:bibliographicCitation>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:created></dct:created>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0124/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0124</cpt:identifier>
+<dc:type>cts:work</dc:type>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 124</dc:title>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0124/fulda_dronke.dronke0124.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0124.lat001</cpt:identifier>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0124</cpt:parent>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:language>lat</dc:language>
+<dc:description xml:lang="deu">None</dc:description>
+<dc:source>Codex diplomaticus Fuldensis Nr. 124, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 73.</dc:source>
+<dc:type>cts:edition</dc:type>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 124</dc:title>
+<dc:format>application/tei+xml</dc:format>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<cpt:structured-metadata>
+<dct:created></dct:created>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 124, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 73.</dct:bibliographicCitation>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0126/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0126</cpt:identifier>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<dc:type>cts:work</dc:type>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 126</dc:title>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0126/fulda_dronke.dronke0126.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0126.lat001</cpt:identifier>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 126</dc:title>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:type>cts:edition</dc:type>
+<dc:description xml:lang="deu">None</dc:description>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0126</cpt:parent>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:format>application/tei+xml</dc:format>
+<dc:language>lat</dc:language>
+<dc:source>Codex diplomaticus Fuldensis Nr. 126, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 74.</dc:source>
+<cpt:structured-metadata>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 126, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 74.</dct:bibliographicCitation>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+<dct:created></dct:created>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0192/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0192</cpt:identifier>
+<dc:type>cts:work</dc:type>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 192</dc:title>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0192/fulda_dronke.dronke0192.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0192.lat001</cpt:identifier>
+<dc:type>cts:edition</dc:type>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 192</dc:title>
+<dc:language>lat</dc:language>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0192</cpt:parent>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:source>Codex diplomaticus Fuldensis Nr. 192, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 106.</dc:source>
+<dc:format>application/tei+xml</dc:format>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:description xml:lang="deu">None</dc:description>
+<cpt:structured-metadata>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 192, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 106.</dct:bibliographicCitation>
+<dct:created></dct:created>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0323/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0323</cpt:identifier>
+<dc:type>cts:work</dc:type>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 323</dc:title>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0323/fulda_dronke.dronke0323.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0323.lat001</cpt:identifier>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 323</dc:title>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0323</cpt:parent>
+<dc:format>application/tei+xml</dc:format>
+<dc:description xml:lang="deu">None</dc:description>
+<dc:source>Codex diplomaticus Fuldensis Nr. 323, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 156-157.</dc:source>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:type>cts:edition</dc:type>
+<dc:language>lat</dc:language>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 323, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 156-157.</dct:bibliographicCitation>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:created></dct:created>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0616/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0616</cpt:identifier>
+<dc:type>cts:work</dc:type>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 616</dc:title>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0616/fulda_dronke.dronke0616.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0616.lat001</cpt:identifier>
+<dc:language>lat</dc:language>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:type>cts:edition</dc:type>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:source>Codex diplomaticus Fuldensis Nr. 616, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 278.</dc:source>
+<dc:format>application/tei+xml</dc:format>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0616</cpt:parent>
+<dc:description xml:lang="deu">None</dc:description>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 616</dc:title>
+<cpt:structured-metadata>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 616, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 278.</dct:bibliographicCitation>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+<dct:created></dct:created>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:abstract xml:lang="deu"></dct:abstract>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<bib:AbbreviatedTitle>Cod. dipl. Fuldensis</bib:AbbreviatedTitle>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/collected/__capitains__.xml">
+<cpt:identifier>a:different.identifier</cpt:identifier>
+<cpt:parent>default</cpt:parent>
+<dc:type>cts:textgroup</dc:type>
+<dc:title xml:lang="eng">This is a collected collection</dc:title>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073.lat001_as_com</cpt:identifier>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<cpt:parent>a:different.identifier</cpt:parent>
+<dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+<dc:type>cts:commentary</dc:type>
+<dc:format>application/tei+xml</dc:format>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+<dc:language>fre</dc:language>
+<cpt:structured-metadata>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:created></dct:created>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0073/passau.heuwieser0073.lat005.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0073.lat005_as_trans</cpt:identifier>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73</dc:title>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:language>deu</dc:language>
+<dc:format>application/tei+xml</dc:format>
+<dc:description xml:lang="deu">ZEUGENAUSSAGEN (AUFZEICHNUNGEN) ÜBER DEN DER PASSAUER KIRCHE GEHÖRIGEN BESITZ DER KLÖSTERCHEN ROTT (POSTMÜNSTER) UND RIMBACH, ZU UTTENDORF UND OBERBIERBACH (BAYERBACH).</dc:description>
+<cpt:parent>a:different.identifier</cpt:parent>
+<dc:type>cts:translation</dc:type>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dc:source>
+<cpt:structured-metadata>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 73, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 61-62.</dct:bibliographicCitation>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:created></dct:created>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0004a/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0004a</cpt:identifier>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 4a</dc:title>
+<dc:type>cts:work</dc:type>
+<cpt:parent>a:different.identifier</cpt:parent>
+<cpt:parent>urn:cts:formulae:fulda_dronke</cpt:parent>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/fulda_dronke/dronke0004a/fulda_dronke.dronke0004a.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:fulda_dronke.dronke0004a.lat001</cpt:identifier>
+<cpt:parent>urn:cts:formulae:fulda_dronke.dronke0004a</cpt:parent>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Your Name (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Dr. Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:format>application/tei+xml</dc:format>
+<dc:type>cts:edition</dc:type>
+<dc:source>Codex diplomaticus Fuldensis Nr. 4a, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 2-3..</dc:source>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:language>lat</dc:language>
+<dc:description xml:lang="deu">None</dc:description>
+<dc:title xml:lang="deu">Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 4a</dc:title>
+<cpt:structured-metadata>
+<dct:bibliographicCitation>Codex diplomaticus Fuldensis Nr. 4a, in: Ernst Friedrich Johann Dronke, Codex diplomaticus Fuldensis, Kassel 1850, S. 2-3..</dct:bibliographicCitation>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<dct:created></dct:created>
+<bib:editor>Ernst Friedrich Johann Dronke</bib:editor>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:dateCopyrighted>1850</dct:dateCopyrighted>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0083/__capitains__.xml">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0083</cpt:identifier>
+<cpt:parent>a:different.identifier</cpt:parent>
+<cpt:parent>urn:cts:formulae:passau</cpt:parent>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</dc:title>
+<dc:type>cts:work</dc:type>
+<cpt:members>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0083/passau.heuwieser0083.lat001.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0083.lat001</cpt:identifier>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0083</cpt:parent>
+<dc:language>lat</dc:language>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:type>cts:edition</dc:type>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</dc:title>
+<dc:description xml:lang="deu">EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</dc:description>
+<dc:format>application/tei+xml</dc:format>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dc:source>
+<cpt:structured-metadata>
+<dct:created></dct:created>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:dateCopyrighted>1930 1969</dct:dateCopyrighted>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
+<dct:abstract xml:lang="deu"></dct:abstract>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+<cpt:collection path="../tests/testing_data/guidelines_v3/data/passau/heuwieser0083/passau.heuwieser0083.lat002.xml" readable="true">
+<cpt:identifier>urn:cts:formulae:passau.heuwieser0083.lat002</cpt:identifier>
+<dc:title xml:lang="deu">Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 83</dc:title>
+<dc:format>application/tei+xml</dc:format>
+<cpt:parent>urn:cts:formulae:passau.heuwieser0083</cpt:parent>
+<dc:contributor>Prof. Dr. Philippe Depreux (Universität Hamburg)</dc:contributor>
+<dc:contributor>Franziska Quaas (Universität Hamburg)</dc:contributor>
+<dc:contributor>Matthew Munson (Universität Hamburg)</dc:contributor>
+<dc:contributor>Margherita Mariani (Studentische Hilfskraft, Universität Hamburg)</dc:contributor>
+<dc:contributor>Morgane Pica (Praktikantin, Ecole nationale des Chartes, Paris, Frankreich)</dc:contributor>
+<dc:language>lat</dc:language>
+<dc:publisher xml:lang="mul">Formulae-Litterae-Chartae Projekt</dc:publisher>
+<dc:source>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dc:source>
+<dc:type>cts:edition</dc:type>
+<dc:description xml:lang="deu">EINHERI MIT SEINER GEMAHLIN IRMINSUIIND SCHENKT SEINEN BESITZ ZU ASTÄTT NEBST ZWEI UNFREIEN UNTER VORBEHALT LEBENSLÄNGLICHER NUTZBIESSUNG DIESER UND EINER FRÜHEREN SCHENKUNG SEINES BRUDERS, DES PRIESTERS GAGANHART.</dc:description>
+<cpt:structured-metadata>
+<bib:editor>Heuwieser, Max</bib:editor>
+<dct:created></dct:created>
+    <dct:dateCopyrighted>1930</dct:dateCopyrighted>
+    <dct:dateCopyrighted>1969</dct:dateCopyrighted>
+<dct:bibliographicCitation>Die Traditionen des Hochstifts Passau Nr. 83, in: Max Heuwieser, Die Traditionen des Hochstifts Passau, München 1930 1969, [URI: http://d-nb.info/458436127], S. 69-70.</dct:bibliographicCitation>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<dct:abstract xml:lang="deu"></dct:abstract>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+<bib:AbbreviatedTitle>Collected</bib:AbbreviatedTitle>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>
+</cpt:members>
+<cpt:structured-metadata>
+<rdf:type>http://purl.org/capitains/ns/1.0#collection</rdf:type>
+</cpt:structured-metadata>
+</cpt:collection>

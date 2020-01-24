@@ -48,7 +48,7 @@ pprint(deIra.export(output=Mimetypes.JSON.DTS.Std))
 What we might want to do is to browse metadata about seneca's De Ira
 Remember that CtsCollections have a parents attribute !
 """
-for descAsc in deIra.descendants + [deIra] + deIra.parents:
+for descAsc in deIra.descendants + [deIra] + deIra.ancestors:
     # We filter out Textgroup which has an empty Metadata value
     if not isinstance(descAsc, HttpCtsRetriever):
         print(

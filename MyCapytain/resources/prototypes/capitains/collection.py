@@ -18,7 +18,7 @@ from collections import defaultdict
 
 from rdflib import RDF, Literal, URIRef
 from rdflib.namespace import DC
-from typing import List, Dict
+from typing import List, Dict, Set
 
 __all__ = [
     "PrototypeCapitainsCollection",
@@ -40,7 +40,6 @@ class PrototypeCapitainsCollection(Collection):
 
     EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.GUIDELINES3]
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
-    SUBTYPE = "unknown"
     TYPE_URI = RDF_NAMESPACES.CAPITAINS.term("collection")
     COLLECTION_ATTRIBUTES = ['path', 'readable']
 
@@ -48,7 +47,7 @@ class PrototypeCapitainsCollection(Collection):
         super(PrototypeCapitainsCollection, self).__init__(identifier, resolver)
 
         self._id = str(identifier)
-        self.__subtype__ = self.SUBTYPE
+        self._subtype = set()
         self._parent = list()
 
     @property
@@ -60,23 +59,23 @@ class PrototypeCapitainsCollection(Collection):
         return self._id
 
     @property
-    def subtype(self):
-        """ Subtype of the object
+    def subtype(self) -> Set[str]:
+        """ Subtypes of the object
 
         :return: string representation of subtype
         """
-        return self.__subtype__
+        return self._subtype
 
     @subtype.setter
-    def subtype(self, val):
+    def subtype(self, val: str):
         """ Set the subtype of the object
 
         :param val: the object's subtype
         """
         if isinstance(val, str):
-            self.__subtype__ = val
+            self._subtype.add(val)
         else:
-            self.__subtype__ = str(val)
+            self._subtype.add(str(val))
 
     @property
     def children(self) -> Dict[str, 'PrototypeCapitainsCollection']:
@@ -84,15 +83,6 @@ class PrototypeCapitainsCollection(Collection):
 
         """
         return {x: self._resolver.id_to_coll[x] for x in self._resolver.children[self.id]}
-
-    def _add_member(self, member):
-        """ Does not add member if it already knows it.
-
-        .. warning:: It should not be called !
-
-        :param member: Collection to add to members
-        """
-        self._resolver.add_child(self.id, member.id)
 
     @property
     def parent(self):

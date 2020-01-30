@@ -88,7 +88,8 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
         for lang in xml.xpath("dc:language", namespaces=XPATH_NAMESPACES):
             o.lang = lang.text
         o.path = xml.get('path')
-        o.subtype = xml.xpath("dc:type", namespaces=XPATH_NAMESPACES)[0].text
+        for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES):
+            o.subtype = t.text
         resolver.add_collection(o.id, o)
         if parent is not None:
             o.parent = parent
@@ -140,7 +141,8 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
         o = cls(urn=identifier, resolver=resolver)
         resolver = o._resolver
         o.path = xml.get('path')
-        o.subtype = [t.text for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES)]
+        for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES):
+            o.subtype = t.text
         if o.id in resolver.id_to_coll:
             resolver.id_to_coll[o.id].update(o)
         else:

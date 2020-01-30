@@ -574,6 +574,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             len(TG3["urn:cts:formulae:elexicon.abbas"]), 3,
             "There should be 3 texts in work"
         )
+        self.assertEqual(TG3["urn:cts:formulae:elexicon.abbas"].subtype, {'cts:work'},
+                         'The type of object should be correct.')
 
     def test_addition_textgroup(self):
         """ Test merging two textgroups together """

@@ -941,6 +941,14 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             ["A great charter!"]
         )
 
+    def test_collection_equality(self):
+        """ Make sure that the equality of two collections is correctly returned"""
+        coll1 = XmlCapitainsCollectionMetadata(urn='ID')
+        coll2 = XmlCapitainsCollectionMetadata(urn='ID')
+        self.assertEqual(coll1, coll2, 'Collections wih the same IDs should be equal')
+        coll3 = XmlCapitainsCollectionMetadata(urn='other')
+        self.assertNotEqual(coll1, coll3, 'Collections with different IDs should not be equal')
+
 
 class TestCitation(unittest.TestCase):
     def test_empty(self):

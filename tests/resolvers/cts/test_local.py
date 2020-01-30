@@ -453,6 +453,8 @@ class TextXMLFolderResolver(TestCase):
             len(metadata.readableDescendants), 26,
             "There should be as many readable descendants as there is edition, translation, commentary (26 ed+tr+cm)"
         )
+        self.assertEqual(len(self.resolver.texts), 26,
+                         'Calling texts should return all readable collections in the resolver.')
         self.assertEqual(
             len([x for x in metadata.readableDescendants if isinstance(x, TextMetadata)]), 26,
             "There should be 24 editions + 1 translation + 1 commentary in readableDescendants"

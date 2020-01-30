@@ -576,6 +576,14 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(TG3["urn:cts:formulae:elexicon.abbas"].subtype, {'cts:work'},
                          'The type of object should be correct.')
+        TG3["urn:cts:formulae:elexicon.abbas"].subtype = XmlCapitainsCollectionMetadata
+        self.assertEqual(TG3["urn:cts:formulae:elexicon.abbas"].subtype,
+                         {'cts:work', "<class 'MyCapytain.resources.collections.capitains.XmlCapitainsCollectionMetadata'>"},
+                         'The type of object should be correct.')
+        self.assertEqual(TG3["urn:cts:formulae:elexicon.abbas.fre001"].descendants, dict(),
+                         'The descendants of a readable object should return an empty dictionary.')
+        self.assertEqual(str(TG3["urn:cts:formulae:elexicon.abbas.fre001"].get_title()), 'Abbas, abbatissa (fre)',
+                         'Title should be correct.')
 
     def test_addition_textgroup(self):
         """ Test merging two textgroups together """

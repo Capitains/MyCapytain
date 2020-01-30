@@ -4,16 +4,15 @@ from __future__ import unicode_literals
 
 from MyCapytain.resolvers.capitains.local import XmlCapitainsLocalResolver
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES, get_graph
-from MyCapytain.common.reference._capitains_cts import CtsReference, URN
-from MyCapytain.errors import InvalidURN, UnknownObjectError, UndispatchedTextError
+from MyCapytain.common.reference._capitains_cts import CtsReference
+from MyCapytain.errors import UnknownObjectError, UndispatchedTextError
 from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.collections.capitains import XmlCapitainsCollectionMetadata
 from MyCapytain.resources.prototypes.capitains.collection import CapitainsCollectionMetadata, CapitainsReadableMetadata
 from MyCapytain.resources.prototypes.cts.text import PrototypeCtsPassage
 from MyCapytain.resolvers.utils import CollectionDispatcher
 from unittest import TestCase
-from rdflib.namespace import DC, DCTERMS
-from rdflib import RDFS
+from rdflib.namespace import DC
 
 
 class TestXMLFolderResolverBehindTheScene(TestCase):
@@ -221,6 +220,8 @@ class TextXMLFolderResolver(TestCase):
             self.resolver.getTextualNode("urn:cts:formulae:passau.heuwieser0073", "2")
         with self.assertRaises(UnknownObjectError):
             self.resolver.getTextualNode("urn:cts:formulae:passau", "2")
+        with self.assertRaises(UnknownObjectError):
+            self.resolver.getTextualNode({"urn:cts:formulae:passau"}, "2")
 
     def test_getPassage_subreference(self):
         """ Test that we can get a subreference text passage"""

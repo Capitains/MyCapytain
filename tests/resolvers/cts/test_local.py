@@ -496,10 +496,6 @@ class TextXMLFolderResolver(TestCase):
             metadata.parent, CtsTextgroupMetadata,
             "First parent should be CtsTextgroupMetadata"
         )
-        self.assertIsInstance(
-            metadata.ancestors[0], CtsTextgroupMetadata,
-            "First parent should be CtsTextgroupMetadata"
-        )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE).xpath(
                 "//ti:edition[@urn='urn:cts:latinLit:phi1294.phi002.perseus-lat2']", namespaces=XPATH_NAMESPACES)), 1,

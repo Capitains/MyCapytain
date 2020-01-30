@@ -16,7 +16,7 @@ class CollectionDispatcher:
     def __init__(self, collection, default_inventory_name=None):
         self.collection = collection
         if default_inventory_name is None:
-            default_inventory_name = list(self.collection.children.values())[0].id
+            default_inventory_name = list(self.collection.children.keys())[0]
         self.__methods__ = [(default_inventory_name, lambda x, **kwargs: True)]
 
     @property

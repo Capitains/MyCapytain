@@ -11,6 +11,7 @@ import xmlunittest
 from MyCapytain.common import constants
 from MyCapytain.resources.collections.capitains import *
 from MyCapytain.resources.prototypes.capitains.text import PrototypeCapitainsNode
+from MyCapytain.resolvers.capitains.local import XmlCapitainsLocalResolver
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import Mimetypes, RDF_NAMESPACES, XPATH_NAMESPACES
 from rdflib import URIRef, Literal
@@ -539,20 +540,21 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 </cpt:collection>
 </cpt:members>
 </cpt:collection>""".replace("\n", "")
-        TG1, children = XmlCapitainsCollectionMetadata.parse(resource=self.tg, _with_children=True, recursive=True)
-        TG2, children = XmlCapitainsCollectionMetadata.parse(resource=tg, _with_children=True, recursive=True)
+        resolver = XmlCapitainsLocalResolver('', autoparse=False)
+        TG1, children = XmlCapitainsCollectionMetadata.parse(resource=self.tg, _with_children=True, recursive=True, resolver=resolver)
         self.assertEqual(
             len(TG1), 1,
             "There is one edition in TG1"
         )
+        TG2, children = XmlCapitainsCollectionMetadata.parse(resource=tg, _with_children=True, recursive=True, resolver=resolver)
         self.assertEqual(
-            len(TG2), 2,
-            "There is one edition in TG1"
+            len(TG2), 3,
+            "There are now 3 texts in TTG2"
         )
         TG3 = TG1.update(TG2)
         self.assertEqual(
             len(TG3), 3,
-            "There are two texts in merged objects"
+            "There are three texts in merged objects"
         )
         self.assertEqual(str(TG3), str(TG1), "Addition in equal or incremental should have same result")
         self.assertEqual(
@@ -620,15 +622,16 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 </cpt:collection>
 </cpt:members>
 </cpt:collection>""".replace("\n", "")
-        TG1, children = XmlCapitainsCollectionMetadata.parse(resource=self.tg, _with_children=True, recursive=True)
-        TG2, children = XmlCapitainsCollectionMetadata.parse(resource=tg, _with_children=True, recursive=True)
+        resolver = XmlCapitainsLocalResolver('', autoparse=False)
+        TG1, children = XmlCapitainsCollectionMetadata.parse(resource=self.tg, _with_children=True, recursive=True, resolver=resolver)
         self.assertEqual(
             len(TG1), 1,
             "There is one edition in TG1"
         )
+        TG2, children = XmlCapitainsCollectionMetadata.parse(resource=tg, _with_children=True, recursive=True, resolver=resolver)
         self.assertEqual(
-            len(TG2), 2,
-            "There are 2 editions in TG2"
+            len(TG2), 3,
+            "There are 3 editions in TG2"
         )
         TG3 = TG1.update(TG2)
         self.assertEqual(
@@ -715,15 +718,23 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 </cpt:members>
 </cpt:collection>
         """
-        TI1, children = XmlCapitainsCollectionMetadata.parse(resource=self.t, _with_children=True, recursive=True)
-        TI2, children = XmlCapitainsCollectionMetadata.parse(resource=ti, _with_children=True, recursive=True)
+        resolver = XmlCapitainsLocalResolver('', autoparse=False)
+        TI1, children = XmlCapitainsCollectionMetadata.parse(resource=self.t, _with_children=True, recursive=True, resolver=resolver)
         self.assertEqual(
             len(TI1), 1,
             "There is one edition in TI1"
         )
+        self.assertEqual(len(TI1['default'].children), 1,
+                         'The default collection should have one child.')
+        TI2, children = XmlCapitainsCollectionMetadata.parse(resource=ti, _with_children=True, recursive=True, resolver=resolver)
+        # If the collections are given the same resolver, they should be automatically merged with each other.
+        self.assertEqual(len(TI1['default'].children), 2,
+                         'Now the default collection should have 2 children.')
+        self.assertEqual(TI1['default'].children, TI2['default'].children,
+                         'The collections that are shared between the two collections should have the same children.')
         self.assertEqual(
-            len(TI2), 1,
-            "There is one edition in TI2"
+            len(TI2), 2,
+            "There should be 2 editions in TI2"
         )
         TI3 = TI1.update(TI2)
         self.assertEqual(
@@ -832,10 +843,11 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
                 </cpt:collection>
             </cpt:members>
         </cpt:collection>"""
+        resolver = XmlCapitainsLocalResolver('', autoparse=False)
         TI1, children = XmlCapitainsCollectionMetadata.parse(resource=wrapper.format(tg=coll1),
-                                                             _with_children=True, recursive=True)
+                                                             _with_children=True, recursive=True, resolver=resolver)
         TI2, children = XmlCapitainsCollectionMetadata.parse(resource=wrapper.format(tg=coll2),
-                                                             _with_children=True, recursive=True)
+                                                             _with_children=True, recursive=True, resolver=resolver)
         TI3 = TI1.update(TI2)
         self.assertEqual(TI1, TI1, "Make sure that the same collection is equal to itself.")
         self.assertEqual(
@@ -843,13 +855,13 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             "There is only one text in merged objects"
         )
         self.assertCountEqual(
-            [x.id for x in TI3["urn:cts:formulae:salzburg"].parent],
+            [x for x in TI3["urn:cts:formulae:salzburg"].parent],
             ['default', 'default2'],
             "The single textgroup should have both collections as parents."
         )
         self.assertCountEqual(
-            [x.id for x in TI3["urn:cts:formulae:salzburg"].ancestors][:2],
-            ['default', 'default2'],
+            [x for x in TI3["urn:cts:formulae:salzburg"].ancestors],
+            ['default', 'default2', 'defaultTic'],
             "Make sure that the first two elements of parents are the direct parents."
         )
         self.assertListEqual(

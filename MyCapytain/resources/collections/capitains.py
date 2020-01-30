@@ -1,10 +1,9 @@
-from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollection
 from MyCapytain.resources.collections.cts import _parse_structured_metadata, XmlCtsCitation
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
-from MyCapytain.common.reference._capitains_cts import Citation as CitationPrototype
 from MyCapytain.resources.prototypes.capitains import collection as capitains
-from rdflib.namespace import DCTERMS, DC
+from rdflib.namespace import DC
+from typing import Union, List, Tuple
 
 XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/", 'dct': 'http://purl.org/dc/terms/'})
 
@@ -81,14 +80,16 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
         """
 
     @classmethod
-    def parse(cls, resource, parent=None):
+    def parse(cls, resource, parent=None, resolver=None):
         xml = xmlparser(resource)
-        o = cls(urn=xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text, parent=parent)
+        o = cls(urn=xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text, parent=parent, resolver=resolver)
+        resolver = o._resolver
         o.metadata.set(RDF_NAMESPACES.CAPITAINS.identifier, o.id)
         for lang in xml.xpath("dc:language", namespaces=XPATH_NAMESPACES):
             o.lang = lang.text
         o.path = xml.get('path')
         o.subtype = xml.xpath("dc:type", namespaces=XPATH_NAMESPACES)[0].text
+        resolver.add_collection(o.id, o)
         if parent is not None:
             o.parent = parent
         cls.parse_metadata(o, xml)
@@ -113,7 +114,12 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
     CLASS_READABLE = XmlCapitainsReadableMetadata
 
     @classmethod
-    def parse(cls, resource, parent=None, _with_children=False, recursive=False):
+    def parse(cls, resource, parent: 'XmlCapitainsCollectionMetadata'=None,
+              _with_children: bool=False, recursive: bool=False,
+              resolver=None) -> Union['XmlCapitainsCollectionMetadata',
+                                      Tuple['XmlCapitainsCollectionMetadata',
+                                            List[Union['XmlCapitainsCollectionMetadata',
+                                                       'XmlCapitainsReadableMetadata']]]]:
         """ Parse a resource
 
         :param resource: Element rerpresenting a collection
@@ -131,9 +137,14 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
         # This is for a local collection
         if identifier is None:
             identifier = xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text
-        o = cls(urn=identifier)
+        o = cls(urn=identifier, resolver=resolver)
+        resolver = o._resolver
         o.path = xml.get('path')
         o.subtype = [t.text for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES)]
+        if o.id in resolver.id_to_coll:
+            resolver.id_to_coll[o.id].update(o)
+        else:
+            resolver.add_collection(o.id, o)
         if parent is not None:
             o.parent = parent
 
@@ -151,11 +162,11 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
             children = []
             children.extend(_xpathDict(
                 xml=xml, xpath='cpt:members/cpt:collection[@readable="true"]',
-                cls=cls.CLASS_READABLE, parent=o
+                cls=cls.CLASS_READABLE, parent=o, resolver=resolver
             ))
             children.extend(_xpathDict(
                 xml=xml, xpath='cpt:members/cpt:collection[not(@readable="true")]',
-                cls=cls, parent=o, _with_children=recursive, recursive=recursive
+                cls=cls, parent=o, _with_children=recursive, recursive=recursive, resolver=resolver
             ))
             return o, children
         return o

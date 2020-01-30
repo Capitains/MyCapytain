@@ -412,12 +412,12 @@ class TextXMLFolderResolver(TestCase):
             "Resolver should return a collection object"
         )
         self.assertIsInstance(
-            metadata.members[0], Collection,
-            "Members of Inventory should be TextGroups"
+            list(metadata.children.values())[0], Collection,
+            "Members of Inventory should be Collections"
         )
         self.assertEqual(
-            len(metadata.members[0].members), 5,
-            "There should be four grandchildren to top-level Collection."
+            len(metadata.children['default'].children), 5,
+            "There should be 5 children of the default collection."
         )
         self.assertEqual(
             len(metadata.descendants), 37,
@@ -433,8 +433,8 @@ class TextXMLFolderResolver(TestCase):
             "There should be as many readable descendants as there is texts"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, CapitainsReadableMetadata)]), 19,
-            "There should be 18 readable descendants"
+            len([x for x in metadata.readableDescendants.values() if isinstance(x, CapitainsReadableMetadata)]), 19,
+            "There should be 19 readable descendants"
         )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE, recursion_depth=5).xpath(
@@ -468,16 +468,16 @@ class TextXMLFolderResolver(TestCase):
             "There should be 5 readableDescendants"
         )
         self.assertEqual(
-            len([x for x in metadata.readableDescendants if isinstance(x, CapitainsReadableMetadata)]), 5,
+            len([x for x in metadata.readableDescendants.values() if isinstance(x, CapitainsReadableMetadata)]), 5,
             "All readable descendants should be CapitainsReadableMetadata"
         )
         self.assertIsInstance(
-            metadata.parent[0], CapitainsCollectionMetadata,
+            metadata._resolver.id_to_coll[list(metadata.parent)[0]], CapitainsCollectionMetadata,
             "First parent should be CapitainsCollectionMetadata"
         )
         self.assertIsInstance(
-            metadata.ancestors[0], CapitainsCollectionMetadata,
-            "First parent should be CapitainsCollectionMetadata"
+            metadata._resolver.id_to_coll[[x for x in metadata.ancestors][0]], CapitainsCollectionMetadata,
+            "First ancestor should be CapitainsCollectionMetadata"
         )
         self.assertEqual(
             len(metadata.export(output=Mimetypes.PYTHON.ETREE, recursion_depth=1).xpath(
@@ -604,7 +604,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
         get_graph().remove((None, None, None))
 
     def test_dispatching_collections(self):
-        tic = CapitainsCollectionMetadata()
+        tic = CapitainsCollectionMetadata("defaultTic")
         fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
         fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
         passau = CapitainsCollectionMetadata("urn:cts:formulae:passau", parent=tic)
@@ -612,12 +612,22 @@ class TextXMLFolderResolverDispatcher(TestCase):
         collected = CapitainsCollectionMetadata("a:different.identifier", parent=tic)
         collected.metadata.add(DC.title, "A collected collection.", "eng")
         collected.metadata.add(DC.title, "Eine Sammelsammlung", "deu")
-        collected = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
-        collected.metadata.add(DC.title, "Salzburger Urkunden", "deu")
-        collected = CapitainsCollectionMetadata("urn:cts:formulae:elexicon", parent=tic)
-        collected.metadata.add(DC.title, "E-Lexikon Einträge", "deu")
+        salzburg = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
+        salzburg.metadata.add(DC.title, "Salzburger Urkunden", "deu")
+        elexicon = CapitainsCollectionMetadata("urn:cts:formulae:elexicon", parent=tic)
+        elexicon.metadata.add(DC.title, "E-Lexikon Einträge", "deu")
+        tic._resolver.add_child('defaultTic', fulda.id)
+        tic._resolver.add_child('defaultTic', passau.id)
+        tic._resolver.add_child('defaultTic', collected.id)
+        tic._resolver.add_child('defaultTic', salzburg.id)
+        tic._resolver.add_child('defaultTic', elexicon.id)
+        tic._resolver.add_collection(fulda.id, fulda)
+        tic._resolver.add_collection(passau.id, passau)
+        tic._resolver.add_collection(collected.id, collected)
+        tic._resolver.add_collection(salzburg.id, salzburg)
+        tic._resolver.add_collection(elexicon.id, elexicon)
 
-        dispatcher = CollectionDispatcher(tic)
+        dispatcher = CollectionDispatcher(tic, default_inventory_name='urn:cts:formulae:passau')
 
         @dispatcher.inventory("urn:cts:formulae:fulda_dronke")
         def dispatchFulda(collection, path=None, **kwargs):
@@ -633,7 +643,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
 
         @dispatcher.inventory("a:different.identifier")
         def dispatchCollected(collection, path=None, **kwargs):
-            if collected in collection.ancestors:
+            if collected.id in collection.ancestors:
                 return True
             return False
 
@@ -682,10 +692,12 @@ class TextXMLFolderResolverDispatcher(TestCase):
             _ = fulda_stuff["urn:cts:formulae:salzburg.hauthaler-a0100"]
 
     def test_dispatching_error(self):
-        tic = CapitainsCollectionMetadata()
+        tic = CapitainsCollectionMetadata('defaultTic')
         fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
         fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
-        dispatcher = CollectionDispatcher(tic)
+        tic._resolver.add_child('defaultTic', fulda.id)
+        tic._resolver.add_collection(fulda.id, fulda)
+        dispatcher = CollectionDispatcher(tic, default_inventory_name=fulda.id)
         # We remove default dispatcher
         dispatcher.__methods__ = []
 
@@ -714,7 +726,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
     # readableDescendants require that a text be sent through the resolver now.
     # So the next two tests will not work until we add the resolver as a property on the objects.
     def test_dispatching_output(self):
-        tic = CapitainsCollectionMetadata()
+        tic = CapitainsCollectionMetadata('defaultTic')
         fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
         fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
         passau = CapitainsCollectionMetadata("urn:cts:formulae:passau", parent=tic)
@@ -722,8 +734,16 @@ class TextXMLFolderResolverDispatcher(TestCase):
         collected = CapitainsCollectionMetadata("a:different.identifier", parent=tic)
         collected.metadata.add(DC.title, "A collected collection.", "eng")
         collected.metadata.add(DC.title, "Eine Sammelsammlung", "deu")
-        collected = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
-        collected.metadata.add(DC.title, "Salzburger Urkunden", "deu")
+        salzburg = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
+        salzburg.metadata.add(DC.title, "Salzburger Urkunden", "deu")
+        tic._resolver.add_child('defaultTic', fulda.id)
+        tic._resolver.add_child('defaultTic', passau.id)
+        tic._resolver.add_child('defaultTic', collected.id)
+        tic._resolver.add_child('defaultTic', salzburg.id)
+        tic._resolver.add_collection(fulda.id, fulda)
+        tic._resolver.add_collection(passau.id, passau)
+        tic._resolver.add_collection(collected.id, collected)
+        tic._resolver.add_collection(salzburg.id, salzburg)
 
         dispatcher = CollectionDispatcher(tic)
 
@@ -741,7 +761,7 @@ class TextXMLFolderResolverDispatcher(TestCase):
 
         @dispatcher.inventory("a:different.identifier")
         def dispatchCollected(collection, path=None, **kwargs):
-            if collected in collection.ancestors:
+            if collected.id in collection.ancestors:
                 return True
             return False
 

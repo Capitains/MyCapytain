@@ -13,6 +13,7 @@ from MyCapytain.common.utils import literal_to_dict, Subgraph
 from MyCapytain.common.constants import RDF_NAMESPACES, RDFLIB_MAPPING, Mimetypes, get_graph
 from MyCapytain.common.base import Exportable
 from MyCapytain.common.reference import BaseCitationSet
+from MyCapytain.resolvers.prototypes import Resolver
 from rdflib import URIRef, RDF, Literal, Graph, RDFS
 from rdflib.namespace import SKOS, DC, DCTERMS
 from typing import List
@@ -48,7 +49,7 @@ class Collection(Exportable):
     MODEL_URI = URIRef(RDF_NAMESPACES.DTS.collection)
     EXPORT_TO = [Mimetypes.JSON.LD, Mimetypes.JSON.DTS.Std, Mimetypes.XML.RDF]
 
-    def __init__(self, identifier="", *args, **kwargs):
+    def __init__(self, identifier: str="", resolver: Resolver=None, *args, **kwargs):
         super(Collection, self).__init__(identifier, *args, **kwargs)
         self._graph = get_graph()
 
@@ -60,6 +61,9 @@ class Collection(Exportable):
 
         self._parent = None
         self._children = {}
+        if resolver is None:
+            resolver = Resolver()
+        self._resolver = resolver
 
     def __repr__(self):
         return "%s(%s)#%s" % (self.__class__.__name__, self.id, id(self))

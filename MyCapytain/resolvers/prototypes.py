@@ -8,7 +8,6 @@
 """
 
 from typing import Tuple, Union, Optional, Dict, Any, Set
-from MyCapytain.resources.prototypes.metadata import Collection
 from MyCapytain.resources.prototypes.text import TextualNode
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet
 from collections import defaultdict
@@ -40,16 +39,14 @@ class Resolver(object):
         self._children = defaultdict(set)
 
     @property
-    def id_to_coll(self) -> Dict[str, Collection]:
+    def id_to_coll(self) -> Dict[str, object]:
         """ Returns a mapping from collection's id to its Collection object"""
         return self._id_to_coll
 
-    def add_collection(self, id: str, collection: Collection):
+    def add_collection(self, id: str, collection: object):
         """ Adds an id to coll mapping to self._id_to_coll"""
         if not isinstance(id, str):
             id = str(id)
-        if not isinstance(collection, Collection):
-            raise TypeError("'collection' must have be of type 'Collection'")
         self._id_to_coll.update({id: collection})
 
     @property
@@ -64,6 +61,7 @@ class Resolver(object):
         if not isinstance(parent_id, str):
             parent_id = str(parent_id)
         self._parents[collection_id].add(parent_id)
+        self.add_child(parent_id, collection_id)
 
     @property
     def children(self) -> Dict[str, Set[str]]:
@@ -78,7 +76,23 @@ class Resolver(object):
             child_id = str(child_id)
         self._children[collection_id].add(child_id)
 
-    def getMetadata(self, objectId: str=None, **filters) -> Collection:
+    @property
+    def texts(self) -> Dict[str, object]:
+        """ returns all readable texts
+
+        :return: Readable descendants
+        :rtype: {str: CapitainsReadableMetadata}
+        """
+        # Changed to a dictionary to match with the return type for XmlCapitainsCollectionMetadata.texts
+        texts = {}
+        for s in self.children.values():
+            for v in s:
+                c = self.id_to_coll[v]
+                if c.readable:
+                    texts[v] = c
+        return texts
+
+    def getMetadata(self, objectId: str=None, **filters) -> object:
         """ Request metadata about a text or a collection
 
         :param objectId: Object Identifier to filter on

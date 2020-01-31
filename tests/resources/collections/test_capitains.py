@@ -956,6 +956,11 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
         coll3 = XmlCapitainsCollectionMetadata(identifier='other')
         self.assertNotEqual(coll1, coll3, 'Collections with different IDs should not be equal')
 
+    def test_init_coll_with_parent(self):
+        """ Make sure that a collection that is initiated with a parent has that parent added to its resolver"""
+        coll1 = XmlCapitainsCollectionMetadata(identifier='id', parent=XmlCapitainsCollectionMetadata(identifier='ID'))
+        self.assertEqual(coll1.parent, {'ID'})
+
 
 class TestCitation(unittest.TestCase):
     def test_empty(self):

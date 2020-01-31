@@ -319,11 +319,11 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
     CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.identifier, RDF_NAMESPACES.CAPITAINS.parent]
     CAPITAINS_LINKS = [RDF_NAMESPACES.CAPITAINS.about]
 
-    def __init__(self, urn: str="", parent: 'CapitainsCollectionMetadata'=None, lang: str=None, resolver: Resolver=None):
-        super(CapitainsReadableMetadata, self).__init__(identifier=str(urn), resolver=resolver)
+    def __init__(self, identifier: str= "", parent: 'CapitainsCollectionMetadata'=None, lang: str=None, resolver: Resolver=None):
+        super(CapitainsReadableMetadata, self).__init__(identifier=str(identifier), resolver=resolver)
         self.resource = None
         self.citation = None
-        self.__urn__ = str(urn)
+        self.__urn__ = str(identifier)
         self.docname = None
         self.validate = None
         self.lang = lang
@@ -398,8 +398,8 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
     EXPORT_TO = [Mimetypes.XML.GUIDELINES3]
     CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.title]
 
-    def __init__(self, urn: str=None, parent: 'CapitainsCollectionMetadata'=None, resolver: Resolver=None):
-        super(CapitainsCollectionMetadata, self).__init__(identifier=str(urn), resolver=resolver)
+    def __init__(self, identifier: str=None, parent: 'CapitainsCollectionMetadata'=None, resolver: Resolver=None):
+        super(CapitainsCollectionMetadata, self).__init__(identifier=str(identifier), resolver=resolver)
 
         if parent is not None:
             self.parent = parent

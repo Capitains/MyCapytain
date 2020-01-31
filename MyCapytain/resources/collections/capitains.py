@@ -82,7 +82,7 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
     @classmethod
     def parse(cls, resource, parent=None, resolver=None):
         xml = xmlparser(resource)
-        o = cls(urn=xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text, parent=parent, resolver=resolver)
+        o = cls(identifier=xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text, parent=parent, resolver=resolver)
         resolver = o._resolver
         o.metadata.set(RDF_NAMESPACES.CAPITAINS.identifier, o.id)
         for lang in xml.xpath("dc:language", namespaces=XPATH_NAMESPACES):
@@ -138,7 +138,7 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
         # This is for a local collection
         if identifier is None:
             identifier = xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text
-        o = cls(urn=identifier, resolver=resolver)
+        o = cls(identifier=identifier, resolver=resolver)
         resolver = o._resolver
         o.path = xml.get('path')
         for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES):

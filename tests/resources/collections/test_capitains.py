@@ -893,13 +893,13 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
         from MyCapytain.errors import InvalidURN
         self.assertRaises(
             TypeError,
-            lambda x: XmlCapitainsCollectionMetadata(urn="urn:cts:latinLit:phi1294.phi002").update(XmlCapitainsReadableMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
+            lambda x: XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1294.phi002").update(XmlCapitainsReadableMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
             "Addition of different work with different URN should fail"
         )
         self.assertRaises(
             InvalidURN,
-            lambda x: XmlCapitainsCollectionMetadata(urn="urn:cts:latinLit:phi1294").update(
-                XmlCapitainsCollectionMetadata(urn="urn:cts:latinLit:phi1297")),
+            lambda x: XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1294").update(
+                XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1297")),
             "Addition of different work with different URN should fail"
         )
 
@@ -951,10 +951,10 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
 
     def test_collection_equality(self):
         """ Make sure that the equality of two collections is correctly returned"""
-        coll1 = XmlCapitainsCollectionMetadata(urn='ID')
-        coll2 = XmlCapitainsCollectionMetadata(urn='ID')
+        coll1 = XmlCapitainsCollectionMetadata(identifier='ID')
+        coll2 = XmlCapitainsCollectionMetadata(identifier='ID')
         self.assertEqual(coll1, coll2, 'Collections wih the same IDs should be equal')
-        coll3 = XmlCapitainsCollectionMetadata(urn='other')
+        coll3 = XmlCapitainsCollectionMetadata(identifier='other')
         self.assertNotEqual(coll1, coll3, 'Collections with different IDs should not be equal')
 
 

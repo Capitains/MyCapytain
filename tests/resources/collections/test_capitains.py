@@ -887,14 +887,13 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             "The repeated text in both collections should be the same object."
         )
 
-
     def test_wrong_urn_addition_work_textgroup(self):
         """ Checks that we cannot add work or textgroup with different URN"""
         from MyCapytain.errors import InvalidURN
         self.assertRaises(
             TypeError,
-            lambda x: XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1294.phi002").update(XmlCapitainsReadableMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
-            "Addition of different work with different URN should fail"
+            lambda x: XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1294.phi002").update(XmlCapitainsReadableMetadata(identifier="urn:cts:latinLit:phi1297.phi002")),
+            "Addition of readable to non-readable should fail"
         )
         self.assertRaises(
             InvalidURN,

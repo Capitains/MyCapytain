@@ -417,13 +417,12 @@ class TextXMLFolderResolver(TestCase):
             "Members of Inventory should be Collections"
         )
         self.assertEqual(
-            len(metadata.children['default'].children), 5,
+            len(metadata.children), 5,
             "There should be 5 children of the default collection."
         )
         self.assertEqual(
-            len(metadata.descendants), 37,
-            "There should be as many descendants as there is readables plus collections + 1 "
-            "for default inventory"
+            len(metadata.descendants), 36,
+            "There should be as many descendants as there is readables plus collections"
         )
         self.assertEqual(
             len(metadata.readableDescendants), 19,
@@ -445,7 +444,8 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertCountEqual(
             [x["@id"] for x in metadata.export(output=Mimetypes.JSON.DTS.Std)["member"]],
-            ["default"],
+            ['urn:cts:formulae:salzburg', 'a:different.identifier', 'urn:cts:formulae:passau',
+             'urn:cts:formulae:elexicon', 'urn:cts:formulae:fulda_dronke'],
             "There should only be one member in DTS JSON"
         )
 
@@ -594,223 +594,4 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertEqual(
             reffs[0], CtsReference("1.1")
-        )
-
-    # Add test for parents here
-
-
-class TextXMLFolderResolverDispatcher(TestCase):
-    """ Ensure working state of resolver """
-    def setUp(self):
-        get_graph().remove((None, None, None))
-
-    def test_dispatching_collections(self):
-        tic = CapitainsCollectionMetadata("defaultTic")
-        fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
-        fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
-        passau = CapitainsCollectionMetadata("urn:cts:formulae:passau", parent=tic)
-        passau.metadata.add(DC.title, "Passauer Urkunden", "deu")
-        collected = CapitainsCollectionMetadata("a:different.identifier", parent=tic)
-        collected.metadata.add(DC.title, "A collected collection.", "eng")
-        collected.metadata.add(DC.title, "Eine Sammelsammlung", "deu")
-        salzburg = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
-        salzburg.metadata.add(DC.title, "Salzburger Urkunden", "deu")
-        elexicon = CapitainsCollectionMetadata("urn:cts:formulae:elexicon", parent=tic)
-        elexicon.metadata.add(DC.title, "E-Lexikon Einträge", "deu")
-        tic._resolver.add_child('defaultTic', fulda.id)
-        tic._resolver.add_child('defaultTic', passau.id)
-        tic._resolver.add_child('defaultTic', collected.id)
-        tic._resolver.add_child('defaultTic', salzburg.id)
-        tic._resolver.add_child('defaultTic', elexicon.id)
-        tic._resolver.add_collection(fulda.id, fulda)
-        tic._resolver.add_collection(passau.id, passau)
-        tic._resolver.add_collection(collected.id, collected)
-        tic._resolver.add_collection(salzburg.id, salzburg)
-        tic._resolver.add_collection(elexicon.id, elexicon)
-
-        dispatcher = CollectionDispatcher(tic, default_inventory_name='urn:cts:formulae:passau')
-
-        @dispatcher.inventory("urn:cts:formulae:fulda_dronke")
-        def dispatchFulda(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:fulda_dronke"):
-                return True
-            return False
-
-        @dispatcher.inventory("urn:cts:formulae:passau")
-        def dispatchPassau(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:passau"):
-                return True
-            return False
-
-        @dispatcher.inventory("a:different.identifier")
-        def dispatchCollected(collection, path=None, **kwargs):
-            if collected.id in collection.ancestors:
-                return True
-            return False
-
-        @dispatcher.inventory("urn:cts:formulae:salzburg")
-        def dispatchPassau(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:salzburg"):
-                return True
-            return False
-
-        @dispatcher.inventory("urn:cts:formulae:elexicon")
-        def dispatchPassau(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:elexicon"):
-                return True
-            return False
-
-        resolver = XmlCapitainsLocalResolver(
-            ["./tests/testing_data/guidelines_v3"],
-            dispatcher=dispatcher
-        )
-        fulda_stuff = resolver.getMetadata("urn:cts:formulae:fulda_dronke")
-        collected_stuff = resolver.getMetadata("a:different.identifier")
-        passau_stuff = resolver.getMetadata("urn:cts:formulae:passau")
-        elexicon_stuff = resolver.getMetadata("urn:cts:formulae:elexicon")
-        self.assertEqual(
-            len(fulda_stuff.readableDescendants), 8,
-            "There should be 8 readable descendants in Fulda"
-        )
-        self.assertIsInstance(
-            fulda_stuff, CapitainsCollectionMetadata, "should be collection"
-        )
-        self.assertEqual(
-            len(collected_stuff.readableDescendants), 5,
-            "There should be 5 readable descendants in the collected collection"
-        )
-        self.assertEqual(
-            len(passau_stuff.descendants), 9,
-            "There should be 9 descendants in Passau"
-        )
-        self.assertEqual(
-            str(collected_stuff.get_label(lang="deu")), "Eine Sammelsammlung",
-            "Label should be correct"
-        )
-        self.assertEqual(tic.get_label(), None, 'A collection without a label should return None.')
-
-        with self.assertRaises(KeyError):
-            _ = fulda_stuff["urn:cts:formulae:salzburg.hauthaler-a0100"]
-
-    def test_dispatching_error(self):
-        tic = CapitainsCollectionMetadata('defaultTic')
-        fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
-        fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
-        tic._resolver.add_child('defaultTic', fulda.id)
-        tic._resolver.add_collection(fulda.id, fulda)
-        dispatcher = CollectionDispatcher(tic, default_inventory_name=fulda.id)
-        # We remove default dispatcher
-        dispatcher.__methods__ = []
-
-        @dispatcher.inventory("urn:cts:formulae:fulda_dronke")
-        def dispatchFulda(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:fulda_dronke"):
-                return True
-            return False
-
-        XmlCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = True
-        with self.assertRaises(UndispatchedTextError):
-            resolver = XmlCapitainsLocalResolver(
-                ["./tests/testing_data/guidelines_v3"],
-                dispatcher=dispatcher
-            )
-
-        XmlCapitainsLocalResolver.RAISE_ON_UNDISPATCHED = False
-        try:
-            resolver = XmlCapitainsLocalResolver(
-                ["./tests/testing_data/guidelines_v3"],
-                dispatcher=dispatcher
-            )
-        except UndispatchedTextError as E:
-            self.fail("UndispatchedTextError should not have been raised")
-
-    # readableDescendants require that a text be sent through the resolver now.
-    # So the next two tests will not work until we add the resolver as a property on the objects.
-    def test_dispatching_output(self):
-        tic = CapitainsCollectionMetadata('defaultTic')
-        fulda = CapitainsCollectionMetadata("urn:cts:formulae:fulda_dronke", parent=tic)
-        fulda.metadata.add(DC.title, "Codex diplomaticus Fuldensis", "lat")
-        passau = CapitainsCollectionMetadata("urn:cts:formulae:passau", parent=tic)
-        passau.metadata.add(DC.title, "Passauer Urkunden", "deu")
-        collected = CapitainsCollectionMetadata("a:different.identifier", parent=tic)
-        collected.metadata.add(DC.title, "A collected collection.", "eng")
-        collected.metadata.add(DC.title, "Eine Sammelsammlung", "deu")
-        salzburg = CapitainsCollectionMetadata("urn:cts:formulae:salzburg", parent=tic)
-        salzburg.metadata.add(DC.title, "Salzburger Urkunden", "deu")
-        tic._resolver.add_child('defaultTic', fulda.id)
-        tic._resolver.add_child('defaultTic', passau.id)
-        tic._resolver.add_child('defaultTic', collected.id)
-        tic._resolver.add_child('defaultTic', salzburg.id)
-        tic._resolver.add_collection(fulda.id, fulda)
-        tic._resolver.add_collection(passau.id, passau)
-        tic._resolver.add_collection(collected.id, collected)
-        tic._resolver.add_collection(salzburg.id, salzburg)
-
-        dispatcher = CollectionDispatcher(tic)
-
-        @dispatcher.inventory("urn:cts:formulae:fulda_dronke")
-        def dispatchFulda(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:fulda_dronke"):
-                return True
-            return False
-
-        @dispatcher.inventory("urn:cts:formulae:passau")
-        def dispatchPassau(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:passau"):
-                return True
-            return False
-
-        @dispatcher.inventory("a:different.identifier")
-        def dispatchCollected(collection, path=None, **kwargs):
-            if collected.id in collection.ancestors:
-                return True
-            return False
-
-        @dispatcher.inventory("urn:cts:formulae:salzburg")
-        def dispatchPassau(collection, path=None, **kwargs):
-            if collection.id.startswith("urn:cts:formulae:salzburg"):
-                return True
-            return False
-
-        resolver = XmlCapitainsLocalResolver(
-            ["./tests/testing_data/guidelines_v3"],
-            dispatcher=dispatcher
-        )
-
-        all = resolver.getMetadata().export(Mimetypes.XML.GUIDELINES3, recursion_depth=5)
-        fulda_stuff = resolver.getMetadata("urn:cts:formulae:fulda_dronke").export(Mimetypes.XML.GUIDELINES3,
-                                                                                   recursion_depth=5)
-        collected_stuff = resolver.getMetadata("a:different.identifier").export(Mimetypes.XML.GUIDELINES3,
-                                                                                recursion_depth=5)
-        passau_stuff = resolver.getMetadata("urn:cts:formulae:passau").export(Mimetypes.XML.GUIDELINES3,
-                                                                              recursion_depth=5)
-        get_graph().remove((None, None, None))
-        fulda_stuff, collected_stuff, passau_stuff = XmlCapitainsCollectionMetadata.parse(fulda_stuff),\
-                                                     XmlCapitainsCollectionMetadata.parse(collected_stuff), \
-                                                     XmlCapitainsCollectionMetadata.parse(passau_stuff)
-        self.assertEqual(
-            len(fulda_stuff.readableDescendants), 0,
-            "Readable descendants should only be available through the resolver"
-        )
-        self.assertIsInstance(
-            fulda_stuff, XmlCapitainsCollectionMetadata, "should be collection"
-        )
-        self.assertEqual(
-            len(collected_stuff.readableDescendants), 0,
-            "Readable descendants should only be available through the resolver"
-        )
-        self.assertEqual(
-            len(passau_stuff.descendants), 0,
-            "Descendants should only be available through the resolver"
-        )
-        self.assertIn(
-            str(collected_stuff.get_label("fre")),
-            ['Eine Sammelsammlung', 'A collected collection.', 'This is a collected collection'],
-            "Label should be correct"
-        )
-        get_graph().remove((None, None, None))
-        all = XmlCapitainsCollectionMetadata.parse(all)
-        self.assertEqual(
-            len(all.readableDescendants), 0,
-            "Readable descendants should only be available through the resolver"
         )

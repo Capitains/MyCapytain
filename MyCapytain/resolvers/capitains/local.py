@@ -79,26 +79,15 @@ class XmlCapitainsLocalResolver(Resolver):
                     texts[v] = c
         return texts
 
-    def __init__(self, resource, name=None, logger=None, dispatcher=None, autoparse=True):
+    def __init__(self, resource, name=None, logger=None, autoparse=True):
         """ Initiate the XMLResolver
         """
         super(XmlCapitainsLocalResolver, self).__init__()
         self.classes = {}
         self.classes.update(type(self).CLASSES)
 
-        if dispatcher is None:
-            inventory_collection = self.classes["Collection"]("defaultTic", resolver=self)
-            inventory_collection.path = ''
-            ti = self.classes["Collection"]("default", resolver=self)
-            self.add_parent(ti.id, inventory_collection.id)
-            ti.set_label("Default collection", "eng")
-            ti.path = ''
-            self.add_collection(inventory_collection.id, inventory_collection)
-            self.add_collection(ti.id, ti)
-            self.dispatcher = CollectionDispatcher(inventory_collection)
-        else:
-            self.dispatcher = dispatcher
-        self._inventory = self.dispatcher.collection
+        self._inventory = self.classes["Collection"](name or "defaultTic", resolver=self)
+        self.add_collection(self._inventory.id, self._inventory)
         self.name = name
 
         self.logger = logger
@@ -215,33 +204,6 @@ class XmlCapitainsLocalResolver(Resolver):
             self.logger.error("%s is not present", text_metadata.path)
             return False
 
-    def _dispatch(self, collection: XmlCapitainsCollectionMetadata, directory: str):
-        """ Run the dispatcher over a textgroup.
-
-        :param collection: Collection object that needs to be dispatched
-        :param directory: Directory in which the Collection was found
-        """
-        if collection.id in self.dispatcher.collection:
-            self.dispatcher.collection[collection.id].update(collection)
-        else:
-            self.dispatcher.dispatch(collection, path=directory)
-
-    def _dispatch_container(self, collection: XmlCapitainsCollectionMetadata, directory: str):
-        """ Run the dispatcher over a collection within a try/except block
-
-        .. note:: This extraction allows to change the dispatch routine \
-            without having to care for the error dispatching
-
-        :param collection: Collection object that needs to be dispatched
-        :param directory: Directory in which the Collection was found
-        """
-        try:
-            self._dispatch(collection, directory)
-        except UndispatchedTextError as E:
-            self.logger.error("Error dispatching %s ", directory)
-            if self.RAISE_ON_UNDISPATCHED is True:
-                raise E
-
     def _clean_invalids(self, invalids: List[XmlCapitainsReadableMetadata]):
         """ Optionally remove texts that were found to be invalid
 
@@ -280,16 +242,13 @@ class XmlCapitainsLocalResolver(Resolver):
                         if not self._parse_text(child):
                             invalids.append(child)
 
-        # Dispatching routine
-        # The sorting is required to make sure that the top-level collections are dispatched first.
-        for collection in sorted(self.id_to_coll.values(), key=lambda x: x.id in self.parents):
-            if collection.readable is False:
-                self._dispatch_container(collection, os.path.dirname(collection.path))
+        for coll_id, collection in self.id_to_coll.items():
+            if coll_id not in self.parents and coll_id != self.inventory.id:
+                self.add_parent(coll_id, self.inventory.id)
 
         # Clean invalids if there was a need
         self._clean_invalids(invalids)
 
-        self.inventory = self.dispatcher.collection
         return self.inventory
 
     def _get_text(self, identifier: str) -> (Union[CapitainsCtsText, None], XmlCapitainsReadableMetadata):

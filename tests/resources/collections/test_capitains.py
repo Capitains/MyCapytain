@@ -770,6 +770,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             len(TI3["default"]), 2,
             "There should be 2 texts in inventory"
         )
+        self.assertTrue("urn:cts:formulae:salzburg.hauthaler-a0100" in TI1)
+        self.assertFalse("urn:cts:formulae:elexicon" in TI2)
 
     def test_additions_inventory(self):
         """ Test merging two partially overlapping inventories"""
@@ -960,6 +962,8 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
         """ Make sure that a collection that is initiated with a parent has that parent added to its resolver"""
         coll1 = XmlCapitainsCollectionMetadata(identifier='id', parent=XmlCapitainsCollectionMetadata(identifier='ID'))
         self.assertEqual(coll1.parent, {'ID'})
+        self.assertEqual(coll1._resolver.parents, {'id': {'ID'}})
+        self.assertEqual(coll1._resolver.children, {'ID': {'id'}})
 
 
 class TestCitation(unittest.TestCase):

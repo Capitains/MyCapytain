@@ -172,7 +172,7 @@ class PrototypeCapitainsCollection(Collection):
         return x
 
     def set_label(self, label, lang):
-        return NotImplementedError('Use obj.metadata.add(DC.title, {}, {}) to add a title to collection'.format(label,
+        raise NotImplementedError('Use obj.metadata.add(DC.title, {}, {}) to add a title to collection'.format(label,
                                                                                                                 lang))
 
     def __getitem__(self, key):
@@ -448,6 +448,7 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
                 for parent in other_descendant.parent.union(self_descendants[desc_id].parent):
                     self._resolver.id_to_coll[desc_id].parent = self._resolver.id_to_coll[parent]
             else:
+                self._resolver.add_collection(desc_id, other_descendant)
                 new_parents = []
                 for parent in other_descendant.parent:
                     if parent in self._resolver.id_to_coll:
@@ -455,10 +456,11 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
                         # parent_coll.update(other._resolver.id_to_coll[parent])
                     else:
                         parent_coll = other._resolver.id_to_coll[parent]
+                        self._resolver.add_collection(parent, parent_coll)
                     new_parents.append(parent_coll)
                 other_descendant._parent = []
                 for parent in new_parents:
-                    other_descendant.parent = parent
+                    self._resolver.add_parent(desc_id, parent.id)
 
         return self
 

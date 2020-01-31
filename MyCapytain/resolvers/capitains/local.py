@@ -83,10 +83,11 @@ class XmlCapitainsLocalResolver(Resolver):
         """ Initiate the XMLResolver
         """
         super(XmlCapitainsLocalResolver, self).__init__()
+        self._inventory = None
         self.classes = {}
         self.classes.update(type(self).CLASSES)
 
-        self._inventory = self.classes["Collection"](name or "defaultTic", resolver=self)
+        self.inventory = self.classes["Collection"](name or "defaultTic", resolver=self)
         self.add_collection(self._inventory.id, self._inventory)
         self.name = name
 

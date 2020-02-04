@@ -4,6 +4,7 @@ from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPA
 from MyCapytain.resources.prototypes.capitains import collection as capitains
 from rdflib.namespace import DC
 from typing import Union, List, Tuple
+from lxml import etree
 
 XPATH_NAMESPACES.update({'dc': "http://purl.org/dc/elements/1.1/", 'dct': 'http://purl.org/dc/terms/'})
 
@@ -140,13 +141,14 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
             identifier = xml.xpath("cpt:identifier", namespaces=XPATH_NAMESPACES)[0].text
         o = cls(identifier=identifier, resolver=resolver)
         resolver = o._resolver
-        o.path = xml.get('path')
-        for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES):
-            o.subtype = t.text
         if o.id in resolver.id_to_coll:
             resolver.id_to_coll[o.id].update(o)
         else:
             resolver.add_collection(o.id, o)
+        o = resolver.id_to_coll[o.id]
+        o.path = xml.get('path')
+        for t in xml.xpath("dc:type", namespaces=XPATH_NAMESPACES):
+            o.subtype = t.text
         if parent is not None:
             o.parent = parent
 

@@ -12,12 +12,13 @@ from MyCapytain.resources.prototypes.metadata import Collection, ResourceCollect
 from MyCapytain.common.reference._capitains_cts import URN
 from MyCapytain.common.utils.xml import make_xml_node, xmlparser
 from MyCapytain.common.constants import RDF_NAMESPACES, Mimetypes, GRAPH_BINDINGS
-from MyCapytain.errors import InvalidURN
+from MyCapytain.errors import InvalidURN, UnknownCollection
+from MyCapytain.resolvers.prototypes import Resolver
 from collections import defaultdict
 
 from rdflib import RDF, Literal, URIRef
 from rdflib.namespace import DC
-from typing import List
+from typing import List, Dict, Set
 
 __all__ = [
     "PrototypeCapitainsCollection",
@@ -39,15 +40,14 @@ class PrototypeCapitainsCollection(Collection):
 
     EXPORT_TO = [Mimetypes.PYTHON.ETREE, Mimetypes.XML.GUIDELINES3]
     DEFAULT_EXPORT = Mimetypes.PYTHON.ETREE
-    SUBTYPE = "unknown"
     TYPE_URI = RDF_NAMESPACES.CAPITAINS.term("collection")
     COLLECTION_ATTRIBUTES = ['path', 'readable']
 
-    def __init__(self, identifier=""):
-        super(PrototypeCapitainsCollection, self).__init__(identifier)
+    def __init__(self, identifier: str='', resolver: Resolver=None):
+        super(PrototypeCapitainsCollection, self).__init__(identifier, resolver)
 
         self._id = str(identifier)
-        self.__subtype__ = self.SUBTYPE
+        self._subtype = set()
         self._parent = list()
 
     @property
@@ -59,39 +59,30 @@ class PrototypeCapitainsCollection(Collection):
         return self._id
 
     @property
-    def subtype(self):
-        """ Subtype of the object
+    def subtype(self) -> Set[str]:
+        """ Subtypes of the object
 
         :return: string representation of subtype
         """
-        return self.__subtype__
+        return self._subtype
 
     @subtype.setter
-    def subtype(self, val):
+    def subtype(self, val: str):
         """ Set the subtype of the object
 
         :param val: the object's subtype
         """
         if isinstance(val, str):
-            self.__subtype__ = val
+            self._subtype.add(val)
         else:
-            self.__subtype__ = str(val)
+            self._subtype.add(str(val))
 
     @property
-    def ancestors(self) -> List[Collection]:
-        """ Iterator to find parents of current collection, from closest to furthest
+    def children(self) -> Dict[str, 'PrototypeCapitainsCollection']:
+        """ Dictionary of childrens {Identifier: Collection}
 
-        :rtype: [Collection]
         """
-        p = self.parent
-        parents = []
-        while p != []:
-            parents.extend(p)
-            new_p = []
-            for parent in p:
-                new_p.extend(parent.parent)
-            p = new_p
-        return parents
+        return {x: self._resolver.id_to_coll[x] for x in self._resolver.children[self.id]}
 
     @property
     def parent(self):
@@ -99,7 +90,7 @@ class PrototypeCapitainsCollection(Collection):
 
         :rtype: [Collection]
         """
-        return self._parent
+        return self._resolver.parents[self.id]
 
     @parent.setter
     def parent(self, parent):
@@ -109,12 +100,61 @@ class PrototypeCapitainsCollection(Collection):
         :type parent: Collection
         :return:
         """
-        if parent not in self._parent:
-            self._parent.append(parent)
-            self.graph.add(
-                (self.asNode(), RDF_NAMESPACES.CAPITAINS.parent, parent.asNode())
-            )
-            parent._add_member(self)
+        self.metadata.add(RDF_NAMESPACES.CAPITAINS.parent, URIRef(parent.id))
+        self._resolver.add_parent(self.id, parent.id)
+
+    @property
+    def ancestors(self) -> Dict[str, 'Collection']:
+        """ Iterator to find parents of current collection, from closest to furthest
+
+        :rtype: Generator[:class:`Collection`]
+        """
+        ancestors = set()
+        parents = self.parent
+        ancestors.update(parents)
+        while parents:
+            new_p = set()
+            for parent in parents:
+                parent_coll = self._resolver.id_to_coll[parent]
+                ancestors.update(parent_coll.parent)
+                new_p.update(parent_coll.parent)
+            parents = new_p
+        return {x: self._resolver.id_to_coll[x] for x in ancestors}
+
+    @property
+    def descendants(self) -> Dict[str, 'Collection']:
+        """ Any descendant (no max level) of the collection's item
+
+        :rtype: [Collection]
+        """
+        descendants = set()
+        children = self.children
+        descendants.update(children)
+        while children:
+            new_c = set()
+            for child in children:
+                child_coll = self._resolver.id_to_coll[child]
+                descendants.update(child_coll.children)
+                new_c.update(child_coll.children)
+            children = new_c
+        return {x: self._resolver.id_to_coll[x] for x in descendants}
+
+    @property
+    def readableDescendants(self) -> Dict[str, 'CapitainsReadableMetadata']:
+        """ List of element available which are readable
+
+        :rtype: [Collection]
+        """
+        return {k: v for k, v in self.descendants.items() if v.readable}
+
+    @property
+    def texts(self) -> Dict[str, 'CapitainsReadableMetadata']:
+        """ Texts
+
+        :return: Readable descendants
+        :rtype: {str: CapitainsReadableMetadata}
+        """
+        return self.readableDescendants
 
     def get_label(self, lang=None):
         """ Return label for given lang or any default
@@ -132,8 +172,30 @@ class PrototypeCapitainsCollection(Collection):
         return x
 
     def set_label(self, label, lang):
-        return NotImplementedError('Use obj.metadata.add(DC.title, {}, {}) to add a title to collection'.format(label,
+        raise NotImplementedError('Use obj.metadata.add(DC.title, {}, {}) to add a title to collection'.format(label,
                                                                                                                 lang))
+
+    def __getitem__(self, key):
+        """ Retrieve an item by its ID in the tree of a collection
+
+        :param key: Key of the object to delete
+        :return: Collection identified by the item
+        """
+        if key == self.id:
+            return self
+        if key in self.members or key in self.descendants:
+            return self._resolver.id_to_coll[key]
+        raise UnknownCollection("%s is not part of this object" % key)
+
+    def __contains__(self, item):
+        """ Retrieve an item by its ID in the tree of a collection
+
+        :param item:
+        :return: Collection identified by the item
+        """
+        if item == self.id or item in self.descendants:
+            return True
+        return False
 
     def __eq__(self, other):
         if self is other:
@@ -257,11 +319,11 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
     CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.identifier, RDF_NAMESPACES.CAPITAINS.parent]
     CAPITAINS_LINKS = [RDF_NAMESPACES.CAPITAINS.about]
 
-    def __init__(self, urn="", parent=None, lang=None):
-        super(CapitainsReadableMetadata, self).__init__(identifier=str(urn))
+    def __init__(self, identifier: str= "", parent: 'CapitainsCollectionMetadata'=None, lang: str=None, resolver: Resolver=None):
+        super(CapitainsReadableMetadata, self).__init__(identifier=str(identifier), resolver=resolver)
         self.resource = None
         self.citation = None
-        self.__urn__ = str(urn)
+        self.__urn__ = str(identifier)
         self.docname = None
         self.validate = None
         self.lang = lang
@@ -281,7 +343,7 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
 
         :rtype: list
         """
-        return list()
+        return dict()
 
     @property
     def descendants(self):
@@ -291,7 +353,7 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
 
         :rtype: list
         """
-        return list()
+        return dict()
 
     @property
     def readable_siblings(self):
@@ -302,7 +364,7 @@ class CapitainsReadableMetadata(ResourceCollection, PrototypeCapitainsCollection
         """
         sibs = dict()
         for parent in self.parent:
-            sibs.update({x.id: x for x in parent.readableDescendants})
+            sibs.update({k: v for k, v in self._resolver.id_to_coll[parent].readableDescendants.items()})
         sibs.pop(self.id, None)
         return list(sibs.values())
 
@@ -336,22 +398,11 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
     EXPORT_TO = [Mimetypes.XML.GUIDELINES3]
     CAPITAINS_PROPERTIES = [RDF_NAMESPACES.CAPITAINS.title]
 
-    def __init__(self, urn=None, parent=None):
-        super(CapitainsCollectionMetadata, self).__init__(identifier=str(urn))
-        self.__urn__ = str(urn)
-        self.__children__ = defaultdict(CapitainsReadableMetadata)
+    def __init__(self, identifier: str=None, parent: 'CapitainsCollectionMetadata'=None, resolver: Resolver=None):
+        super(CapitainsCollectionMetadata, self).__init__(identifier=str(identifier), resolver=resolver)
 
         if parent is not None:
             self.parent = parent
-
-    @property
-    def texts(self):
-        """ Texts
-
-        :return: Readable descendants
-        :rtype: {str: CapitainsReadableMetadata}
-        """
-        return {item.id: item for item in self.readableDescendants}
 
     @property
     def collections(self):
@@ -360,7 +411,7 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
         :return: List of sub-collections
         :rtype: {str: CapitainsCollectionMetadata}
         """
-        return {collection.id: collection for collection in self.members if collection.readable is False}
+        return {k: v for k, v in self.children.items() if v.readable is False}
 
     @property
     def lang(self):
@@ -370,7 +421,7 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
         """
         return None
 
-    def update(self, other):
+    def update(self, other: 'CapitainsCollectionMetadata') -> 'CapitainsCollectionMetadata':
         """ Merge two CapitainsCollectionMetadata Objects.
 
         - Original (left Object) keeps his parent.
@@ -387,25 +438,29 @@ class CapitainsCollectionMetadata(PrototypeCapitainsCollection):
             raise InvalidURN("Cannot add CapitainsCollectionMetadata %s to CapitainsCollectionMetadata %s " % (self.urn, other.urn))
 
         # This is necessary because self.texts cannot just call self.children since not all children will be readable
-        self_descendants = {x.id: x for x in self.descendants}
+        self_descendants = {k: v for k, v in self.descendants.items()}
         # The sorting here is to make sure that the new descendants that are added to self will be processed first.
         # This is so that a descendant in other that is also in self but has a different parent in other will have its parent attribute correctly expanded.
-        for other_descendant in sorted(other.descendants, key=lambda x: x.id in self_descendants.keys()):
-            if other_descendant.id in self_descendants.keys():
+        for desc_id, other_descendant in sorted(other.descendants.items(), key=lambda x: x[0] in self_descendants.keys()):
+            if desc_id in self_descendants.keys():
                 if other_descendant.readable is False:
-                    self[other_descendant.id].update(other_descendant)
-                for parent in other_descendant.parent + self_descendants[other_descendant.id].parent:
-                    self[other_descendant.id].parent = parent
+                    self._resolver.id_to_coll[desc_id].update(other_descendant)
+                for parent in other_descendant.parent.union(self_descendants[desc_id].parent):
+                    self._resolver.id_to_coll[desc_id].parent = self._resolver.id_to_coll[parent]
             else:
+                self._resolver.add_collection(desc_id, other_descendant)
                 new_parents = []
                 for parent in other_descendant.parent:
-                    if parent.id in self_descendants.keys() or parent.id == self.id:
-                        new_parents.append(self[parent.id])
+                    if parent in self._resolver.id_to_coll:
+                        parent_coll = self._resolver.id_to_coll[parent]
+                        # parent_coll.update(other._resolver.id_to_coll[parent])
                     else:
-                        new_parents.append(parent)
+                        parent_coll = other._resolver.id_to_coll[parent]
+                        self._resolver.add_collection(parent, parent_coll)
+                    new_parents.append(parent_coll)
                 other_descendant._parent = []
                 for parent in new_parents:
-                    other_descendant.parent = parent
+                    self._resolver.add_parent(desc_id, parent.id)
 
         return self
 

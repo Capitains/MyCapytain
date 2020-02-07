@@ -15,7 +15,6 @@ from MyCapytain.common.reference import Citation, NodeId, BaseReference, BaseRef
 from MyCapytain.common.metadata import Metadata
 from MyCapytain.common.constants import Mimetypes, get_graph, RDF_NAMESPACES
 from MyCapytain.common.base import Exportable
-from MyCapytain.resources.prototypes.metadata import Collection
 
 
 __all__ = [

@@ -7,10 +7,10 @@
 
 """
 
-from typing import Tuple, Union, Optional, Dict, Any
-from MyCapytain.resources.prototypes.metadata import Collection
+from typing import Tuple, Union, Optional, Dict, Any, Set
 from MyCapytain.resources.prototypes.text import TextualNode
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet
+from collections import defaultdict
 
 
 __all__ = [
@@ -24,7 +24,75 @@ class Resolver(object):
     Initiation of resolvers are dependent on the implementation of the prototype
 
     """
-    def getMetadata(self, objectId: str=None, **filters) -> Collection:
+    def __init__(self):
+        """
+        :ivar _id_to_coll: maps a collection id to that collection's object
+        :type _id_to_coll: {str: Collection}
+        :ivar _parents: maps a child id to the ids of its direct parents
+        :type _parents: {str: {str}}
+        :ivar _children: maps a parent id to the ids of its direct descendants, i.e., its children
+        :type _children: {str: {str}}
+
+        """
+        self._id_to_coll = dict()
+        self._parents = defaultdict(set)
+        self._children = defaultdict(set)
+
+    @property
+    def id_to_coll(self) -> Dict[str, object]:
+        """ Returns a mapping from collection's id to its Collection object"""
+        return self._id_to_coll
+
+    def add_collection(self, id: str, collection: object):
+        """ Adds an id to coll mapping to self._id_to_coll"""
+        if not isinstance(id, str):
+            id = str(id)
+        self._id_to_coll.update({id: collection})
+
+    @property
+    def parents(self) -> Dict[str, Set[str]]:
+        """ Returns a mapping from a collection's id to the ids of its direct parents"""
+        return self._parents
+
+    def add_parent(self, collection_id: str, parent_id: str):
+        """ Adds a parent id to the set of a collection's parents"""
+        if not isinstance(collection_id, str):
+            collection_id = str(collection_id)
+        if not isinstance(parent_id, str):
+            parent_id = str(parent_id)
+        self._parents[collection_id].add(parent_id)
+        self.add_child(parent_id, collection_id)
+
+    @property
+    def children(self) -> Dict[str, Set[str]]:
+        """ Returns a mapping from a collection's id to the ids of its direct children"""
+        return self._children
+
+    def add_child(self, collection_id: str, child_id: str):
+        """ Adds a child id to the set of a collection's children"""
+        if not isinstance(collection_id, str):
+            collection_id = str(collection_id)
+        if not isinstance(child_id, str):
+            child_id = str(child_id)
+        self._children[collection_id].add(child_id)
+
+    @property
+    def texts(self) -> Dict[str, object]:
+        """ returns all readable texts
+
+        :return: Readable descendants
+        :rtype: {str: CapitainsReadableMetadata}
+        """
+        # Changed to a dictionary to match with the return type for XmlCapitainsCollectionMetadata.texts
+        texts = {}
+        for s in self.children.values():
+            for v in s:
+                c = self.id_to_coll[v]
+                if c.readable:
+                    texts[v] = c
+        return texts
+
+    def getMetadata(self, objectId: str=None, **filters) -> object:
         """ Request metadata about a text or a collection
 
         :param objectId: Object Identifier to filter on

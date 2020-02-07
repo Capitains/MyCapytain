@@ -11,8 +11,10 @@ import xmlunittest
 from MyCapytain.common import constants
 from MyCapytain.resources.collections.capitains import *
 from MyCapytain.resources.prototypes.capitains.text import PrototypeCapitainsNode
+from MyCapytain.resolvers.capitains.local import XmlCapitainsLocalResolver
 from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import Mimetypes, RDF_NAMESPACES, XPATH_NAMESPACES
+from MyCapytain.errors import UnknownCollection
 from rdflib import URIRef, Literal
 import re
 
@@ -303,6 +305,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertIsInstance(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"], XmlCapitainsReadableMetadata)
         self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_label()),
                          'Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41')
+        self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_label(lang='deu')),
+                         'Codex diplomaticus Fuldensis (Ed. Dronke) Nr. 41')
         self.assertEqual(str(TI["urn:cts:formulae:fulda_dronke.dronke0041.lat001"].get_property(DC, 'subject')[None][0]),
                          'Medieval Charter')
         self.assertEqual(len(TI['urn:cts:formulae:passau.heuwieser0073'].ancestors), 3)
@@ -320,6 +324,10 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         self.assertIn('Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73',
                       [str(x) for x in tg["urn:cts:formulae:passau.heuwieser0073.lat001"].get_property(DC, 'title', 'deu')],
                       "Readable should have a title")
+        with self.assertRaises(NotImplementedError):
+            tg.set_label('Some Label', 'eng')
+        with self.assertRaises(UnknownCollection):
+            x = tg['some_weird_id']
 
     def test_xml_Work_GetItem(self):
         """ Test access through getItem obj[urn] """
@@ -540,19 +548,20 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 </cpt:members>
 </cpt:collection>""".replace("\n", "")
         TG1, children = XmlCapitainsCollectionMetadata.parse(resource=self.tg, _with_children=True, recursive=True)
-        TG2, children = XmlCapitainsCollectionMetadata.parse(resource=tg, _with_children=True, recursive=True)
         self.assertEqual(
             len(TG1), 1,
             "There is one edition in TG1"
         )
+        TG2, children = XmlCapitainsCollectionMetadata.parse(resource=tg, _with_children=True, recursive=True)
         self.assertEqual(
             len(TG2), 2,
-            "There is one edition in TG1"
+            "There are now 3 texts in TTG2"
         )
         TG3 = TG1.update(TG2)
+        print(TG1._resolver.id_to_coll)
         self.assertEqual(
             len(TG3), 3,
-            "There are two texts in merged objects"
+            "There are three texts in merged objects"
         )
         self.assertEqual(str(TG3), str(TG1), "Addition in equal or incremental should have same result")
         self.assertEqual(
@@ -572,6 +581,16 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             len(TG3["urn:cts:formulae:elexicon.abbas"]), 3,
             "There should be 3 texts in work"
         )
+        self.assertEqual(TG3["urn:cts:formulae:elexicon.abbas"].subtype, {'cts:work'},
+                         'The type of object should be correct.')
+        TG3["urn:cts:formulae:elexicon.abbas"].subtype = XmlCapitainsCollectionMetadata
+        self.assertEqual(TG3["urn:cts:formulae:elexicon.abbas"].subtype,
+                         {'cts:work', "<class 'MyCapytain.resources.collections.capitains.XmlCapitainsCollectionMetadata'>"},
+                         'The type of object should be correct.')
+        self.assertEqual(TG3["urn:cts:formulae:elexicon.abbas.fre001"].descendants, dict(),
+                         'The descendants of a readable object should return an empty dictionary.')
+        self.assertEqual(str(TG3["urn:cts:formulae:elexicon.abbas.fre001"].get_title()), 'Abbas, abbatissa (fre)',
+                         'Title should be correct.')
 
     def test_addition_textgroup(self):
         """ Test merging two textgroups together """
@@ -628,7 +647,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         )
         self.assertEqual(
             len(TG2), 2,
-            "There are 2 editions in TG2"
+            "There are 3 editions in TG2"
         )
         TG3 = TG1.update(TG2)
         self.assertEqual(
@@ -716,14 +735,17 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
 </cpt:collection>
         """
         TI1, children = XmlCapitainsCollectionMetadata.parse(resource=self.t, _with_children=True, recursive=True)
-        TI2, children = XmlCapitainsCollectionMetadata.parse(resource=ti, _with_children=True, recursive=True)
         self.assertEqual(
             len(TI1), 1,
             "There is one edition in TI1"
         )
+        TI2, children = XmlCapitainsCollectionMetadata.parse(resource=ti, _with_children=True, recursive=True)
+        # If the collections are given the same resolver, they should be automatically merged with each other.
+        self.assertEqual(len(TI1['default'].children), 1,
+                         'The default collection should have one child.')
         self.assertEqual(
             len(TI2), 1,
-            "There is one edition in TI2"
+            "There should be 1 editions in TI2"
         )
         TI3 = TI1.update(TI2)
         self.assertEqual(
@@ -748,6 +770,8 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
             len(TI3["default"]), 2,
             "There should be 2 texts in inventory"
         )
+        self.assertTrue("urn:cts:formulae:salzburg.hauthaler-a0100" in TI1)
+        self.assertFalse("urn:cts:formulae:elexicon" in TI2)
 
     def test_additions_inventory(self):
         """ Test merging two partially overlapping inventories"""
@@ -843,13 +867,13 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             "There is only one text in merged objects"
         )
         self.assertCountEqual(
-            [x.id for x in TI3["urn:cts:formulae:salzburg"].parent],
+            [x for x in TI3["urn:cts:formulae:salzburg"].parent],
             ['default', 'default2'],
             "The single textgroup should have both collections as parents."
         )
         self.assertCountEqual(
-            [x.id for x in TI3["urn:cts:formulae:salzburg"].ancestors][:2],
-            ['default', 'default2'],
+            [x for x in TI3["urn:cts:formulae:salzburg"].ancestors],
+            ['default', 'default2', 'defaultTic'],
             "Make sure that the first two elements of parents are the direct parents."
         )
         self.assertListEqual(
@@ -865,19 +889,18 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             "The repeated text in both collections should be the same object."
         )
 
-
     def test_wrong_urn_addition_work_textgroup(self):
         """ Checks that we cannot add work or textgroup with different URN"""
         from MyCapytain.errors import InvalidURN
         self.assertRaises(
             TypeError,
-            lambda x: XmlCapitainsCollectionMetadata(urn="urn:cts:latinLit:phi1294.phi002").update(XmlCapitainsReadableMetadata(urn="urn:cts:latinLit:phi1297.phi002")),
-            "Addition of different work with different URN should fail"
+            lambda x: XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1294.phi002").update(XmlCapitainsReadableMetadata(identifier="urn:cts:latinLit:phi1297.phi002")),
+            "Addition of readable to non-readable should fail"
         )
         self.assertRaises(
             InvalidURN,
-            lambda x: XmlCapitainsCollectionMetadata(urn="urn:cts:latinLit:phi1294").update(
-                XmlCapitainsCollectionMetadata(urn="urn:cts:latinLit:phi1297")),
+            lambda x: XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1294").update(
+                XmlCapitainsCollectionMetadata(identifier="urn:cts:latinLit:phi1297")),
             "Addition of different work with different URN should fail"
         )
 
@@ -926,6 +949,21 @@ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dts="https://w3id.
             edition.xpath("./cpt:structured-metadata/dct:abstract[@xml:lang = 'deu']/text()", namespaces=XPATH_NAMESPACES),
             ["A great charter!"]
         )
+
+    def test_collection_equality(self):
+        """ Make sure that the equality of two collections is correctly returned"""
+        coll1 = XmlCapitainsCollectionMetadata(identifier='ID')
+        coll2 = XmlCapitainsCollectionMetadata(identifier='ID')
+        self.assertEqual(coll1, coll2, 'Collections wih the same IDs should be equal')
+        coll3 = XmlCapitainsCollectionMetadata(identifier='other')
+        self.assertNotEqual(coll1, coll3, 'Collections with different IDs should not be equal')
+
+    def test_init_coll_with_parent(self):
+        """ Make sure that a collection that is initiated with a parent has that parent added to its resolver"""
+        coll1 = XmlCapitainsCollectionMetadata(identifier='id', parent=XmlCapitainsCollectionMetadata(identifier='ID'))
+        self.assertEqual(coll1.parent, {'ID'})
+        self.assertEqual(coll1._resolver.parents, {'id': {'ID'}})
+        self.assertEqual(coll1._resolver.children, {'ID': {'id'}})
 
 
 class TestCitation(unittest.TestCase):

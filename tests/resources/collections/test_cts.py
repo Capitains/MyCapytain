@@ -205,6 +205,7 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         """ Tests CtsTextInventoryMetadata parses without errors """
         TI = XmlCtsTextInventoryMetadata.parse(resource=self.getCapabilities)
         self.assertGreater(len(TI.textgroups), 0)
+        self.assertEqual(TI['thibault3'], TI)
 
     def test_xml_TextInventory_GetItem(self):
         """ Test access through getItem obj[urn] """

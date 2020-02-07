@@ -6,7 +6,6 @@ import logging
 import os.path
 from glob import glob
 from math import ceil
-from collections import OrderedDict
 
 from MyCapytain.common.reference._capitains_cts import CtsReference
 from MyCapytain.common.utils.xml import xmlparser
@@ -18,6 +17,8 @@ from MyCapytain.resources.collections.capitains import XmlCapitainsCollectionMet
 from MyCapytain.resources.collections.cts import XmlCtsCitation
 from MyCapytain.resources.prototypes.capitains.collection import CapitainsCollectionMetadata
 from MyCapytain.resources.texts.local.capitains.cts import CapitainsCtsText
+from MyCapytain.common.constants import RDF_NAMESPACES
+from typing import Dict, List, Union
 
 
 __all__ = [
@@ -63,30 +64,31 @@ class XmlCapitainsLocalResolver(Resolver):
         self._inventory = value
 
     @property
-    def texts(self):
+    def texts(self) -> Dict[str, XmlCapitainsReadableMetadata]:
         """ returns all readable texts
 
         :return: Readable descendants
         :rtype: {str: CapitainsReadableMetadata}
         """
         # Changed to a dictionary to match with the return type for XmlCapitainsCollectionMetadata.texts
-        return {text.id: text for text in self.inventory.readableDescendants}
+        texts = {}
+        for s in self.children.values():
+            for v in s:
+                c = self.id_to_coll[v]
+                if c.readable:
+                    texts[v] = c
+        return texts
 
-    def __init__(self, resource, name=None, logger=None, dispatcher=None, autoparse=True):
+    def __init__(self, resource, name=None, logger=None, autoparse=True):
         """ Initiate the XMLResolver
         """
+        super(XmlCapitainsLocalResolver, self).__init__()
+        self._inventory = None
         self.classes = {}
         self.classes.update(type(self).CLASSES)
 
-        if dispatcher is None:
-            inventory_collection = self.classes["Collection"](urn="defaultTic")
-            ti = self.classes["Collection"]("default")
-            ti.parent = inventory_collection
-            ti.set_label("Default collection", "eng")
-            self.dispatcher = CollectionDispatcher(inventory_collection)
-        else:
-            self.dispatcher = dispatcher
-        self._inventory = self.dispatcher.collection
+        self.inventory = self.classes["Collection"](name or "defaultTic", resolver=self)
+        self.add_collection(self._inventory.id, self._inventory)
         self.name = name
 
         self.logger = logger
@@ -106,7 +108,7 @@ class XmlCapitainsLocalResolver(Resolver):
         """
         return xmlparser(file)
 
-    def read(self, identifier, path):
+    def read(self, identifier: str, path: str) -> CapitainsCtsText:
         """ Retrieve and parse a text given an identifier
 
         :param identifier: Identifier of the text
@@ -120,7 +122,7 @@ class XmlCapitainsLocalResolver(Resolver):
             o = self.classes["Text"](urn=identifier, resource=self.xmlparse(f))
         return o
 
-    def _parse_collection_wrapper(self, metadata_file, collection=None):
+    def _parse_collection_wrapper(self, metadata_file: str, collection: XmlCapitainsCollectionMetadata=None):
         """ Wraps with a Try/Except the Work parsing from a cts file
 
         :param metadata_file: Path to the metadata File
@@ -136,7 +138,10 @@ class XmlCapitainsLocalResolver(Resolver):
             if self.RAISE_ON_GENERIC_PARSING_ERROR:
                 raise E
 
-    def _parse_collection(self, metadata_file, collection=None):
+    def _parse_collection(self, metadata_file: str, collection: XmlCapitainsCollectionMetadata=None)\
+            -> (XmlCapitainsCollectionMetadata,
+                List[Union[XmlCapitainsCollectionMetadata, XmlCapitainsReadableMetadata]],
+                str):
         """ Parses a work from a cts file
 
         :param metadata_file: Path to the CTS File
@@ -149,12 +154,13 @@ class XmlCapitainsLocalResolver(Resolver):
             work, children = self.classes["Collection"].parse(
                 resource=_xml,
                 parent=collection,
-                _with_children=True
+                _with_children=True,
+                resolver=self
             )
 
         return work, children, os.path.dirname(metadata_file)
 
-    def _parse_text(self, text):
+    def _parse_text(self, text: XmlCapitainsReadableMetadata) -> bool:
         """ Complete the TextMetadata object with its citation scheme by parsing the original text
         Note that this still uses guidelines 2.0 (i.e., CTS) citation system
 
@@ -199,34 +205,7 @@ class XmlCapitainsLocalResolver(Resolver):
             self.logger.error("%s is not present", text_metadata.path)
             return False
 
-    def _dispatch(self, collection, directory):
-        """ Run the dispatcher over a textgroup.
-
-        :param collection: Collection object that needs to be dispatched
-        :param directory: Directory in which the Collection was found
-        """
-        if collection.id in self.dispatcher.collection:
-            self.dispatcher.collection[collection.id].update(collection)
-        else:
-            self.dispatcher.dispatch(collection, path=directory)
-
-    def _dispatch_container(self, collection, directory):
-        """ Run the dispatcher over a collection within a try/except block
-
-        .. note:: This extraction allows to change the dispatch routine \
-            without having to care for the error dispatching
-
-        :param collection: Collection object that needs to be dispatched
-        :param directory: Directory in which the Collection was found
-        """
-        try:
-            self._dispatch(collection, directory)
-        except UndispatchedTextError as E:
-            self.logger.error("Error dispatching %s ", directory)
-            if self.RAISE_ON_UNDISPATCHED is True:
-                raise E
-
-    def _clean_invalids(self, invalids):
+    def _clean_invalids(self, invalids: List[XmlCapitainsReadableMetadata]):
         """ Optionally remove texts that were found to be invalid
 
         :param invalids: List of text identifiers
@@ -234,15 +213,12 @@ class XmlCapitainsLocalResolver(Resolver):
         """
         pass
 
-    def parse(self, resource):
+    def parse(self, resource: List[str]) -> XmlCapitainsCollectionMetadata:
         """ Parse a list of directories and reads it into a collection
 
         :param resource: List of folders
         :return: An inventory resource and a list of CapitainsReadableMetadata metadata-objects
         """
-        id_to_coll = dict()
-        members = dict()
-        parents = dict()
         invalids = []
 
         for folder in resource:
@@ -250,42 +226,33 @@ class XmlCapitainsLocalResolver(Resolver):
             for metadata_file in metadata_files:
                 collection, children, rel_dir = self._parse_collection_wrapper(metadata_file)
                 collection.path = os.path.normpath(metadata_file)
-                id_to_coll[collection.id] = collection
-                members[collection.id] = [child.id for child in children]
+                # Setting up relationships in the resolver is in the parse methods of the collection objects
+                # Moving the relationship building there means that XML files parsed without a resolver will also have these relationships.
+                # This assumes that the resolver will never ingest anything that doesn't parse xml files
+                # self.add_collection(collection.id, collection)
 
                 for child in children:
-                    if child.id not in parents:
-                        parents.update({child.id: [collection]})
+                    child.path = os.path.normpath(os.path.join(rel_dir, child.path))
+                    # self.add_parent(child.id, collection.id)
+                    child.metadata.add(RDF_NAMESPACES.CAPITAINS.parent, collection.id)
+                    """if child.id in self.id_to_coll and not child.readable:
+                        self.id_to_coll[child.id].update(child)
                     else:
-                        parents[child.id].append(collection)
-                    if child.readable is True:
-                        child.path = os.path.normpath(os.path.join(rel_dir, child.path))
-                        id_to_coll[child.id] = child
+                        self.add_collection(child.id, child)"""
+                    if child.readable:
+                        if not self._parse_text(child):
+                            invalids.append(child)
 
-        for k, v in id_to_coll.items():
-            if k in parents:
-                for parent in parents[k]:
-                    v.parent = parent
-            if v.readable is False:
-                v.children.update({ident: id_to_coll[ident] for ident in members[k]})
-            else:
-                # If text_id is not none, the text parsing errored
-                if not self._parse_text(v):
-                    invalids.append(v)
-
-        # Dispatching routine
-        # The sorting is required to make sure that the top-level collections are dispatched first.
-        for collection in sorted(id_to_coll, key=lambda x: x in parents.keys()):
-            if id_to_coll[collection].readable is False:
-                self._dispatch_container(id_to_coll[collection], os.path.dirname(id_to_coll[collection].path))
+        for coll_id, collection in self.id_to_coll.items():
+            if coll_id not in self.parents and coll_id != self.inventory.id:
+                self.add_parent(coll_id, self.inventory.id)
 
         # Clean invalids if there was a need
         self._clean_invalids(invalids)
 
-        self.inventory = self.dispatcher.collection
         return self.inventory
 
-    def _get_text(self, identifier):
+    def _get_text(self, identifier: str) -> (Union[CapitainsCtsText, None], XmlCapitainsReadableMetadata):
         """ Returns a XmlCapitainsReadableMetadata object
         :param identifier: URN of a text to retrieve
         :type identifier: str, URN
@@ -294,10 +261,11 @@ class XmlCapitainsLocalResolver(Resolver):
         """
         # This will raise an UnknownCollection error if the identifier does not exist in the collection
         # I assume that this is the desired outcome. If not, we can do a try/except here.
-        temp_text = self.inventory[str(identifier)]
-        if temp_text.readable:
-            text = temp_text
-        else:
+        if not isinstance(identifier, str):
+            identifier = str(identifier)
+        try:
+            text = self.texts[identifier]
+        except KeyError:
             # Perhaps there is a better exception to raise here?
             raise(UnknownObjectError('{} is not a readable object'.format(str(identifier))))
 
@@ -313,47 +281,30 @@ class XmlCapitainsLocalResolver(Resolver):
         return resource, text
 
     def _get_text_metadata(self,
-                           urn=None, page=None, limit=None,
-                           lang=None, category=None, pagination=False
-                           ):
+                           id: str=None, page: int=None, limit: int=None,
+                           lang: str=None, pagination: bool=False
+                           ) -> (List[XmlCapitainsReadableMetadata], int, int):
         """ Retrieve a slice of the inventory filtered by given arguments
-        :param urn: Partial URN to use to filter out resources
-        :type urn: str
+        :param id: identifier to use to filter out resources
         :param page: Page to show
-        :type page: int
         :param limit: Item Per Page
-        :type limit: int
-        :param inventory: Inventory name
-        :type inventory: str
         :param lang: Language to filter on
-        :type lang: str
-        :param category: Type of elements to show
-        :type category: str
         :param pagination: Activate pagination
-        :type pagination: bool
         :return: ([Matches], Page, Count)
-        :rtype: ([CtsTextMetadata], int, int)
         """
-        if urn is not None:
-            collection = self.inventory[urn].readableDescendants or [self.inventory[urn]]
+        if id:
+            collection = {id: self.id_to_coll[id]}
+            if not collection[id].readable:
+                collection = collection[id].readableDescendants
         else:
-            collection = self.inventory.readableDescendants
+            collection = self.texts
 
         matches = [
             text
-            for text in collection
+            for text in collection.values()
             if
             (lang is None or (lang is not None and lang == text.lang)) and
-            (text.citation is not None) and
-            # I am not sure that this categorization is useful since the type is not longer a strictly controlled
-            # vocabulary.
-            # It might be possible if the resolver built a list of the types as it was ingesting the texts and then
-            # checked to see if the category parameter is a member of this list.
-            (
-                category not in ["cts:edition", "cts:translation", "cts:commentary"] or
-                (category in ["cts:edition", "cts:translation", "cts:commentary"]
-                 and category.lower() == text.subtype.lower())
-            )
+            (text.citation is not None)
         ]
         if pagination:
             start_index, end_index, page, count = type(self).pagination(page, limit, len(matches))
@@ -363,7 +314,7 @@ class XmlCapitainsLocalResolver(Resolver):
         return matches[start_index:end_index], page, count
 
     @staticmethod
-    def pagination(page, limit, length):
+    def pagination(page: int, limit: int, length: int) -> (int, int, int, int):
         """ Help for pagination
         :param page: Provided Page
         :param limit: Number of item to show
@@ -390,7 +341,7 @@ class XmlCapitainsLocalResolver(Resolver):
 
         return page, count + 1, realpage, count - page + 1
 
-    def getMetadata(self, objectId=None, **filters):
+    def getMetadata(self, objectId: str=None, **filters) -> Union[XmlCapitainsReadableMetadata, XmlCapitainsCollectionMetadata]:
         """ Request metadata about a text or a collection
 
         :param objectId: Object Identifier to filter on
@@ -401,35 +352,7 @@ class XmlCapitainsLocalResolver(Resolver):
         """
         if objectId is None:
             return self.inventory
-        elif objectId in self.inventory.children.keys():
-            return self.inventory[objectId]
-        texts, _, _ = self._get_text_metadata(urn=objectId)
-
-        # We store inventory names and if there is only one we recreate the inventory
-        inv_names = [text.ancestors[-2].id for text in texts]
-        if len(set(inv_names)) == 1:
-            inventory = self.classes["Collection"](urn=inv_names[0])
-        else:
-            inventory = self.classes["Collection"]()
-
-        # For each text we found using the filter
-        for text in texts:
-            # Generate any ancestor collections for the text
-            reversed_parents = text.ancestors[::-1][2:]
-            parent = inventory
-            for ancestor in reversed_parents:
-                coll_urn = str(ancestor.urn)
-                if coll_urn not in parent.collections:
-                    self.classes["Collection"](urn=coll_urn, parent=parent)
-                parent = parent.collections[coll_urn]
-                parent.path = ancestor.path
-                parent.children.update(ancestor.children)
-
-            x = self.classes["ReadableCollection"](urn=str(text.urn), parent=parent, lang=text.lang)
-            x.citation = text.citation
-            x.path = text.path
-
-        return inventory[objectId]
+        return self.id_to_coll[objectId]
 
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API

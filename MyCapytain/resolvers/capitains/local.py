@@ -9,7 +9,7 @@ from math import ceil
 
 from MyCapytain.common.reference._capitains_cts import CtsReference
 from MyCapytain.common.utils.xml import xmlparser
-from MyCapytain.errors import UnknownObjectError, UndispatchedTextError
+from MyCapytain.errors import UnknownObjectError, UndispatchedTextError, UnknownCollection
 from MyCapytain.resolvers.prototypes import Resolver
 from MyCapytain.resolvers.utils import CollectionDispatcher
 from MyCapytain.resources.collections.capitains import XmlCapitainsCollectionMetadata, \
@@ -352,7 +352,10 @@ class XmlCapitainsLocalResolver(Resolver):
         """
         if objectId is None:
             return self.inventory
-        return self.id_to_coll[objectId]
+        try:
+            return self.id_to_coll[objectId]
+        except KeyError:
+            raise UnknownCollection("%s is not part of this object" % objectId)
 
     def getTextualNode(self, textId, subreference=None, prevnext=False, metadata=False):
         """ Retrieve a text node from the API

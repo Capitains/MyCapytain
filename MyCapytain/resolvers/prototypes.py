@@ -39,11 +39,11 @@ class Resolver(object):
         self._children = defaultdict(set)
 
     @property
-    def id_to_coll(self) -> Dict[str, object]:
+    def id_to_coll(self) -> Dict[str, Any]:
         """ Returns a mapping from collection's id to its Collection object"""
         return self._id_to_coll
 
-    def add_collection(self, id: str, collection: object):
+    def add_collection(self, id: str, collection: Any):
         """ Adds an id to coll mapping to self._id_to_coll"""
         if not isinstance(id, str):
             id = str(id)
@@ -77,7 +77,7 @@ class Resolver(object):
         self._children[collection_id].add(child_id)
 
     @property
-    def texts(self) -> Dict[str, object]:
+    def texts(self) -> Dict[str, Any]:
         """ returns all readable texts
 
         :return: Readable descendants
@@ -92,7 +92,7 @@ class Resolver(object):
                     texts[v] = c
         return texts
 
-    def getMetadata(self, objectId: str=None, **filters) -> object:
+    def getMetadata(self, objectId: str=None, **filters) -> Any:
         """ Request metadata about a text or a collection
 
         :param objectId: Object Identifier to filter on

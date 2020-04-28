@@ -62,11 +62,7 @@ class Metadata(Exportable):
         if not isinstance(value, Literal) and lang is not None:
             value = Literal(value, lang=lang)
         elif not isinstance(value, (BNode, URIRef)):
-            value, _type = term._castPythonToLiteral(value)
-            if _type is None:
-                value = Literal(value)
-            else:
-                value = Literal(value, datatype=_type)
+            value = Literal(value)
         self.graph.set((self.asNode(), key, value))
 
     def add(self, key, value, lang=None):
@@ -79,11 +75,7 @@ class Metadata(Exportable):
         if not isinstance(value, Literal) and lang is not None:
             value = Literal(value, lang=lang)
         elif not isinstance(value, (BNode, URIRef)):
-            value, _type = term._castPythonToLiteral(value)
-            if _type is None:
-                value = Literal(value)
-            else:
-                value = Literal(value, datatype=_type)
+            value = Literal(value)
         self.graph.add((self.asNode(), key, value))
 
     def get(self, key, lang=None):

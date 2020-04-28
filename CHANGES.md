@@ -1,3 +1,11 @@
+### 2020-04-28 3.0.2 @ponteineptique
+
+- Fixed a bug related to a dependency update (rdflib) (Issue #207) 
+
+### 2020-10-29 3.0.1 @sonofmun
+
+- Corrected an error when calculating the siblings for a range when the end of the range + the length equaled doc length
+
 ### 2019-07-01 3.0.0 @ponteineptique
 
 - Added DTS !

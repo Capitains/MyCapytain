@@ -115,7 +115,7 @@ def _parse_structured_metadata(obj, xml):
             if s_m.startswith("urn:") or s_m.startswith("http:") or s_m.startswith("https:") or s_m.startswith("hdl:"):
                 obj.metadata.add(
                     tag,
-                    URIRef(metadata)
+                    URIRef(str(metadata))
                 )
             elif '{http://www.w3.org/XML/1998/namespace}lang' in metadata.attrib:
                 obj.metadata.add(

@@ -11,6 +11,9 @@ from typing import Tuple, Union, Optional, Dict, Any, Set
 from MyCapytain.resources.prototypes.text import TextualNode
 from MyCapytain.common.reference import BaseReference, BaseReferenceSet
 from collections import defaultdict
+FOR_TYPING = 1
+if FOR_TYPING == 0:
+    from MyCapytain.resources.prototypes.metadata import Collection
 
 
 __all__ = [
@@ -39,11 +42,11 @@ class Resolver(object):
         self._children = defaultdict(set)
 
     @property
-    def id_to_coll(self) -> Dict[str, object]:
+    def id_to_coll(self) -> Dict[str, "Collection"]:
         """ Returns a mapping from collection's id to its Collection object"""
         return self._id_to_coll
 
-    def add_collection(self, id: str, collection: object):
+    def add_collection(self, id: str, collection: "Collection"):
         """ Adds an id to coll mapping to self._id_to_coll"""
         if not isinstance(id, str):
             id = str(id)
@@ -77,7 +80,7 @@ class Resolver(object):
         self._children[collection_id].add(child_id)
 
     @property
-    def texts(self) -> Dict[str, object]:
+    def texts(self) -> Dict[str, "Collection"]:
         """ returns all readable texts
 
         :return: Readable descendants
@@ -92,7 +95,7 @@ class Resolver(object):
                     texts[v] = c
         return texts
 
-    def getMetadata(self, objectId: str=None, **filters) -> object:
+    def getMetadata(self, objectId: str=None, **filters) -> "Collection":
         """ Request metadata about a text or a collection
 
         :param objectId: Object Identifier to filter on

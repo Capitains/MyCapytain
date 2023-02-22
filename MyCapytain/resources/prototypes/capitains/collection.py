@@ -260,7 +260,6 @@ class PrototypeCapitainsCollection(Collection):
                         else:
                             metadata_strings.append(make_xml_node(self.graph,
                                                                   URIRef(GRAPH_BINDINGS[ns_plus_tag[0]] + ns_plus_tag[-1]),
-                                                                  # GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
                                                                   text=member['@value'],
                                                                   complete=True,
                                                                   attributes=attrs))
@@ -272,7 +271,6 @@ class PrototypeCapitainsCollection(Collection):
                         print(ns_plus_tag[0])
                         structured_strings.append(make_xml_node(self.graph,
                                                                 URIRef(GRAPH_BINDINGS[ns_plus_tag[0]] + ns_plus_tag[-1]),
-                                                                # GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
                                                                 text=member['@value'],
                                                                 complete=True,
                                                                 attributes=attrs))

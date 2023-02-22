@@ -157,7 +157,6 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
         for child in xml.getchildren():
             if child.tag.startswith('{' + XPATH_NAMESPACES['dc']):
                 lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-                # o.metadata.add(DC.term(child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')), child.text, lg)
                 o.metadata.add(URIRef("http://purl.org/dc/elements/1.1/" + child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')), child.text, lg)
 
         _parse_structured_metadata(o, xml)

@@ -476,21 +476,21 @@ class TestXMLImplementation(unittest.TestCase, xmlunittest.XmlTestMixin):
         txt_text.set_metadata_from_collection(ti_text)
         self.assertEqual(str(txt_text.urn), "urn:cts:formulae:passau.heuwieser0073.lat003")
         self.assertEqual(
-            str(txt_text.metadata.get_single(DC.term("type"))),
+            str(txt_text.metadata.get_single(DC.type)),
             "cts:edition",
             "Test get_single with no language"
         )
         self.assertEqual(
-            re.sub(r'\s+', ' ', str(txt_text.metadata.get_single(DC.term("publisher"), "mul"))),
+            re.sub(r'\s+', ' ', str(txt_text.metadata.get_single(DC.publisher, "mul"))),
             "Formulae-Litterae-Chartae Projekt",
             "Test get_single with language."
         )
         self.assertIn('Matthew Munson (Universität Hamburg)',
-                      [str(x) for x in txt_text.metadata.get(DC.term("contributor"))],
+                      [str(x) for x in txt_text.metadata.get(DC.contributor)],
                       "Check get for a predicate that has multiple objects."
         )
         self.assertEqual('Die Traditionen des Hochstifts Passau (Ed. Heuwieser) Nr. 73',
-                         str(list(txt_text.metadata.get(DC.term("title"), 'deu'))[0]),
+                         str(list(txt_text.metadata.get(DC.title, 'deu'))[0]),
                          "Check get with language.")
         self.assertEqual({'': [URIRef('urn:cts:formulae:passau.heuwieser0073')]}, txt_text.get_capitains_metadata('parent'),
                          "get_capitatins_metadata should work with no language given")

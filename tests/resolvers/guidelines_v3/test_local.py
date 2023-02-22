@@ -271,7 +271,7 @@ class TextXMLFolderResolver(TestCase):
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            str(passage.metadata[DC.term('title'), 'deu']),
+            str(passage.metadata[DC.title, 'deu']),
             "Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
@@ -281,7 +281,7 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertIn(
             "a) Der Edle Vodalhard (Odalhard) übergibt dem Erzbischof 7 Huben am Ergoltsbach",
-            str(passage.metadata[DC.term("description"), "deu"]),
+            str(passage.metadata[DC.description, "deu"]),
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(
@@ -360,7 +360,7 @@ class TextXMLFolderResolver(TestCase):
             "GetPassage should always return passages objects"
         )
         self.assertEqual(
-            str(passage.metadata[DC.term('title'), 'deu']),
+            str(passage.metadata[DC.title, 'deu']),
             "Salzburger Urkundenbuch (Ed. Hauthaler); Codex A Nummer 100",
             "Local Inventory Files should be parsed and aggregated correctly"
         )
@@ -370,7 +370,7 @@ class TextXMLFolderResolver(TestCase):
         )
         self.assertIn(
             "a) Der Edle Vodalhard (Odalhard) übergibt dem Erzbischof 7 Huben am Ergoltsbach",
-            str(passage.metadata[DC.term("description"), "deu"]),
+            str(passage.metadata[DC.description, "deu"]),
             "Local Inventory Files should be parsed and aggregated correctly"
         )
         self.assertEqual(

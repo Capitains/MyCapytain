@@ -3,6 +3,7 @@ from MyCapytain.common.utils.xml import xmlparser
 from MyCapytain.common.constants import XPATH_NAMESPACES, Mimetypes, RDF_NAMESPACES
 from MyCapytain.resources.prototypes.capitains import collection as capitains
 from rdflib.namespace import DC
+from rdflib import URIRef
 from typing import Union, List, Tuple
 from lxml import etree
 
@@ -62,7 +63,7 @@ class XmlCapitainsReadableMetadata(capitains.CapitainsReadableMetadata):
         for child in xml.getchildren():
             if child.tag.startswith('{' + XPATH_NAMESPACES['dc']):
                 lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-                obj.metadata.add(DC.term(child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')),
+                obj.metadata.add(URIRef("http://purl.org/dc/elements/1.1/" + child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')),
                                  child.text, lg)
 
         obj.citation = cls.CLASS_CITATION.ingest(xml, obj.citation, "cpt:structured-metadata/ti:online/ti:citationMapping/ti:citation")
@@ -156,8 +157,8 @@ class XmlCapitainsCollectionMetadata(capitains.CapitainsCollectionMetadata):
         for child in xml.getchildren():
             if child.tag.startswith('{' + XPATH_NAMESPACES['dc']):
                 lg = child.get("{http://www.w3.org/XML/1998/namespace}lang")
-                o.metadata.add(DC.term(child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')),
-                               child.text, lg)
+                # o.metadata.add(DC.term(child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')), child.text, lg)
+                o.metadata.add(URIRef("http://purl.org/dc/elements/1.1/" + child.tag.replace('{' + XPATH_NAMESPACES['dc'] + '}', '')), child.text, lg)
 
         _parse_structured_metadata(o, xml)
 

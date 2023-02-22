@@ -216,7 +216,7 @@ class PrototypeCapitainsCollection(Collection):
         :rtype: dict([Literal]) or [Literal]
         """
         x = defaultdict(list)
-        for obj in self.metadata.get(namespace.term(name)):
+        for obj in self.metadata.get(URIRef(namespace + name)):
             x[getattr(obj, 'language', "")].append(obj)
         if lang is not None:
             if lang in x:
@@ -259,7 +259,8 @@ class PrototypeCapitainsCollection(Collection):
                                                                               recursion_depth=recursion_depth - 1))
                         else:
                             metadata_strings.append(make_xml_node(self.graph,
-                                                                  GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
+                                                                  URIRef(GRAPH_BINDINGS[ns_plus_tag[0]] + ns_plus_tag[-1]),
+                                                                  # GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
                                                                   text=member['@value'],
                                                                   complete=True,
                                                                   attributes=attrs))
@@ -268,8 +269,10 @@ class PrototypeCapitainsCollection(Collection):
                         attrs = None
                         if member['@lang']:
                             attrs = {'xml:lang': member['@lang']}
+                        print(ns_plus_tag[0])
                         structured_strings.append(make_xml_node(self.graph,
-                                                                GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
+                                                                URIRef(GRAPH_BINDINGS[ns_plus_tag[0]] + ns_plus_tag[-1]),
+                                                                # GRAPH_BINDINGS[ns_plus_tag[0]].term(ns_plus_tag[-1]),
                                                                 text=member['@value'],
                                                                 complete=True,
                                                                 attributes=attrs))
